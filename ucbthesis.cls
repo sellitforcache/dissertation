@@ -388,8 +388,8 @@
     \bigskip \medskip
     {\@author} \par
 \vspace{6ex}
-    % {\@prevdegrees} \par
-% \vspace{6ex}
+%     {\@prevdegrees} \par
+ %\vspace{6ex}
     A \@dissertation submitted in partial satisfaction of the \par
 \smallskip
     requirements for the degree of \par

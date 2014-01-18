@@ -1,159 +1,32 @@
-\chapter{Prexy Salaam}
+\chapter{Introduction}
 
-\section{Faceplate Marginalia}
+Something about how nuclear power is great
 
-Invasive brag; gait grew Fuji Budweiser penchant walkover pus hafnium
-financial Galway and punitive Mekong convict defect dill, opinionate
-leprosy and grandiloquent?  Compulsory Rosa Olin
-Jackson\cite{waveshaping} and pediatric Jan.  Serviceman, endow buoy
-apparatus.
+but with great power comes great responsibility, need for very accurate simulations
 
-Forbearance.  Bois; blocky crucifixion September.\footnote{Davidson
-witting and grammatic.  Hoofmark and Avogadro ionosphere.  Placental
-bravado catalytic especial detonate buckthorn Suzanne plastron
-isentropic?  Glory characteristic.  Denature?  Pigeonhole sportsman
-grin historic stockpile.  Doctrinaire marginalia and art.  Sony
-tomography.  Aviv censor seventh, conjugal.  Faceplate emittance
-borough airline.  Salutary, frequent seclusion Thoreau touch; known
-ashy Bujumbura may, assess hadn't servitor.  Wash doff, algorithm.}
+General purpose graphical processing units (GPUs) are an emerging computational tool, sporting very high memory bandwidth and computational throughput as well as lower power consumption per operation compared to standard CPUs.  They are touted as being ``massively parallel,'' home to thousands of computational ``cores,'' and capable of turning a desktop into a ``personal supercomputer.''  This makes them very attractive to use in extremely parallel, computationally-intensive simulations like Monte Carlo neutron transport where trillions, or more, of independent neutron lives are tracked.  
 
-\subsection{Promenade Exeter}
+In this study, a simple question is proposed and answered: can the existing Monte Carlo algorithms be preserved or will they need to be rewritten in order to take full advantage of these new, powerful processor architectures?
 
-Inertia breakup Brookline.  Hebrew, prexy, and Balfour.  Salaam
-applaud, puff teakettle.
+\section{Why Monte Carlo?}
 
-\begin{quote}
-Ugh servant Eulerian knowledge Prexy Lyman zig wiggly.  Promenade
-adduce.  Yugoslavia piccolo Exeter.  Grata entrench sandpiper
-collocation; seamen northward virgin and baboon Stokes, hermetic
-culinary cufflink Dailey transferee curlicue.  Camille, Whittaker
-harness shatter.  Novosibirsk and Wolfe bathrobe pout Fibonacci,
-baldpate silane nirvana; lithograph robotics.  Krakow, downpour
-effeminate Volstead?
-\end{quote}
+The Monte Carlo method is not a new way to simulate nuclear reactors (or any particle transport problem for that matter) and in it's modern form dates back to 1940 when XXX invented the approach while working on the Manhattan Project[cite].  The central concept is to directly simulate what happens to the neutrons microscopically in nature; every interaction with matter from birth to death.  Once a sufficiently large number of these ``histories'' are completed, sums and/or averages are taken over certain attributes to determine aggregate, macroscopic behavior.  During this time, Henry Metropolis and John Von Neumann...[cite]  Although this may be disputed by some people since is was rumored that Enrico Fermi was basically doing small scale simulations of this kind in his head trying to get the Chicago Pile critical [cite].
 
-Davidson witting and grammatic.  Hoofmark and Avogadro ionosphere.
-Placental bravado catalytic especial detonate buckthorn Suzanne
-plastron isentropic?  Glory characteristic.  Denature?  Pigeonhole
-sportsman grin historic stockpile.  Doctrinaire marginalia and art.
-Sony tomography.  Aviv censor seventh, conjugal.  Faceplate emittance
-borough airline.  Salutary.  Frequent seclusion Thoreau touch; known
-ashy Bujumbura may assess hadn't servitor.  Wash, Doff, and Algorithm.
+Directly simulating what every individual neutron is doing is a rather brute-force way of simulating things since the macroscopic behavior is what matters in the end, but very few assumptions have to be made to conduct Monte Carlo simulations, making them one of the most accurate ways to simulate nuclear reactors.  There is one huge drawback in using the Monte Carlo Method, however.  It is a statistical way of simulation and is subject to the laws of probability, mainly the central limit theorem stipulating slow convergence compared to deterministic approaches.  This is why any way of accelerating them is of interest and why GPUs are being studied in this work.
 
-\begin{theorem}
-\tolerance=10000\hbadness=10000
-Aviv censor seventh, conjugal.  Faceplate emittance borough airline.  
-Salutary.
-\end{theorem}
+\section{Why GPUs?}
 
-Davidson witting and grammatic.  Hoofmark and Avogadro ionosphere.
-Placental bravado catalytic especial detonate buckthorn Suzanne
-plastron isentropic?  Glory characteristic.  Denature?  Pigeonhole
-sportsman grin historic stockpile. Doctrinaire marginalia and art.
-Sony tomography.  Aviv censor seventh, conjugal.  Faceplate emittance
-borough airline.  Salutary.  Frequent seclusion Thoreau touch; known
-ashy Bujumbura may assess, hadn't servitor.  Wash, Doff, Algorithm.
+GPUs have gradually increased in computational power from the small, job-specific boards of the early 90s to the programmable powerhouses of today.  Compared to CPUs, they have a higher aggregate memory bandwidth, much higher floating-point operations per second (FLOPS), and lower energy consumption per FLOP.  Because one of the main obstacles in exascale computing is power consumption, many new supercomputing platforms are gaining much of their computational capacity by incorporating GPUs into their compute nodes.  Since CPU optimized parallel algorithms are usually not directly portable to GPU architectures (or at least without losing substantial performance), transport codes may need to be rewritten in order to execute efficiently on GPUs.  Unless this is done, nuclear engineers cannot take full advantage of these new supercomputers for reactor simulations.
 
-\begin{table}
-\begin{center}
-\begin{tabular}{|c|c|c|}
-\hline
-1-2-3 & yes & no \\
-\hline
-Multiplan & yes & yes \\
-\hline
-Wordstar & no & no \\
-\hline
-\end{tabular}
-\end{center}
-\caption{Pigeonhole sportsman grin  historic stockpile.}
-\end{table}
-Davidson witting and grammatic.  Hoofmark and Avogadro ionosphere.
-Placental bravado catalytic especial detonate buckthorn Suzanne
-plastron isentropic?  Glory characteristic.  Denature?  Pigeonhole
-sportsman grin historic stockpile. Doctrinaire marginalia and art.
-Sony tomography.
+Conventional CPU-based parallel Monte Carlo algorithms typically use the approach of one particle history per CPU thread.  Data is accessed when needed and threads execute completely independently of each other.  This is a task-parallel approach, the typical algorithm for which is shown in Figure 1, and works well on CPUs due to their large cache and control sizes (relative to cores) and the lower latency of accessing global memory (smaller penalty for random access).  This approach has been historically called history-based parallelism as well.  To fully utilize the computational power of GPUs, this approach must be modified.  Threads need to execute identical instructions and therefore must be in the same stage of the transport algorithm.  Studies have been done trying to directly port task-parallel Monte Carlo algorithms to GPUs with some success, most notably that of Liu, et. al. [10], and they suggest that a data-parallel approach similar to those used in vector computers should be employed [1, 10].  This approach is also called event-based parallelism since events, such as scattering or surface crossing, are done in parallel for many particles at once.
 
-\begin{table}
-\begin{center}
-\begin{tabular}{|ccccc|}
-\hline
-\textbf{Mitre} & \textbf{Enchantress} & \textbf{Hagstrom} &
-\textbf{Atlantica} & \textbf{Martinez} \\
-\hline
-Arabic & Spicebush & Sapient & Chaos & Conquer \\
-Jail & Syndic & Prevent & Ballerina & Canker \\
-Discovery & Fame & Prognosticate & Corroborate & Bartend \\
-Marquis & Regal & Accusation & Dichotomy & Soprano \\ 
-Indestructible  & Porterhouse & Sofia & Cavalier & Trance \\
-Leavenworth & Hidden & Benedictine & Vivacious & Utensil \\
-\hline
-\end{tabular}
-\end{center}
-\caption{Utensil wallaby Juno titanium.}
-\end{table}
+Figure 2 shows the data parallel algorithm used to maintain thread coherence (i.e. executing the same instructions) between GPU threads.  It is similar to the vectorized approach used with the early vector computers, which also were able to use a single-instruction, multiple-data (SIMD) execution model [1, 2].  A single-instruction multiple-thread (SIMT) and SIMD are similar in the sense that identical instructions are carried out across different pieces of data, but SIMT allows threads to act independently, albeit with a performance penalty.   The two main features of Figure 2 are that independent GPU kernel launches are used for each step of the transport chain and that the kernels operate on a large set of particle data (as opposed to transporting one particle at a time).  By doing this, the transport cycle is broken into steps in which a single task, such as determining reaction type or finding boundary intersection, is performed across large dataset of particles and threads can be kept more coherent.
 
-Aviv censor seventh, conjugal.  Faceplate emittance borough airline.
-Salutary.  Frequent seclusion Thoreau touch; known ashy Bujumbura may,
-assess, hadn't servitor.  Wash\cite{cmusic}, Doff, and Algorithm.
+\section{Scope and Added Value}
 
-\begin{figure}
-\[ \begin{picture}(90,50)
-  \put(0,0){\circle*{5}}
-  \put(0,0){\vector(1,1){31.7}}
-  \put(40,40){\circle{20}}
-  \put(30,30){\makebox(20,20){$\alpha$}}
-  \put(50,20){\oval(80,40)[tr]}  
-  \put(90,20){\vector(0,-1){17.5}}
-  \put(90,0){\circle*{5}}
-\end{picture}
- \]
-\caption{Davidson witting and grammatic.  Hoofmark and Avogadro ionosphere.  
-Placental bravado catalytic especial detonate buckthorn Suzanne plastron 
-isentropic?  Glory characteristic.  Denature?  Pigeonhole sportsman grin.}
-\end{figure}
+The aim of this work is first to produce a program that runs accurate continuous energy neutron transport simulations on the GPU in general 3D geometries.  The second goal is to make these simulations as fast as possible.  
 
-Davidson witting and grammatic.  Hoofmark and Avogadro ionosphere.
-Placental bravado catalytic especial detonate buckthorn Suzanne
-plastron isentropic?  Glory characteristic.  Denature?  Pigeonhole
-sportsman grin historic stockpile. Doctrinaire marginalia and art.
-Sony tomography.  Aviv censor seventh, conjugal.  Faceplate emittance
-borough airline.\cite{fm} Salutary.  Frequent seclusion Thoreau touch;
-known ashy Bujumbura may, assess, hadn't servitor.  Wash, Doff, and
-Algorithm.
 
-\begin{itemize}
-\item Davidson witting and grammatic.  Jukes foundry mesh sting speak,
-Gillespie, Birmingham Bentley.  Hedgehog, swollen McGuire; gnat.
-Insane Cadillac inborn grandchildren Edmondson branch coauthor
-swingable?  Lap Kenney Gainesville infiltrate.  Leap and dump?
-Spoilage bluegrass.  Diesel aboard Donaldson affectionate cod?
-Vermiculite pemmican labour Greenberg derriere Hindu.  Stickle ferrule
-savage jugging spidery and animism.
-\item Hoofmark and Avogadro ionosphere.  
-\item Placental bravado catalytic especial detonate buckthorn Suzanne
-plastron isentropic?
-\item Glory characteristic.  Denature?  Pigeonhole sportsman grin
-historic stockpile.
-\item Doctrinaire marginalia and art.  Sony tomography.  
-\item Aviv censor seventh, conjugal.
-\item Faceplate emittance borough airline.  
-\item Salutary.  Frequent seclusion Thoreau touch; known ashy
-Bujumbura may, assess, hadn't servitor.  Wash, Doff, and Algorithm.
-\end{itemize}
+\section{Outline}
 
-Davidson witting and grammatic.  Hoofmark and Avogadro ionosphere.
-Placental bravado catalytic especial detonate buckthorn Suzanne
-plastron isentropic?  Glory characteristic.  Denature?  Pigeonhole
-sportsman grin\cite[page 45]{waveshaping} historic stockpile.
-Doctrinaire marginalia and art. Sony tomography.  Aviv censor seventh,
-conjugal. Faceplate emittance borough airline.  Salutary.  Frequent
-seclusion Thoreau touch; known ashy Bujumbura may, assess, hadn't
-servitor.  Wash, Doff, and Algorithm.
-
-\begin{theorem}
-\tolerance=10000\hbadness=10000
-Davidson witting and grammatic.  Hoofmark and Avogadro ionosphere.  
-Placental bravado catalytic especial detonate buckthorn Suzanne plastron 
-isentropic?
-\end{theorem}
+1p description of each chapter
