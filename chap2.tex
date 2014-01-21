@@ -17,7 +17,7 @@ The Monte Carlo method is not a new way to simulate nuclear reactors (or any par
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Nuclear Interactions}
 
-The core of a Monte Carlo simulation is explicitly modeling the individual interactions the neutron undergoes as it moves through matter.  At the highest level, these reactions can be broken down into two categories, elastic reactions and inelastic reactions.  Elastic reactions are those where both momentum and kinetic energy are conserved, i.e. ones where any energy the neutron loses is given to the target nucleus.  Inelastic reactions are those that conserve momentum but do not conserve kinetic energy, i.e. ones where the kinetic energy of the particles can be converted to a vibrational mode of the target nucleus, etc.  These reactions are further divided by the number and type of secondary particles they produce.  Reactions that produce no secondary neutrons are called ``disappearance'' reactions since the neutron effectively disappears, reactions that produce a single neutron are typically called scattering reactions since they effectively change the incoming neutron's energy and direction, and reaction the produce more than one particle are simply called ``secondary-producing'' reactions. Table \ref{nuc_reaction_summary} show a summary of the reaction classifications, and it can be seen that elastic scattering is the only elastic reaction.  
+The core of a Monte Carlo simulation is explicitly modeling the individual interactions the neutron undergoes as it moves through matter.  At the highest level, these reactions can be broken down into two categories, elastic reactions and inelastic reactions.  Elastic reactions are those where both momentum and kinetic energy are conserved, i.e. ones where any energy the neutron loses is given to the target nucleus.  Inelastic reactions are those that conserve momentum but do not conserve kinetic energy, i.e. ones where the kinetic energy of the particles can be converted to a vibrational mode of the target nucleus, etc.  These reactions are further divided by the number and type of secondary particles they produce.  Reactions that produce no secondary neutrons are called ``disappearance'' reactions since the neutron effectively disappears, reactions that produce a single neutron are typically called scattering reactions since they effectively change the incoming neutron's energy and direction, and reaction the produce more than one particle are simply called ``secondary-producing'' reactions. Table \ref{nuc_reaction_summary} show a summary of the reaction classifications, and it can be seen that elastic scattering is the only elastic reaction.   potential scattering vs compund nucleus.
 
 \begin{table}[h]
 \centering
@@ -50,7 +50,7 @@ Integrating \ref{pop_diff} over an interval yields an expression for the number 
 \end{equation}
 
 \begin{equation}
-\Sigma = - \frac{  \mathrm{ln}(    \mathrm{I} / \mathrm{I}_0  )  }  {\mathrm{x}_1}
+\Sigma = \frac{ - \mathrm{ln}(    \mathrm{I} / \mathrm{I}_0  )  }  {\mathrm{x}_1}
 \label{pop_beam}
 \end{equation}
 
@@ -71,7 +71,7 @@ Since these expressions also apply to beam intensity, they can be used to measur
 \label{material_sum_xs}
 \end{equation}
 
-The quantum mechanical details that go into cross sections can cause them to depend strongly on the energy (or velocity) of the neutron and the target nucleus.  Many nuclides have resonances where the interactions probability spikes to very large values.  This typically happens when the incoming energy is exactly that of an energy level of the resultant compound nucleus \cite{duderstadt}.   Figure \ref{xs_e_dependence_li} shows the energy dependence of various reactions type in lithium-6 and Figure \ref{xs_e_dependence_u} shows additional reactions in uranium-235.
+The above expressions do not take energy into account, so they are assumed to be at a single energy.  Using such simple expressions to determine the cross section of an isotope would only be valid with the use of a very, very precisely mono-energetic beam.  The quantum mechanical details that go into cross sections can cause them to depend strongly on the energy (or velocity) of the neutron and the target nucleus.  Many nuclides have resonances where the interactions probability spikes to very large values.  This typically happens when the incoming energy is exactly that of an energy level of the resultant compound nucleus \cite{duderstadt}.   Figure \ref{xs_e_dependence_li} shows the energy dependence of various reactions type in lithium-6 and Figure \ref{xs_e_dependence_u} shows additional reactions in uranium-235.  
 
 \begin{figure}[h]
   \label{xs_e_dependence_li}
@@ -87,12 +87,13 @@ The quantum mechanical details that go into cross sections can cause them to dep
     \caption{The energy dependence of some reactions in uranium-235.}
 \end{figure}
 
+It is important to note the complexity shown in uranium-235.  The strong energy dependence and lack of smoothness in regions. Cross section behavior, 1/v
+
 
 \subsubsection{Elastic Scattering}
 
-Elastic scattering conserves both the momentum and the kinetic energy of the reacting particles.  On a quantum mechanics level, SOMETHING.
+Elastic scattering conserves both the momentum and the kinetic energy of the reacting particles. 
 
-Cross section behavior, 1/v
 
 \begin{equation}
 \end{equation}
@@ -102,7 +103,6 @@ Cross section behavior, 1/v
 
 
 \subsubsection{Inelastic Level Scattering}
-
 
 
 \begin{equation}
@@ -129,11 +129,14 @@ n,2n and n,alpha/n
 
 \subsubsection{Disappearance Reactions}
 
-
+radiative capture - n,a etc
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Temperature Effects}
 
+thermal motion, thermal peak
+
+doppler
 
 
 
