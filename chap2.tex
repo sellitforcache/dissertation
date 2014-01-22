@@ -17,7 +17,9 @@ The Monte Carlo method is not a new way to simulate nuclear reactors (or any par
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Nuclear Interactions}
 
-The core of a Monte Carlo simulation is explicitly modeling the individual interactions the neutron undergoes as it moves through matter.  At the highest level, these reactions can be broken down into two categories, elastic reactions and inelastic reactions.  Elastic reactions are those where both momentum and kinetic energy are conserved, i.e. ones where any energy the neutron loses is given to the target nucleus.  Inelastic reactions are those that conserve momentum but do not conserve kinetic energy, i.e. ones where the kinetic energy of the particles can be converted to a vibrational mode of the target nucleus, etc.  These reactions are further divided by the number and type of secondary particles they produce.  Reactions that produce no secondary neutrons are called ``disappearance'' reactions since the neutron effectively disappears, reactions that produce a single neutron are typically called scattering reactions since they effectively change the incoming neutron's energy and direction, and reaction the produce more than one particle are simply called ``secondary-producing'' reactions. Table \ref{nuc_reaction_summary} show a summary of the reaction classifications, and it can be seen that elastic scattering is the only elastic reaction.   potential scattering vs compund nucleus.
+The core of a Monte Carlo simulation is explicitly modeling the individual interactions the neutron undergoes as it moves through matter.  At the highest level, these reactions can be broken down into two categories, elastic reactions and inelastic reactions.  Elastic reactions are those where both momentum and kinetic energy are conserved, i.e. ones where any energy the neutron loses is given to the target nucleus.  Inelastic reactions are those that conserve momentum but do not conserve kinetic energy, i.e. ones where the kinetic energy of the particles can be converted to a vibrational mode of the target nucleus, etc.  These reactions are further divided by the number and type of secondary particles they produce.  Reactions that produce no secondary neutrons are called ``disappearance'' reactions since the neutron effectively disappears, reactions that produce a single neutron are typically called scattering reactions since they effectively change the incoming neutron's energy and direction, and reaction the produce more than one particle are simply called ``secondary-producing'' reactions. Table \ref{nuc_reaction_summary} show a summary of the reaction classifications, and it can be seen that elastic scattering is the only elastic reaction.   
+
+potential scattering vs compound nucleus.
 
 \begin{table}[h]
 \centering
@@ -56,6 +58,7 @@ Integrating \ref{pop_diff} over an interval yields an expression for the number 
 
 Since these expressions also apply to beam intensity, they can be used to measure the cross sections for materials by rearranging the equations into the form shown in \eqref{pop_beam}.  If the source intensity, the exiting intensity, and the material thickness are all known, the macroscopic cross section for that material can be determined.  On a microscopic level, however, the neutron interaction probabilities only depend on the type of nucleus, not the aggregate material.  To correct for this, the measured macroscopic cross section can be divided by the number density of nuclei in the material to give the microscopic cross section, $\sigma$, which is material-independent and only depends on the isotope.  In \eqref{micro_exp}, N represents the number density in units of cm$^{-3}$, $\rho$ represents the material density in terms of g*cm$^{-3}$, and M represents the nuclear mass in g.  The microscopic cross section has units of barns, and is what is given in nuclear data files.  They are more general since they are not material-dependent and can be summed into a total material macroscopic cross section by weighting individual microscopic cross sections with the number density of an isotope in a material, as show in \eqref{material_sum_xs}.  In this expression, $f_\mathrm{i}$ is the atomic fraction of isotope i in the material.
 
+
 \begin{equation}
 \Sigma = N \sigma = \frac{\rho}{M} \sigma
 \label{micro_exp}
@@ -71,35 +74,104 @@ Since these expressions also apply to beam intensity, they can be used to measur
 \label{material_sum_xs}
 \end{equation}
 
-The above expressions do not take energy into account, so they are assumed to be at a single energy.  Using such simple expressions to determine the cross section of an isotope would only be valid with the use of a very, very precisely mono-energetic beam.  The quantum mechanical details that go into cross sections can cause them to depend strongly on the energy (or velocity) of the neutron and the target nucleus.  Many nuclides have resonances where the interactions probability spikes to very large values.  This typically happens when the incoming energy is exactly that of an energy level of the resultant compound nucleus \cite{duderstadt}.   Figure \ref{xs_e_dependence_li} shows the energy dependence of various reactions type in lithium-6 and Figure \ref{xs_e_dependence_u} shows additional reactions in uranium-235.  
+The above expressions do not take energy into account, so they are assumed to be at a single energy.  Using such simple expressions to determine the cross section of an isotope would only be valid with the use of a very, very precisely mono-energetic beam.  The quantum mechanical details that go into cross sections can cause them to depend strongly on the energy (or velocity) of the neutron and the target nucleus.  Many nuclides have resonances where the interactions probability spikes to very large values.  This typically happens when the incoming energy is exactly that of an energy level of the resultant compound nucleus \cite{duderstadt}.   Figure \ref{xs_e_dependence_li} shows the energy dependence of various reactions type in lithium-6 and Figure \ref{xs_e_dependence_u} shows the dependence of others in uranium-235.  
 
-\begin{figure}[h]
+\begin{figure}[h!]
   \label{xs_e_dependence_li}
   \centering
-    \includegraphics[width=0.85\textwidth]{xs/noise.eps}
+    \includegraphics[width=0.8\textwidth]{graphics/xs_li6.eps}
      \caption{The energy dependence of some reactions in lithium-6.}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[h!]
   \label{xs_e_dependence_u}
   \centering
-    \includegraphics[width=0.85\textwidth]{xs/noise.eps}
+    \includegraphics[width=0.8\textwidth]{graphics/xs_u235.eps}
     \caption{The energy dependence of some reactions in uranium-235.}
 \end{figure}
 
-It is important to note the complexity shown in uranium-235.  The strong energy dependence and lack of smoothness in regions. Cross section behavior, 1/v
+It is important to note the complexity shown in uranium-235 in the 0.1eV to 40keV range.  This is referred to as the ``resonance region'' and adds much of the complexity in accurately modeling neutron transport.  There are no simple functional representations available for these types of cross sections, so they must be represented in a point-wise tabular format.  It is also important to note that at low energies, cross sections typically lose structure and exhibit the same ``1/$v$'' scaling.  This is due to the particle and the target having more time to interact with each other.  The energy levels where this phenomenon exists is similar the thermal energy of the target and the target no longer appears stationary from the neutrons perspective.  If the neutron is slow enough, the targets appear to be moving instead of the neutron, and more of them come into the neutrons sphere of interaction.  This is the qualitative reason for 1/$v$ scaling at low energies.  Due to to their identical scaling, the ratios between the reaction types stays constant as velocity is decreased but the overall interaction probability with respect to distance increases.
 
+In the next subsections, the characteristics and kinematics of the different reaction types are explained.
 
 \subsubsection{Elastic Scattering}
 
-Elastic scattering conserves both the momentum and the kinetic energy of the reacting particles. 
-
+Elastic scattering conserves both the momentum and the kinetic energy of the reacting particles and occurs when the neutron does not enter the nucleus, only bounces off of it's potential field.  Since there is only a single exiting particle, elastic scattering is a two-body interaction and the exiting energies can be determined if the angle between the exiting particle is known.  This problem is greatly simplified if the interacting particles' velocities are transformed into the center-of-mass (CM) frame, where net momentum is zero. The velocity of the CM is defined in \eqref{vCM} where $m$ and $M$ are the neutron's and the target's respective masses, $v$ and $V$ are their respective velocity vectors, and $A$ is the ratio of the target's mass to the neutron's mass (also know as the ``atomic weight ratio'' or AWR).  The derivation from here follows closely with that in ref \cite{jaakko}.
 
 \begin{equation}
+A = \frac{M}{m}
+\label{AWR}
 \end{equation}
 
- Often, the energy of the neutron is much larger than that of the nucleus it is scattering off of, so the target velocity can be set to
+\begin{equation}
+\boldsymbol{v_{\mathrm{CM}}} = \frac{ m \boldsymbol{v} + M \boldsymbol{V} }    {m+M} = \frac{ \boldsymbol{v} + A \boldsymbol{V} }    {1+A}
+\label{vCM}
+\end{equation}
 
+The CM velocities of the target and the neutron are then calculated by subtracting the CM velocity out of them, ash shown in \eqref{CM}.  The $_\mathrm{c}$ subscript will denote the CM-frame values from now on, whereas $v_{\mathrm{CM}}$ will denote the velocity of the CM frame relative to the lab frame.
+
+\begin{equation}
+\begin{split}
+ \boldsymbol{v_{_\mathrm{c}}} &= \boldsymbol{v} - \boldsymbol{v_{\mathrm{CM}}} \\  
+ \boldsymbol{V_{\mathrm{c}}} &= \boldsymbol{V} - \boldsymbol{v_{\mathrm{CM}}}
+ \end{split}
+\label{CM}
+\end{equation}
+
+Once in the CM frame, the equation for conservation of momentum can be written as \eqref{consMomCM}.  The primed values are those after the collision.  Since the net momentum is zero, the directions of the neutron and the target must be in opposite directions as shown in \eqref{rotationCM}.
+
+\begin{equation}
+\begin{split}
+m \boldsymbol{v_{_\mathrm{c}}} + M \boldsymbol{V_{_\mathrm{c}}} &= m \boldsymbol{v_{_\mathrm{c}}^\prime} + M \boldsymbol{V_{_\mathrm{c}}^\prime} = 0\\
+    \boldsymbol{v_{_\mathrm{c}}} + A  \boldsymbol{V_{_\mathrm{c}}} &=     \boldsymbol{v_{_\mathrm{c}}^\prime} + A  \boldsymbol{V_{_\mathrm{c}}^\prime} = 0
+\end{split}
+\label{consMomCM}
+\end{equation}
+
+\begin{equation}
+\begin{split}
+\boldsymbol{v_{_\mathrm{c}}^\prime} &= - A  \boldsymbol{V_{_\mathrm{c}}^\prime} \\
+\boldsymbol{v_{_\mathrm{c}}} &= -A  \boldsymbol{V_{_\mathrm{c}}}
+\end{split}
+\label{rotationCM}
+\end{equation}
+
+The equation for conservation of energy is shown in \ref{consECM}.  Energy is a scalar quantity, and therefore these equations are as well.  There are no vectors, which are indicated with boldface type, since $v^2 =( \boldsymbol{v} \cdot \boldsymbol{v})$.  $Q$ is the amount of energy released by the reaction, and is zero here but is convenient to include in this derivation for use in inelastic collision kinematics where it is nonzero.
+
+\begin{equation}
+\begin{split}
+m v_{_\mathrm{c}}^2 + M V_{_\mathrm{c}}^2 &= m v_{_\mathrm{c}}^{\prime2} + M V_{_\mathrm{c}}^{\prime2} + 2Q \\
+    v_{_\mathrm{c}}^2 + A  V_{_\mathrm{c}}^2 &=     v_{_\mathrm{c}}^{\prime2} + A  V_{_\mathrm{c}}^{\prime2} + \frac{2Q}{m}
+\end{split}
+\label{consECM}
+\end{equation}
+
+There are now two unknowns (the primed values) and two equations, and the final velocities of the neutron and the target can be determined.  Substituting \eqref{rotationCM} into \eqref{consECM} and solving yields either equation in \eqref{finalvCM}, depending on how the substitution is done.  It can be seen that if $Q$ is zero, as it is in elastic scattering, the initial and final velocities are the same for the particles and the interaction only causes a rotation in the CM frame.
+
+\begin{equation}
+\begin{split}
+v_{_\mathrm{c}}^{\prime} &=  \sqrt{ v_{_\mathrm{c}}^{2} + \frac{2AQ}{m(A+1)}  }  \\
+V_{_\mathrm{c}}^{\prime} &= \sqrt{ V_{_\mathrm{c}}^{2} + \frac{2Q}{mA(A+1)}  } 
+\end{split}
+\label{finalvCM}
+\end{equation}
+
+At first glance, it seems like the interaction has been fully characterized, but \eqref{rotationCM} only relates the initial states of the neutron and the target to one another and the final states of neutron and the target to one another.  The initial state and final state of the neutron still need to be related.  It has been mentioned already that the interaction is only a rotation in the CM frame, so the initial and final state of the neutron's direction can be related by a three-dimensional rotation formula.  An efficient algorithm is given by the Rodrigues' rotation formula, shown in \eqref{RodriguesRot}.  In the formula, $\boldsymbol{k}$ is an auxilliary unit vector around which $\boldsymbol{v}$ is being rotated.  From this unit vector, $theta$ is the angle $\boldsymbol{v}$ is rotated away from $\boldsymbol{k}$ such that $(\boldsymbol{v} \cdot \boldsymbol{v_{\mathrm{rot}}}) = |v||v_{\mathrm{rot}}|\cos\theta$.  It is ``efficient'' in the sense that to rotate a vector, a full 3x3 matrix does not need to be constructed and multiplied by the vector. In other words, matrix-vector operations are not needed and it can be carried out with only vector operations \cite{}.
+
+\begin{equation}
+ \boldsymbol{ v_{ \mathrm{rot}}} = \boldsymbol{v} \cos \theta + (\boldsymbol{k} \times \boldsymbol{v}) \sin \theta + \boldsymbol{k} (\boldsymbol{k} \cdot \boldsymbol{v})(1-\cos \theta)
+\label{RodriguesRot}
+\end{equation}
+
+If the polar and azimuthal rotation angles, $\theta$ and $\phi$, respectively, are determined,  that the final velocities are known in the CM frame, they can be transformed back to the lab frame, as shown in \eqref{xformbackCM}, to give the final velocities there.
+
+\begin{equation}
+\begin{split}
+ \boldsymbol{v^{\prime}}  &= \boldsymbol{v_{\mathrm{c}}^{\prime}} + \boldsymbol{v_{\mathrm{CM}}} \\  
+ \boldsymbol{V^{\prime}} &= \boldsymbol{V_{\mathrm{c}}^{\prime}} + \boldsymbol{v_{\mathrm{CM}}}
+ \end{split}
+\label{xformbackCM}
+\end{equation}
 
 
 \subsubsection{Inelastic Level Scattering}
