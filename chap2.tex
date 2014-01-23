@@ -6,7 +6,14 @@ In this chapter, details regarding the simulation theory are gone over.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Reactor Analysis}
 
-What its all about
+reactors in general, LWR, fast breeders, GenIV, waste streams, power conversion
+
+fission chain reaction, 7 factor formula?
+
+coupling between TH, need for fast simulations in oder to do convergence iterations
+
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{History}
@@ -176,32 +183,81 @@ If the polar and azimuthal rotation angles, $\theta$ and $\phi$, respectively, a
 
 \subsubsection{Inelastic Level Scattering}
 
+Inelastic scattering is the other type of scattering a neutron can undergo where kinetic energy is no longer conserved.  An amount of energy is either released from the reaction to the particles, or more commonly, taken from the particles and lost to the reaction.  In neutron-nucleus collisions, the target nucleus can be excited to a higher energy state than its ground state if the colliding neutron has a high enough energy to do so.  If it does and the collision excites the nucleus, a discrete amount of energy equal to the energy of the excited state is lost to the reaction.  These excited states typically do not have long half lives, and a gamma ray is emitted when the nucleus relaxes to its ground state.  This type of reaction is called inelastic level scattering due to a an excited energy \emph{level} becoming occupied by the target nucleus.  
 
-\begin{equation}
-\end{equation}
+Since it is still a two-body interaction, the kinematics of the reaction are identical to elastic scattering except the $Q$ value is nonzero and negative.  These reactions have a threshold energy below which their cross sections are zero since the neutron would not have enough energy to excite the state.   Figure \ref{Elevels} shows the energy levels in lead-XXX, which is often used as a fast neutron moderators due to its many, low-lying energy levels and its large inelastic scattering cross sections.
+
+\begin{figure}[h!]
+  \label{Elevels}
+  \centering
+    \includegraphics[width=0.8\textwidth]{graphics/noise.eps}
+     \caption{The energy levels of lead-XXX\cite{}.}
+\end{figure}
 
 \subsubsection{Inelastic Continuum Scattering}
 
-\begin{equation}
-\end{equation}
-
-\subsubsection{Fission}
-
-\begin{equation}
-\end{equation}
-
-fission
-
-\subsubsection{Other Inelastic Secondary-Producing Reactions}
-
-\begin{equation}
-\end{equation}
-
-n,2n and n,alpha/n
+At energies above the distinct levels there lies a continuum in the nuclear energy states.  This isn't truly a ``continuum'' in the strictest sense, but the energy levels become so close together they they effectively form a domain where energy can take continuous values.  Unlike the discrete $Q$ values corresponding to a single excited state used in inelastic level scattering, the $Q$ value of the reaction now follows a distribution.
 
 \subsubsection{Disappearance Reactions}
 
-radiative capture - n,a etc
+Unlike scattering reactions, where the energy and direction of the neutron is changed but continues to transport, \emph{disappearance} reactions remove a free neutron.  Typically this \emph{capture} of a neutron leaves the daughter nucleus in an excited state, which them relaxes to ground state by emitting a gamma ray.
+
+
+\subsubsection{Fission}
+
+Fission means ``the splitting splitting of something into two parts'' in the literal sense of the word.  This is exactly what nuclear fission is as well.  It is when a nucleus splits into two smaller nuclei, called \emph{fission fragments}.  When heavy nuclei undergo fission, they release energy, and typically emit a few other particles, including neutrons.  That this reaction releases energy is the reason heavy elements, like uranium, can be used as an energy source.  This is because the fission fragments have a higher binding energy per nucleon compared to the parent nucleus.  Figure \ref{binding_e_per_nuc} shows the average binding energy per nucleon for a wide range of isotopes.  Note that the peak of the curve is at Iron-56, the most tightly bound nucleus, and that heavier nuclides are lower than it.  Fission splits the parent into two lighter nuclides, and since the fragments are more tightly bound, the excess binding energy from the parent is released.  The released energy isn't simply deposited as heat directly, however, it is released in a range of forms.  Fission doesn't just release some energy, it releases a substantial amount of it.  Uranium-235, for example, releases a total of 192.9$\pm$0.5 \emph{MeV} per fission \cite{duderstadt}.  Compared to chemical energy sources where the energy released per reaction is on the order of 1\emph{eV}.  Fission energy yield is 8 orders of magnitude larger!  Not all of this energy is converted to heat, bit a substantial amount is.  Table \ref{fission_dist} shows the fraction of this total energy that is given to each entity.  Note that a significant fraction is given to neutrinos, which is essentially lost due to their very small interaction cross section.  The kinetic energy of the fission fragments has the majority of the energy, and since they are heavy and charged, their energy is deposited as heat very near to the fission site.  Other particles, light photons and neutrons, carry some of the fission energy further away from the fission site, but their energy mostly still ends up as heat.
+  
+\begin{figure}[h!]
+\label{binding_e_per_nuc}
+  \centering
+    \includegraphics[width=0.8\textwidth]{graphics/binding_e_per_nuc.eps}
+     \caption{Average binding energy per nucleon.  REPLACE ME WITH ONE YOU MAKE YOURSELF FROM DATA. \cite{}.}
+\end{figure}
+
+\begin{table}[h]
+\centering
+\caption{Average distribution of fission energy \cite{duderstadt}.}
+\label{fission_dist}
+\begin{tabular}{| l | c | r | r |}
+\hline
+Particle & Energy (\%) & Range & Time \\
+\hline
+Fission fragment kinetic energy & 80 & $<$0.1cm & prompt \\
+\hline
+Prompt neutrons & 3 & 10-100cm & prompt \\
+\hline
+Photons & 4 & 100cm & prompt \\
+\hline
+Fission product $\beta$ decay & 4 & short & delayed \\
+\hline
+Neutrinos &  5 & extremely long & delayed \\
+\hline
+Nonfission reactions from n capture & 4 & 100cm & delayed \\
+\hline
+\end{tabular}
+\end{table}
+
+Fission is technically considered a disappearance reaction as well since the fission-inducing neutron is absorbed by the nuclide.  Even though is is absorbed, more than 2 new neutrons are released by fission, enabling the fission chain reaction to occur.  An important parameter of the fission chain reaction is $nu$, the fission neutron yield.    The total yield is different than the prompt yield in that it also includes neutrons produced from photon-induced emission and from fission product decay.  These neutrons are not ``prompt'' in that they are not emitted immediately from the fission itself.  The processes that create these ``delayed'' neutrons (decay and nuclear relaxation) take time to occur.  Prompt neutrons appear immediately after fission, whereas delayed neutrons can appear anywhere between 0.6 to 80 seconds after.  The kinetics of a nuclear chain reaction depend heavily on the fraction the delayed neutrons which sustain the chain reaction.  Since they have a relatively large time delay, they cause the time between subsequent neutron generations to become longer.  This time between generations is called the \emph{effective neutron lifetime}, and is approximately $10^{-4}$ seconds for prompt neutrons and $0.1$ seconds for delayed neutrons in light water (thermal spectrum) reactors \cite{duderstadt}.  
+
+\begin{figure}[h!]
+  \label{nu_compare}
+  \centering
+    \includegraphics[width=0.8\textwidth]{graphics/nu_compare.eps}
+     \caption{Total fission yield, $\nu_\mathrm{T}$, for uranium-235, uranium-238, and plutonium-239.}
+\end{figure}
+
+\begin{figure}[h!]
+  \label{xs_fission_only}
+  \centering
+    \includegraphics[width=0.8\textwidth]{graphics/xs_fissile.eps}
+     \caption{Fission cross sections for uranium-235, uranium-238, and plutonium-239.}
+\end{figure}
+
+Figure \ref{nu_compare} shows the energy dependence of the total fission neutron yield, $nu_\mathrm{T}$. It is shown at one temperature since it have very weak temperature dependence.   It can be seen that it is constant until energies in the MeV range, where it increases sharply due to the energy the incident neutron provides being sufficient to eject a bound neutron.  Figure \ref{xs_fission_only} shows the total fission cross sections for two \emph{fissile} isotopes, uranium-235 and plutonium-239, and one \emph{fertile} isotope, uranium-238.  Fissile isotopes are those which neutrons at any energy can induce fission.  The figure shows that uranium-238 has a fission cross section, but it isn't significant until above 1 MeV.  For uranium-238, fission is a threshold reaction.  Simply absorbing a neutron does not provide enough energy to split the nucleus.  Additional energy is required, which can be provided in the form of an incident neutron's kinetic energy.  Uranium-238 isn't fissile, but it can be a significant contributor of fission reactions in reactors where the neutron population is \emph{fast}, i.e. mainly high-energy.  As mentioned before, uranium-238 is considered fertile, which means that it produces a fissile isotope after it absorbs a neutron, and in this case decays to plutonium-239.  
+
+\subsubsection{Other Inelastic Secondary-Producing Reactions}
+
+n,2n and n,alpha/n
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Temperature Effects}
@@ -216,6 +272,8 @@ doppler
 \subsection{Nuclear Data}
 
 it's all about the data
+
+heirarchy
 
 
 
