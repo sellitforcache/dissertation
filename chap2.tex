@@ -280,11 +280,35 @@ Of the reactions that produce secondary neutrons, the (n,2n) reaction is most si
 
 Thus, far there has only been mention of the target nuclide's by how it manifests itself in the 1/$v$ behavior of cross sections at low energy.  Most of the time, it is a good assumption that the thermal motion of the target nuclide is negligible.  Thermal energy is on the order of .01 eV, and this is a good assumption when neutrons are at MeV range energies, but when they scatter and lose energy, they can come near the thermal energy of the material.  When this happens, the target nuclide no longer appears stationary, and assuming that it has zero velocity in scattering calculations is inaccurate.  MCNP sets the threshold at 400kT, which corresponds to about 10 eV for materials at room temperature, above which the target nuclide can be assumed stationary.  Below this threshold, it is important to model thermal effects.  If this wasn't done, a neutron could keep scattering off of zero-energy targets and it's energy could approach zero, which is not physical.  Neutrons can only scatter down to a state where they are in thermal equilibrium with the material they are traveling through.  This creates a ``thermal peak'' at low energies where neutrons collect, especially in materials where the scattering cross section is large and neutrons scatter many times before they are absorbed.
 
+\begin{figure}[h!]
+  \label{MB_dist}
+  \centering
+    \includegraphics[width=0.8\textwidth]{graphics/MB_dist.eps}
+     \caption{Maxwell-Boltzmann distribution for velocity for heavy and light nuclides at different temperatures.}
+\end{figure}
+
+
 \subsubsection{Doppler Effect}
 
-doppler
 
+The other effect that thermal motion has is the \emph{Doppler effect}.  This is where resonances are broadened as temperature increases due to the thermal distribution becoming wider, as shown in Figures \ref{MB_dist} and \ref{xs_pu_broaden}.  The effects is also known as \emph{Doppler broadening} for this reason.  Note that the effect is much more pronounced for light nuclei. MORE.  
 
+\begin{figure}[h!]
+  \label{xs_pu_broaden}
+  \centering
+    \includegraphics[width=0.8\textwidth]{graphics/xs_pu_broaden.eps}
+     \caption{Doppler broadening of the 1eV fission resonance in Pu-239.}
+\end{figure}
+
+At 0K, resonances are very sharp and can be treated as delta functions.  To make the assumption that the target is at rest, the thermal distribution must be convolved with the cross section to order to account for the different speeds the targets are moving.  This is especially significant at resonances since slight movements in velocity can produce very large differences in cross section.  The exact method for doing this is shown in \eqref{broaden}\cite{broaden_text}.
+
+\begin{equation}
+\begin{split}
+such\\
+equation
+ \end{split}
+\label{broaden}
+\end{equation}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

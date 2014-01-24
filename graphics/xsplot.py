@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 
 from pyne import ace
+import numpy as np
 import pylab as pl
 import os
 import sys
@@ -56,6 +57,7 @@ pl.ylim(1e-4,lims[1])
 if plot:
 	pl.show()
 else:
+	print 'xs_u235.eps'
 	fig.savefig('xs_u235.eps')
 ###################
 tope_number=3006
@@ -90,6 +92,7 @@ pl.ylim(1e-4,lims[1])
 if plot:
 	pl.show()
 else:
+	print 'xs_li6.eps'
 	fig.savefig('xs_li6.eps')
 ################
 tope_number=92235
@@ -130,7 +133,52 @@ pl.ylim(1e-4,lims[1])
 if plot:
 	pl.show()
 else:
+	print 'xs_fissile.eps'
 	fig.savefig('xs_fissile.eps')
+################
+tope_number=94239
+lib=ace.Library('/usr/local/SERPENT/xsdata/endfb7/acedata/'+str(tope_number)+'ENDF7.ace')
+lib.read()
+temp_extension='.03c'
+lib_pu1 = lib.find_table(str(tope_number)+temp_extension)
+temp1 = '%6.2f' % (lib_pu1.temp/8.617332478e-11)
+ene_1=lib_pu1.energy
+xs_1 =lib_pu1.reactions[18].sigma
+temp_extension='.09c'
+lib_pu2 = lib.find_table(str(tope_number)+temp_extension)
+temp2 = '%6.2f' % (lib_pu2.temp/8.617332478e-11)
+ene_2=lib_pu2.energy
+xs_2 =lib_pu2.reactions[18].sigma
+temp_extension='.15c'
+lib_pu3 = lib.find_table(str(tope_number)+temp_extension)
+temp3 = '%6.2f' % (lib_pu3.temp/8.617332478e-11)
+ene_3=lib_pu3.energy
+xs_3 =lib_pu3.reactions[18].sigma
+fig = pl.figure(figsize=(10,6))
+ax = fig.add_subplot(1,1,1)
+dex1_1=np.where(ene_1>7e-6)[0][0]
+dex1_2=np.where(ene_1>8.5e-6)[0][0]
+dex2_1=np.where(ene_2>7e-6)[0][0]
+dex2_2=np.where(ene_2>8.5e-6)[0][0]
+dex3_1=np.where(ene_3>7e-6)[0][0]
+dex3_2=np.where(ene_3>8.5e-6)[0][0]
+ax.loglog(ene_1[dex1_1:dex1_2],   xs_1[dex1_1:dex1_2],    label=temp1+'K')
+ax.loglog(ene_2[dex2_1:dex2_2],   xs_2[dex2_1:dex2_2],    label=temp2+'K')
+ax.loglog(ene_3[dex3_1:dex3_2],   xs_3[dex3_1:dex3_2],    label=temp3+'K')
+pl.title('Fission cross section of Pu-239')
+pl.ylabel('Total Fission Cross Section (barns)')
+pl.xlabel('Energy (MeV)')
+handles, labels = ax.get_legend_handles_labels()
+ax.legend(handles, labels, loc=1)
+pl.grid('on')
+pl.xlim(7e-6,8.5e-6)
+lims=pl.ylim()
+#pl.ylim(1e-4,lims[1])
+if plot:
+	pl.show()
+else:
+	print 'xs_pu_broaden.eps'
+	fig.savefig('xs_pu_broaden.eps')
 
 
 
@@ -175,4 +223,45 @@ pl.grid('on')
 if plot:
 	pl.show()
 else:
+	print 'nu_compare.eps'
 	fig.savefig('nu_compare.eps')
+	
+#
+# MB dist
+#
+def mb_speed(vel_grid,m_in,T):
+	m=m_in*1.66053892e-27
+	pi = 3.14159
+	kT = T * 1.3806488e-23
+	a=np.sqrt(np.power(m/(2*pi*kT),3))
+	b=4*pi*np.power(vel_grid,2)
+	c=np.exp(-m*np.power(vel_grid,2)/(2*kT))
+	return np.multiply(c,np.multiply(a,b))
+x=np.array(np.linspace(0,5000,5000))
+m1=239
+y1_1= mb_speed(x,m1,300)
+y1_2= mb_speed(x,m1,900)
+y1_3= mb_speed(x,m1,1500)
+m2=16
+y2_1= mb_speed(x,m2,300)
+y2_2= mb_speed(x,m2,900)
+y2_3= mb_speed(x,m2,1500)
+fig = pl.figure(figsize=(10,6))
+ax = fig.add_subplot(1,1,1)
+ax.semilogx( x, y1_1, label='A=239, 300.00K')
+ax.semilogx( x, y1_2, label='A=239, 900.00K')
+ax.semilogx( x, y1_3, label='A=239, 1500.00K')
+ax.semilogx( x, y2_1, label='A=16,  300.00K')
+ax.semilogx( x, y2_2, label='A=16,  900.00K')
+ax.semilogx( x, y2_3, label='A=16,  1500.00K')
+pl.title('')
+pl.ylabel('')
+pl.xlabel('Energy (MeV)')
+handles, labels = ax.get_legend_handles_labels()
+ax.legend(handles, labels, loc=2)
+pl.grid('on')
+if plot:
+	pl.show()
+else:
+	print 'MB_dist.eps'
+	fig.savefig('MB_dist.eps')
