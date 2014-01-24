@@ -1,0 +1,94 @@
+\chapter{GPU Implementation}
+
+typical task-based MC.  data-parallel MC - wide but single task, homework grading, weaving!
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Data Layout}
+
+brief introduction
+
+\subsubsection{unionized}
+
+unionized glory, why its good and bad \cite{jaakko}.
+
+
+\subsubsection{linked lists}
+
+how to resolve the data heterogeny problem
+
+
+\subsection{Embedded Python}
+
+amazing Python C API
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Tasks}
+
+breakdown of tasks into sub-tasks
+
+\subsection{Grid Search}
+
+binary search here? more logN?  quad tree?
+
+\subsection{Geometry Representation}
+
+stuff about geom and "where am I?"
+
+\subsubsection{OptiX}
+
+\subsubsection{Acceleration Structures}
+
+Importance of logN
+
+
+\subsubsection{Point-in-Polygon / Gauss's Law / Divergence Thoerem}
+
+Roll the where am I into  trace
+
+cellular geometry as opposed to combinatorial
+
+
+\subsubsection{Scaling}
+
+optix scaling toy problem - need to have very large sets in order to hide overhead
+
+
+\subsection{Macroscopic}
+
+material
+
+\subsection{Microscopic}
+
+nuclide
+
+\subsection{Interactions}
+
+\subsubsection{Scattering}
+
+Rodriguez rotation
+
+\subsubsection{Secondary-Producing}
+
+\subsubsection{Disappearance}
+
+\subsubsection{Concurrent Kernels}
+
+\subsection{Parallel Operations}
+
+CUDPP, reductions, sums, and sorts - sorting by reaction to keep warps full, memory implications
+
+\subsubsection{Fixed source subcritical multiplication}
+
+necessary to be subcritical.
+
+\subsubsection{Criticality}
+
+cannot simply pop, unless generation number is associated, then data can be generated and post-processed?
+
+
+
+
+
