@@ -22,6 +22,20 @@ The Monte Carlo method is not a new way to simulate nuclear reactors (or any par
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Nuclear Data}
+
+it's all about the data, complexity?
+
+endf
+
+measurements?
+
+heirarchy
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Nuclear Interactions}
 
 The core of a Monte Carlo simulation is explicitly modeling the individual interactions the neutron undergoes as it moves through matter.  At the highest level, these reactions can be broken down into two categories, elastic reactions and inelastic reactions.  Elastic reactions are those where both momentum and kinetic energy are conserved, i.e. ones where any energy the neutron loses is given to the target nucleus.  Inelastic reactions are those that conserve momentum but do not conserve kinetic energy, i.e. ones where the kinetic energy of the particles can be converted to a vibrational mode of the target nucleus, etc.  These reactions are further divided by the number and type of secondary particles they produce.  Reactions that produce no secondary neutrons are called ``disappearance'' reactions since the neutron effectively disappears, reactions that produce a single neutron are typically called scattering reactions since they effectively change the incoming neutron's energy and direction, and reaction the produce more than one particle are simply called ``secondary-producing'' reactions. Table \ref{nuc_reaction_summary} show a summary of the reaction classifications, and it can be seen that elastic scattering is the only elastic reaction.   
@@ -257,23 +271,18 @@ Figure \ref{nu_compare} shows the energy dependence of the total fission neutron
 
 \subsubsection{Other Inelastic Secondary-Producing Reactions}
 
-n,2n and n,alpha/n
+This category encompasses all the other reactions neutrons undergo.  There are two types, ones that produce secondary neutrons in some amount and those that do not.  Those that do not may still produce other particles, like alpha particles, tritons, protons, et cetera.  Since they do not produce secondary neutrons, however, they are basically equivalent to a disappearance reaction in the scope of neutron transport.  Even though they aren't capture reactions, they can contribute significantly to an isotope's absorption of neutrons.  Figure \ref{xs_e_dependence_li} shows that the (n,$^3$H) in lithium-6 is by far the main component of the total cross section and makes it a very strong absorber of low energy neutrons.  Boron-10 is another great example of this.  Its (n,$\alpha$) reaction has a very high cross section for low energy neutrons, and it is widely used in thermal spectrum reactors in safety and control systems.
+
+Of the reactions that produce secondary neutrons, the (n,2n) reaction is most significant, due to it having the lowest threshold energy.  At higher incident neutron energies, (n,3n) and even (n,4n) can become possible.  Other particle combinations are possible as well, such as (n,n$\alpha$), and these reactions act like an inelastic scatter interaction where the relationship between scattering angle and energy no longer applies due to there being three bodies to distribute energy to instead of only two.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Temperature Effects}
 
-thermal motion, thermal peak
+Thus, far there has only been mention of the target nuclide's by how it manifests itself in the 1/$v$ behavior of cross sections at low energy.  Most of the time, it is a good assumption that the thermal motion of the target nuclide is negligible.  Thermal energy is on the order of .01 eV, and this is a good assumption when neutrons are at MeV range energies, but when they scatter and lose energy, they can come near the thermal energy of the material.  When this happens, the target nuclide no longer appears stationary, and assuming that it has zero velocity in scattering calculations is inaccurate.  MCNP sets the threshold at 400kT, which corresponds to about 10 eV for materials at room temperature, above which the target nuclide can be assumed stationary.  Below this threshold, it is important to model thermal effects.  If this wasn't done, a neutron could keep scattering off of zero-energy targets and it's energy could approach zero, which is not physical.  Neutrons can only scatter down to a state where they are in thermal equilibrium with the material they are traveling through.  This creates a ``thermal peak'' at low energies where neutrons collect, especially in materials where the scattering cross section is large and neutrons scatter many times before they are absorbed.
+
+\subsubsection{Doppler Effect}
 
 doppler
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Nuclear Data}
-
-it's all about the data
-
-heirarchy
 
 
 
@@ -303,6 +312,10 @@ scaling
 advantages
 
 drawbacks and limitations
+
+sampling schemes
+
+\subsubsection{Free Gas Treatment}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

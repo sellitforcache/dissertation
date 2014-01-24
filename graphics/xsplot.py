@@ -2,6 +2,24 @@
 
 from pyne import ace
 import pylab as pl
+import os
+import sys
+
+#
+#  Get input arguments
+#
+plot = len(sys.argv)-1
+
+
+#
+#  set latex and font
+#  !!!! THIS BREAKS THE PLOTS BUT THEY RENDER BEAUTIFULLY IN THE .eps FILE !!!!
+if plot:
+	print ' --- Plotting without LaTeX, NO FILES WRITTEN'
+else:
+	print ' --- Rendering .eps files with LaTeX enabled'
+	pl.rc('text', usetex=True)
+	pl.rc('font', family='serif')
 
 
 #
@@ -35,8 +53,10 @@ ax.legend(handles, labels, loc=3)
 pl.grid('on')
 lims=pl.ylim()
 pl.ylim(1e-4,lims[1])
-pl.show()
-fig.savefig('xs_u235.eps')
+if plot:
+	pl.show()
+else:
+	fig.savefig('xs_u235.eps')
 ###################
 tope_number=3006
 temp_extension='.03c'
@@ -56,7 +76,7 @@ fig = pl.figure(figsize=(10,6))
 ax = fig.add_subplot(1,1,1)
 ax.loglog(ene,xs_1,label='Total')
 ax.loglog(ene,xs_2,label='Elastic Scatter')
-ax.loglog(ene[xs_3_start:],xs_3,label='(n,H3)')
+ax.loglog(ene[xs_3_start:],xs_3,label='(n,$^3$H)')
 ax.loglog(ene,xs_4,label='Capture')
 ax.loglog(ene[xs_5_start:],xs_5,label='Inelastic Scatter to 1st Excited State')
 pl.title('Lithium-6 at '+tempstr+'K')
@@ -67,8 +87,10 @@ ax.legend(handles, labels, loc=1)
 pl.grid('on')
 lims=pl.ylim()
 pl.ylim(1e-4,lims[1])
-pl.show()
-fig.savefig('xs_li6.eps')
+if plot:
+	pl.show()
+else:
+	fig.savefig('xs_li6.eps')
 ################
 tope_number=92235
 temp_extension='.03c'
@@ -105,8 +127,10 @@ ax.legend(handles, labels, loc=1)
 pl.grid('on')
 lims=pl.ylim()
 pl.ylim(1e-4,lims[1])
-pl.show()
-fig.savefig('xs_fissile.eps')
+if plot:
+	pl.show()
+else:
+	fig.savefig('xs_fissile.eps')
 
 
 
@@ -148,5 +172,7 @@ ax.legend(handles, labels, loc=2)
 pl.grid('on')
 #lims=pl.ylim()
 #pl.ylim(0,lims[1])
-pl.show()
-fig.savefig('nu_compare.eps')
+if plot:
+	pl.show()
+else:
+	fig.savefig('nu_compare.eps')
