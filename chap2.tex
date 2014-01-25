@@ -21,19 +21,6 @@ coupling between TH, need for fast simulations in oder to do convergence iterati
 The Monte Carlo method is not a new way to simulate nuclear reactors (or any particle transport problem for that matter) and in it's modern form dates back to 1940 when XXX invented the approach while working on the Manhattan Project[cite]. Uncle in Monaco...  During this time, Henry Metropolis and John Von Neumann...[cite]  Although this may be disputed by some people since is was rumored that Enrico Fermi was basically doing small scale simulations of this kind in his head trying to get the Chicago Pile critical [cite].
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Nuclear Data}
-
-it's all about the data, complexity?
-
-endf
-
-measurements?
-
-heirarchy
-
-
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Nuclear Interactions}
@@ -284,31 +271,47 @@ Thus, far there has only been mention of the target nuclide's by how it manifest
   \label{MB_dist}
   \centering
     \includegraphics[width=0.8\textwidth]{graphics/MB_dist.eps}
-     \caption{Maxwell-Boltzmann distribution for velocity for heavy and light nuclides at different temperatures.}
+     \caption{Maxwell-Boltzmann distribution for the speed of heavy and light nuclides at different temperatures.}
 \end{figure}
 
 
 \subsubsection{Doppler Effect}
 
 
-The other effect that thermal motion has is the \emph{Doppler effect}.  This is where resonances are broadened as temperature increases due to the thermal distribution becoming wider, as shown in Figures \ref{MB_dist} and \ref{xs_pu_broaden}.  The effects is also known as \emph{Doppler broadening} for this reason.  Note that the effect is much more pronounced for light nuclei. MORE.  
+The other effect that thermal motion has is the \emph{Doppler effect}.  This is where resonances are broadened as temperature increases due to the thermal distribution becoming wider.  The effect is also known as \emph{Doppler broadening} for this reason.  Figure \ref{MB_dist} shows the Maxwell-Boltzmann distributions at various temperatures for a heavy particle and for a light particle.  This is the distribution of speeds particles in a ``gas'' have if they only interact by scattering off of one another.  Most solids can be modeled as a dense gas when there are no strong anisotropies in their structure, which is why modeling the target velocities in this way is called the ``free gas model.''  Note that the broadening effect is much more pronounced for light nuclei.  
+
+The widening of resonances effects reactors in significant ways, most notably in that more neutrons are absorbed in the resonance region as the scatter down to thermal energies.  The number of neutrons lost to capture increases and reduces the overall multiplication factor.  It is important for reactor safelt that this occurs since it produces a negative reactivity feedback for temperature and helps prevent power excursions and meltdowns.  If the multiplication factor is above unity, the power starts to rise, and therefore so does the temperature (if the coolant flow rate remains the same).  When the temperature goes up, the increased captures causes it to go back down, stopping the power from increasing.  Of course, there are many different types of reactivity feedback phenomena, but the temperature feedback is generally negative due to Doppler broadening.  Capture is increases most in fission products since they often have strong absorption resonances and are lighter than fuel nuclides.  Very light nuclides typically do not have absorption resonances, so Doppler broadening has littler effect on their absorption rates.  This is why temperature feedback is least effective in fresh fuel where there are few fission products.  Figure \ref{xs_eu_broaden} shows the effect in europium-155, a fission product with a high capture cross section.
 
 \begin{figure}[h!]
-  \label{xs_pu_broaden}
+  \label{xs_eu_broaden}
   \centering
-    \includegraphics[width=0.8\textwidth]{graphics/xs_pu_broaden.eps}
-     \caption{Doppler broadening of the 1eV fission resonance in Pu-239.}
+    \includegraphics[width=0.8\textwidth]{graphics/xs_eu_broaden.eps}
+     \caption{Doppler broadening of the 1eV fission resonance in Eu-155.}
 \end{figure}
 
-At 0K, resonances are very sharp and can be treated as delta functions.  To make the assumption that the target is at rest, the thermal distribution must be convolved with the cross section to order to account for the different speeds the targets are moving.  This is especially significant at resonances since slight movements in velocity can produce very large differences in cross section.  The exact method for doing this is shown in \eqref{broaden}\cite{broaden_text}.
+At 0K, resonances are very sharp and can be treated as delta functions.  To make the assumption that the target is at rest, the thermal distribution must be convolved with the cross section to order to account for the different speeds the targets are moving.  This is especially significant at resonances since slight movements in velocity can produce very large differences in cross section.  The exact method for doing this is shown in \eqref{broaden}\cite{Cullen_Weisbin_1976}.
 
 \begin{equation}
 \begin{split}
-such\\
-equation
+Find a copy\\
+of the paper!
  \end{split}
 \label{broaden}
 \end{equation}
+
+Then say some things about it once you get details, particularly that it is an expensive operation
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Nuclear Data}
+
+it's all about the data, complexity?
+
+endf
+
+measurements?
+
+heirarchy
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 
+from termcolor import colored
 from pyne import ace
 import numpy as np
 import pylab as pl
@@ -16,9 +17,9 @@ plot = len(sys.argv)-1
 #  set latex and font
 #  !!!! THIS BREAKS THE PLOTS BUT THEY RENDER BEAUTIFULLY IN THE .eps FILE !!!!
 if plot:
-	print ' --- Plotting without LaTeX, NO FILES WRITTEN'
+	print colored(' --- Plotting without LaTeX, NO FILES WRITTEN','red')
 else:
-	print ' --- Rendering .eps files with LaTeX enabled'
+	print colored(' --- Rendering .eps files with LaTeX enabled','green')
 	pl.rc('text', usetex=True)
 	pl.rc('font', family='serif')
 
@@ -136,49 +137,54 @@ else:
 	print 'xs_fissile.eps'
 	fig.savefig('xs_fissile.eps')
 ################
-tope_number=94239
+tope_number=63155
 lib=ace.Library('/usr/local/SERPENT/xsdata/endfb7/acedata/'+str(tope_number)+'ENDF7.ace')
 lib.read()
 temp_extension='.03c'
 lib_pu1 = lib.find_table(str(tope_number)+temp_extension)
 temp1 = '%6.2f' % (lib_pu1.temp/8.617332478e-11)
 ene_1=lib_pu1.energy
-xs_1 =lib_pu1.reactions[18].sigma
+xs_1 =lib_pu1.reactions[102].sigma
 temp_extension='.09c'
 lib_pu2 = lib.find_table(str(tope_number)+temp_extension)
 temp2 = '%6.2f' % (lib_pu2.temp/8.617332478e-11)
 ene_2=lib_pu2.energy
-xs_2 =lib_pu2.reactions[18].sigma
+xs_2 =lib_pu2.reactions[102].sigma
 temp_extension='.15c'
 lib_pu3 = lib.find_table(str(tope_number)+temp_extension)
 temp3 = '%6.2f' % (lib_pu3.temp/8.617332478e-11)
 ene_3=lib_pu3.energy
-xs_3 =lib_pu3.reactions[18].sigma
+xs_3 =lib_pu3.reactions[102].sigma
 fig = pl.figure(figsize=(10,6))
 ax = fig.add_subplot(1,1,1)
-dex1_1=np.where(ene_1>7e-6)[0][0]
-dex1_2=np.where(ene_1>8.5e-6)[0][0]
-dex2_1=np.where(ene_2>7e-6)[0][0]
-dex2_2=np.where(ene_2>8.5e-6)[0][0]
-dex3_1=np.where(ene_3>7e-6)[0][0]
-dex3_2=np.where(ene_3>8.5e-6)[0][0]
-ax.loglog(ene_1[dex1_1:dex1_2],   xs_1[dex1_1:dex1_2],    label=temp1+'K')
-ax.loglog(ene_2[dex2_1:dex2_2],   xs_2[dex2_1:dex2_2],    label=temp2+'K')
-ax.loglog(ene_3[dex3_1:dex3_2],   xs_3[dex3_1:dex3_2],    label=temp3+'K')
-pl.title('Fission cross section of Pu-239')
+emin=6.5e-6
+emax=8.0e-6
+dex1_1=np.where(ene_1>emin)[0][0]
+dex1_2=np.where(ene_1>emax)[0][0]
+dex2_1=np.where(ene_2>emin)[0][0]
+dex2_2=np.where(ene_2>emax)[0][0]
+dex3_1=np.where(ene_3>emin)[0][0]
+dex3_2=np.where(ene_3>emax)[0][0]
+ax.semilogy(ene_1[dex1_1:dex1_2]*1e6,   xs_1[dex1_1:dex1_2],    label=temp1+'K')
+ax.semilogy(ene_2[dex2_1:dex2_2]*1e6,   xs_2[dex2_1:dex2_2],    label=temp2+'K')
+ax.semilogy(ene_3[dex3_1:dex3_2]*1e6,   xs_3[dex3_1:dex3_2],    label=temp3+'K')
+pl.title('Asorbtion cross section of Eu-155')
 pl.ylabel('Total Fission Cross Section (barns)')
-pl.xlabel('Energy (MeV)')
+pl.xlabel('Energy (eV)')
 handles, labels = ax.get_legend_handles_labels()
 ax.legend(handles, labels, loc=1)
 pl.grid('on')
-pl.xlim(7e-6,8.5e-6)
-lims=pl.ylim()
-#pl.ylim(1e-4,lims[1])
+pl.xlim(emin*1e6,emax*1e6)
+ax.set_xticks(np.linspace(emin*1e6,emax*1e6,10)) 
+ax.get_xaxis().get_major_formatter().labelOnlyBase = False
+ax.xaxis.get_major_formatter().set_powerlimits((0, 1))
+#lims=pl.ylim()
+#pl.ylim(1e-4,1e4)
 if plot:
 	pl.show()
 else:
-	print 'xs_pu_broaden.eps'
-	fig.savefig('xs_pu_broaden.eps')
+	print 'xs_eu_broaden.eps'
+	fig.savefig('xs_eu_broaden.eps')
 
 
 
@@ -237,7 +243,7 @@ def mb_speed(vel_grid,m_in,T):
 	b=4*pi*np.power(vel_grid,2)
 	c=np.exp(-m*np.power(vel_grid,2)/(2*kT))
 	return np.multiply(c,np.multiply(a,b))
-x=np.array(np.linspace(0,5000,5000))
+x=np.array(np.linspace(0,3000,1000))
 m1=239
 y1_1= mb_speed(x,m1,300)
 y1_2= mb_speed(x,m1,900)
@@ -248,17 +254,17 @@ y2_2= mb_speed(x,m2,900)
 y2_3= mb_speed(x,m2,1500)
 fig = pl.figure(figsize=(10,6))
 ax = fig.add_subplot(1,1,1)
-ax.semilogx( x, y1_1, label='A=239, 300.00K')
-ax.semilogx( x, y1_2, label='A=239, 900.00K')
-ax.semilogx( x, y1_3, label='A=239, 1500.00K')
-ax.semilogx( x, y2_1, label='A=16,  300.00K')
-ax.semilogx( x, y2_2, label='A=16,  900.00K')
-ax.semilogx( x, y2_3, label='A=16,  1500.00K')
-pl.title('')
-pl.ylabel('')
-pl.xlabel('Energy (MeV)')
+ax.plot( x, y1_1,'b-' ,label='A=239, 300.00K')
+ax.plot( x, y1_2,'g-' ,label='A=239, 900.00K')
+ax.plot( x, y1_3,'r-' ,label='A=239, 1500.00K')
+ax.plot( x, y2_1,'b.-' ,label='A=16,  300.00K')
+ax.plot( x, y2_2,'g.-' ,label='A=16,  900.00K')
+ax.plot( x, y2_3,'r.-' ,label='A=16,  1500.00K')
+pl.title('Speed Distributions')
+pl.ylabel('PDF')
+pl.xlabel('Speed (m/s)')
 handles, labels = ax.get_legend_handles_labels()
-ax.legend(handles, labels, loc=2)
+ax.legend(handles, labels, loc=1)
 pl.grid('on')
 if plot:
 	pl.show()
