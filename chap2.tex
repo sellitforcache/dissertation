@@ -312,12 +312,10 @@ Cross section data is distributed by the Department of Energy in \emph{ENDF} fil
   \label{data_levels}
   \centering
     \includegraphics[width=0.8\textwidth]{graphics/data_levels.eps}
-     \caption{Hierarchy in ACE-formatted neutron data libraries.}
+     \caption{Hierarchy in ACE formatted neutron data libraries.}
 \end{figure}
 
-All of the complexity and 
-it's all about the data
-
+Many Monte Carlo codes read ACE formatted data rather than the original ENDF file.  ACE stands for ``a compact ENDF'' and strips out a lot of the extra information unnecessary for neutron transport.  As Figure \ref{data_levels} shows, ACE files not only contain cross sections, but also angle and energy distributions used in scattering and fission.  ENDF assigns a number to each type of reaction called the \emph{MT} number.  Table \ref{MT_numbers}, taken from a LANL website, shows the major numbers \cite{MTnums}.  It can cleary be seen that there are many reactions a neutron can undergo, most of which have very energy strong dependance.  Most of the complexity in modeling nuclear reactors comes from the fact that the data needed to model neutrons is very complicated.  It may be the most important part of the simulation, it is what ties the calculations to reality.  If inaccurate data is used, the results will not have any physical meaning, and the simulation becomes a mathematical exercise. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Neutron Transport}

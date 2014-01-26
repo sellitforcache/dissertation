@@ -1,0 +1,77 @@
+\chapter{Appendix}
+
+
+\begin{table}[h]
+\centering
+\caption{ENDF MT numbers and the reactions they stand for.}
+\label{MT_numbers}\scriptsize
+\begin{tabular}{| l | c | l |}
+\multicolumn{3}{l}{Sum and Elastic Cross Sections}\\
+\hline
+MT & Reaction & Description \\
+\hline
+1	  & (n,total)	    &  Neutron total cross section. \\
+2	  & (z,z0)	      & Elastic scattering cross section.\\
+3	  & (z,nonelastic)&	Nonelastic cross section. \\
+4	  & (z,n)	        &  Production of one neutron in the exit channel. Sum of MT=50-91.	\\
+5	  & (z,anything)	& Sum of all reactions not given explicitly in another MT number. \\
+10	& (z,continuum)	& Total continuum reaction; exclues all discrete reactions.	\\
+27	& (z,abs)	    &    Absorption. Sum of MT=18 and MT=102-117.	\\
+101	& (z,disap)	  &   Disappearance. Sum of MT=102-117.	\\
+\hline
+\multicolumn{3}{l}{Neutron-Producing \& Continuum Reactions}\\
+\hline
+11	& (z,2nd)	    &  Production of two neutrons and a deuteron, plus a residual.	\\
+16	& (z,2n)	    &   Production of two neutrons, plus a residual.	\\
+17	& (z,2n)	    &   Production of three neutrons, plus a residual.	\\
+18	& (z,fission)  &	   Total fission.\\
+19	& (z,f)	   &      First-chance fission.	\\
+20	& (z,nf)	 &       Second-chance fission.	\\
+21	& (z,2nf)	 &    Third-chance fission.	\\
+22	& (z,na)	 &    Production of a neutron and alpha particle, plus a residual.	\\
+23	& (z,n3a)	 &    Production of a neutron and three alpha particles, plus a residual.	\\
+24	& (z,2na)	 &    Production of two neutrons and an alpha particle, plus a residual.	\\
+25	& (z,3na)	 &    Production of three neutrons and an alpha particle, plus a residual.	\\
+28	& (z,np)	 &    Production of a neutron and a proton, plus a residual.	\\
+29	& (z,n2a)	 &    Production of a neutron and two alpha particles, plus a residual.	\\
+30	& (z,2n2a)	&   Production of two neutrons and two alpha particles, plus a residual.	\\
+32	& (z,nd)	 &    Production of a neutron and a deuteron, plus a residual.	\\
+33	& (z,nt)	 &    Production of a neutron and a triton, plus a residual.	\\
+34	& (z,n3He)	&   Production of a neutron and a 3He particle, plus a residual.	\\
+35	& (z,nd2a)	&   Production of a neutron, a deuteron, and two alpha particles, plus a residual.	\\
+36	& (z,nt2a)	&   Production of a neutron, a triton, and two alpha particles, plus a residual.	\\
+37	& (z,4n)	 &    Production of four neutrons, plus a residual.	\\
+38	& (z,3nf)	 &    Fourth-change fission.	\\
+41	& (z,2np)	 &    Production of two neutrons and a proton, plus a residual.	\\
+42	& (z,3np)	 &    Production of three neutrons and a proton, plus a residual.	\\
+44	& (z,n2p)	 &    Production of a neutron and two protons, plus a residual.	\\
+45	& (z,npa)	 &    Production of a neutron, a proton, and an alpha particle, plus a residual.	\\
+\hline
+\multicolumn{3}{l}{ Neutron-Producing Discrete Reactions} \\
+\hline
+51	& (z,n1)	& Production of a neutron, nucleus in the first excited state.	\\
+52	& (z,n2)	& Production of a neutron, nucleus in the second excited state.	\\
+... & & \\
+90	& (z,n40) &	Production of a neutron, nucleus in the 40th excited state.	\\
+91	& (z,nc)	& Production of a neutron in the continuum.	\\
+\hline
+\multicolumn{3}{l}{Reactions That Do Not Produce Neutrons}\\
+\hline
+102	& (z,gamma) &	Radiative capture.	\\
+103	& (z,p)	   & Production of a proton, plus a residual.          \\
+104	& (z,d)	   & Production of a deuteron, plus a residual.        \\
+105	& (z,t)	   & Production of a triton, plus a residual.          \\
+106	& (z,3He)	&    Production of a He particles, plus a residual.  \\
+107	& (z,a)	  &  Production of an alpha particle, plus a residual. \\
+108	& (z,2a)	& Production of two alphas, plus a residual.	\\
+109	& (z,3a)	& Production of three alphas, plus a residual.	\\
+111	& (z,2p)	& Production of two protons, plus a residual.	\\
+112	& (z,pa)	& Production of a proton and an alpha particle, plus a residual.	\\
+113	& (z,t2a)	& Production of a triton and two alphas, plus a residual.	\\
+114	& (z,d2a)	& Production of a deuteron and two alphas, plus a residual.	\\
+115	& (z,pd)	& Production of a proton and a deuteron, plus a residual.	\\
+116	& (z,pt)	& Production of a proton and a triton, plus a residual.	\\
+117	& (z,da)	& Production of a deuteron and an alpha particle, plus a residual.	\\
+\hline
+\end{tabular}
+\end{table}
