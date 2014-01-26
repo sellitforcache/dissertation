@@ -197,7 +197,9 @@ Since it is still a two-body interaction, the kinematics of the reaction are ide
 
 \subsubsection{Inelastic Continuum Scattering}
 
-At energies above the distinct levels there lies a continuum in the nuclear energy states.  This isn't truly a ``continuum'' in the strictest sense, but the energy levels become so close together they they effectively form a domain where energy can take continuous values.  Unlike the discrete $Q$ values corresponding to a single excited state used in inelastic level scattering, the $Q$ value of the reaction now follows a distribution.
+At energies above the distinct levels there lies a continuum in the nuclear energy states.  This isn't truly a ``continuum'' in the strictest sense, but the energy levels become so close together they they effectively form a domain where energy can take continuous values.  Unlike the discrete $Q$ values corresponding to a single excited state used in inelastic level scattering, the $Q$ value of the reaction now follows a distribution.  
+
+S(a,b)
 
 \subsubsection{Disappearance Reactions}
 
@@ -304,14 +306,17 @@ Then say some things about it once you get details, particularly that it is an e
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Nuclear Data}
 
-it's all about the data, complexity?
+Cross section data is distributed by the Department of Energy in \emph{ENDF} files.  ENDF stands for ``evaluated nuclear data file,'' and can contain data for nuclear decay, photons, atomic relaxation, fission yields, thermal neutron scattering, and charged particle reactions as well as neutron reactions.  They are called ``evaluated'' because an organization decides, or evaluates, which experimental data is the highest quality and will be included in the final dataset.  They also decide how to represent regimes that haven't been measured yet by comparing simulation results to experiments.   The first data released was ENDF/B-I in 1968 and the latest set is ENDF/B-VII, which was released in 2006.  They have a standard format that dates back to when the data was stored on magnetic tapes, and are sometimes referred to as ``tapes'' to this day.  The format is rather archaic and contains a lot of redundant information about record locations which was useful when the tape head had to physically move between points in the tape.  
 
-endf
+\begin{figure}[h!]
+  \label{data_levels}
+  \centering
+    \includegraphics[width=0.8\textwidth]{graphics/data_levels.eps}
+     \caption{Hierarchy in ACE-formatted neutron data libraries.}
+\end{figure}
 
-measurements?
-
-heirarchy
-
+All of the complexity and 
+it's all about the data
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
