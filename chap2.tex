@@ -327,15 +327,42 @@ Now that the events which can happen to neutrons have been outlined, we will mov
 
 \subsubsection{Neutron Distribution Function}
 
-The \emph{neutron distribution function} simply describes the number of neutrons present in each differential quantity it represents.  The most detailed version is differential in space (vector of 3 dimensions), angle (vector of two dimensions), and energy (or velocity, 1 dimension) and has inverse units of these dimensions.  Like any distribution, it must be integrated over to calculate any quantities.  If we define the $i$th moment of the distribution according to \eqref{NDF_moments}, then the $0$th moment would be the population and the $1$st moment would be the mean.
+The \emph{neutron distribution function} simply describes the number of neutrons present in each differential quantity it represents.  The most detailed version is differential in space, angle, energy (or velocity), and time, and has inverse units of these dimensions.  In the subsequent derivations, the spatial, or position vector will be represented by $\boldsymbol{\vec{r}}$, the angular vector by $\boldsymbol{\hat{\Omega}}$, energy by $E$, and time by $t$.  The angle vector is a unit vector that specifies direction only, not magnitude.  It is easiest to express the directional vector as a unit vector in spherical coordinates $(\theta, \phi)$, the polar angle and the azimuthal angle, respectively.  Their cartesian projections are given by \eqref{ang_cart} and shown in Figure \ref{ang_relations}.
+
+\begin{equation}
+\label{ang_cart}
+\begin{split}
+\Omega_x &= \sin \theta \sin \phi  \\
+\Omega_y &= \sin \theta \cos \phi \\
+\Omega_z &= \cos \theta = \mu
+\end{split}
+\end{equation}
+
+\begin{figure}[h!]
+  \label{ang_relations}
+  \centering
+    \includegraphics[width=0.8\textwidth]{graphics/ang_relation.eps}
+     \caption{The cartesian projections of the angle vector.}
+\end{figure}
+
+Like any distribution, it must be integrated over to calculate any quantities.  If we define the $i$th moment of the distribution according to \eqref{NDF_moments}, then the $0$th moment would be the population and the $1$st moment would be the mean.
 
 \begin{equation}
 \label{NDF_moments}
 M_i = \int_{-\infty}^{\infty} n(x)  x^{i} dx
 \end{equation}
 
-For example, if we wanted 
+For example, if we are given a neutron distribution which has no time dependence, $n(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E)$, and wanted to calculate the total number of neutrons present in a volume V, we would calculate this number by \eqref{NDF_sample}, whereas if we wanted to know the average energy, we would do this by \eqref{NDF_avg}.
 
+\begin{equation}
+\label{NDF_sample}
+N_V = \int_0^\infty \int_{\boldsymbol{\hat{\Omega}}} \int_{V} n(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E) dV d\boldsymbol{\hat{\Omega}} dE
+\end{equation}
+
+\begin{equation}
+\label{NDF_avg}
+\bar{E} = \int_0^\infty \int_{\boldsymbol{\hat{\Omega}}} \int_{V} E n(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E) dV d\boldsymbol{\hat{\Omega}} dE
+\end{equation}
 
 \subsubsection{Reaction Rates}
 
