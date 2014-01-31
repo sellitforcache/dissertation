@@ -55,11 +55,13 @@ class Arrow3D(FancyArrowPatch):
         self.set_positions((xs[0],ys[0]),(xs[1],ys[1]))
         FancyArrowPatch.draw(self, renderer)
 
-a = Arrow3D([0,xproj],[0,yproj],[0,zproj], mutation_scale=20, lw=1, arrowstyle="-|>", color="k")
+a = Arrow3D([0,xproj],[0,yproj],[0,zproj], mutation_scale=20, lw=1, arrowstyle="-|>", color="b")
 ax.add_artist(a)
 
 #set axis spans
-xspan, yspan, zspan = 3 * [np.linspace(0,1,20)]
+xspan = np.linspace(0,1.3*xproj,20)
+yspan = np.linspace(0,1.3*yproj,20)
+zspan = np.linspace(0,1.3*zproj,20)
 zero = np.zeros_like(xspan)
 
 
@@ -68,21 +70,37 @@ ax.plot3D(xspan, zero, zero,'k--')
 ax.plot3D(zero, yspan, zero,'k--')
 ax.plot3D(zero, zero, zspan,'k--')
 #plot box
-#ax.plot3D( [xproj,xproj] , [0,yproj,] , [0,0],'k:')
-#ax.plot3D( [0,xproj] , [yproj,yproj,] , [0,0],'k:')
-#ax.plot3D( [xproj,xproj] , [,yproj,] , [zproj,zproj],'k:')
+#xproj
+ax.plot3D( [xproj,xproj] , [0,yproj] , [0,0],'k:')
+ax.plot3D( [xproj,xproj] , [0,0] , [0,zproj],'k:')
+ax.plot3D( [xproj,xproj] , [0,yproj] , [zproj,zproj],'k:')
+ax.plot3D( [xproj,xproj] , [yproj,yproj] , [0,zproj],'k:')
+ax.plot3D( [0,xproj] , [yproj,yproj] , [0,0],'k:')
+ax.plot3D( [0,0] , [yproj,yproj] , [0,zproj],'k:')
+ax.plot3D( [0,xproj] , [yproj,yproj] , [zproj,zproj],'k:')
+ax.plot3D( [0,xproj] , [0,0] , [zproj,zproj],'k:')
+ax.plot3D( [0,0] , [0,yproj] , [zproj,zproj],'k:')
+ax.plot3D( [0,xproj] , [0,yproj] , [0,0],'k:')
 #plot solid projections
-ax.plot3D( [0,xproj] , [0,0] , [0,0],'k-')
-ax.plot3D( [0,0] , [0,yproj] , [0,0],'k-')
-ax.plot3D( [0,0] , [0,0] , [0,zproj],'k-')
+ax.plot3D( [0,xproj] , [0,0] , [0,0],'b-')
+ax.plot3D( [0,0] , [0,yproj] , [0,0],'b-')
+ax.plot3D( [0,0] , [0,0] , [0,zproj],'b-')
+# arcs
+ax.plot3D( .2*np.cos(np.linspace(0,phi,20)) , .2*np.sin(np.linspace(0,phi,20)) , 0 ,'r-')
+ax.plot3D( .2*np.sin(np.linspace(0,theta,20))*np.cos(phi) , .2*np.sin(np.linspace(0,theta,20))*np.sin(phi) , .2*np.cos(np.linspace(0,theta,20)) ,'r-')
 #annotate
-ax.text(xspan.max() *1.1, 0, 0, "x", color='k')
-ax.text(0, yspan.max() *1.1, 0, "y", color='k')
-ax.text(0, 0, zspan.max() *1.1, "z", color='k')
-ax.text( xproj ,0, 0,"$\hat{\Omega}_x$",color='k')
-ax.text( 0,yproj,0,"$\hat{\Omega}_y$",color='k')
-ax.text( 0,0,zproj,"$\hat{\Omega}_z$",color='k')
+ax.text(xspan.max() *1.1, 0, 0, "$x$", color='k', size=16)
+ax.text(0, yspan.max() *1.05, 0, "$y$", color='k', size=16)
+ax.text(0, 0, zspan.max() *1.05, "$z$", color='k', size=16)
+ax.text( xproj ,0, 0,"$\hat{\Omega}_x$",color='k', size=16)
+ax.text( 0,yproj,0,"$\hat{\Omega}_y$",color='k', size=16)
+ax.text( 0,0,zproj,"$\hat{\Omega}_z$",color='k', size=16)
+ax.text( 1*xproj,1*yproj,1*zproj,"$\mathbf{\hat{\Omega}}$",color='k', size=16)
+ax.text( .2*np.sin(theta/2)*np.cos(phi) , .2*np.sin(theta/2)*np.sin(phi) , .2*np.cos(theta/2), r'$\theta$',color='k', size=16)
+ax.text( .2*np.cos(phi/2),.2*np.sin(phi/2),0,"$\phi$",color='k', size=16)
 
+# axis view
+ax.view_init(elev=theta*180/3.14159/2, azim=phi*180/3.14159/2)
 ax.set_aspect("equal")
 ax.set_axis_off()
 

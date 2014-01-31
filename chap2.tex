@@ -338,14 +338,14 @@ The \emph{neutron distribution function} simply describes the number of neutrons
 \end{split}
 \end{equation}
 
-\begin{figure}[h!]
+\begin{figure}[h!] 
   \label{ang_relations}
   \centering
-    \includegraphics[width=0.8\textwidth]{graphics/ang_relation.eps}
-     \caption{The cartesian projections of the angle vector.}
+    \includegraphics[width=0.8\textwidth , trim= 0cm 2cm 0cm 2cm]{graphics/ang_relation.eps} % trim = l b r t
+     \caption{The cartesian projections of the directional vector.}
 \end{figure}
 
-Like any distribution, it must be integrated over to calculate any quantities.  If we define the $i$th moment of the distribution according to \eqref{NDF_moments}, then the $0$th moment would be the population and the $1$st moment would be the mean.
+Like any continuous distribution, it must be integrated over to calculate any quantities.  If we define the $i$th moment of the distribution according to \eqref{NDF_moments}, then the $0$th moment would be the population and the $1$st moment would be the mean.
 
 \begin{equation}
 \label{NDF_moments}
@@ -366,13 +366,44 @@ N_V = \int_0^\infty \int_{\boldsymbol{\hat{\Omega}}} \int_{V} n(\boldsymbol{\vec
 
 \subsubsection{Reaction Rates}
 
+A \emph{reaction rate} is the rate at which a certain reaction is happening in a volume.  If we go to a pulse-type scenario once more, we have $N_\mathrm{p}$ particles which travel at speed $v$ in one direction.  If $\Sigma$ is the interaction probability per unit length, multiplying it by the speed gives the probability of interaction per second, or the rate of interaction.  Since there are $N$ particles, multiplying the rate by it gives the overall reaction rate, $N_\mathrm{p} v \Sigma$, of the pulse in an infinite medium.  If $N$ is now substituted for the neutron distribution function instead of a pulse, the expression now becomes the reaction rate per distribution differential, or the \emph{reaction rate density}.  This expression is shown in \eqref{RR} and is the first building block of the \emph{neutron balance equation}.
+
+\begin{equation}
+\label{RR}
+R(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t)  = v(E) n(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) \Sigma(E)
+\end{equation}
+
+If we assume there is only one energy, $E_0$ and one direction, $\hat{x}$, and integrate over the constant dimensions of this equation, as shown in \eqref{1d_diff}, we get an expression for the reaction rate in an infinitesimal slice dx.  $A$ is the area perpendicular to the direction of motion where the neutron population is nonzero.
+
+
+\begin{equation}
+\label{1d_diff}
+\int_A \int_{\boldsymbol{\hat{\Omega}}} \int_0^{\infty}  dE d\boldsymbol{\hat{\Omega}} dxdydz  v(E) n(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) \Sigma(E) \delta(E-E_0) \delta(\boldsymbol{\hat{\Omega}}-\hat{x})  = v \Sigma A n(x)dx 
+\end{equation}
+
+This is effectively the loss term for a beam in the $\hat{x}$ direction, and if we set it as such, we recover the beam-type expression \eqref{recover_beam}, which is equivalent to \eqref{pop_diff}.  
+
+\begin{equation}
+\label{recover_beam}
+dn(x) = - v \Sigma A n(x)dx  \qquad \Rightarrow \qquad  \frac{dI(x)}{dx}= - \Sigma I
+\end{equation}
 
 \subsubsection{Angular and Scalar Flux}
 
 
 \subsubsection{Neutron Transport Equation}
 
+\begin{equation}
+\label{NBE}
+1
+\end{equation}
+
 derivation from neutron balance
+
+\begin{equation}
+\label{NTE}
+2
+\end{equation}
 
 
 \section{Discrete Methods}
