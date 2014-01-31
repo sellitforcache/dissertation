@@ -322,7 +322,34 @@ Many Monte Carlo codes read ACE formatted data rather than the original ENDF fil
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Neutron Transport}
 
-Now that the events which can happen to neutrons have been outlined, we will move to describing the neutron population itself.  Since the neutron population in reactors is large, on the order of $10^{20}/\mathrm{cm}^3$, and the neutrons themselves have very small radii, about $1.75\times10^{-17}$ cm, the distribution of neutrons can be treated as an continuum.  
+Now that the events which can happen to neutrons have been outlined, we will move to describing the neutron population itself.  Since the neutron population in reactors is large, on the order of $10^{XXX}/\mathrm{cm}^3$, and the neutrons themselves have very small radii, about $1.75\times10^{-17}$ cm, the distribution of neutrons can be treated as an continuum.  
+
+Eventually come to a linearized version of the Boltzmann transport equation since neutrons are assumed to not interact with each other - takes advantage of the fact that the neutron density is many orders of magnitude smaller than the material density. 
+
+Assumptions made
+
+\subsubsection{Neutron Balance Equation}
+
+\begin{figure}[h!] 
+  \label{diff_volume}
+  \centering
+    \includegraphics[width=0.8\textwidth]{graphics/noise.eps} 
+     \caption{The differential volume of the neutron balance equation.}
+\end{figure}
+
+Before any explicit terms need to defined to capture the necessary physics of the transport problem, a balance equation can be written for a differential volume.  This equation simply describes the amount of neutrons entering and exiting a infinitesimally small volume and their difference being equal to the rate of change of neutrons in the volume.  We know about the reactions that neutrons can undergo, and we know they move through material, so we should have  enough information the write this abstract equation. Figure \ref{diff_volume} shows an illustration of the differential volume.
+
+\begin{equation}
+\footnotesize
+\label{NBE}
+\begin{array}{c}
+\mathrm{rate\:of\:change} = (\mathrm{neutrons\:in}) - (\mathrm{neutrons\:out}) \\
+\\
+\frac{\partial n}{\partial t} = ( \mathrm{movement\:in} + \mathrm{source} + \mathrm{scatter\:in}) - ( \mathrm{movement\:out} + \mathrm{disappearance} + \mathrm{scatter\:out})
+\end{array}
+\end{equation}
+
+Something about what we need
 
 
 \subsubsection{Neutron Distribution Function}
@@ -388,15 +415,47 @@ This is effectively the loss term for a beam in the $\hat{x}$ direction, and if 
 dn(x) = - v \Sigma A n(x)dx  \qquad \Rightarrow \qquad  \frac{dI(x)}{dx}= - \Sigma I
 \end{equation}
 
+
+
 \subsubsection{Angular and Scalar Flux}
+
+Since the reactions rate density is dependent on the cross section and the velocity multiplied by the neutron distribution, this quantity is redefined as the \emph{angular flux} as shown in \eqref{ang_flux}.  Flux meaning that it represents a rate at which particles are passing through a surface, and angular meaning that it is differential in angle.  Again, since the reactions rates depend on this quantity, the neutron transport problem is usually written in terms of the angular flux, which is then solved for instead of the neutron distribution.
+
+\begin{equation}
+\label{ang_flux}
+\psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) = v(E) n(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t)
+\end{equation}
+
+Scattering and neutron movement have angular dependence, but reaction cross sections do not, so the reactions can be written in terms of angular flux which has been integrated over angle, or the \emph{scalar flux} or simply the \emph{flux}.  This is usually the most interesting quantity in reactor physics since the reactor power profile is directly proportional to it.
+
+\begin{equation}
+\label{scalar_flux}
+\phi(\boldsymbol{\vec{r}},E,t) = \int_{\boldsymbol{\Omega}} \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t)
+\end{equation}
+
+\begin{equation}
+\label{scalar_flux_RR}
+ R(\boldsymbol{\vec{r}},E,t) = \int_{\boldsymbol{\Omega}} \Sigma(E) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) = \Sigma(E) \int_{\boldsymbol{\Omega}} \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) = \Sigma(E) \phi(\boldsymbol{\vec{r}},E,t)
+ \end{equation}
+
+\subsubsection{Scattering}
+
+Scattering changes a neutrons angle and energy, so the scattering cross section is \emph{doubly differential} rather than being a scalar quantity.  So instead of only having energy dependence, it also depends on outgoing angle and energy, which are shown with primes in \eqref{scattering_DD_xs}.
+
+\begin{equation}
+\label{scattering_DD_xs}
+\Sigma_s = \Sigma_s(E \rightarrow E^\prime,\boldsymbol{\hat{\Omega}} \rightarrow \boldsymbol{\hat{\Omega}}^\prime)
+ \end{equation}
+
+Granted, in the data, the scattering cross sections are integrated over exiting energy and angle to make a scalar quantity that can be compared against other cross sections and used to determine \emph{whether} scattering happens in a Monte Carlo simulation rather than \emph{how} it happens.
+
+
+\subsubsection{Advection and Leakage}
+
+so far all integrals, now time for some derivatives
 
 
 \subsubsection{Neutron Transport Equation}
-
-\begin{equation}
-\label{NBE}
-1
-\end{equation}
 
 derivation from neutron balance
 
