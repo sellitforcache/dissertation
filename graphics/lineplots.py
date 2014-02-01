@@ -110,4 +110,106 @@ if plot:
 else:
 	print 'ang_relation.eps'
 	fig.savefig('ang_relation.eps')
+	
+	
+	
+	
+#
+#  differential
+#
+name = 'diff_balance'
+
+theta = 3.14159/4
+phi   = 3.14159/4
+r     = 1
+
+#bounds
+x1=1
+x2=2
+y1=1
+y2=2
+z1=1
+z2=2
+
+#points
+p1=[x1,y1,z1]
+p2=[x2,y1,z1]
+p3=[x1,y2,z1]
+p4=[x2,y2,z1]
+p5=[x1,y1,z2]
+p6=[x2,y1,z2]
+p7=[x1,y2,z2]
+p8=[x2,y2,z2]
+v1 =np.array([p1 , p2])
+v2 =np.array([p2 , p4])
+v3 =np.array([p4 , p3])
+v4 =np.array([p3 , p1])
+v5 =np.array([p5 , p6])
+v6 =np.array([p6 , p8])
+v7 =np.array([p8 , p7])
+v8 =np.array([p7 , p5])
+v9 =np.array([p1 , p5])
+v10=np.array([p2 , p6])
+v11=np.array([p3 , p7])
+v12=np.array([p4 , p8])
+
+
+#add figure
+fig = pl.figure()
+ax = Axes3D(fig)
+
+## add Arrow3D
+class Arrow3D(FancyArrowPatch):
+    def __init__(self, xs, ys, zs, *args, **kwargs):
+        FancyArrowPatch.__init__(self, (0,0), (0,0), *args, **kwargs)
+        self._verts3d = xs, ys, zs
+
+    def draw(self, renderer):
+        xs3d, ys3d, zs3d = self._verts3d
+        xs, ys, zs = proj3d.proj_transform(xs3d, ys3d, zs3d, renderer.M)
+        self.set_positions((xs[0],ys[0]),(xs[1],ys[1]))
+        FancyArrowPatch.draw(self, renderer)
+
+a = Arrow3D([0,xproj],[0,yproj],[0,zproj], mutation_scale=20, lw=1, arrowstyle="-|>", color="b")
+ax.add_artist(a)
+
+#plot axes
+ax.plot3D(xspan, zero, zero,'k--')
+ax.plot3D(zero, yspan, zero,'k--')
+ax.plot3D(zero, zero, zspan,'k--')
+#plot box
+ax.plot3D( v1 [:,0] , v1 [:,1], v1 [:,2] ,'k:')
+ax.plot3D( v2 [:,0] , v2 [:,1], v2 [:,2] ,'k:')
+ax.plot3D( v3 [:,0] , v3 [:,1], v3 [:,2] ,'k:')
+ax.plot3D( v4 [:,0] , v4 [:,1], v4 [:,2] ,'k:')
+ax.plot3D( v5 [:,0] , v5 [:,1], v5 [:,2] ,'k:')
+ax.plot3D( v6 [:,0] , v6 [:,1], v6 [:,2] ,'k:')
+ax.plot3D( v7 [:,0] , v7 [:,1], v7 [:,2] ,'k:')
+ax.plot3D( v8 [:,0] , v8 [:,1], v8 [:,2] ,'k:')
+ax.plot3D( v9 [:,0] , v9 [:,1], v9 [:,2] ,'k:')
+ax.plot3D( v10[:,0] , v10[:,1], v10[:,2] ,'k:')
+ax.plot3D( v11[:,0] , v11[:,1], v11[:,2] ,'k:')
+ax.plot3D( v12[:,0] , v12[:,1], v12[:,2] ,'k:')
+#annotate
+ax.text(xspan.max() *1.1, 0, 0, "$x$", color='k', size=16)
+ax.text(0, yspan.max() *1.05, 0, "$y$", color='k', size=16)
+ax.text(0, 0, zspan.max() *1.05, "$z$", color='k', size=16)
+ax.text( xproj ,0, 0,"$\hat{\Omega}_x$",color='k', size=16)
+ax.text( 0,yproj,0,"$\hat{\Omega}_y$",color='k', size=16)
+ax.text( 0,0,zproj,"$\hat{\Omega}_z$",color='k', size=16)
+ax.text( 1*xproj,1*yproj,1*zproj,"$\mathbf{\hat{\Omega}}$",color='k', size=16)
+ax.text( .2*np.sin(theta/2)*np.cos(phi) , .2*np.sin(theta/2)*np.sin(phi) , .2*np.cos(theta/2), r'$\theta$',color='k', size=16)
+ax.text( .2*np.cos(phi/2),.2*np.sin(phi/2),0,"$\phi$",color='k', size=16)
+
+# axis view
+ax.view_init(elev=theta*180/3.14159/2, azim=phi*180/3.14159/2)
+ax.set_aspect("equal")
+ax.set_axis_off()
+
+
+if plot:
+	pl.show()
+else:
+	print name+'.eps'
+	fig.savefig(name+'.eps')
 
