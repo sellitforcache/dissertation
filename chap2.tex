@@ -322,11 +322,9 @@ Many Monte Carlo codes read ACE formatted data rather than the original ENDF fil
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Neutron Transport}
 
-Now that the events which can happen to neutrons have been outlined, we will move to describing the neutron population itself.  Since the neutron population in reactors is large, on the order of $10^{XXX}/\mathrm{cm}^3$, and the neutrons themselves have very small radii, about $1.75\times10^{-17}$ cm, the distribution of neutrons can be treated as an continuum.  
+Now that the events which can happen to neutrons have been outlined, we will move to describing the neutron population itself.  Since the neutron population in reactors is large, on the order of $10^{XXX}/\mathrm{cm}^3$, and the neutrons themselves have very small radii, about $1.75\times10^{-17}$ cm, the distribution of neutrons can be treated as an continuum.  We will eventually derive the \emph{neutron transport equation}, which is a linearized version of the Boltzmann transport equation.  It is linear since it is assumed that neutrons do not interact with each other.  This is usually a good assumption in normal matter since the neutron density present in reactors is many orders of magnitude smaller than the material density and neutrons are much more likely to interact with it than each other.  
 
-Eventually come to a linearized version of the Boltzmann transport equation since neutrons are assumed to not interact with each other - takes advantage of the fact that the neutron density is many orders of magnitude smaller than the material density. 
-
-Assumptions made
+Other than eliminating neutron self interaction, there are a handful of other assumptions that go into the equation that will hold true for the rest of the derivations.  One that follows veery closely is that neutrons are assumed to be points in space, so even at very high densities they sill will not interact with each other, and later when we start to discretize spaces, neutrons cannot be in more than one unique volume by overlapping.  The next assumption is that any relativistic effects are negligible.  The energies of importance in reactor physics are below 10MeV, which is about where they start to become non-negligible for neutrons.  Since neutrons are neutral and have long interaction distances compared to their radii, they are also assumed to move in straight lines between collisions.  Materials are also assumed to be in thermal equilibrium and have isotropic properties.  Materials like graphic and water do not have isotropic properties when it comes to scattering, however.  As will be explained later, this can be corrected by adjusting the scattering kernel.
 
 \subsubsection{Neutron Balance Equation}
 
@@ -349,12 +347,12 @@ Before any explicit terms need to defined to capture the necessary physics of th
 \end{array}
 \end{equation}
 
-Something about what we need
+Now that this equation has been written, we can start to explicitly define the terms.  One quantity has already been touched upon - the neutron density.  The neutron density is the fundamental quantity in reactor physics.  This is shown in \eqref{NBE} as $n$, but in the subsequent sections its dependencies will be elaborated on, as will all other dependencies.
 
 
 \subsubsection{Neutron Distribution Function}
 
-The \emph{neutron distribution function} simply describes the number of neutrons present in each differential quantity it represents.  The most detailed version is differential in space, angle, energy (or velocity), and time, and has inverse units of these dimensions.  In the subsequent derivations, the spatial, or position vector will be represented by $\boldsymbol{\vec{r}}$, the angular vector by $\boldsymbol{\hat{\Omega}}$, energy by $E$, and time by $t$.  The angle vector is a unit vector that specifies direction only, not magnitude.  It is easiest to express the directional vector as a unit vector in spherical coordinates $(\theta, \phi)$, the polar angle and the azimuthal angle, respectively.  Their cartesian projections are given by \eqref{ang_cart} and shown in Figure \ref{ang_relations}.
+The \emph{neutron distribution function} simply describes the number of neutrons present in each differential quantity it represents.  The most detailed version is differential in space, angle, energy (or velocity), and time, and has inverse units of these dimensions.  In other words, it describes a density in each of it components.  In the subsequent derivations, the spatial, or position vector will be represented by $\boldsymbol{\vec{r}}$, the angular vector by $\boldsymbol{\hat{\Omega}}$, energy by $E$, and time by $t$.  The angle vector is a unit vector that specifies direction only, not magnitude.  It is easiest to express the directional vector as a unit vector in spherical coordinates $(\theta, \phi)$, the polar angle and the azimuthal angle, respectively.  Their cartesian projections are given by \eqref{ang_cart} and shown in Figure \ref{ang_relations}.
 
 \begin{equation}
 \label{ang_cart}
@@ -393,11 +391,11 @@ N_V = \int_0^\infty \int_{\boldsymbol{\hat{\Omega}}} \int_{V} n(\boldsymbol{\vec
 
 \subsubsection{Reaction Rates}
 
-A \emph{reaction rate} is the rate at which a certain reaction is happening in a volume.  If we go to a pulse-type scenario once more, we have $N_\mathrm{p}$ particles which travel at speed $v$ in one direction.  If $\Sigma$ is the interaction probability per unit length, multiplying it by the speed gives the probability of interaction per second, or the rate of interaction.  Since there are $N$ particles, multiplying the rate by it gives the overall reaction rate, $N_\mathrm{p} v \Sigma$, of the pulse in an infinite medium.  If $N$ is now substituted for the neutron distribution function instead of a pulse, the expression now becomes the reaction rate per distribution differential, or the \emph{reaction rate density}.  This expression is shown in \eqref{RR} and is the first building block of the \emph{neutron balance equation}.
+A \emph{reaction rate} is the rate at which a certain reaction is happening in a volume.  If we go to a pulse-type scenario once more, we have $N_\mathrm{p}$ particles which travel at speed $v$ in one direction.  If $\Sigma$ is the interaction probability per unit length, multiplying it by the speed gives the probability of interaction per second, or the \emph{collision rate}.  Since there are $N$ particles, multiplying the rate by it gives the overall reaction rate, $N_\mathrm{p} v \Sigma$, of the pulse in an infinite medium.  If $N$ is now substituted for the neutron distribution function instead of a pulse, the expression now becomes the reaction rate per distribution differential, or the \emph{reaction rate density}.  This expression is shown in \eqref{RR} and is the first building block of the \emph{neutron balance equation}.
 
 \begin{equation}
 \label{RR}
-R(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t)  = v(E) n(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) \Sigma(E)
+R(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t)  = v(E) n(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) \Sigma(\boldsymbol{\vec{r}},E)
 \end{equation}
 
 If we assume there is only one energy, $E_0$ and one direction, $\hat{x}$, and integrate over the constant dimensions of this equation, as shown in \eqref{1d_diff}, we get an expression for the reaction rate in an infinitesimal slice dx.  $A$ is the area perpendicular to the direction of motion where the neutron population is nonzero.
@@ -405,7 +403,7 @@ If we assume there is only one energy, $E_0$ and one direction, $\hat{x}$, and i
 
 \begin{equation}
 \label{1d_diff}
-\int_A \int_{\boldsymbol{\hat{\Omega}}} \int_0^{\infty}  dE d\boldsymbol{\hat{\Omega}} dxdydz  v(E) n(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) \Sigma(E) \delta(E-E_0) \delta(\boldsymbol{\hat{\Omega}}-\hat{x})  = v \Sigma A n(x)dx 
+\int_A \int_{\boldsymbol{\hat{\Omega}}} \int_0^{\infty}  dE d\boldsymbol{\hat{\Omega}} dxdydz  v(E) n(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) \Sigma(\boldsymbol{\vec{r}},E) \delta(E-E_0) \delta(\boldsymbol{\hat{\Omega}}-\hat{x})  = v \Sigma A n(x)dx 
 \end{equation}
 
 This is effectively the loss term for a beam in the $\hat{x}$ direction, and if we set it as such, we recover the beam-type expression \eqref{recover_beam}, which is equivalent to \eqref{pop_diff}.  
@@ -426,44 +424,67 @@ Since the reactions rate density is dependent on the cross section and the veloc
 \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) = v(E) n(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t)
 \end{equation}
 
-Scattering and neutron movement have angular dependence, but reaction cross sections do not, so the reactions can be written in terms of angular flux which has been integrated over angle, or the \emph{scalar flux} or simply the \emph{flux}.  This is usually the most interesting quantity in reactor physics since the reactor power profile is directly proportional to it.
+Scattering and neutron movement have angular dependence, but reaction cross sections do not, so the reactions can be written in terms of angular flux which has been integrated over all angles, or the \emph{scalar flux} or simply the \emph{flux}.  The relation between the two fluxes is show in \eqref{scalar_flux}.  This is usually the most interesting quantity in reactor physics since the reactor power profile is directly proportional to it.  The reaction rate for a reaction $i$ is shown in \eqref{scalar_flux_RR}.
 
 \begin{equation}
 \label{scalar_flux}
-\phi(\boldsymbol{\vec{r}},E,t) = \int_{\boldsymbol{\Omega}} \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t)
+\phi(\boldsymbol{\vec{r}},E,t) = \int_{4\pi} \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t)
 \end{equation}
 
 \begin{equation}
 \label{scalar_flux_RR}
- R(\boldsymbol{\vec{r}},E,t) = \int_{\boldsymbol{\Omega}} \Sigma(E) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) = \Sigma(E) \int_{\boldsymbol{\Omega}} \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) = \Sigma(E) \phi(\boldsymbol{\vec{r}},E,t)
+ R_i(\boldsymbol{\vec{r}},E,t) = \int_{4\pi} \Sigma_i(\boldsymbol{\vec{r}},E) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) = \Sigma(\boldsymbol{\vec{r}},E) \int_{\boldsymbol{\Omega}} \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) = \Sigma(\boldsymbol{\vec{r}},E) \phi(\boldsymbol{\vec{r}},E,t)
  \end{equation}
 
 \subsubsection{Scattering}
 
-Scattering changes a neutrons angle and energy, so the scattering cross section is \emph{doubly differential} rather than being a scalar quantity.  So instead of only having energy dependence, it also depends on outgoing angle and energy, which are shown with primes in \eqref{scattering_DD_xs}.
+Scattering is highly dependent on angle and energy and requires as more detailed cross section than disappearance reactions.  Elastic scattering has a fixed relation between outgoing energy and angle, but inelastic scattering does not.  Scattering moves a neutrons energy and angle, so to be completely general in describing it, the cross section is assumed to not only ne dependent on incoming energy like all other cross sections, but also on outgoing energy, incoming angle, and outgoing angle.  Since two quantities are being related before and after a scattering event, the scattering cross section is considered \emph{doubly differential} and is sometimes called the \emph{scattering kernel} whereas the integrated value which only depends on incoming energy is called the scattering cross section.   An expression for the scattering kernel is shown in \eqref{scattering_DD_xs} with the incoming values primed.
 
 \begin{equation}
 \label{scattering_DD_xs}
-\Sigma_s = \Sigma_s(E \rightarrow E^\prime,\boldsymbol{\hat{\Omega}} \rightarrow \boldsymbol{\hat{\Omega}}^\prime)
+\Sigma_s = \Sigma_s(E^\prime \rightarrow E,\boldsymbol{\hat{\Omega}}^\prime \rightarrow \boldsymbol{\hat{\Omega}})
  \end{equation}
 
-Granted, in the data, the scattering cross sections are integrated over exiting energy and angle to make a scalar quantity that can be compared against other cross sections and used to determine \emph{whether} scattering happens in a Monte Carlo simulation rather than \emph{how} it happens.
+There is a practical reason for separating scattering into a total cross section that describes its likelihood, or probability of a neutron entering the reaction, and a kernel that describes how it exits.  In a Monte Carlo simulation, the cross section is used to determine \emph{whether} scattering happens rather than \emph{how} it happens.  The scattering kernel is only used if a neutron has already been determined to scatter.  This is also shown in the expressions for the scattering in a differential volume.  The cross section is used as the removal of a neutron from a particular energy, whereas the kernel is used to determine from which other energies and angles a neutron is scatter \emph{into}.  This can be seen in \eqref{scattering_DD_xs}.  If the outgoing energy and angle are held constant, the quantity is the probability which other angles and energies scatter into it.
 
+Using these two quantities, source and loss terms can be written for scattering.  The expression for loss uses the cross section, shown in \eqref{scattering_loss}, and the kernel is used in what is often called the \emph{scattering source} term, shown in \eqref{scattering_source}.  The source term need to be integrated over all other energies $E^\prime$ and angles, $\boldsymbol{\hat{\Omega}}^\prime$, which neutrons can scatter into energy $E$ and angle $\boldsymbol{\hat{\Omega}}$.
 
-\subsubsection{Advection and Leakage}
+\begin{equation}
+\label{scattering_loss}
+R_{s, \mathrm{loss}}( \boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t ) = \Sigma_s (\boldsymbol{\vec{r}},E) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t)
+ \end{equation}
+ 
+ \begin{equation}
+\label{scattering_source}
+R_{s, \mathrm{source}}(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) = \int_0^\infty  \int_{4\pi} \Sigma_s(E^\prime \rightarrow E,\boldsymbol{\hat{\Omega}}^\prime \rightarrow \boldsymbol{\hat{\Omega}}) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}}^\prime,E^\prime,t) d\boldsymbol{\hat{\Omega}}^\prime dE^\prime
+ \end{equation}
+ 
 
-so far all integrals, now time for some derivatives
+\subsubsection{Streaming}
+
+So far all that has been  touched on is how neutrons within a volume move in angle and energy or are removed outright.  Now we will go over how they move in space, and to do this we consider a surface $S$ around our differential volume.  We want to find an expression for the net number of neutrons passing through this surface and this will be our net leakage term (incoming minus outgoing).  The angular neutron flux describes the number of neutrons crossing a differential surface at angle $\boldsymbol{\hat{\Omega}}$, but in order to perform any vector operations on it, we must multiply it by the unit vector.  We can then write and expression for the leakage by performing a surface integral over the current and surface normal's dot product, shown in \eqref{leakage_surface}.
+
+\begin{equation}
+\label{leakage_surface}
+\mathrm{Leakage} = \int_S ds \cdot \boldsymbol{\hat{\Omega}} \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t)
+\end{equation}
+ 
+ We can turn this into a volume integral by applying the divergence theorem, shown in \eqref{div_theorem}.  If the volume of interest is shrunk to an infinitesimal volume and we switch the order of the dot product, we come to an expression that can be used in the balance equation.  This expression, shown in \eqref{streaming}, is often called the \emph{streaming} term, since it describes the net movement of neutrons into the differential volume due to their physical movement.
+ 
+\begin{equation}
+\label{div_theorem}
+\int_S ds \cdot \boldsymbol{\hat{\Omega}} \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) = \int_V dV \nabla \cdot \boldsymbol{\hat{\Omega}}  \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t)
+\end{equation}
+
+\begin{equation}
+\label{leakage_surface}
+ \lim_{V\to dV} \int_V dV \nabla \cdot \boldsymbol{\hat{\Omega}}  \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) =  \boldsymbol{\hat{\Omega}}  \cdot \nabla\psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) 
+ \end{equation}
 
 
 \subsubsection{Neutron Transport Equation}
 
-derivation from neutron balance
-
-\begin{equation}
-\label{NTE}
-2
-\end{equation}
-
+Now we have al terms we need to write down a full transport equation
 
 \section{Discrete Methods}
 
