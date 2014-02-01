@@ -480,11 +480,26 @@ So far all that has been  touched on is how neutrons within a volume move in ang
 \label{leakage_surface}
  \lim_{V\to dV} \int_V dV \nabla \cdot \boldsymbol{\hat{\Omega}}  \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) =  \boldsymbol{\hat{\Omega}}  \cdot \nabla\psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) 
  \end{equation}
+ 
+\subsubsection{Fission Source}
 
 
 \subsubsection{Neutron Transport Equation}
 
-Now we have al terms we need to write down a full transport equation
+Now we have all terms we need to write down a version full transport equation \eqref{NTE}
+
+\begin{equation}
+\label{NTE}
+\begin{split}
+\frac{\partial }{\partial t}\psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) &+  \\
+\boldsymbol{\hat{\Omega}}  \cdot \nabla \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) &+ \\
+\Sigma_i(\boldsymbol{\vec{r}},E) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) & \\
+& =  \\
+& \quad \int_0^\infty  \int_{4\pi} \Sigma_s(E^\prime \rightarrow E,\boldsymbol{\hat{\Omega}}^\prime \rightarrow \boldsymbol{\hat{\Omega}}) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}}^\prime,E^\prime,t) d\boldsymbol{\hat{\Omega}}^\prime dE^\prime  \\
+&+ \frac{1}{4\pi} \int_0^\infty  \int_{4\pi} \nu \chi(E) \Sigma_f(\boldsymbol{\vec{r}},E) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) d\boldsymbol{\Omega}  dE\\
+& + S_{\mathrm{external}}
+\end{split}
+ \end{equation}
 
 \section{Discrete Methods}
 
