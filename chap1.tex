@@ -20,9 +20,12 @@ Conventional CPU-based parallel Monte Carlo algorithms typically use the approac
 
 Figure 2 shows the data parallel algorithm used to maintain thread coherence (i.e. executing the same instructions) between GPU threads.  It is similar to the vectorized approach used with the early vector computers, which also were able to use a single-instruction, multiple-data (SIMD) execution model [1, 2].  A single-instruction multiple-thread (SIMT) and SIMD are similar in the sense that identical instructions are carried out across different pieces of data, but SIMT allows threads to act independently, albeit with a performance penalty.   The two main features of Figure 2 are that independent GPU kernel launches are used for each step of the transport chain and that the kernels operate on a large set of particle data (as opposed to transporting one particle at a time).  By doing this, the transport cycle is broken into steps in which a single task, such as determining reaction type or finding boundary intersection, is performed across large dataset of particles and threads can be kept more coherent.
 
-\section{Scope and Added Value}
+\section{Added Value}
 
 The aim of this work is first to produce a program that runs accurate continuous energy neutron transport simulations on the GPU in general 3D geometries using standard nuclear data files.  The second goal is to make these simulations as fast as possible.  Producing this program, which has been named WARP, will be the first step in hopefully creating a full featured reactor simulation program that runs on GPU accelerator cards.  The added value in doing this comes from the fact that many supercomputers are gaining power from GPUs and in order for nuclear engineers to take advantage of this new computing power, which they always need more of, a new code must be written to run on them.  Even though GPU computing is still in its very early stages, developing WARP hedges risk for the simulation community against their computational tools becoming under powered or even obsolete.  Conversely, it also exposes a substantial amount of  computing power that couldn't otherwise be used on personal computers, workstations, and laptops.  Targeting GPUs could enable smaller computers to take on substantial reactor simulation tasks, and potentially reduce design iterations for people without access to supercomputers.  Other than being a nod to NVIDIA's terminology, if WARP were an acronym, it would stand for ``weaving all the random particles,'' with the words ``weaving all'' referring to the lockstep way in which ``all the random particles'', i.e. the neutrons, are sorted into coherent bundles and transported.
+
+\section{Objective}
+
 
 \section{Outline}
 

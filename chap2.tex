@@ -331,7 +331,7 @@ Other than eliminating neutron self interaction, there are a handful of other as
 \begin{figure}[h!] 
   \label{diff_volume}
   \centering
-    \includegraphics[width=0.8\textwidth]{graphics/noise.eps} 
+    \includegraphics[width=0.8\textwidth,trim= 0cm 2.5cm 0cm 0cm]{graphics/diff_balance.eps} 
      \caption{The differential volume of the neutron balance equation.}
 \end{figure}
 
@@ -491,12 +491,12 @@ Now we have all terms we need to write down a version full transport equation \e
 \begin{equation}
 \label{NTE}
 \begin{split}
-\frac{\partial }{\partial t}\psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) &+  \\
+\frac{1}{v} \frac{\partial }{\partial t}\psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) &+  \\
 \boldsymbol{\hat{\Omega}}  \cdot \nabla \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) &+ \\
 \Sigma_i(\boldsymbol{\vec{r}},E) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) & \\
 & =  \\
 & \quad \int_0^\infty  \int_{4\pi} \Sigma_s(E^\prime \rightarrow E,\boldsymbol{\hat{\Omega}}^\prime \rightarrow \boldsymbol{\hat{\Omega}}) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}}^\prime,E^\prime,t) d\boldsymbol{\hat{\Omega}}^\prime dE^\prime  \\
-&+ \frac{1}{4\pi} \int_0^\infty  \int_{4\pi} \nu \chi(E) \Sigma_f(\boldsymbol{\vec{r}},E) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) d\boldsymbol{\Omega}  dE\\
+&+ \frac{1}{4\pi} \int_0^\infty  \int_{4\pi} \nu \chi(E) \Sigma_f(\boldsymbol{\vec{r}},E^\prime) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E^\prime,t) d\boldsymbol{\Omega}  dE^\prime\\
 & + S_{\mathrm{external}}
 \end{split}
  \end{equation}
