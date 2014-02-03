@@ -459,6 +459,24 @@ R_{s, \mathrm{loss}}( \boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t ) = \Si
 R_{s, \mathrm{source}}(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) = \int_0^\infty  \int_{4\pi} \Sigma_s(E^\prime \rightarrow E,\boldsymbol{\hat{\Omega}}^\prime \rightarrow \boldsymbol{\hat{\Omega}}) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}}^\prime,E^\prime,t) d\boldsymbol{\hat{\Omega}}^\prime dE^\prime
  \end{equation}
  
+ \subsubsection{Fission Source}
+
+The nuclear chain reaction is sustained by fission reactions producing neutrons, so it is essential to model it in any material that has fissionable isotopes.  There are three determining factors for the fission source.  The first is the fission reaction rate, which is represented by the flux multiplied by the fission cross section.  The second is the fission spectrum, which is represented by $\chi$.  Neutrons born from fission are not emitted at a single energy, and the fission spectrum describes the probability for a neutron to be emitted at a certain energy.  The energy spectrum is weakly dependent of the incoming neutron energy, which higher incoming energies producing more higher energy neutrons.  This dependence only starts making a significant difference in spectrum shape at energies above 10MeV, higher than energies usually seen in a reactor.  This is why the fission spectrum is usually treated as being independent of incoming neutron energy.  The spectra of uranium-235 and plutonium-239 for fission induced by a 0.5 MeV neutron are shown in Figure \ref{fiss_spec}, and it can be seen that plutonium-239 produces more high energy neutrons.  The last parameter is the average number of neutrons emitted in a fission event, or the \emph{fission yield}, represented by $\nu$, and is relatively flat until about 1MeV, as was shown in Figure \ref{nu_compare}.  Since 1MeV is within the typical energy range present in nuclear reactions, it is treated as a function of energy.
+
+\begin{figure}[h!] 
+  \label{fiss_spec}
+  \centering
+    \includegraphics[width=0.8\textwidth ]{graphics/fiss_spec.eps} 
+     \caption{The prompt fission spectrum for uranium-235 and plutonium-239.}
+\end{figure}
+
+To write an expression for the fission source, or the number of fission neutrons born in energy $E$, we must know the number of neutrons born from fission at all energies.  Once this is known, it is multiplied by the fission spectrum to select the fraction that will be in energy $E$.  The expression for the fission source is shown in \eqref{fiss_source}.
+
+\begin{equation}
+\label{fiss_source}
+\frac{\chi(E)}{4\pi} \int_0^\infty  \int_{4\pi}   \nu(E^\prime) \Sigma_f(\boldsymbol{\vec{r}},E^\prime) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}}^\prime,E^\prime,t) d\boldsymbol{\Omega}^\prime  dE^\prime = \frac{\chi(E)}{4\pi} \int_0^\infty   \nu(E^\prime) \Sigma_f(\boldsymbol{\vec{r}},E^\prime) \phi(\boldsymbol{\vec{r}},E^\prime,t)  dE^\prime
+ \end{equation}
+
 
 \subsubsection{Streaming}
 
@@ -477,30 +495,30 @@ So far all that has been  touched on is how neutrons within a volume move in ang
 \end{equation}
 
 \begin{equation}
-\label{leakage_surface}
+\label{streaming}
  \lim_{V\to dV} \int_V dV \nabla \cdot \boldsymbol{\hat{\Omega}}  \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) =  \boldsymbol{\hat{\Omega}}  \cdot \nabla\psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) 
  \end{equation}
  
-\subsubsection{Fission Source}
-
 
 \subsubsection{Neutron Transport Equation}
 
-Now we have all terms we need to write down a version full transport equation \eqref{NTE}
+Now all the terms of \eqref{NBE} have been explicitly defined.  Substituting them all in yields \eqref{NTE}, the \emph{neutron transport equation}, written here with the neutron sinks on the left side and the neutron sources on the right side.  An additional external source term, $S_{\mathrm{external}}$, has been added to account for any sources not induced by the neutron flux itself, i.e. external sources.
 
 \begin{equation}
 \label{NTE}
 \begin{split}
 \frac{1}{v} \frac{\partial }{\partial t}\psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) &+  \\
 \boldsymbol{\hat{\Omega}}  \cdot \nabla \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) &+ \\
-\Sigma_i(\boldsymbol{\vec{r}},E) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) & \\
+\Sigma_t(\boldsymbol{\vec{r}},E) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) & \\
 & =  \\
-& \quad \int_0^\infty  \int_{4\pi} \Sigma_s(E^\prime \rightarrow E,\boldsymbol{\hat{\Omega}}^\prime \rightarrow \boldsymbol{\hat{\Omega}}) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}}^\prime,E^\prime,t) d\boldsymbol{\hat{\Omega}}^\prime dE^\prime  \\
-&+ \frac{1}{4\pi} \int_0^\infty  \int_{4\pi} \nu \chi(E) \Sigma_f(\boldsymbol{\vec{r}},E^\prime) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E^\prime,t) d\boldsymbol{\Omega}  dE^\prime\\
+& \quad \int_0^\infty  \int_{4\pi} \Sigma_s(E^\prime \rightarrow E,\boldsymbol{\hat{\Omega}}^\prime \rightarrow \boldsymbol{\hat{\Omega}}) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}}^\prime,E^\prime,t) d\boldsymbol{\Omega}^\prime dE^\prime  \\
+&+ \frac{\chi(E)}{4\pi} \int_0^\infty  \int_{4\pi}   \nu(E^\prime) \Sigma_f(\boldsymbol{\vec{r}},E^\prime) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}}^\prime,E^\prime,t) d\boldsymbol{\Omega}^\prime  dE^\prime\\
 & + S_{\mathrm{external}}
 \end{split}
  \end{equation}
-
+ 
+ The neutron transport equation in this form is an integro-differential equation since it has both derivates and integrals in it.  It's spatial parts are differential, whereas its angular and energy parts are integral.  It is linear and relatively easy to solve for simple geometries and reaction parameters.  The complexity in solving it comes from the complex energy dependence of the reaction parameters and the large and complex domains over which it must be solved in order to capture all the relevant physics.
+ 
 \section{Discrete Methods}
 
 moments

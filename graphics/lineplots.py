@@ -184,6 +184,9 @@ b = Arrow3D([x_cent,x_cent],[y_cent,y_cent],[z_cent,z_cent+1.0], mutation_scale=
 ax.add_artist(b)
 
 #plot axes
+xspan = np.linspace(0,1,20)
+yspan = np.linspace(0,1,20)
+zspan = np.linspace(0,1,20)
 ax.plot3D(xspan, zero, zero,'k-')
 ax.plot3D(zero, yspan, zero,'k-')
 ax.plot3D(zero, zero, zspan,'k-')

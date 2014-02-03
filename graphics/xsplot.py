@@ -233,6 +233,29 @@ else:
 	fig.savefig('nu_compare.eps')
 	
 #
+#  fission spec plots, sugin the data from nu plots
+#
+fig = pl.figure(figsize=(10,6))
+ax = fig.add_subplot(1,1,1)
+u_e 		= lib_u.reactions[18].energy_dist.energy_out[1]
+u_spec		= lib_u.reactions[18].energy_dist.pdf[1]
+pu_e 		= lib_pu.reactions[18].energy_dist.energy_out[1]
+pu_spec		= lib_pu.reactions[18].energy_dist.pdf[1]
+ax.semilogx( u_e, u_spec ,label='U-235')
+ax.semilogx( pu_e , pu_spec ,label='Pu-239')
+pl.title('Fission spectra for U-235 and Pu-239')
+pl.ylabel('Probability Density Function')
+pl.xlabel('Energy (MeV)')
+handles, labels = ax.get_legend_handles_labels()
+ax.legend(handles, labels, loc=2)
+pl.grid('on')
+if plot:
+	pl.show()
+else:
+	print 'fiss_spec.eps'
+	fig.savefig('fiss_spec.eps')
+	
+#
 # MB dist
 #
 def mb_speed(vel_grid,m_in,T):
