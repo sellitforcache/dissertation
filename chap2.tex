@@ -565,15 +565,34 @@ Although discrete methods are readily mapped to computer hardware and execute qu
 
 \section{Monte Carlo}
 
-The Monte Carlo method takes a different approach in mapping the transport problem to a computer.  Instead of the neutron population being continuous and the spatial, angular, and energy dimensions being discretized, it leaves the dimensions continuous and discretizes the neutron population!   Quantities of interested are then determined by integrating over the neutron population!   This way of integrating the neutron transport equation can be thought of as integrating it ``sideways'' in the sense that instead of being fixed to a discrete space angle and energy, the discretized neutron shoots through the transport equation many times, sweeping out the entire phase space and thus effectively integrating it.
+The Monte Carlo method takes a different approach in mapping the transport problem to a computer.  Instead of the neutron population being continuous and the spatial, angular, and energy dimensions being discretized, it leaves the dimensions continuous and discretizes the neutron population!   Quantities of interested are then determined by integrating over the neutron population!   This way of integrating the neutron transport equation can be thought of as integrating it ``sideways.''   Deterministic approaches integrate it by discretizing the dimensions and ensuring consistency of the transport equation between the discrete points.  This is the ``standard'' way of integrating the transport equation.  In the Monte Carlo method, the discretized neutron ``shoots through'' the transport equation many times, sweeping out the entire phase space, effectively integrating it when a sum is done over the individual neutron realizations, or \emph{histories}.  It is important to note that the Monte Carlo method does not actually solve the transport equation, per se, but rather is able to \emph{estimate} the solution very well.
 
-The first step in understanding how the Monte Carlo method does this, a simple equations and derivations and such
+To understand how the Monte Carlo method performs this integration, simple equations and derivations and such as calculating $\pi$ can be done.   First, given a continuous random variable $x$ that follows the probability distribution $P$, the mean value can be calculated by taking the first moment as was shown in \eqref{} and is reproduced in \eqref{int_mean}.  But we are interested in determining the mean from the measurements rather than the underlying distribution.  If we have $N$ independent measurements of quantity $x$, this is simply taking the arithmetic mean, as shown in \eqref{arith_mean}.
 
-advantages, parallel scaling, low assumptions, high fidelity geom
+\begin{equation}
+\label{int_mean}
+\mu = \int_{-\infty}^{\infty} x P(x) dx
+\end{equation}
 
-drawbacks and limitations
+\begin{equation}
+\label{arith_mean}
+\mu = \frac{1}{N} \sum_i^N x_i
+\end{equation}
+
+The rate at which the estimate \eqref{arith_mean}  converges to the true mean \eqref{int_mean},
+
+
+There are advantages in using the Monte Carlo method for neutron transport, some of which have been mentioned.  The first and foremost is that it that very few assumptions must be done to the physics and the geometry of the problem. Paraphrasing Forrest Brown when he spoke at the Supercomputing in Nuclear Applications and Monte Carlo conference on October 30th, 2013 in Paris,  the only reason people use Monte Carlo methods is that they are able to produce physically accurate results and are trusted to so so.  Anyone developing Monte Carlo code should not abuse this trust and must put accuracy first and foremost in their implementations.
+
+There are considerable drawbacks to using Monte Carlo as well; primarily statistical error, convergence rates, and silent inaccuracies.  Since it is a statistical calculation, it is bound by statistical laws.   
+
+but parallel scaling
+
+
 
 \subsection{Sampling Schemes}
+
+
 
 \subsubsection{Interpolation}
 
@@ -601,6 +620,8 @@ fission dist
 
 source pop
 
+
+\subsection{Error Estimation}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
