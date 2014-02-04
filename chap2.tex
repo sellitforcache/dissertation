@@ -6,11 +6,22 @@ In this chapter, details regarding the simulation theory are gone over.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Reactor Analysis}
 
-reactors in general, LWR, fast breeders, GenIV, waste streams, power conversion
+reactors in general, LWR, fast breeders, GenIV, waste streams, power conversion, coupling between TH, need for fast simulations in oder to do convergence iterations
 
-fission chain reaction, 7 factor formula?
+fission chain reaction, 
 
-coupling between TH, need for fast simulations in oder to do convergence iterations
+\subsection{Seven Factor Formula}
+ 7 factors
+
+\subsection{Point Kinetics}
+
+\begin{equation}
+\label{keff}
+k_\mathrm{eff} = 
+\end{equation}
+
+
+
 
 
 
@@ -414,7 +425,6 @@ dn(x) = - v \Sigma A n(x)dx  \qquad \Rightarrow \qquad  \frac{dI(x)}{dx}= - \Sig
 \end{equation}
 
 
-
 \subsubsection{Angular and Scalar Flux}
 
 Since the reactions rate density is dependent on the cross section and the velocity multiplied by the neutron distribution, this quantity is redefined as the \emph{angular flux} as shown in \eqref{ang_flux}.  Flux meaning that it represents a rate at which particles are passing through a surface, and angular meaning that it is differential in angle.  Again, since the reactions rates depend on this quantity, the neutron transport problem is usually written in terms of the angular flux, which is then solved for instead of the neutron distribution.
@@ -435,6 +445,13 @@ Scattering and neutron movement have angular dependence, but reaction cross sect
 \label{scalar_flux_RR}
  R_i(\boldsymbol{\vec{r}},E,t) = \int_{4\pi} \Sigma_i(\boldsymbol{\vec{r}},E) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) = \Sigma(\boldsymbol{\vec{r}},E) \int_{\boldsymbol{\Omega}} \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) = \Sigma(\boldsymbol{\vec{r}},E) \phi(\boldsymbol{\vec{r}},E,t)
  \end{equation}
+ 
+ From \eqref{NBE} we can see that the time derivative is in terms of the neutron density, not the angular flux.  Since reaction rates are proportional to angular flux, the balance equation will be written in terms of it.  This mean that the time dependent term must be transformed to angular flux by multiplying and dividing it by the velocity as shown in \eqref{time_depedent_flux}.
+
+\begin{equation}
+\label{time_depedent_flux}
+\frac{\partial }{\partial t}n(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) = \frac{\partial }{\partial t}  \frac{v(E)}{v(E)} n(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) =  \frac{\partial }{\partial t}  \frac{\psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t)}{v(E)} = \frac{1}{v(E)} \frac{\partial }{\partial t}\psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t)
+\end{equation}
 
 \subsubsection{Scattering}
 
@@ -502,12 +519,12 @@ So far all that has been  touched on is how neutrons within a volume move in ang
 
 \subsubsection{Neutron Transport Equation}
 
-Now all the terms of \eqref{NBE} have been explicitly defined.  Substituting them all in yields \eqref{NTE}, the \emph{neutron transport equation}, written here with the neutron sinks on the left side and the neutron sources on the right side.  An additional external source term, $S_{\mathrm{external}}$, has been added to account for any sources not induced by the neutron flux itself, i.e. external sources.
+Now all the terms of \eqref{NBE} have been explicitly defined.  Substituting them all in yields \eqref{NTE}, the \emph{neutron transport equation}, written here with the neutron sinks on the left side and the neutron sources on the right side.  An additional external source term, $S_{\mathrm{external}}$, has been added to account for any sources not induced by the neutron flux itself, i.e. external sources.  
 
 \begin{equation}
 \label{NTE}
 \begin{split}
-\frac{1}{v} \frac{\partial }{\partial t}\psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) &+  \\
+\frac{1}{v(E)} \frac{\partial }{\partial t}\psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) &+  \\
 \boldsymbol{\hat{\Omega}}  \cdot \nabla \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) &+ \\
 \Sigma_t(\boldsymbol{\vec{r}},E) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) & \\
 & =  \\
@@ -517,21 +534,40 @@ Now all the terms of \eqref{NBE} have been explicitly defined.  Substituting the
 \end{split}
  \end{equation}
  
- The neutron transport equation in this form is an integro-differential equation since it has both derivates and integrals in it.  It's spatial parts are differential, whereas its angular and energy parts are integral.  It is linear and relatively easy to solve for simple geometries and reaction parameters.  The complexity in solving it comes from the complex energy dependence of the reaction parameters and the large and complex domains over which it must be solved in order to capture all the relevant physics.
+ The neutron transport equation in this form is an integro-differential equation since it has both derivates and integrals in it.  It's spatial parts are differential, whereas its angular and energy parts are integral.  It is linear and relatively easy to solve for simple geometries and reaction parameters.  The complexity in solving it comes from the complex energy dependence of the reaction parameters and the large and complex domains over which it must be solved in order to capture all the relevant physics.  The reaction parameters can span more then 12 orders of magnitude, from $1\times 10 ^{-11}$ to $1\times 10 ^{1}$ MeV and above, and the geometries involved can include millions of individual material regions with many different mixtures of material within them.
  
+ \subsubsection{Time Independent Neutron Transport Equation}
+
+In most situations, the equilibrium state of the neutron population is of interest.  By setting all time derivates to zero, \eqref{NTE} becomes the time-independent neutron transport equation shown in \eqref{time_ind_NTE}.  Another parameter has been introduced, the effective multiplication factor, $k_\mathrm{eff}$, which was described earlier using the seven factor formula.  It is introduced here since by forcing the time derivates to be zero, it is implied that the multiplication factor must be equal to one.  The material and geometric properties of a problem may say otherwise, however, and failing to divide the fission source by the effective multiplication factor could make time independent equation inconsistent.  Of course, there will be no inequality if the source and sink terms are actually balanced and $k_\mathrm{eff}$ calculated from \eqref{NTE} is one.
+
+\begin{equation}
+\label{time_ind_NTE}
+\begin{split}
+\boldsymbol{\hat{\Omega}}  \cdot \nabla \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) &+ \\
+\Sigma_t(\boldsymbol{\vec{r}},E) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) & \\
+& =  \\
+& \quad \int_0^\infty  \int_{4\pi} \Sigma_s(E^\prime \rightarrow E,\boldsymbol{\hat{\Omega}}^\prime \rightarrow \boldsymbol{\hat{\Omega}}) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}}^\prime,E^\prime,t) d\boldsymbol{\Omega}^\prime dE^\prime  \\
+&+ \frac{1}{k_{\mathrm{eff}}}\frac{\chi(E)}{4\pi} \int_0^\infty  \int_{4\pi}   \nu(E^\prime) \Sigma_f(\boldsymbol{\vec{r}},E^\prime) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}}^\prime,E^\prime,t) d\boldsymbol{\Omega}^\prime  dE^\prime\\
+& + S_{\mathrm{external}}
+\end{split}
+ \end{equation}
+ 
+
+ 
+
 \section{Discrete Methods}
 
-moments
+The usual method in solving continuous differential and integral equations on a computer is to discretize the domain over which it is being solved.  This can be applied to the neutron transport equation as well.  Since energy is involved in integrals in the neutron transport equation, it can be discretized by integrating over set boundaries and treating the reaction parameters as constant within them.  The same method can be applied to them angular dependence.   The simplest way of discretizing the geometry is to voxelize the domain, laying down a uniform grid in every dimension and treating the material within each voxel as being uniform.  Discrete geometry representation is and area where an lot of error can occur since it is three dimensional and scales can range from millimeters to hundred of meters. 
 
-Diffusion, SN
+derivations?  moments, diffusion, SN?
 
-drawbacks, limitations
+Although discrete methods are readily mapped to computer hardware and execute quite fast, there are drawbacks and limitations in using them.  The biggest drawback is that they're accuracy greatly depends and the discretization methods used.  MORE.
 
 \section{Monte Carlo}
 
-instead of the neutron population being continuous and the spatial and energy dimensions discretized (and integrating along them), we make the population discrete (and integrate over it) and leave the other dimensions continuous! 
+The Monte Carlo method takes a different approach in mapping the transport problem to a computer.  Instead of the neutron population being continuous and the spatial, angular, and energy dimensions being discretized, it leaves the dimensions continuous and discretizes the neutron population!   Quantities of interested are then determined by integrating over the neutron population!   This way of integrating the neutron transport equation can be thought of as integrating it ``sideways'' in the sense that instead of being fixed to a discrete space angle and energy, the discretized neutron shoots through the transport equation many times, sweeping out the entire phase space and thus effectively integrating it.
 
-equations and derivations and such
+The first step in understanding how the Monte Carlo method does this, a simple equations and derivations and such
 
 advantages, parallel scaling, low assumptions, high fidelity geom
 
