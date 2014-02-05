@@ -567,7 +567,14 @@ Although discrete methods are readily mapped to computer hardware and execute qu
 
 The Monte Carlo method takes a different approach in mapping the transport problem to a computer.  Instead of the neutron population being continuous and the spatial, angular, and energy dimensions being discretized, it leaves the dimensions continuous and discretizes the neutron population!   Quantities of interested are then determined by integrating over the neutron population!   This way of integrating the neutron transport equation can be thought of as integrating it ``sideways.''   Deterministic approaches integrate it by discretizing the dimensions and ensuring consistency of the transport equation between the discrete points.  This is the ``standard'' way of integrating the transport equation.  In the Monte Carlo method, the discretized neutron ``shoots through'' the transport equation many times, sweeping out the entire phase space, effectively integrating it when a sum is done over the individual neutron realizations, or \emph{histories}.  It is important to note that the Monte Carlo method does not actually solve the transport equation, per se, but rather is able to \emph{estimate} the solution very well.
 
-To understand how the Monte Carlo method performs this integration, simple equations and derivations and such as calculating $\pi$ can be done.   First, given a continuous random variable $x$ that follows the probability distribution $P$, the mean value can be calculated by taking the first moment as was shown in \eqref{} and is reproduced in \eqref{int_mean}.  But we are interested in determining the mean from the measurements rather than the underlying distribution.  If we have $N$ independent measurements of quantity $x$, this is simply taking the arithmetic mean, as shown in \eqref{arith_mean}.
+There are advantages in using the Monte Carlo method for neutron transport, some of which have been mentioned.  The first and foremost is that it that very few assumptions must be done to the physics and the geometry of the problem. Paraphrasing Forrest Brown when he spoke at the Supercomputing in Nuclear Applications and Monte Carlo conference on October 30th, 2013 in Paris,  the only reason people use Monte Carlo methods is that they are able to produce physically accurate results and are trusted to so so.  Anyone developing Monte Carlo code should not abuse this trust and must put accuracy first and foremost in their implementations.
+
+There are considerable drawbacks to using Monte Carlo as well; primarily statistical error, convergence rates, and silent inaccuracies.  Since it is a statistical calculation, it is bound by statistical laws.   
+
+but parallel scaling
+
+\subsection{Statistics}
+To understand how the Monte Carlo method performs this integration, simple equations and derivations and such as calculating $\pi$ can be done.   First, given a continuous random variable $x$ that follows the probability distribution $P$, the mean value can be calculated by taking the first moment as was shown in \eqref{NDF_moments} and is reproduced in \eqref{int_mean}.  But we are interested in determining the mean from a set measurements rather than the underlying distribution.  If we have $N$ independent measurements of quantity $x$, this is simply taking the arithmetic mean, as shown in \eqref{arith_mean}.
 
 \begin{equation}
 \label{int_mean}
@@ -579,7 +586,7 @@ To understand how the Monte Carlo method performs this integration, simple equat
 \bar{X}_N = \frac{1}{N} \sum_i^N x_i
 \end{equation}
 
-The shape of the distribution about the mean is important as well, since it quantifies the uncertainty.  The variance can be computed by performing the central second moment on $P$ and estimated by Bessel's Correction on the standard variance estimator \eqref{varience_est}\cite{}.
+The shape of the distribution about the mean is important as well, since it quantifies the uncertainty.  The variance can be computed by performing the central second moment on $P$ and estimated by Bessel's Correction on the standard variance estimator \eqref{varience_est}\cite{}.  It is useful that the sample mean can be removed from the sum of the sample squares since this means that only the sample sum and the sum of sample squares need be stored.  The entire sample set does not need to be stored and used to compute the variance at the end when the sample mean is known.
 
 \begin{equation}
 \label{varience}
@@ -598,25 +605,40 @@ The law of large number states that \eqref{arith_mean}, the sample mean, will co
 Pr\left(\lim_{N\rightarrow\infty} \bar{X}_N = \mu \right) =0
 \end{equation}
 
-The rate at which the estimate \eqref{arith_mean}  converges to the true mean \eqref{int_mean} comes from the central limit theorem.  Shown in \eqref{CLT}, it states that the distribution of the means of taken from a large set of independent random variables will be normally distributed.  In this case, if a large number of measurements are taken, we would like to know how close the mean of a completely independent set measurements will be to the true mean.  
+The rate at which the estimate \eqref{arith_mean} converges to the true mean \eqref{int_mean} comes from the central limit theorem.  Shown in \eqref{CLT}, it states that the distribution of the means of taken from a large set of independent random variables will be normally distributed.  
 
 \begin{equation}
 \label{CLT}
 \sqrt{N}\left(\left(\frac{1}{N} \sum_i^N x_i \right)-\mu\right) \xrightarrow[]{d} \mathcal{N}(0,\sigma^2)
 \end{equation}
 
-Since the central limit theorem states that it is normally distributed, we can make use of the well-know properties of the normal distribution.
+In this case, if a large number of measurements are taken, we would like to know how close the mean of a completely independent set measurements will be to the true mean.  In other words, the variance of the mean is desired.  Luckily, this can be estimated with only one measurement instead of directly computing the variance with many measurements.  The Bienaym\'e formula, shown in \eqref{bien}, states that the variance of a sum of uncorrelated random variables is equal to the sum of the variances of the variables.
 
-There are advantages in using the Monte Carlo method for neutron transport, some of which have been mentioned.  The first and foremost is that it that very few assumptions must be done to the physics and the geometry of the problem. Paraphrasing Forrest Brown when he spoke at the Supercomputing in Nuclear Applications and Monte Carlo conference on October 30th, 2013 in Paris,  the only reason people use Monte Carlo methods is that they are able to produce physically accurate results and are trusted to so so.  Anyone developing Monte Carlo code should not abuse this trust and must put accuracy first and foremost in their implementations.
+\begin{equation}
+\label{bien}
+Var\left(\sum_{i=0}^N x_i \right) = \sum_{i=0}^N Var(x_i)
+\end{equation}
 
-There are considerable drawbacks to using Monte Carlo as well; primarily statistical error, convergence rates, and silent inaccuracies.  Since it is a statistical calculation, it is bound by statistical laws.   
+Applying this to distribution of mean values inn \eqref{sum_var}, an expression for the variance of the mean in terms of the variance of the sample be found.  
 
-but parallel scaling
+\begin{equation}
+\label{sum_var}
+Var(\bar{X}_i) = Var\left(\frac{1}{N}\sum_{i=0}^N x_i \right) = \frac{1}{N^2} \sum_{i=0}^N Var(x_i) = \frac{\sigma_N^2}{N} = \frac{1}{(N-1)} \left( \frac{1}{N}\sum_i^N x_i^2-\bar{X}_N^2 \right)
+\end{equation}
 
+It should be noted that \eqref{sum_var} implies that the standard deviation of the mean scales as $1/\sqrt{N}$ in the worst case.  This is a blessing and a burden in that it means any calculation will variance of the mean will go to zero, or the sample mean will converge to the true mean, as long it is run long enough and enough samples are collected, but that it will converge as $1/\sqrt{N}$, which is slow.
+
+Since the central limit theorem states that it is normally distributed, we can make use of the well-know properties of the normal distribution, namely the confidence interval.  The normal distribution has well-defined confidence intervals: 68\% of the population will lie within a single standard deviation, $\sigma$, and 95.5\% will lie within $2\sigma$.  From this knowledge, an expression for the realtive error can be written.  The expression for the relative error shown in \eqref{rel_err} is for the 68\% confidence level, and simply needs to be doubled for the 95\% level \cite{MCNP}\cite{jaakko}.
+
+\begin{equation}
+\label{rel_err}
+\mathrm{Rel. Err.} = \frac{\sigma}{\bar{X}_N} = \frac{1}{\bar{X}_N}\sqrt{\frac{1}{(N-1)} \left( \frac{1}{N}\sum_i^N x_i^2-\bar{X}_N^2 \right)}
+\end{equation}
 
 
 \subsection{Sampling Schemes}
 
+In order to actually carry out the Monte Carlo simulation,
 
 
 \subsubsection{Interpolation}
