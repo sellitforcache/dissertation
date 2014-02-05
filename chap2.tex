@@ -576,11 +576,36 @@ To understand how the Monte Carlo method performs this integration, simple equat
 
 \begin{equation}
 \label{arith_mean}
-\mu = \frac{1}{N} \sum_i^N x_i
+\bar{X}_N = \frac{1}{N} \sum_i^N x_i
 \end{equation}
 
-The rate at which the estimate \eqref{arith_mean}  converges to the true mean \eqref{int_mean},
+The shape of the distribution about the mean is important as well, since it quantifies the uncertainty.  The variance can be computed by performing the central second moment on $P$ and estimated by Bessel's Correction on the standard variance estimator \eqref{varience_est}\cite{}.
 
+\begin{equation}
+\label{varience}
+\sigma^2 = \int_{-\infty}^{\infty} x^2 P(x) dx- \mu^2
+\end{equation}
+
+\begin{equation}
+\label{varience_est}
+\sigma_N^2 =  \frac{1}{N-1} \sum_i^N (x_i-\mu)^2 =  \frac{1}{N-1} \left( \sum_i^N x_i^2-N\bar{X}_N^2 \right)
+\end{equation}
+
+The law of large number states that \eqref{arith_mean}, the sample mean, will converge to the true mean \eqref{int_mean} in the limit where $N\rightarrow\infty$.  
+
+\begin{equation}
+\label{LLN}
+Pr\left(\lim_{N\rightarrow\infty} \bar{X}_N = \mu \right) =0
+\end{equation}
+
+The rate at which the estimate \eqref{arith_mean}  converges to the true mean \eqref{int_mean} comes from the central limit theorem.  Shown in \eqref{CLT}, it states that the distribution of the means of taken from a large set of independent random variables will be normally distributed.  In this case, if a large number of measurements are taken, we would like to know how close the mean of a completely independent set measurements will be to the true mean.  
+
+\begin{equation}
+\label{CLT}
+\sqrt{N}\left(\left(\frac{1}{N} \sum_i^N x_i \right)-\mu\right) \xrightarrow[]{d} \mathcal{N}(0,\sigma^2)
+\end{equation}
+
+Since the central limit theorem states that it is normally distributed, we can make use of the well-know properties of the normal distribution.
 
 There are advantages in using the Monte Carlo method for neutron transport, some of which have been mentioned.  The first and foremost is that it that very few assumptions must be done to the physics and the geometry of the problem. Paraphrasing Forrest Brown when he spoke at the Supercomputing in Nuclear Applications and Monte Carlo conference on October 30th, 2013 in Paris,  the only reason people use Monte Carlo methods is that they are able to produce physically accurate results and are trusted to so so.  Anyone developing Monte Carlo code should not abuse this trust and must put accuracy first and foremost in their implementations.
 
