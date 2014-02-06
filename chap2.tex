@@ -617,14 +617,25 @@ In this case, if a large number of measurements are taken, we would like to know
 Var\left(\sum_{i=0}^N x_i \right) = \sum_{i=0}^N Var(x_i)
 \end{equation}
 
-Applying this to distribution of mean values inn \eqref{sum_var}, an expression for the variance of the mean in terms of the variance of the sample be found.  
+
+Applying the Bienaym\'e formula and the variance relation show in \eqref{basic_var_scaling} to the sample mean results in an expression for the variance of the mean, $Var(\bar{X}_N)$, in terms of the variance of the sample, $\sigma_N^2$.  This expression is shown in \eqref{sum_var}.  
+
+\begin{equation}
+\label{basic_var_scaling}
+Var\left(a X \right) = a^2 Var\left( X \right)
+\end{equation}
+
+\begin{equation}
+\label{sum_var_1}
+Var(\bar{X}_i) = Var\left(\frac{1}{N}\sum_{i=0}^N x_i \right) = \frac{1}{N^2} \sum_{i=0}^N Var(x_i) = \frac{N\sigma_N^2}{N^2} =  \frac{\sigma_N^2}{N} 
+\end{equation}
 
 \begin{equation}
 \label{sum_var}
-Var(\bar{X}_i) = Var\left(\frac{1}{N}\sum_{i=0}^N x_i \right) = \frac{1}{N^2} \sum_{i=0}^N Var(x_i) = \frac{\sigma_N^2}{N} = \frac{1}{(N-1)} \left( \frac{1}{N}\sum_i^N x_i^2-\bar{X}_N^2 \right)
+ \frac{\sigma_N^2}{N} = \frac{1}{N(N-1)} \left( \sum_i^N x_i^2- N\bar{X}_N^2 \right) = \frac{1}{(N-1)} \left( \frac{1}{N} \sum_i^N x_i^2 - \left(   \frac{1}{N} \sum_i^N x_i \right)   \right)
 \end{equation}
 
-It should be noted that \eqref{sum_var} implies that the standard deviation of the mean scales as $1/\sqrt{N}$ in the worst case.  This is a blessing and a burden in that it means any calculation will variance of the mean will go to zero, or the sample mean will converge to the true mean, as long it is run long enough and enough samples are collected, but that it will converge as $1/\sqrt{N}$, which is slow.
+It should be noted that \eqref{sum_var_1} implies that the standard deviation of the mean always scales as $1/\sqrt{N}$.  This is a blessing and a burden in that it means any calculation will variance of the mean will go to zero, or the sample mean will converge to the true mean, as long it is run long enough and enough samples are collected, but that it will converge as $1/\sqrt{N}$, which is slow.
 
 Since the central limit theorem states that it is normally distributed, we can make use of the well-know properties of the normal distribution, namely the confidence interval.  The normal distribution has well-defined confidence intervals: 68\% of the population will lie within a single standard deviation, $\sigma$, and 95.5\% will lie within $2\sigma$.  From this knowledge, an expression for the realtive error can be written.  The expression for the relative error shown in \eqref{rel_err} is for the 68\% confidence level, and simply needs to be doubled for the 95\% level \cite{MCNP}\cite{jaakko}.
 
@@ -645,18 +656,18 @@ The direct inversion method relies and being able to analytically integrate the 
 CDF(x) = \int_0^x PDF(x^\prime) dx^\prime
 \end{equation}
 
-Since a PDF must be positive and normalized by definition, the CDF must range from 0 to 1 and increase monotonically.  Setting the CDF equal to a uniformly distributed random number $\xi$ and solving for the value to be sampled yields the sampling scheme.
+Since a PDF must be positive and normalized by definition, the CDF must range from 0 to 1 and increase monotonically.  Setting the CDF equal to a uniformly distributed random number $\xi$ and solving for the value to be sampled yields the sampling scheme.  Figure \ref{direct_samp} shows this graphically.  The CDF describes the probability that a value of a random number $x$ obeying the PDF will be below the value $x$.  Uniformly sampling the y-values of the CDF, is effectively integrating the inverse function of the CDF.  Since the area under the curve of the inverse CDF is diretly proportional to the PDF at the same value of $x$, the sampled values of $x$ must follow the PDF.
 
 \begin{equation}
 \label{CDF}
-CDF(x) =\xi \qquad \Rightarrow \qquad x = CDF^{-1}(\xi)
+CDF(x) =\xi \qquad \Rightarrow \qquad x_i = CDF^{-1}(\xi_i)
 \end{equation}
 
 \begin{figure}[h!] 
   \label{direct_samp}
   \centering
     \includegraphics[width=0.8\textwidth]{graphics/direct_samp.eps}
-     \caption{Sampling from a CDF.}
+     \caption{Sampling a PDF by the direct inversion method.}
 \end{figure}
 
 \subsubsection{Interpolation}
