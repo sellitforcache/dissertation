@@ -243,3 +243,40 @@ else:
 	print name+'.eps'
 	fig.savefig(name+'.eps')
 
+
+
+#
+#  direct inversion
+#
+name = 'direct_samp'
+fig = pl.figure(figsize=(10,6))
+ax1 = fig.add_subplot(2,1,1)
+ax2 = fig.add_subplot(2,1,2)
+x = np.linspace(0,2*np.pi)
+y1 = 1.0/(2*np.pi*np.pi)*(np.sin(x)*x+np.cos(x)+x*x/2-1.0)
+y2 = 1.0/(2*np.pi*np.pi)*(x*np.cos(x)+x)
+x1xi = 4.2
+y1xi = 1.0/(2*np.pi*np.pi)*(np.sin(x1xi)*x1xi+np.cos(x1xi)+x1xi*x1xi/2-1.0)
+y2xi = 1.0/(2*np.pi*np.pi)*(x1xi*np.cos(x1xi)+x1xi)
+ax1.plot(x,y1,label="CDF")
+ax1.plot([0,x1xi],[y1xi,y1xi],'r--')
+ax1.plot([x1xi,x1xi],[y1xi,0],'r--')
+ax2.plot([x1xi,x1xi],[2/np.pi,y2xi],'r--')
+ax2.plot(x,y2,label="PDF")
+ax1.set_ylabel(r'CDF$(x)$')
+ax2.set_ylabel(r'PDF$(x)$')
+ax2.set_xlabel(r'$x$')
+ax1.grid('on')
+ax2.grid('on')
+fig.text( 0.06, 0.6, r'$\xi=$',color='k', size=16)
+ax1.set_xlim(0,2*np.pi)
+ax1.set_ylim(0,1)
+ax2.set_xlim(0,2*np.pi)
+ax2.set_ylim(0,2/np.pi)
+
+if plot:
+	pl.show()
+else:
+	print name+'.eps'
+	fig.savefig(name+'.eps')
+
