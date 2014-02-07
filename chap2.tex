@@ -656,10 +656,15 @@ The direct inversion method relies and being able to analytically integrate the 
 CDF(x) = \int_0^x PDF(x^\prime) dx^\prime
 \end{equation}
 
-Since a PDF must be positive and normalized by definition, the CDF must range from 0 to 1 and increase monotonically.  Setting the CDF equal to a uniformly distributed random number $\xi$ and solving for the value to be sampled yields the sampling scheme.  Figure \ref{direct_samp} shows this graphically.  The CDF describes the probability that a value of a random number $x$ obeying the PDF will be below the value $x$.  Uniformly sampling the y-values of the CDF, is effectively integrating the inverse function of the CDF.  Since the area under the curve of the inverse CDF is diretly proportional to the PDF at the same value of $x$, the sampled values of $x$ must follow the PDF.
+Since a PDF must be positive and normalized by definition, the CDF must range from 0 to 1 and increase monotonically.  Setting the CDF equal to a uniformly distributed random number $\xi$ and solving for the value to be sampled yields the sampling scheme.  Figure \ref{direct_samp} shows this graphically.  The CDF describes the probability that a value of a random number $x$ obeying the PDF will be below the value $x$.  Taking an interval gives the probability $x$ will be in the interval, as shown in \eqref{CDF_propery}.  Uniformly sampling the y-values of the CDF, is effectively integrating the inverse function of the CDF.  Since the width of inverse CDF is directly proportional to the PDF at the same value of $x$, the sampled values of $x$ must follow the PDF.
 
 \begin{equation}
-\label{CDF}
+\label{CDF_property}
+CDF(x_2) - CDF(x_1) = P( x_1 < x_i < x_2) = \int_{x_1}^{x_2} PDF(x) dx
+\end{equation}
+
+\begin{equation}
+\label{CDF_inversion}
 CDF(x) =\xi \qquad \Rightarrow \qquad x_i = CDF^{-1}(\xi_i)
 \end{equation}
 

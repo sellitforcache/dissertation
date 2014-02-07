@@ -253,15 +253,31 @@ fig = pl.figure(figsize=(10,6))
 ax1 = fig.add_subplot(2,1,1)
 ax2 = fig.add_subplot(2,1,2)
 x = np.linspace(0,2*np.pi)
-y1 = 1.0/(2*np.pi*np.pi)*(np.sin(x)*x+np.cos(x)+x*x/2-1.0)
-y2 = 1.0/(2*np.pi*np.pi)*(x*np.cos(x)+x)
+y1 = 1.0/(2*np.pi*np.pi)*(np.sin(x)*x+np.cos(x)+x*x/2-1.0)  #cdf
+y2 = 1.0/(2*np.pi*np.pi)*(x*np.cos(x)+x)					#pdf
 x1xi = 4.2
+tol = .1
 y1xi = 1.0/(2*np.pi*np.pi)*(np.sin(x1xi)*x1xi+np.cos(x1xi)+x1xi*x1xi/2-1.0)
 y2xi = 1.0/(2*np.pi*np.pi)*(x1xi*np.cos(x1xi)+x1xi)
 ax1.plot(x,y1,label="CDF")
+fill_x  = np.linspace(0,x1xi+tol,512)
+fill_y1 = np.linspace(0,x1xi+tol,512)
+fill_y2 = np.linspace(0,x1xi+tol,512)
+fill_y1.fill( 1.0/(2*np.pi*np.pi)*(np.sin(x1xi-tol)*(x1xi-tol)+np.cos(x1xi-tol)+(x1xi-tol)*(x1xi-tol)/2-1.0) )
+fill_y2.fill( 1.0/(2*np.pi*np.pi)*(np.sin(x1xi+tol)*(x1xi+tol)+np.cos(x1xi+tol)+(x1xi+tol)*(x1xi+tol)/2-1.0) )
+a=0
+for val in fill_x:
+	if val > x1xi-tol:
+		fill_y1[a]=1.0/(2*np.pi*np.pi)*(np.sin(val)*(val)+np.cos(val)+(val)*(val)/2-1.0)
+	a=a+1
+ax1.fill_between(fill_x,fill_y1,fill_y2,color='red',facecolor='red', alpha=0.25)
+fill_x = np.linspace(x1xi-tol,x1xi+tol,128)
+fill_y2 = 1.0/(2*np.pi*np.pi)*(np.sin(fill_x)*fill_x+np.cos(fill_x)+fill_x*fill_x/2-1.0)
+ax1.fill_between(fill_x,0,fill_y2,color='red',facecolor='red', alpha=0.25)
+ax2.fill_between(fill_x,0,2/np.pi,color='red',facecolor='red', alpha=0.25)
 ax1.plot([0,x1xi],[y1xi,y1xi],'r--')
 ax1.plot([x1xi,x1xi],[y1xi,0],'r--')
-ax2.plot([x1xi,x1xi],[2/np.pi,y2xi],'r--')
+ax2.plot([x1xi,x1xi],[0,2/np.pi],'r--')   #[2/np.pi,y2xi],'r--')
 ax2.plot(x,y2,label="PDF")
 ax1.set_ylabel(r'CDF$(x)$')
 ax2.set_ylabel(r'PDF$(x)$')
