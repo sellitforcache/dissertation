@@ -615,7 +615,7 @@ In this case, if a large number of measurements are taken, we would like to know
 \begin{equation}
 \label{bien}
 Var\left(\sum_{i=0}^N x_i \right) = \sum_{i=0}^N Var(x_i)
-\end{equation}
+\end{equation}      
 
 
 Applying the Bienaym\'e formula and the variance relation show in \eqref{basic_var_scaling} to the sample mean results in an expression for the variance of the mean, $Var(\bar{X}_N)$, in terms of the variance of the sample, $\sigma_N^2$.  This expression is shown in \eqref{sum_var}.  
@@ -649,31 +649,46 @@ Since the central limit theorem states that it is normally distributed, we can m
 
 In order to actually transport a neutron across the geometry in a Monte Carlo simulation, a the probability distributions of the reaction types must be sampled in order to produce accurate distributions when the histories are aggregated.  There are two methods that are commonly used to do so; the direct inversion method and the rejection method.  
 
-The direct inversion method relies and being able to analytically integrate the probability distribution function (PDF) to create a cumulative distribution function (CDF) and being able to invert it.  The first step is to integrate the PDF to find the CDF, as shown in \eqref{CDF}.
+The \emph{direct inversion} method relies and being able to analytically integrate the probability distribution function (PDF) to create a cumulative distribution function (CDF) and being able to invert it.  The first step is to integrate the PDF to find the CDF, as shown in \eqref{CDF}.
 
 \begin{equation}
 \label{CDF}
 CDF(x) = \int_0^x PDF(x^\prime) dx^\prime
 \end{equation}
 
-Since a PDF must be positive and normalized by definition, the CDF must range from 0 to 1 and increase monotonically.  Setting the CDF equal to a uniformly distributed random number $\xi$ and solving for the value to be sampled yields the sampling scheme.  Figure \ref{direct_samp} shows this graphically.  The CDF describes the probability that a value of a random number $x$ obeying the PDF will be below the value $x$.  Taking an interval gives the probability $x$ will be in the interval, as shown in \eqref{CDF_propery}.  Uniformly sampling the y-values of the CDF, is effectively integrating the inverse function of the CDF.  Since the width of inverse CDF is directly proportional to the PDF at the same value of $x$, the sampled values of $x$ must follow the PDF.
+Since a PDF must be positive and normalized by definition, the CDF must range from 0 to 1 and increase monotonically.  Setting the CDF equal to a uniformly distributed random number $\xi$ and solving for the value to be sampled yields the sampling scheme.  Figure \ref{direct_samp} shows this graphically.  The CDF describes the probability that a value of a random number $x$ obeying the PDF will be below the value $x$.  Taking an interval gives the probability $x$ will be in the interval, as shown in \eqref{CDF_property1}.  Since the width of inverse CDF is directly proportional to the PDF at the same value of $x$, as shown in \eqref{CDF_property2}, and if $\xi$ is uniformly distributed on [0,1), the interval $\Delta \xi$ will contain a fraction of samples on [0,1) equal to $P( x_1 < x_i < x_2)$.  As the interval is reduced to 0, $P(x_i)= PDF(x)dx = d\xi$ (again, since $\xi$ is uniformly distributed on [0,1), leading to the sampling scheme shown in \eqref{CDF_inversion}.  This method is only useful if the CDF is simple enough to be inverted analytically.
 
 \begin{equation}
-\label{CDF_property}
+\label{CDF_property1}
 CDF(x_2) - CDF(x_1) = P( x_1 < x_i < x_2) = \int_{x_1}^{x_2} PDF(x) dx
 \end{equation}
 
 \begin{equation}
+\label{CDF_property2}
+CDF(x_2) - CDF(x_1) = \Delta \xi =  \int_{x_1}^{x_2} PDF(x) dx
+\end{equation}
+
+\begin{equation}
 \label{CDF_inversion}
-CDF(x) =\xi \qquad \Rightarrow \qquad x_i = CDF^{-1}(\xi_i)
+ x_i = CDF^{-1}(\xi_i)
 \end{equation}
 
 \begin{figure}[h!] 
   \label{direct_samp}
   \centering
-    \includegraphics[width=0.8\textwidth]{graphics/direct_samp.eps}
-     \caption{Sampling a PDF by the direct inversion method.}
+    \includegraphics[width=0.8\textwidth]{graphics/direct_samp.pdf}
+     \caption{Sampling $PDF(x)=\frac{1}{2\pi^2}(x \cos x - x)$ by the direct inversion method on the domain $(0,2\pi)$.}
 \end{figure}
+
+When the CDF is not invertible, the \emph{rejection sampling} method can be used.  It uses a secondary PDF, $f{x}$, that is greater at all points than the PDF to be sampled from.  Since the PDF is normalized, $f(x)$ now corresponds to being able to have probabilities greater than one.  This is simply a scaling problem, and the random numbers used to directly sample from it must be uniform on $[0,\int_\mathrm{domain}f(x))$ instead of $[0,1)$.   Then two random numbers are generated  The first, $\xi_1$ is sampled from a $f(x)$ using a scaled random number as mentioned, and the second, $\xi_2$ is uniformly distributed on $[0,f(\xi_1))$.  If $\xi_2 < PDF(\xi_1)$, the sampled value $(\xi_1)$, is added to the population, else it is \emph{rejected}, or discarded from the population.  The set of accepted values of ${\xi_2}$ will then follow PDF(x).  Figure \ref{rejection_samp} shows an illustration of rejection sampling.
+
+\begin{figure}[h!] 
+  \label{rejection_samp}
+  \centering
+    \includegraphics[width=0.8\textwidth]{graphics/rejection_samp.pdf}
+     \caption{Sampling $PDF(x)=\frac{1}{2\pi^2}(x \cos x - x)$ by the rejection method on the domain $(0,2\pi)$.  The auxilliary function $f(x)=x/\pi$ and the random number used to sample from it must be on $[0,2\pi)$ instead of $[0,1)$.}
+\end{figure}
+
 
 \subsubsection{Interpolation}
 

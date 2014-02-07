@@ -252,7 +252,7 @@ name = 'direct_samp'
 fig = pl.figure(figsize=(10,6))
 ax1 = fig.add_subplot(2,1,1)
 ax2 = fig.add_subplot(2,1,2)
-x = np.linspace(0,2*np.pi)
+x = np.linspace(0,2*np.pi,512)
 y1 = 1.0/(2*np.pi*np.pi)*(np.sin(x)*x+np.cos(x)+x*x/2-1.0)  #cdf
 y2 = 1.0/(2*np.pi*np.pi)*(x*np.cos(x)+x)					#pdf
 x1xi = 4.2
@@ -293,6 +293,45 @@ ax2.set_ylim(0,2/np.pi)
 if plot:
 	pl.show()
 else:
-	print name+'.eps'
-	fig.savefig(name+'.eps')
+	print name+'.pdf (PDF due to use of transparency)'
+	fig.savefig(name+'.pdf')
+
+
+#
+#  rejection
+#
+accepted_x=[]
+accepted_y=[]
+rejected_x=[]
+rejected_y=[]
+for n in range(0,1000):
+	rand1 = np.sqrt(np.random.random())*2.0*np.pi
+	rand2 = rand1*np.random.random()/(np.pi*np.pi)
+	if rand2 > 1.0/(2*np.pi*np.pi)*(rand1*np.cos(rand1)+rand1):
+		rejected_x.append(rand1)
+		rejected_y.append(rand2)
+	else:
+		accepted_x.append(rand1)
+		accepted_y.append(rand2)
+name = 'rejection_samp'
+fig = pl.figure(figsize=(10,6))
+ax = fig.add_subplot(1,1,1)
+x = np.linspace(0,2*np.pi,512)
+y1 = 1.0/(2*np.pi*np.pi)*(x*np.cos(x)+x)  #pdf
+y2 = np.linspace(0,2/np.pi,512)
+ax.fill_between(x,0,y1,color='blue',facecolor='blue', alpha=0.25)
+ax.fill_between(x,y1,y2,color='red',facecolor='red', alpha=0.25)
+ax.scatter(accepted_x,accepted_y,marker='.',color='blue')
+ax.scatter(rejected_x,rejected_y,marker='.',color='red')
+ax.set_ylabel(r'PDF$(x)$')
+ax.set_xlabel(r'$x$')
+ax.grid('on')
+ax.set_xlim(0,2.0*np.pi)
+ax.set_ylim(0,2.0/np.pi)
+
+if plot:
+	pl.show()
+else:
+	print name+'.pdf (PDF due to use of transparency)'
+	fig.savefig(name+'.pdf')
 
