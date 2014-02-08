@@ -698,6 +698,33 @@ When the CDF is not invertible, the \emph{rejection sampling} method can be used
 
 Using these two methods of sampling from probability distributions, expressions can be found for every reaction type and transport phenomenon that a neutron undergoes in it's random walk through matter.  The specific schemes are described in the following subsections.
 
+\subsubsection{Cross Section Interpolation}
+
+When a Monte Carlo simulation is referred to as ``Continuous Energy,'' it means that the cross sections are evaluated on the fly at the exact energy the neutron is currently at instead of using a fixed value for a range of energies.  The cross section data is finite, of course, and only includes data at discrete points in energy.  Therefore, interpolation must be performed between the data points.  This is done by linear interpolation.  It assumes that the cross section is a straight line between the surrounding energy points, $E_i$ and $E_{i+1}$, and the interpolated value is calculated using the slope of the line via \eqref{xs_interp}.
+
+ \begin{equation}
+\label{xs_interp}
+\begin{gathered}
+E_i < E < E_{i+1} \\
+\sigma(E) = \frac{E-E_i}{E_{i+1}-E_i}(\sigma(E_{i+1})-\sigma(E_i)) + \sigma(E_i)
+\end{gathered}
+\end{equation}
+
+\subsubsection{Tabular Distribution Interpolation}
+
+For reactions that have any exiting neutrons, like scattering and fission, there are probability tables that specify at what probability certain angles and energies will be emitted.  These tables are typically have a CDF specified in a tabular format.  To sample from these tabular CDFs, a random number $\xi$ is generated.  Again, since the data is discrete, some type of interpolation must be performed to generated a value between the data points.  There are two methods specified in the ENDF format.  The first is histogram interpolation, which is similar to the linear cross section in the previous section.  It assumes the CDF is a line in between the data points, and the interpolated value is calculated to lie on this line.  A tabular PDF is also usually specified, but is not used in the actual computations in this study since the PDF value can be computed from the CDF and doing so reduces the global memory access of a GPU kernel.  Histogram interpolation is shown in \eqref{histo_interp} where $C_{i}$ is the value of the CDF at point $i$.  The outgoing cosine, $\mu^\prime$, is used, but this method can be used to sampled a CDF of any quantity.
+
+ \begin{equation}
+\label{histo_interp}
+\begin{gathered}
+C_i < \xi < C_{i+1} \\
+ \mu^\prime(\xi) = \frac{\xi-C_i}{C_{i+1}-C_i}(\mu^\prime(C_{i+1})-\mu^\prime(C_i)) + \mu^\prime(C_i)
+\end{gathered}
+\end{equation}
+
+The second method is called linear-linear interpolation.  Instead of assuming the CDF function is a line, it assumes the first derivative (the PDF) is a line and is interpolated as such.
+
+
 \subsubsection{Distance To Interaction}
 
 The first step in stochastically transporting a neutron through matter is finding the distance to the next interaction.  The expression for the probability of non-interaction was shown in \eqref{pop_NI}.  The probability of interaction in $dx$ around $x$ is $\Sigma_t dx$.  Therefore the probability of not interacting from 0 to x and then interacting at $dx$ around $x$ is simply the product.  This expression, shown in \eqref{first_col}, is commonly referred to as the \emph{first collision probability}.
@@ -741,6 +768,7 @@ PDF_k = \frac{\sigma_k}{\sigma_t} \qquad \Rightarrow \qquad CDF_k = \frac{1}{\si
 
 This method introduces another type of sampling method which is based on mathematical first principles instead of integration of a PDF.  
 
+
 \subsubsection{Elastic Scattering}
 
 
@@ -753,9 +781,7 @@ fission dist
 
 source pop
 
-\subsubsection{Interpolation}
 
-``Continuous Energy'' = interpolation
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
