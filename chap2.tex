@@ -571,6 +571,13 @@ There are advantages in using the Monte Carlo method for neutron transport, some
 
 There are considerable drawbacks to using Monte Carlo as well; primarily convergence rates and silent inaccuracies.  Since it is a statistical calculation, it is bound by statistical laws which dictate that the error in Monte Carlo calculations reduces as $1/\sqrt{N}$, where N is the number of histories performed.  Also, since geometries can be large, very small but very influencing volumes can be missed by the neutron random walk if the number of histories is not large enough.  The estimated statistical error may be low at $N$ histories, but there is a chance the entire phase space has not yet been sufficiently sampled to produce accurate results.  Deterministic methods would not have this problem since there will be a discretized point in this small volume, and it will contribute to the overall calculation.  The slow convergence rate can be combated by using parallel computing, however.  Requiring that neutrons do not interact with each other was an assumption that went into deriving the neutron transport equation, and can be exploited in Monte Carlo simulations.  Since each neutron history is completely independent, histories can be run completely in parallel without communication until the results are combined at the end of the simulation.  This leads to very good scaling of parallel calculations, which can be used to reduced run times of large problems to acceptable values.
 
+\begin{figure}[h!] 
+  \label{direct_samp}
+  \centering
+    \includegraphics[width=0.8\textwidth]{graphics/MC_diagram.pdf}
+     \caption{The Monte Carlo random walk process.}
+\end{figure}
+
 \subsection{Statistics}
 To understand how the Monte Carlo method performs this integration, simple equations and derivations and such as calculating $\pi$ can be done.   First, given a continuous random variable $x$ that follows the probability distribution $P$, the mean value can be calculated by taking the first moment as was shown in \eqref{NDF_moments} and is reproduced in \eqref{int_mean}.  But we are interested in determining the mean from a set measurements rather than the underlying distribution.  If we have $N$ independent measurements of quantity $x$, this is simply taking the arithmetic mean, as shown in \eqref{arith_mean}.
 
@@ -680,31 +687,59 @@ CDF(x_2) - CDF(x_1) = \Delta \xi =  \int_{x_1}^{x_2} PDF(x) dx
      \caption{Sampling $PDF(x)=\frac{1}{2\pi^2}(x \cos x - x)$ by the direct inversion method on the domain $(0,2\pi)$.}
 \end{figure}
 
-When the CDF is not invertible, the \emph{rejection sampling} method can be used.  It uses a secondary PDF, $f{x}$, that is greater at all points than the PDF to be sampled from.  Since the PDF is normalized, $f(x)$ now corresponds to being able to have probabilities greater than one.  This is simply a scaling problem, and the random numbers used to directly sample from it must be uniform on $[0,\int_\mathrm{domain}f(x))$ instead of $[0,1)$.   Then two random numbers are generated  The first, $\xi_1$ is sampled from a $f(x)$ using a scaled random number as mentioned, and the second, $\xi_2$ is uniformly distributed on $[0,f(\xi_1))$.  If $\xi_2 < PDF(\xi_1)$, the sampled value $(\xi_1)$, is added to the population, else it is \emph{rejected}, or discarded from the population.  The set of accepted values of ${\xi_2}$ will then follow PDF(x).  Figure \ref{rejection_samp} shows an illustration of rejection sampling.
+When the CDF is not invertible, the \emph{rejection sampling} method can be used.  It uses a secondary PDF, $f{x}$, that is greater at all points than the PDF to be sampled from and whose CDF is easily inverted.  Since the PDF is normalized, $f(x)$ now corresponds to probabilities greater than one.  This is simply a scaling problem, and the random numbers used to directly sample from it must be uniform on $[0,\int_\mathrm{domain}f(x))$ instead of $[0,1)$.   Then two random numbers are generated.  The first, $\xi_1$ is sampled from a $f(x)$ using a scaled random number as mentioned, and the second, $\xi_2$ is uniformly distributed on $[0,f(\xi_1))$.  If $\xi_2 < PDF(\xi_1)$, the sampled value $(\xi_1)$, is added to the population, else it is \emph{rejected}, or discarded from the population.  The set of accepted values of ${\xi_2}$ will then follow $PDF(x)$.  Figure \ref{rejection_samp} shows an illustration of rejection sampling.
 
 \begin{figure}[h!] 
   \label{rejection_samp}
   \centering
     \includegraphics[width=0.8\textwidth]{graphics/rejection_samp.pdf}
-     \caption{Sampling $PDF(x)=\frac{1}{2\pi^2}(x \cos x - x)$ by the rejection method on the domain $(0,2\pi)$.  The auxilliary function $f(x)=x/\pi$ and the random number used to sample from it must be on $[0,2\pi)$ instead of $[0,1)$.}
+     \caption{Sampling $PDF(x)=\frac{1}{2\pi^2}(x \cos x - x)$ by the rejection method on the domain $(0,2\pi)$.  The auxiliary function $f(x)=x/\pi$ and the random number used to sample from it must be on $[0,2\pi)$ instead of $[0,1)$.}
 \end{figure}
 
+Using these two methods of sampling from probability distributions, expressions can be found for every reaction type and transport phenomenon that a neutron undergoes in it's random walk through matter.  The specific schemes are described in the following subsections.
 
-\subsubsection{Interpolation}
+\subsubsection{Distance To Interaction}
 
-``Continuous Energy'' = interpolation
+The first step in stochastically transporting a neutron through matter is finding the distance to the next interaction.  The expression for the probability of non-interaction was shown in \eqref{pop_NI}.  The probability of interaction in $dx$ around $x$ is $\Sigma_t dx$.  Therefore the probability of not interacting from 0 to x and then interacting at $dx$ around $x$ is simply the product.  This expression, shown in \eqref{first_col}, is commonly referred to as the \emph{first collision probability}.
 
-\subsubsection{Distance To Collision}
-Macro
+\begin{equation}
+\label{first_col}
+P(x) = \Sigma_t e^{- \Sigma_t  x}
+\end{equation}
 
+This expression is simple and can be inverted for direct sampling.  The sampling scheme is shown in \eqref{first_col_samp}.  The expression $1-\xi$ can be replaced with $\xi$ since it is identically distributed.
 
-\subsubsection{Reaction Type}
-micro
+\begin{equation}
+\label{first_col}
+CDF(x) = \int_0^x \Sigma_t e^{- \Sigma_t  x^\prime} dx^\prime = 1- e^{- \Sigma_t  x} 
+\end{equation}
+
+\begin{equation}
+\label{first_col_samp}
+x_i=CDF^{-1}(\xi) \qquad \Rightarrow \qquad x_i=\frac{-\ln(1-\xi) }{\Sigma_t}=\frac{-\ln(\xi) }{\Sigma_t}
+\end{equation}
+
+The total cross section $\Sigma_t$ is the total macroscopic cross section of the material the neutron is traveling through, i.e. it is the sum of the total macroscopic cross sections of its constituent isotopes as was shown in \eqref{material_sum_xs}.
+
+\subsubsection{Isotope and Reaction Selection}
+
+Now that the neutron has been determined to interact, it must be decided with which isotope it interacts with.  The discrete PDF of this process is shown in \eqref{isotope_selection}, where there are $i$ isotopes in the material each having a total macroscopic cross section $\Sigma_{t,i}$.  The distribution is sampled by generating a uniform random number, $\xi$, on $[0,1)$ and performing a running sum over the individual isotope's total macroscopic cross sections.  When $CDF_i > \xi$, the neutron collision is sampled to happened in isotope $i$.
+
+\begin{equation}
+\label{isotope_selection}
+PDF_i = \frac{\Sigma_{t,i}}{\Sigma_t} \qquad \Rightarrow \qquad CDF_i = \frac{1}{\Sigma_t } \sum_{n=1}^i \Sigma_{t,n}
+\end{equation}
+
+Determining the reaction type is done in a similar fashion, except the number density of the material is no longer a concern since the isotope has already been selected.  Therefore, the running sum of the CDF is done over the isotope $i$'s microscopic cross sections.  Another random number is generated, and when $CDF_k > \xi$, the neutron is sampled to undergo reaction $k$ in isotope $i$.
+
+\begin{equation}
+\label{reaction_selection}
+PDF_k = \frac{\sigma_k}{\sigma_t} \qquad \Rightarrow \qquad CDF_k = \frac{1}{\sigma_{t} } \sum_{n=1}^k \sigma_{n}
+\end{equation}
 
 \subsubsection{Free Gas Treatment}
 
-This method introduces another type of sampling method which is based on mathematical first principles instead of integration of a PDF.
-
+This method introduces another type of sampling method which is based on mathematical first principles instead of integration of a PDF.  
 
 \subsubsection{Elastic Scattering}
 
@@ -718,6 +753,9 @@ fission dist
 
 source pop
 
+\subsubsection{Interpolation}
+
+``Continuous Energy'' = interpolation
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
