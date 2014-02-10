@@ -712,18 +712,44 @@ E_i < E < E_{i+1} \\
 
 \subsubsection{Tabular Distribution Interpolation}
 
-For reactions that have any exiting neutrons, like scattering and fission, there are probability tables that specify at what probability certain angles and energies will be emitted.  These tables are typically have a CDF specified in a tabular format.  To sample from these tabular CDFs, a random number $\xi$ is generated.  Again, since the data is discrete, some type of interpolation must be performed to generated a value between the data points.  There are two methods specified in the ENDF format.  The first is histogram interpolation, which is similar to the linear cross section in the previous section.  It assumes the CDF is a line in between the data points, and the interpolated value is calculated to lie on this line.  A tabular PDF is also usually specified, but is not used in the actual computations in this study since the PDF value can be computed from the CDF and doing so reduces the global memory access of a GPU kernel.  Histogram interpolation is shown in \eqref{histo_interp} where $C_{i}$ is the value of the CDF at point $i$.  The outgoing cosine, $\mu^\prime$, is used, but this method can be used to sampled a CDF of any quantity.
+For reactions that have any exiting neutrons, like scattering and fission, there are probability tables that specify at what probability certain angles and energies will be emitted.  These tables are typically have a CDF specified in a tabular format.  To sample from these tabular CDFs, a random number $\xi$ is generated.  Again, since the data is discrete, some type of interpolation must be performed to generated a value between the data points.  There are two methods specified in the ENDF format.  The first is histogram interpolation, which is similar to the linear cross section in the previous section.  It assumes the CDF is a line in between the data points, and the interpolated value is calculated to lie on this line.  A tabular PDF is also usually specified, but is not used in the actual computations in this study since the PDF value can be computed from the CDF and doing so reduces the global memory access of a GPU kernel.  Histogram interpolation is shown in \eqref{histo_interp} where $C_{i}$ is the value of the CDF at point $i$.  The outgoing cosine, $\mu^\prime$, is used, but this method can be used to sampled a CDF of any quantity.  $\mu^\prime_i$ represents the corresponding value of $\mu^\prime$ in the table for $P_i$ and $C_i$.
 
  \begin{equation}
 \label{histo_interp}
 \begin{gathered}
 C_i < \xi < C_{i+1} \\
- \mu^\prime(\xi) = \frac{\xi-C_i}{C_{i+1}-C_i}(\mu^\prime(C_{i+1})-\mu^\prime(C_i)) + \mu^\prime(C_i)
+ \mu^\prime(\xi) = \frac{\xi-C_i}{C_{i+1}-C_i}(\mu^\prime_{i+1}-\mu^\prime_i) + \mu^\prime_i
 \end{gathered}
 \end{equation}
 
-The second method is called linear-linear interpolation.  Instead of assuming the CDF function is a line, it assumes the first derivative (the PDF) is a line and is interpolated as such.
+The second method is called linear-linear interpolation.  Instead of assuming the CDF is linear, it assumes the first derivative (the PDF) is linear over the interval $C_i < \xi < C_{i+1}$.  The linear expression for the PDF as in \eqref{lin_pdf} is substituted into \eqref{CDF_property1} and integrated to $\mu^\prime$.  Again this derivation is shown for $\mu^\prime$, but is valid for any CDF.
 
+\begin{equation}
+\label{lin_pdf}
+\begin{gathered}
+C_i < \xi < C_{i+1} \\
+P(\mu^\prime) = \frac{P_{i+1}-P_i}{\mu^\prime_{i+1}-\mu^\prime_i}(\mu^\prime - \mu^\prime_i) + P_i = a \mu^\prime + b
+\end{gathered}
+\end{equation}
+
+Integration of \eqref{lin_pdf} to $\mu^\prime$ yields \eqref{lin_pdf_int}.  This expression for $CDF(\mu^\prime)$ is set equal to the random number $\xi$ and solved for $\mu^\prime$ to give the interpolation function.
+
+\begin{equation}
+\label{lin_pdf_int}
+C(\mu^\prime) = C_i  + \int_i^{\mu^\prime} P(\mu^{\prime\prime}) d\mu^{\prime\prime}  = C_i  + \frac{a}{2}(\mu^{\prime 2}-\mu^{\prime 2}_i) + b(\mu^\prime-\mu^\prime_i) = \xi 
+\end{equation}
+
+Taking advantage of the relationship between $a$ and $b$, the interpolation function can be simplified to \eqref{lin_lin} \cite{openmc}.
+
+\begin{equation}
+\label{lin_lin}
+\begin{gathered}
+a = \frac{P_{i+1}-P_i}{\mu^\prime_{i+1}-\mu^\prime_i} \qquad , \qquad b = P_i - a \mu^\prime_i \\
+\mu^\prime = \mu_1 + \frac{1}{a}\left( \sqrt{P^2_i + 2a(\xi -C_i)} -P_i \right)
+\end{gathered}
+\end{equation}
+
+ Which interpolation method is used is specified in the data on a case-by-case basis.
 
 \subsubsection{Distance To Interaction}
 
