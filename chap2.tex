@@ -279,6 +279,7 @@ Of the reactions that produce secondary neutrons, the (n,2n) reaction is most si
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Temperature Effects}
+\label{sec:temp}
 
 Thus, far there has only been mention of the target nuclide's by how it manifests itself in the 1/$v$ behavior of cross sections at low energy.  Most of the time, it is a good assumption that the thermal motion of the target nuclide is negligible.  Thermal energy is on the order of .01 eV, and this is a good assumption when neutrons are at MeV range energies, but when they scatter and lose energy, they can come near the thermal energy of the material.  When this happens, the target nuclide no longer appears stationary, and assuming that it has zero velocity in scattering calculations is inaccurate.  MCNP sets the threshold at 400kT, which corresponds to about 10 eV for materials at room temperature, above which the target nuclide can be assumed stationary.  Below this threshold, it is important to model thermal effects.  If this wasn't done, a neutron could keep scattering off of zero-energy targets and it's energy could approach zero, which is not physical.  Neutrons can only scatter down to a state where they are in thermal equilibrium with the material they are traveling through.  This creates a ``thermal peak'' at low energies where neutrons collect, especially in materials where the scattering cross section is large and neutrons scatter many times before they are absorbed.
 
@@ -295,7 +296,7 @@ Thus, far there has only been mention of the target nuclide's by how it manifest
 
 The other effect that thermal motion has is the \emph{Doppler effect}.  This is where resonances are broadened as temperature increases due to the thermal distribution becoming wider.  The effect is also known as \emph{Doppler broadening} for this reason.  Figure \ref{MB_dist} shows the Maxwell-Boltzmann distributions at various temperatures for a heavy particle and for a light particle.  This is the distribution of speeds particles in a ``gas'' have if they only interact by scattering off of one another.  Most solids can be modeled as a dense gas when there are no strong anisotropies in their structure, which is why modeling the target velocities in this way is called the ``free gas model.''  Note that the broadening effect is much more pronounced for light nuclei.  
 
-The widening of resonances effects reactors in significant ways, most notably in that more neutrons are absorbed in the resonance region as the scatter down to thermal energies.  The number of neutrons lost to capture increases and reduces the overall multiplication factor.  It is important for reactor safelt that this occurs since it produces a negative reactivity feedback for temperature and helps prevent power excursions and meltdowns.  If the multiplication factor is above unity, the power starts to rise, and therefore so does the temperature (if the coolant flow rate remains the same).  When the temperature goes up, the increased captures causes it to go back down, stopping the power from increasing.  Of course, there are many different types of reactivity feedback phenomena, but the temperature feedback is generally negative due to Doppler broadening.  Capture is increases most in fission products since they often have strong absorption resonances and are lighter than fuel nuclides.  Very light nuclides typically do not have absorption resonances, so Doppler broadening has littler effect on their absorption rates.  This is why temperature feedback is least effective in fresh fuel where there are few fission products.  Figure \ref{xs_eu_broaden} shows the effect in europium-155, a fission product with a high capture cross section.
+The widening of resonances effects reactors in significant ways, most notably in that more neutrons are absorbed in the resonance region as the scatter down to thermal energies.  The number of neutrons lost to capture increases and reduces the overall multiplication factor.  It is important for reactor safety that this occurs since it produces a negative reactivity feedback for temperature and helps prevent power excursions and meltdowns.  If the multiplication factor is above unity, the power starts to rise, and therefore so does the temperature (if the coolant flow rate remains the same).  When the temperature goes up, the increased captures causes it to go back down, stopping the power from increasing.  Of course, there are many different types of reactivity feedback phenomena, but the temperature feedback is generally negative due to Doppler broadening.  Capture is increases most in fission products since they often have strong absorption resonances and are lighter than fuel nuclides.  Very light nuclides typically do not have absorption resonances, so Doppler broadening has littler effect on their absorption rates.  This is why temperature feedback is least effective in fresh fuel where there are few fission products.  Figure \ref{xs_eu_broaden} shows the effect in europium-155, a fission product with a high capture cross section.
 
 \begin{figure}[h!]
   \label{xs_eu_broaden}
@@ -304,14 +305,21 @@ The widening of resonances effects reactors in significant ways, most notably in
      \caption{Doppler broadening of the 1eV fission resonance in Eu-155.}
 \end{figure}
 
-At 0K, resonances are very sharp and can be treated as delta functions.  To make the assumption that the target is at rest, the thermal distribution must be convolved with the cross section to order to account for the different speeds the targets are moving.  This is especially significant at resonances since slight movements in velocity can produce very large differences in cross section.  The exact method for doing this is shown in \eqref{broaden}\cite{Cullen_Weisbin_1976}.
+At 0K, resonances are very sharp and can be treated as delta functions.  The reaction rates actually depend on the relative velocity of the neutron and the target nuclide, and since the target nuclides have a spectrum of energies, the relative velocity does as well.  Assuming the target is at rest requires summing all the contributions to the reaction rate from the different relative velocities given a single neutron energy.  From the reaction rate, a \emph{thermally averaged} cross section can be calculated be used in simulations assuming a target at rest.  This is especially significant at resonances since slight movements in velocity can produce very large differences in cross section.  The overall effect is that sharp resonances are \emph{effectively} broadened since they start to contribute to reaction rates once the thermal distribution of relative velocities starts overlap them.   The expression for thermally averaged cross section is shown in \eqref{broaden}, where $v_n$ and $\boldsymbol{v_n}$ are the velocity and speed of the neutron, respectively, $\boldsymbol{v_t}$ is the velocity of the target, $v_\mathrm{rel} = || \boldsymbol{v_n} -\boldsymbol{v_t}||$ is the relative velocity of the neutron to the target, and $M(v_t)$ is the thermal distribution of target speeds.
+
+\begin{equation}
+\bar{\sigma} = \frac{1}{v_n} \int v_\mathrm{rel} \sigma(v_\mathrm{rel}) M(v_t) dv_t
+\label{broaden}
+\end{equation}
+
+The exact method for doing this is shown in \eqref{broaden}\cite{Cullen_Weisbin_1976}.
 
 \begin{equation}
 \begin{split}
 Find a copy\\
 of the paper!
  \end{split}
-\label{broaden}
+\label{broaden_kernel}
 \end{equation}
 
 Then say some things about it once you get details, particularly that it is an expensive operation
@@ -792,14 +800,98 @@ PDF_k = \frac{\sigma_k}{\sigma_t} \qquad \Rightarrow \qquad CDF_k = \frac{1}{\si
 
 \subsubsection{Free Gas Treatment}
 
-The cross section libraries 
+As stated previously, the data in the cross section libraries are broadened for a certain material temperature.  This is done to account for the effect the nuclides' thermal motion has on the apparent width of resonances even when they are modeled as stationary.  Modeling the targets as stationary is a good approximation when the neutron has much larger larger velocities, but such a model would allow a neutron to scatter down to absolute zero.  In reality, they scatter until they come into thermal equilibrium with the target nuclides.  Once they are in equilibrium, on average they lose the same amount of energy as they gain from scattering events and their population becomes stationary in energy.  
 
-low energies, target velocity is significant since vt-vn is no longer basically vn, ref eq.  must be done on the fly, don't want to directly do broadening integral 
+To preserve this collection phenomena, or \emph{thermal peak}, in Monte Carlo simulations, the velocity of the target nuclide must be explicitly modeled.  Elastic scattering is the only interaction that has a neutron in the exit channel at thermal energies, and therefore is the only reaction that needs to consider target velocity.  Fission produces secondary neutrons in distributions uncorrelated with incoming neutron energy or target velocity at thermal energies, so the target motion can be disregarded.  Since the doppler-broadened cross sections produce accurate reaction rates when the targets are modeled to be stationary, this quantity must be preserved when giving the targets a nonzero velocity.  The targets follow a Maxwell-Boltzmann speed distribution, but this cannot be sampled directly for simulation purposes due to the doppler broadening preprocessing done to the cross section data.  Near resonances, portions of the thermal distribution within the resonance contribute much more to the overall reaction rate than the portions outside of it.  Directly sampling a target velocity from the thermal distribution would produce incorrect exiting neutron energies.  Rather the distribution of target velocities which contributed to the reaction rate (and therefore the thermally averaged cross section) must be calculated and sampled from.
 
-maxwellian can't be used directly since the xs are computed for a thermal distribution, etc etc openmc
+The only use for the target velocity is in scattering kinematics to reproduce an accurate thermal peak while maintaining reaction rates.  For the sake of completeness, the following derivation is included and follows the OpenMC documentation closely which in turns follows Gelbard closely \cite{openmc}\cite{gelbard}.  The reaction rate in terms of the target and neutron velocities is shown in \eqref{RR_vel} and is equivalent to \eqref{broaden} in Section \ref{sec:temp}.
 
-This method introduces another type of sampling method which is based on mathematical first principles instead of integration of a PDF.  
+\begin{equation}
+\label{RR_vel}
+R = ||\boldsymbol{v_n}-\boldsymbol{v_t}|| \sigma(||\boldsymbol{v_n}-\boldsymbol{v_t}||) M(v_t)
+\end{equation}
 
+Since elastic scattering is the only reaction of interest, $\sigma(v_\mathrm{rel})$ can be assumed to be a constant.  This assumption is good for most nuclides since the elastic cross sections are in fact relatively constant at low energies.  If there is a low energy scattering resonance, this approximation may produce results that skew the distribution towards lower energies \cite{openmc}, but it is good for most nuclides.  Substituting the Maxwell-Boltzmann speed distribution for $M(v_t)$, the simplified PDF for target velocities can be written as \eqref{RR_vel_simp} where $C$ is the normalization constant calculated from \eqref{RR_vel}.
+
+\begin{equation}
+\label{RR_vel_simp}
+\begin{gathered}
+\beta = \sqrt{\frac{m}{2kT}} \\
+PDF(\boldsymbol{v_t}) = C v_\mathrm{rel} \sigma \left[   \frac{4}{\sqrt{\pi}} \beta^3 v_T^2  \exp (- \beta^2  v_T^2 )      \right]
+\end{gathered}
+\end{equation}
+
+Applying the law of cosines to $v_\mathrm{rel} = ||\boldsymbol{v_n}-\boldsymbol{v_t}||$ yields \eqref{RR_vel_expanded}, which has changed from a vector equation to a scalar one.   The new PDF has two unknowns, the target velocity $v_T$ and the angle between it and the neutron velocity, $\mu$.
+
+\begin{equation}
+\label{RR_vel_expanded}
+\begin{gathered}
+\beta = \sqrt{\frac{m}{2kT}} \\
+PDF(v_t) = C \sigma  \sqrt{v_n^2+v_t^2-2 v_n v_t \mu} \left[   \frac{4}{\sqrt{\pi}} \beta^3 v_T^2  \exp ( -\beta^2  v_T^2 )      \right]
+\end{gathered}
+\end{equation}
+
+There is a restriction on $\mu$, however.  There can be no cases where sampled values of $\mu$ and $v_T$ produce a negative $v_\mathrm{rel}$, which corresponds to the target neutron ``running away'' from the incident neutron.  Such a case is non-physical since it would imply that the reaction never happened.  This PDF cannot be directly inverted, but can be split into two PDFs, $f_1(v_T)$ and $f_2(v_T)$, and sampled by rejection.  The sampling scheme is to normalize $f_2(v_T)$ and sample from it.  The sampled is accepted based on the probability in \eqref{RR_vel_split_samp}\cite{openmc}.
+
+\begin{equation}
+\label{RR_vel_split}
+\begin{gathered}
+f_1(v_T,\mu) = C \sigma  \frac{\sqrt{v_n^2+v_t^2-2 v_n v_t \mu}}{v_n^2+v_t^2}\\
+f_2(v_T) =  \frac{4}{\sqrt{\pi}} (v_n^2+v_t^2) \beta^3 v_T^2  \exp ( -\beta^2  v_T^2 )
+\end{gathered}
+\end{equation}
+
+\begin{equation}
+\label{RR_vel_split_samp}
+\begin{split}
+``CDF(v_T)" &= \frac{f_2(v_T)}{\int f_2(v_T)} \qquad \Rightarrow \qquad v_T^\prime  \\
+p_\mathrm{accept} &= \frac{f_1(v_T^\prime,\mu)}{ f_1(v_T^\prime,\mu=0)}
+\end{split}
+\end{equation}
+
+The multiplication and division by $v_n^2+v_t^2$ seen in \eqref{RR_vel_split} guarantees that $f_1$ is bounded between 0 and 1.  This is necessary since $v_\mathrm{rel}$ is not bounded in any way.  The normalized version of $f_2$ is shown in \eqref{RR_vel_split_norm} as well as a simplified version where $y=\beta v_n$ and $x=\beta v_t$.
+
+\begin{equation}
+\label{RR_vel_split_norm}
+\begin{split}
+``CDF(v_T)" &=  \frac{f_2(v_T)}{\int f_2(v_T)} = \frac{  (v_n^2+v_t^2) \beta^3 v_T^2  \exp ( -\beta^2  v_T^2 ) }{ \frac{1}{4\beta} \sqrt{\pi} \beta v_n +2 } \\
+&= \left( \frac{4}{\sqrt{\pi}}  \frac{\sqrt{\pi}y}{\sqrt{\pi}y+2} \right) x^2 \exp(-x^2)  + \left( 2  \frac{2}{\sqrt{\pi}y+2} \right) x^3 \exp(-x^2) \\
+\end{split}
+\end{equation}
+
+Since this scheme has two separate weighted distributions, the combined PDF can be sampled by sampling the second term with a probability of $2/(\sqrt{\pi}y+2)$ and the first term otherwise.  Luckily, both distributions can be directly sampled via the schemes C49 and C61 listed in the Third Monte Carlo Sampler manual \cite{3rdsampler}.  Sampling scheme C49 is for expressions of the form $\nu^{2n-1}e^{-\nu^2}$ where $n$ is an integer $\ge 1$, i.e. for gaussians multiplied by variables of odd powers.  For $n=2$, this is scheme is for the second term in \eqref{RR_vel_split_norm}, and is shown in \eqref{C49}.
+
+\begin{equation}
+\label{C49}
+\begin{gathered}
+\nu = \sqrt{- \ln \left( \prod_{i=1}^n \xi_i \right)} \\ 
+n = 2 \qquad \Rightarrow \qquad x^\prime = \sqrt{- \ln \left( \xi_1 \xi_2 \right)}
+\end{gathered}
+\end{equation}
+
+Sampling scheme C61 is for expressions of the for $\nu^{2n-1}e^{-\nu^2}$ where $n$ is a half integer $\ge 1/2$, i.e. for gaussians multiplied by variables of even powers.  When $n=3/2$, this is a sampling scheme for the first term in \eqref{RR_vel_split_norm}, and is shown in \eqref{C61}.
+
+\begin{equation}
+\label{C61}
+\begin{gathered}
+h = n-1/2 \\
+\nu = \sqrt{- \ln \left( \prod_{i=1}^h \xi_i  \right)+ \tau^2} \\ 
+\tau^2 = -\ln(\xi_1) \cos^2(\frac{\pi}{2}\xi_2)\\
+n = 3/2 \quad h=1 \qquad \Rightarrow \qquad x^\prime =   \sqrt{- \ln( \xi_1) - \ln(\xi_2) \cos^2(\frac{\pi}{2}\xi_3)}
+\end{gathered}
+\end{equation}
+
+After this is done and $x^\prime$ is sampled, the rejection criterion in \eqref{RR_vel_split_samp} comes into play.  The sampled value of $x^\prime$ is transformed to $v_T^\prime=x^\prime/\beta$, and a value for $\mu$ is sampled isotropically as in \eqref{mu_samp}.  Once $\mu$ is sampled, $f_1(v_T,\mu)$ can be calculated, and the sampled values of $v_T^\prime$ and $\mu$ are accepted with the probability $p_\mathrm{accept}$ as shown in \eqref{prob_accept}, i.e. if another random number $\xi<p_\mathrm{accept}$.  If the sample is rejected, the whole process is repeated until a pair of $v_T^\prime$ and $\mu$ are accepted.
+
+\begin{equation}
+\label{mu_samp}
+\mu = 2\xi - 1 
+\end{equation}
+
+\begin{equation}
+\label{prob_accept}
+p_\mathrm{accept} = \frac{\sqrt{v_n^2+v_t^2-2 v_n v_t \mu}}{v_n^2+v_t^2}
+\end{equation}
 
 \subsubsection{Elastic Scattering}
 
