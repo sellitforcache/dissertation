@@ -35,6 +35,7 @@ The Monte Carlo method is not a new way to simulate nuclear reactors (or any par
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Nuclear Interactions}
+\label{subsec:interactions}
 
 The core of a Monte Carlo simulation is explicitly modeling the individual interactions the neutron undergoes as it moves through matter.  At the highest level, these reactions can be broken down into two categories, elastic reactions and inelastic reactions.  Elastic reactions are those where both momentum and kinetic energy are conserved, i.e. ones where any energy the neutron loses is given to the target nucleus.  Inelastic reactions are those that conserve momentum but do not conserve kinetic energy, i.e. ones where the kinetic energy of the particles can be converted to a vibrational mode of the target nucleus, etc.  These reactions are further divided by the number and type of secondary particles they produce.  Reactions that produce no secondary neutrons are called ``disappearance'' reactions since the neutron effectively disappears, reactions that produce a single neutron are typically called scattering reactions since they effectively change the incoming neutron's energy and direction, and reaction the produce more than one particle are simply called ``secondary-producing'' reactions. Table \ref{nuc_reaction_summary} show a summary of the reaction classifications, and it can be seen that elastic scattering is the only elastic reaction.   
 
@@ -96,17 +97,15 @@ Since these expressions also apply to beam intensity, they can be used to measur
 The above expressions do not take energy into account, so they are assumed to be at a single energy.  Using such simple expressions to determine the cross section of an isotope would only be valid with the use of a very, very precisely mono-energetic beam.  The quantum mechanical details that go into cross sections can cause them to depend strongly on the energy (or velocity) of the neutron and the target nucleus.  Many nuclides have resonances where the interactions probability spikes to very large values.  This typically happens when the incoming energy is exactly that of an energy level of the resultant compound nucleus \cite{duderstadt}.   Figure \ref{xs_e_dependence_li} shows the energy dependence of various reactions type in lithium-6 and Figure \ref{xs_e_dependence_u} shows the dependence of others in uranium-235.  
 
 \begin{figure}[h!]
-  \label{xs_e_dependence_li}
   \centering
     \includegraphics[width=0.8\textwidth]{graphics/xs_li6.eps}
-     \caption{The energy dependence of some reactions in lithium-6.}
+     \caption{The energy dependence of some reactions in lithium-6.\label{xs_e_dependence_li}}
 \end{figure}
 
 \begin{figure}[h!]
-  \label{xs_e_dependence_u}
   \centering
     \includegraphics[width=0.8\textwidth]{graphics/xs_u235.eps}
-    \caption{The energy dependence of some reactions in uranium-235.}
+    \caption{The energy dependence of some reactions in uranium-235.   \label{xs_e_dependence_u}}
 \end{figure}
 
 It is important to note the complexity shown in uranium-235 in the 0.1eV to 40keV range.  This is referred to as the ``resonance region'' and adds much of the complexity in accurately modeling neutron transport.  There are no simple functional representations available for these types of cross sections, so they must be represented in a point-wise tabular format.  It is also important to note that at low energies, cross sections typically lose structure and exhibit the same ``1/$v$'' scaling.  This is due to the particle and the target having more time to interact with each other.  The energy levels where this phenomenon exists is similar the thermal energy of the target and the target no longer appears stationary from the neutrons perspective.  If the neutron is slow enough, the targets appear to be moving instead of the neutron, and more of them come into the neutrons sphere of interaction.  This is the qualitative reason for 1/$v$ scaling at low energies.  Due to to their identical scaling, the ratios between the reaction types stays constant as velocity is decreased but the overall interaction probability with respect to distance increases.
@@ -200,10 +199,9 @@ Inelastic scattering is the other type of scattering a neutron can undergo where
 Since it is still a two-body interaction, the kinematics of the reaction are identical to elastic scattering except the $Q$ value is nonzero and negative.  These reactions have a threshold energy below which their cross sections are zero since the neutron would not have enough energy to excite the state.   Figure \ref{Elevels} shows the energy levels in lead-XXX, which is often used as a fast neutron moderators due to its many, low-lying energy levels and its large inelastic scattering cross sections.
 
 \begin{figure}[h!]
-  \label{Elevels}
   \centering
     \includegraphics[width=0.8\textwidth]{graphics/noise.eps}
-     \caption{The energy levels of lead-XXX\cite{}.}
+     \caption{The energy levels of lead-XXX\cite{}. \label{Elevels}}
 \end{figure}
 
 \subsubsection{Inelastic Continuum Scattering}
@@ -222,16 +220,14 @@ Unlike scattering reactions, where the energy and direction of the neutron is ch
 Fission means ``the splitting splitting of something into two parts'' in the literal sense of the word.  This is exactly what nuclear fission is as well.  It is when a nucleus splits into two smaller nuclei, called \emph{fission fragments}.  When heavy nuclei undergo fission, they release energy, and typically emit a few other particles, including neutrons.  That this reaction releases energy is the reason heavy elements, like uranium, can be used as an energy source.  This is because the fission fragments have a higher binding energy per nucleon compared to the parent nucleus.  Figure \ref{binding_e_per_nuc} shows the average binding energy per nucleon for a wide range of isotopes.  Note that the peak of the curve is at Iron-56, the most tightly bound nucleus, and that heavier nuclides are lower than it.  Fission splits the parent into two lighter nuclides, and since the fragments are more tightly bound, the excess binding energy from the parent is released.  The released energy isn't simply deposited as heat directly, however, it is released in a range of forms.  Fission doesn't just release some energy, it releases a substantial amount of it.  Uranium-235, for example, releases a total of 192.9$\pm$0.5 \emph{MeV} per fission \cite{duderstadt}.  Compared to chemical energy sources where the energy released per reaction is on the order of 1\emph{eV}.  Fission energy yield is 8 orders of magnitude larger!  Not all of this energy is converted to heat, bit a substantial amount is.  Table \ref{fission_dist} shows the fraction of this total energy that is given to each entity.  Note that a significant fraction is given to neutrinos, which is essentially lost due to their very small interaction cross section.  The kinetic energy of the fission fragments has the majority of the energy, and since they are heavy and charged, their energy is deposited as heat very near to the fission site.  Other particles, light photons and neutrons, carry some of the fission energy further away from the fission site, but their energy mostly still ends up as heat.
   
 \begin{figure}[h!]
-\label{binding_e_per_nuc}
   \centering
     \includegraphics[width=0.8\textwidth]{graphics/binding_e_per_nuc.eps}
-     \caption{Average binding energy per nucleon.  REPLACE ME WITH ONE YOU MAKE YOURSELF FROM DATA. \cite{}.}
+     \caption{Average binding energy per nucleon.  REPLACE ME WITH ONE YOU MAKE YOURSELF FROM DATA. \cite{}.\label{binding_e_per_nuc}}
 \end{figure}
 
 \begin{table}[h]
 \centering
-\caption{Average distribution of fission energy \cite{duderstadt}.}
-\label{fission_dist}
+\caption{Average distribution of fission energy \cite{duderstadt}.\label{fission_dist}}
 \begin{tabular}{| l | c | r | r |}
 \hline
 Particle & Energy (\%) & Range & Time \\
@@ -254,17 +250,15 @@ Nonfission reactions from n capture & 4 & 100cm & delayed \\
 Fission is technically considered a disappearance reaction as well since the fission-inducing neutron is absorbed by the nuclide.  Even though is is absorbed, more than 2 new neutrons are released by fission, enabling the fission chain reaction to occur.  An important parameter of the fission chain reaction is $nu$, the fission neutron yield.    The total yield is different than the prompt yield in that it also includes neutrons produced from photon-induced emission and from fission product decay.  These neutrons are not ``prompt'' in that they are not emitted immediately from the fission itself.  The processes that create these ``delayed'' neutrons (decay and nuclear relaxation) take time to occur.  Prompt neutrons appear immediately after fission, whereas delayed neutrons can appear anywhere between 0.6 to 80 seconds after.  The kinetics of a nuclear chain reaction depend heavily on the fraction the delayed neutrons which sustain the chain reaction.  Since they have a relatively large time delay, they cause the time between subsequent neutron generations to become longer.  This time between generations is called the \emph{effective neutron lifetime}, and is approximately $10^{-4}$ seconds for prompt neutrons and $0.1$ seconds for delayed neutrons in light water (thermal spectrum) reactors \cite{duderstadt}.  
 
 \begin{figure}[h!]
-  \label{nu_compare}
   \centering
     \includegraphics[width=0.8\textwidth]{graphics/nu_compare.eps}
-     \caption{Total fission yield, $\nu_\mathrm{T}$, for uranium-235, uranium-238, and plutonium-239.}
+     \caption{Total fission yield, $\nu_\mathrm{T}$, for uranium-235, uranium-238, and plutonium-239. \label{nu_compare}}
 \end{figure}
 
 \begin{figure}[h!]
-  \label{xs_fission_only}
   \centering
     \includegraphics[width=0.8\textwidth]{graphics/xs_fissile.eps}
-     \caption{Fission cross sections for uranium-235, uranium-238, and plutonium-239.}
+     \caption{Fission cross sections for uranium-235, uranium-238, and plutonium-239. \label{xs_fission_only}}
 \end{figure}
 
 Figure \ref{nu_compare} shows the energy dependence of the total fission neutron yield, $nu_\mathrm{T}$. It is shown at one temperature since it have very weak temperature dependence.   It can be seen that it is constant until energies in the MeV range, where it increases sharply due to the energy the incident neutron provides being sufficient to eject a bound neutron.  Figure \ref{xs_fission_only} shows the total fission cross sections for two \emph{fissile} isotopes, uranium-235 and plutonium-239, and one \emph{fertile} isotope, uranium-238.  Fissile isotopes are those which neutrons at any energy can induce fission.  The figure shows that uranium-238 has a fission cross section, but it isn't significant until above 1 MeV.  For uranium-238, fission is a threshold reaction.  Simply absorbing a neutron does not provide enough energy to split the nucleus.  Additional energy is required, which can be provided in the form of an incident neutron's kinetic energy.  Uranium-238 isn't fissile, but it can be a significant contributor of fission reactions in reactors where the neutron population is \emph{fast}, i.e. mainly high-energy.  As mentioned before, uranium-238 is considered fertile, which means that it produces a fissile isotope after it absorbs a neutron, and in this case decays to plutonium-239.  
@@ -299,10 +293,9 @@ The other effect that thermal motion has is the \emph{Doppler effect}.  This is 
 The widening of resonances effects reactors in significant ways, most notably in that more neutrons are absorbed in the resonance region as the scatter down to thermal energies.  The number of neutrons lost to capture increases and reduces the overall multiplication factor.  It is important for reactor safety that this occurs since it produces a negative reactivity feedback for temperature and helps prevent power excursions and meltdowns.  If the multiplication factor is above unity, the power starts to rise, and therefore so does the temperature (if the coolant flow rate remains the same).  When the temperature goes up, the increased captures causes it to go back down, stopping the power from increasing.  Of course, there are many different types of reactivity feedback phenomena, but the temperature feedback is generally negative due to Doppler broadening.  Capture is increases most in fission products since they often have strong absorption resonances and are lighter than fuel nuclides.  Very light nuclides typically do not have absorption resonances, so Doppler broadening has littler effect on their absorption rates.  This is why temperature feedback is least effective in fresh fuel where there are few fission products.  Figure \ref{xs_eu_broaden} shows the effect in europium-155, a fission product with a high capture cross section.
 
 \begin{figure}[h!]
-  \label{xs_eu_broaden}
   \centering
     \includegraphics[width=0.8\textwidth]{graphics/xs_eu_broaden.eps}
-     \caption{Doppler broadening of the 1eV fission resonance in Eu-155.}
+     \caption{Doppler broadening of the 1eV fission resonance in Eu-155.  \label{xs_eu_broaden}}
 \end{figure}
 
 At 0K, resonances are very sharp and can be treated as delta functions.  The reaction rates actually depend on the relative velocity of the neutron and the target nuclide, and since the target nuclides have a spectrum of energies, the relative velocity does as well.  Assuming the target is at rest requires summing all the contributions to the reaction rate from the different relative velocities given a single neutron energy.  From the reaction rate, a \emph{thermally averaged} cross section can be calculated be used in simulations assuming a target at rest.  This is especially significant at resonances since slight movements in velocity can produce very large differences in cross section.  The overall effect is that sharp resonances are \emph{effectively} broadened since they start to contribute to reaction rates once the thermal distribution of relative velocities starts overlap them.   The expression for thermally averaged cross section is shown in \eqref{broaden}, where $v_n$ and $\boldsymbol{v_n}$ are the velocity and speed of the neutron, respectively, $\boldsymbol{v_t}$ is the velocity of the target, $v_\mathrm{rel} = || \boldsymbol{v_n} -\boldsymbol{v_t}||$ is the relative velocity of the neutron to the target, and $M(v_t)$ is the thermal distribution of target speeds.
@@ -330,10 +323,9 @@ Then say some things about it once you get details, particularly that it is an e
 Cross section data is distributed by the Department of Energy in \emph{ENDF} files.  ENDF stands for ``evaluated nuclear data file,'' and can contain data for nuclear decay, photons, atomic relaxation, fission yields, thermal neutron scattering, and charged particle reactions as well as neutron reactions.  They are called ``evaluated'' because an organization decides, or evaluates, which experimental data is the highest quality and will be included in the final dataset.  They also decide how to represent regimes that haven't been measured yet by comparing simulation results to experiments.   The first data released was ENDF/B-I in 1968 and the latest set is ENDF/B-VII, which was released in 2006.  They have a standard format that dates back to when the data was stored on magnetic tapes, and are sometimes referred to as ``tapes'' to this day.  The format is rather archaic and contains a lot of redundant information about record locations which was useful when the tape head had to physically move between points in the tape.  
 
 \begin{figure}[h!]
-  \label{data_levels}
   \centering
     \includegraphics[width=0.8\textwidth]{graphics/data_levels.eps}
-     \caption{Hierarchy in ACE formatted neutron data libraries.}
+     \caption{Hierarchy in ACE formatted neutron data libraries.  \label{data_levels}}
 \end{figure}
 
 Many Monte Carlo codes read ACE formatted data rather than the original ENDF file.  ACE stands for ``a compact ENDF'' and strips out a lot of the extra information unnecessary for neutron transport.  As Figure \ref{data_levels} shows, ACE files not only contain cross sections, but also angle and energy distributions used in scattering and fission.  ENDF assigns a number to each type of reaction called the \emph{MT} number.  Table \ref{MT_numbers}, taken from a LANL website, shows the major numbers \cite{MTnums}.  It can clearly be seen that there are many reactions a neutron can undergo, most of which have very energy strong dependance.  Most of the complexity in modeling nuclear reactors comes from the fact that the data needed to model neutrons is very complicated.  It may be the most important part of the simulation, it is what ties the calculations to reality.  If inaccurate data is used, the results will not have any physical meaning, and the simulation becomes a mathematical exercise. 
@@ -348,10 +340,9 @@ Other than eliminating neutron self interaction, there are a handful of other as
 \subsubsection{Neutron Balance Equation}
 
 \begin{figure}[h!] 
-  \label{diff_volume}
   \centering
     \includegraphics[width=0.8\textwidth,trim= 0cm 2.5cm 0cm 0cm]{graphics/diff_balance.eps} 
-     \caption{The differential volume of the neutron balance equation.}
+     \caption{The differential volume of the neutron balance equation. \label{diff_volume}}
 \end{figure}
 
 Before any explicit terms need to defined to capture the necessary physics of the transport problem, a balance equation can be written for a differential volume.  This equation simply describes the amount of neutrons entering and exiting a infinitesimally small volume and their difference being equal to the rate of change of neutrons in the volume.  We know about the reactions that neutrons can undergo, and we know they move through material, so we should have  enough information the write this abstract equation. Figure \ref{diff_volume} shows an illustration of the differential volume.
@@ -383,10 +374,9 @@ The \emph{neutron distribution function} simply describes the number of neutrons
 \end{equation}
 
 \begin{figure}[h!] 
-  \label{ang_relations}
   \centering
     \includegraphics[width=0.8\textwidth , trim= 0cm 2.5cm 0cm 0cm]{graphics/ang_relation.eps} % trim = l b r t
-     \caption{The cartesian projections of the directional vector.}
+     \caption{The cartesian projections of the directional vector. \label{ang_relations}}
 \end{figure}
 
 Like any continuous distribution, it must be integrated over to calculate any quantities.  If we define the $i$th moment of the distribution according to \eqref{NDF_moments}, then the $0$th moment would be the population and the $1$st moment would be the mean.
@@ -489,10 +479,9 @@ R_{s, \mathrm{source}}(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) = \in
 The nuclear chain reaction is sustained by fission reactions producing neutrons, so it is essential to model it in any material that has fissionable isotopes.  There are three determining factors for the fission source.  The first is the fission reaction rate, which is represented by the flux multiplied by the fission cross section.  The second is the fission spectrum, which is represented by $\chi$.  Neutrons born from fission are not emitted at a single energy, and the fission spectrum describes the probability for a neutron to be emitted at a certain energy.  The energy spectrum is weakly dependent of the incoming neutron energy, which higher incoming energies producing more higher energy neutrons.  This dependence only starts making a significant difference in spectrum shape at energies above 10MeV, higher than energies usually seen in a reactor.  This is why the fission spectrum is usually treated as being independent of incoming neutron energy.  The spectra of uranium-235 and plutonium-239 for fission induced by a 0.5 MeV neutron are shown in Figure \ref{fiss_spec}, and it can be seen that plutonium-239 produces more high energy neutrons.  The last parameter is the average number of neutrons emitted in a fission event, or the \emph{fission yield}, represented by $\nu$, and is relatively flat until about 1MeV, as was shown in Figure \ref{nu_compare}.  Since 1MeV is within the typical energy range present in nuclear reactions, it is treated as a function of energy.
 
 \begin{figure}[h!] 
-  \label{fiss_spec}
   \centering
     \includegraphics[width=0.8\textwidth ]{graphics/fiss_spec.eps} 
-     \caption{The prompt fission spectrum for uranium-235 and plutonium-239.}
+     \caption{The prompt fission spectrum for uranium-235 and plutonium-239. \label{fiss_spec}}
 \end{figure}
 
 To write an expression for the fission source, or the number of fission neutrons born in energy $E$, we must know the number of neutrons born from fission at all energies.  Once this is known, it is multiplied by the fission spectrum to select the fraction that will be in energy $E$.  The expression for the fission source is shown in \eqref{fiss_source}.
@@ -580,10 +569,9 @@ There are advantages in using the Monte Carlo method for neutron transport, some
 There are considerable drawbacks to using Monte Carlo as well; primarily convergence rates and silent inaccuracies.  Since it is a statistical calculation, it is bound by statistical laws which dictate that the error in Monte Carlo calculations reduces as $1/\sqrt{N}$, where N is the number of histories performed.  Also, since geometries can be large, very small but very influencing volumes can be missed by the neutron random walk if the number of histories is not large enough.  The estimated statistical error may be low at $N$ histories, but there is a chance the entire phase space has not yet been sufficiently sampled to produce accurate results.  Deterministic methods would not have this problem since there will be a discretized point in this small volume, and it will contribute to the overall calculation.  The slow convergence rate can be combated by using parallel computing, however.  Requiring that neutrons do not interact with each other was an assumption that went into deriving the neutron transport equation, and can be exploited in Monte Carlo simulations.  Since each neutron history is completely independent, histories can be run completely in parallel without communication until the results are combined at the end of the simulation.  This leads to very good scaling of parallel calculations, which can be used to reduced run times of large problems to acceptable values.
 
 \begin{figure}[h!] 
-  \label{direct_samp}
   \centering
     \includegraphics[width=0.8\textwidth]{graphics/MC_diagram.pdf}
-     \caption{The Monte Carlo random walk process.}
+     \caption{The Monte Carlo random walk process. \label{random_walk}}
 \end{figure}
 
 \subsection{Statistics}
@@ -689,19 +677,17 @@ CDF(x_2) - CDF(x_1) = \Delta \xi =  \int_{x_1}^{x_2} PDF(x) dx
 \end{equation}
 
 \begin{figure}[h!] 
-  \label{direct_samp}
   \centering
     \includegraphics[width=0.8\textwidth]{graphics/direct_samp.pdf}
-     \caption{Sampling $PDF(x)=\frac{1}{2\pi^2}(x \cos x - x)$ by the direct inversion method on the domain $(0,2\pi)$.}
+     \caption{Sampling $PDF(x)=\frac{1}{2\pi^2}(x \cos x - x)$ by the direct inversion method on the domain $(0,2\pi)$. \label{direct_samp}}
 \end{figure}
 
 When the CDF is not invertible, the \emph{rejection sampling} method can be used.  It uses a secondary PDF, $f{x}$, that is greater at all points than the PDF to be sampled from and whose CDF is easily inverted.  Since the PDF is normalized, $f(x)$ now corresponds to probabilities greater than one.  This is simply a scaling problem, and the random numbers used to directly sample from it must be uniform on $[0,\int_\mathrm{domain}f(x))$ instead of $[0,1)$.   Then two random numbers are generated.  The first, $\xi_1$ is sampled from a $f(x)$ using a scaled random number as mentioned, and the second, $\xi_2$ is uniformly distributed on $[0,f(\xi_1))$.  If $\xi_2 < PDF(\xi_1)$, the sampled value $(\xi_1)$, is added to the population, else it is \emph{rejected}, or discarded from the population.  The set of accepted values of ${\xi_2}$ will then follow $PDF(x)$.  Figure \ref{rejection_samp} shows an illustration of rejection sampling.
 
 \begin{figure}[h!] 
-  \label{rejection_samp}
   \centering
     \includegraphics[width=0.8\textwidth]{graphics/rejection_samp.pdf}
-     \caption{Sampling $PDF(x)=\frac{1}{2\pi^2}(x \cos x - x)$ by the rejection method on the domain $(0,2\pi)$.  The auxiliary function $f(x)=x/\pi$ and the random number used to sample from it must be on $[0,2\pi)$ instead of $[0,1)$.}
+     \caption{Sampling $PDF(x)=\frac{1}{2\pi^2}(x \cos x - x)$ by the rejection method on the domain $(0,2\pi)$.  The auxiliary function $f(x)=x/\pi$ and the random number used to sample from it must be on $[0,2\pi)$ instead of $[0,1)$. \label{rejection_samp}}
 \end{figure}
 
 Using these two methods of sampling from probability distributions, expressions can be found for every reaction type and transport phenomenon that a neutron undergoes in it's random walk through matter.  The specific schemes are described in the following subsections.
@@ -893,10 +879,31 @@ After this is done and $x^\prime$ is sampled, the rejection criterion in \eqref{
 p_\mathrm{accept} = \frac{\sqrt{v_n^2+v_t^2-2 v_n v_t \mu}}{v_n^2+v_t^2}
 \end{equation}
 
+\subsubsection{Stochastic Mixing}
+
+
+
 \subsubsection{Elastic Scattering}
 
+The kinematics of elastic scattering were outlined in Section \ref{subsec:interactions}, and even though it seems only the velocities and masses of the target and neutron are needed, data tables still need to be queried to carry out the interaction.  At energies below the MeV range, elastic scattering is isotropic in the CM frame, but at these energies and above, it becomes significantly anisotropic.  Figure \ref{scattering_anisotropy} shows this in oxygen-16.  At high energies, the scattering is both forward- and backward-peaked.  It is essential to model this phenomena accurately since the scattering angle factors heavily into the energy exchange between the particles.  Figure \ref{scattering_error} shows what can happen when elastic scattering is treated as isotropic for all energies.  The figure shows the normalized flux per lethargy in a one meter cube of water with a 2 MeV point source at its center.  The neutron flux spectra immediately under scattering resonances are too large due to neutrons not losing enough energy in scattering events.  The large backward scattering probability causes more energy to be lost on average than purely isotropic scattering.
+
+\begin{figure}[h!] 
+  \centering
+    \includegraphics[width=0.8\textwidth]{graphics/scattering_anisotropy.eps}
+     \caption{Anisotropy in elastic scattering in oxygen-16.  \label{scattering_anisotropy}}
+\end{figure}
+
+\begin{figure}[h!] 
+  \centering
+    \includegraphics[width=0.8\textwidth]{graphics/scattering_error.eps}
+     \caption{Error in the energy spectrum caused by treating elastic scattering as isotropic for all energies.\label{scattering_error}}
+\end{figure}
+
+After the target and neutron are transformed to the CM frame, the scattering CDF histogram interpolated and sampled as described in previous subsections.  Once the scattering angle is known, the rotated angle is calculated via Rodrigues' rotation formula shown in \eqref{RodriguesRot}.  The CM-rotated neutron velocity vector is then transformed back to the lab frame and the reaction is complete.
 
 \subsubsection{Inelastic Reactions}
+
+Inelastic level scattering is treated identically to elastic scattering except that the $Q$ value in \eqref{finalvCM} is now nonzero.  This value is reaction-specific and must be given by the data tables.  Inelastic continuum scattering is treated differently, however.  Instead of having a well-defined kinematic formula relating the scattering angle to the final neutron energy, continuum reactions are defined by correlated scattering and energy tables.  They follow ENDF ``law'' number 44, the Kalbach-Mann correlated energy-angle scattering law \cite{mcnp} \cite{openmc}.
 
 
 \subsubsection{Fission}
