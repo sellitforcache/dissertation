@@ -881,17 +881,30 @@ p_\mathrm{accept} = \frac{\sqrt{v_n^2+v_t^2-2 v_n v_t \mu}}{v_n^2+v_t^2}
 
 \subsubsection{Stochastic Mixing}
 
+The ENDF data tables have probability distributions for reactions at discrete energy points, but this is not physically accurate.  The reactions do not abruptly transition from one PDF to another at a single energy, they smoothly transition.  This is why \emph{stochastic mixing} is prescribed in the ENDF tables.  If the neutron energy, $E$, falls between the ENDF data energy grid values $i$ and $i+1$, the neutron will use data from table $i+1$ with probability $f$, defined in \eqref{mixing_prob} \cite{openmc}.
+
+\begin{equation}
+\label{mixing_prob}
+\begin{gathered}
+E_i < E < E_{i+1} \\
+f = \frac{E-E_i}{E_{i+1}-E_i}
+\end{gathered}
+\end{equation}
+
+As $E$ approaches $E_{i+1}$, the probability it will sample from the $i+1$ distribution go to 1 linearly.  This ensures smooth transitions between reaction data tables.
 
 
 \subsubsection{Elastic Scattering}
 
-The kinematics of elastic scattering were outlined in Section \ref{subsec:interactions}, and even though it seems only the velocities and masses of the target and neutron are needed, data tables still need to be queried to carry out the interaction.  At energies below the MeV range, elastic scattering is isotropic in the CM frame, but at these energies and above, it becomes significantly anisotropic.  Figure \ref{scattering_anisotropy} shows this in oxygen-16.  At high energies, the scattering is both forward- and backward-peaked.  It is essential to model this phenomena accurately since the scattering angle factors heavily into the energy exchange between the particles.  Figure \ref{scattering_error} shows what can happen when elastic scattering is treated as isotropic for all energies.  The figure shows the normalized flux per lethargy in a one meter cube of water with a 2 MeV point source at its center.  The neutron flux spectra immediately under scattering resonances are too large due to neutrons not losing enough energy in scattering events.  The large backward scattering probability causes more energy to be lost on average than purely isotropic scattering.
+The kinematics of elastic scattering were outlined in Section \ref{subsec:interactions}, and even though it seems only the velocities and masses of the target and neutron are needed, data tables still need to be queried to carry out the interaction.  At energies below the MeV range, elastic scattering is isotropic in the CM frame, but at these energies and above, it becomes significantly anisotropic.  Figure \ref{scattering_anisotropy} shows this in oxygen-16.  At high energies, the scattering is both forward- and backward-peaked.  
 
 \begin{figure}[h!] 
   \centering
     \includegraphics[width=0.8\textwidth]{graphics/scattering_anisotropy.eps}
      \caption{Anisotropy in elastic scattering in oxygen-16.  \label{scattering_anisotropy}}
 \end{figure}
+
+It is essential to model this phenomena accurately since the scattering angle factors heavily into the energy exchange between the particles.  Figure \ref{scattering_error} shows what can happen when elastic scattering is treated as isotropic for all energies.  The figure shows the normalized flux per lethargy in a one meter cube of water with a 2 MeV point source at its center.  The neutron flux spectra immediately under scattering resonances are too large due to neutrons not losing enough energy in scattering events.  The large backward scattering probability causes more energy to be lost on average than purely isotropic scattering.
 
 \begin{figure}[h!] 
   \centering
@@ -903,7 +916,30 @@ After the target and neutron are transformed to the CM frame, the scattering CDF
 
 \subsubsection{Inelastic Reactions}
 
-Inelastic level scattering is treated identically to elastic scattering except that the $Q$ value in \eqref{finalvCM} is now nonzero.  This value is reaction-specific and must be given by the data tables.  Inelastic continuum scattering is treated differently, however.  Instead of having a well-defined kinematic formula relating the scattering angle to the final neutron energy, continuum reactions are defined by correlated scattering and energy tables.  They follow ENDF ``law'' number 44, the Kalbach-Mann correlated energy-angle scattering law \cite{mcnp} \cite{openmc}.
+Inelastic level scattering is treated identically to elastic scattering except that the $Q$ value in \eqref{finalvCM} is now nonzero.  This value is reaction-specific and must be given by the data tables.  
+
+Inelastic continuum scattering is treated differently, however.  Instead of having a well-defined kinematic formula relating the scattering angle to the final neutron energy, continuum reactions are defined by correlated scattering and energy tables.  They follow ENDF ``law'' number 44, the Kalbach-Mann correlated energy-angle scattering law \cite{mcnp} \cite{openmc}.  In this sampling scheme, a CDF is histogram or linearly-linearly interpolated and sampled from just like other reactions, except the sampled value is now a set of ``precompound factors,'' $R$, and ``angular slopes,'' $A$, instead of $\mu$ directly.  These values correspond to a secondary PDF, shown in \eqref{law44}, which is again sampled from to find $\mu$.
+
+\begin{equation}
+\label{law44}
+PDF = \frac{A}{2 \sinh (A)} ( \cosh(A\mu)+R \sinh (A\mu))
+\end{equation}
+
+The sampling scheme for this probability distribution shown in \eqref{law44samp}\cite{3rdsampler}\cite{openmc}, where $\xi_1$ and $\xi_2$ are two additional random numbers.  After $\mu$ is sampled, the outgoing energy value is sampled on an independent tabular distribution, which is the topic of the next subsection.
+
+\begin{equation}
+\label{law44samp}
+\begin{split}
+\mathrm{if} \: \xi_1 > R:  \quad T&=(2\xi_2-1)\sinh(A)\\
+\mu &= \frac{\ln(T+\sqrt{T^2+1})}{A}\\
+\mathrm{else: }  \qquad & \\
+\mu &= \frac{ \ln(\xi_2 \exp(A) + (1-\xi_2)\exp(-A))}{A}
+\end{split}
+\end{equation}
+
+\subsubsection{Tabular Energy Distributions}
+
+
 
 
 \subsubsection{Fission}
