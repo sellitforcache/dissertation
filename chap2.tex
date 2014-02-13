@@ -901,7 +901,7 @@ The kinematics of elastic scattering were outlined in Section \ref{subsec:intera
 \begin{figure}[h!] 
   \centering
     \includegraphics[width=0.8\textwidth]{graphics/scattering_anisotropy.eps}
-     \caption{Anisotropy in elastic scattering in oxygen-16.  \label{scattering_anisotropy}}
+     \caption{Elastic scattering anisotropy at high energies in oxygen-16.  \label{scattering_anisotropy}}
 \end{figure}
 
 It is essential to model this phenomena accurately since the scattering angle factors heavily into the energy exchange between the particles.  Figure \ref{scattering_error} shows what can happen when elastic scattering is treated as isotropic for all energies.  The figure shows the normalized flux per lethargy in a one meter cube of water with a 2 MeV point source at its center.  The neutron flux spectra immediately under scattering resonances are too large due to neutrons not losing enough energy in scattering events.  The large backward scattering probability causes more energy to be lost on average than purely isotropic scattering.
@@ -925,7 +925,7 @@ Inelastic continuum scattering is treated differently, however.  Instead of havi
 PDF = \frac{A}{2 \sinh (A)} ( \cosh(A\mu)+R \sinh (A\mu))
 \end{equation}
 
-The sampling scheme for this probability distribution shown in \eqref{law44samp}\cite{3rdsampler}\cite{openmc}, where $\xi_1$ and $\xi_2$ are two additional random numbers.  After $\mu$ is sampled, the outgoing energy value is sampled on an independent tabular distribution, which is the topic of the next subsection.
+The sampling scheme for this probability distribution shown in \eqref{law44samp}, where $\xi_1$ and $\xi_2$ are two additional random numbers .  Since this is a correlated angle-energy distribution, there there is an energy value along with the factors $A$ and $R$ that corresponds to a CDF bin.  This sampled energy value is scaled via \eqref{energy_scaling} just like those from a tabular energy distribution, which is the topic of the next subsection \cite{3rdsampler}\cite{openmc}.
 
 \begin{equation}
 \label{law44samp}
@@ -939,14 +939,26 @@ The sampling scheme for this probability distribution shown in \eqref{law44samp}
 
 \subsubsection{Tabular Energy Distributions}
 
+Continuous, independent energy distributions, like those specified for fission spectra, have multiple CDFs specified at various incoming neutron energies.  Stochastic mixing probability $f$, shown in \eqref{mixing_prob}, is used to select if the lower-bounding or upper-bounding distribution will be sampled from for $E_i < E < E_{i+1}$.  After the distribution is selected, the CDF is sampled with histogram or linear-linear interpolation, which ever is specified in the library.  Once the sampled energy, $E_\mathrm{sampled}$, is calculated, it must be scaled to the bounding incoming energy bins to preserve any thresholds.  This is done via \eqref{energy_scaling} where $E_{i,\mathrm{first}}$ and $E_{i,\mathrm{last}}$ are the first and last energy values of the CDF in $E_i$; and $E_{i+1,\mathrm{first}}$ and $E_{i+1,\mathrm{last}}$ are the first and last energy values of the CDF in $E_{i+1}$ \cite{mcnp}.
+
+\begin{equation}
+\label{energy_scaling}
+\begin{split}
+E_a &= E_{i,\mathrm{first}} +  f( E_{i+1,\mathrm{first}} - E_{i,\mathrm{first}} ) \\
+E_b &= E_{i,\mathrm{last}} +  f( E_{i+1,\mathrm{last}} - E_{i,\mathrm{last}} ) \\
+\mathrm{if\:i+1\:sampled:} \quad \mathrm{diff} &= E_{i+1,\mathrm{last}}  - E_{i+1,\mathrm{first}}  \qquad E_\mathrm{start}= E_{i+1,\mathrm{first}}  \\
+\mathrm{else:}          \qquad \quad       \mathrm{diff} &= E_{i,\mathrm{last}}  - E_{i,\mathrm{first}}  \qquad \qquad E_\mathrm{start}= E_{i,\mathrm{first}}  \\
+E^\prime &=  E1  +  ( E_\mathrm{sampled} - E_\mathrm{start})  \frac{ E_b - E_a}{ \mathrm{diff} }  
+\end{split}
+\end{equation}
+
+\subsection{Fission, $k$-Eigenvalue Method}
+
+Modeling the fission chain reaction is simple in Monte Carlo simulations when a system is exactly critical.  Since the 
 
 
 
-\subsubsection{Fission}
-
-fission dist
-
-source pop
+\cite{jaakko}
 
 
 
