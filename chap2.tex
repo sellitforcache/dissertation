@@ -647,6 +647,8 @@ Since the central limit theorem states that it is normally distributed, we can m
 \mathrm{Rel. Err.} = \frac{\sigma}{\bar{X}_N} = \frac{1}{\bar{X}_N}\sqrt{\frac{1}{(N-1)} \left( \frac{1}{N}\sum_i^N x_i^2-\bar{X}_N^2 \right)}
 \end{equation}
 
+\subsection{Analog }
+
 
 \subsection{Sampling Schemes}
 
@@ -952,10 +954,30 @@ E^\prime &=  E1  +  ( E_\mathrm{sampled} - E_\mathrm{start})  \frac{ E_b - E_a}{
 \end{split}
 \end{equation}
 
-\subsection{Fission, $k$-Eigenvalue Method}
+\subsection{Neutron Sources}
+
+So far, all that has been mentioned is how to handle the different reactions in a Monte Carlo neutron transport simulation.  This is important since reactions describe what happens to neutrons and where they go during their random walk, but how to handle \emph{where} they come from still needs to be defined.  The source terms on the right hand side of the neutron transport equation, other than the scattering source, have not been defined yet.  In this subsection, the other two source terms, the external source and the criticality source, are discussed.
+
+\subsubsection{External Source}
+
+An external, or fixed, source is simply a source which does not depend on the neutron population itself.  Physically, such a source could be from natural radioactive decay, an accelerator source, etc.  The only concern with an external source in a Monte Carlo simulation is in accurately measuring the response of the system, more specifically, the response of the system if it contains fissile material.  If a single neutron is ``shot'' into a multiplying material, all the secondary particles the primary neutron induces also need to be simulated in order to simulate the response of the system.  The number of secondary neutrons produced is fully defined by the multiplication factor since it gives the ratio of subsequent neutron generations.  An expression for the converge infinite series is shown in \eqref{sub_crit_mult}\cite{duderstadt}\cite{jaakko}.
+
+\begin{equation}
+\label{sub_crit_mult}
+N_\mathrm{total} = N_0 + k N_0 + k^2 N_0 + \dots = N_0 \sum_{i=0}^\infty k^i = \frac{N_0}{1-k}
+\end{equation}
+
+This series
+
+\subsubsection{Fission Source, $k$-Eigenvalue Method}
+
+
+
 
 Modeling the fission chain reaction is simple in Monte Carlo simulations when a system is exactly critical.  Since the 
+\cite{jaakko}
 
+\subsection{Tallies}
 
 
 \cite{jaakko}
