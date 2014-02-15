@@ -869,7 +869,7 @@ n = 3/2 \quad h=1 \qquad \Rightarrow \qquad x^\prime =   \sqrt{- \ln( \xi_1) - \
 \end{gathered}
 \end{equation}
 
-After this is done and $x^\prime$ is sampled, the rejection criterion in \eqref{RR_vel_split_samp} comes into play.  The sampled value of $x^\prime$ is transformed to $v_T^\prime=x^\prime/\beta$, and a value for $\mu$ is sampled isotropically as in \eqref{mu_samp}.  Once $\mu$ is sampled, $f_1(v_T,\mu)$ can be calculated, and the sampled values of $v_T^\prime$ and $\mu$ are accepted with the probability $p_\mathrm{accept}$ as shown in \eqref{prob_accept}, i.e. if another random number $\xi<p_\mathrm{accept}$.  If the sample is rejected, the whole process is repeated until a pair of $v_T^\prime$ and $\mu$ are accepted.
+After this is done and $x^\prime$ is sampled, the rejection criterion in \eqref{RR_vel_split_samp} comes into play.  The sampled value of $x^\prime$ is transformed to $v_T^\prime=x^\prime/\beta$, and a value for $\mu$ is sampled isotropically as in \eqref{mu_samp}.  Once $\mu$ is sampled, $f_1(v_T,\mu)$ can be calculated, and the sampled values of $v_T^\prime$ and $\mu$ are accepted with the probability $p_\mathrm{accept}$ as shown in \eqref{prob_accept}, i.e. if another random number $\xi<p_\mathrm{accept}$.  If the sample is rejected, the whole process is repeated until a pair of $v_T^\prime$ and $\mu$ are accepted.  Even though this is a rejections method, it has fairly high efficiency, with samples being accepted at minimum 68\% of the time and 100\% of the time as the neutron velocity goes to zero or values much greater than the target temperature \cite{mcnp}.
 
 \begin{equation}
 \label{mu_samp}
@@ -967,10 +967,11 @@ An external, or fixed, source is simply a source which does not depend on the ne
 N_\mathrm{total} = N_0 + k N_0 + k^2 N_0 + \dots = N_0 \sum_{i=0}^\infty k^i = \frac{N_0}{1-k}
 \end{equation}
 
-This series
+This series only converges for $k<1$, which sets a restriction for fixed-source simulations.  If the multiplication factor is greater than one, it will require infinitely many secondary neutrons to be tracked, so this situation must be avoided.
 
 \subsubsection{Fission Source, $k$-Eigenvalue Method}
 
+When a fission source is specified, the simulation will run in a manner different to an external source problem.
 
 
 
