@@ -562,17 +562,20 @@ Although discrete methods are readily mapped to computer hardware and execute qu
 
 \section{Monte Carlo}
 
+random walk, surface crossing, etc
+
 The Monte Carlo method takes a different approach in mapping the transport problem to a computer.  Instead of the neutron population being continuous and the spatial, angular, and energy dimensions being discretized, it leaves the dimensions continuous and discretizes the neutron population!   Quantities of interested are then determined by integrating over the neutron population!   This way of integrating the neutron transport equation can be thought of as integrating it ``sideways.''   Deterministic approaches integrate it by discretizing the dimensions and ensuring consistency of the transport equation between the discrete points.  This is the ``standard'' way of integrating the transport equation.  In the Monte Carlo method, the discretized neutron ``shoots through'' the transport equation many times, sweeping out the entire phase space, effectively integrating it when a sum is done over the individual neutron realizations, or \emph{histories}.  It is important to note that the Monte Carlo method does not actually solve the transport equation, per se, but rather is able to \emph{estimate} the solution very well.
-
-There are advantages in using the Monte Carlo method for neutron transport, some of which have been mentioned.  The first and foremost is that it that very few assumptions must be done to the physics and the geometry of the problem. Paraphrasing Forrest Brown when he spoke at the Supercomputing in Nuclear Applications and Monte Carlo conference on October 30th, 2013 in Paris,  the only reason people use Monte Carlo methods is that they are able to produce physically accurate results and are trusted to so so.  Anyone developing Monte Carlo code should not abuse this trust and must put accuracy first and foremost in their implementations.
-
-There are considerable drawbacks to using Monte Carlo as well; primarily convergence rates and silent inaccuracies.  Since it is a statistical calculation, it is bound by statistical laws which dictate that the error in Monte Carlo calculations reduces as $1/\sqrt{N}$, where N is the number of histories performed.  Also, since geometries can be large, very small but very influencing volumes can be missed by the neutron random walk if the number of histories is not large enough.  The estimated statistical error may be low at $N$ histories, but there is a chance the entire phase space has not yet been sufficiently sampled to produce accurate results.  Deterministic methods would not have this problem since there will be a discretized point in this small volume, and it will contribute to the overall calculation.  The slow convergence rate can be combated by using parallel computing, however.  Requiring that neutrons do not interact with each other was an assumption that went into deriving the neutron transport equation, and can be exploited in Monte Carlo simulations.  Since each neutron history is completely independent, histories can be run completely in parallel without communication until the results are combined at the end of the simulation.  This leads to very good scaling of parallel calculations, which can be used to reduced run times of large problems to acceptable values.
 
 \begin{figure}[h!] 
   \centering
     \includegraphics[width=0.8\textwidth]{graphics/MC_diagram.pdf}
      \caption{The Monte Carlo random walk process. \label{random_walk}}
 \end{figure}
+
+There are advantages in using the Monte Carlo method for neutron transport, some of which have been mentioned.  The first and foremost is that it that very few assumptions must be done to the physics and the geometry of the problem. Paraphrasing Forrest Brown when he spoke at the Supercomputing in Nuclear Applications and Monte Carlo conference on October 30th, 2013 in Paris,  the only reason people use Monte Carlo methods is that they are able to produce physically accurate results and are trusted to so so.  Anyone developing Monte Carlo code should not abuse this trust and must put accuracy first and foremost in their implementations.
+
+There are considerable drawbacks to using Monte Carlo as well; primarily convergence rates and silent inaccuracies.  Since it is a statistical calculation, it is bound by statistical laws which dictate that the error in Monte Carlo calculations reduces as $1/\sqrt{N}$, where N is the number of histories performed.  Also, since geometries can be large, very small but very influencing volumes can be missed by the neutron random walk if the number of histories is not large enough.  The estimated statistical error may be low at $N$ histories, but there is a chance the entire phase space has not yet been sufficiently sampled to produce accurate results.  Deterministic methods would not have this problem since there will be a discretized point in this small volume, and it will contribute to the overall calculation.  The slow convergence rate can be combated by using parallel computing, however.  Requiring that neutrons do not interact with each other was an assumption that went into deriving the neutron transport equation, and can be exploited in Monte Carlo simulations.  Since each neutron history is completely independent, histories can be run completely in parallel without communication until the results are combined at the end of the simulation.  This leads to very good scaling of parallel calculations, which can be used to reduced run times of large problems to acceptable values.
+
 
 \subsection{Statistics}
 To understand how the Monte Carlo method performs this integration, simple equations and derivations and such as calculating $\pi$ can be done.   First, given a continuous random variable $x$ that follows the probability distribution $P$, the mean value can be calculated by taking the first moment as was shown in \eqref{NDF_moments} and is reproduced in \eqref{int_mean}.  But we are interested in determining the mean from a set measurements rather than the underlying distribution.  If we have $N$ independent measurements of quantity $x$, this is simply taking the arithmetic mean, as shown in \eqref{arith_mean}.
@@ -646,9 +649,6 @@ Since the central limit theorem states that it is normally distributed, we can m
 \label{rel_err}
 \mathrm{Rel. Err.} = \frac{\sigma}{\bar{X}_N} = \frac{1}{\bar{X}_N}\sqrt{\frac{1}{(N-1)} \left( \frac{1}{N}\sum_i^N x_i^2-\bar{X}_N^2 \right)}
 \end{equation}
-
-\subsection{Analog }
-
 
 \subsection{Sampling Schemes}
 
@@ -954,6 +954,14 @@ E^\prime &=  E1  +  ( E_\mathrm{sampled} - E_\mathrm{start})  \frac{ E_b - E_a}{
 \end{split}
 \end{equation}
 
+
+\subsection{Tallies}
+
+
+\cite{jaakko}
+
+
+
 \subsection{Neutron Sources}
 
 So far, all that has been mentioned is how to handle the different reactions in a Monte Carlo neutron transport simulation.  This is important since reactions describe what happens to neutrons and where they go during their random walk, but how to handle \emph{where} they come from still needs to be defined.  The source terms on the right hand side of the neutron transport equation, other than the scattering source, have not been defined yet.  In this subsection, the other two source terms, the external source and the criticality source, are discussed.
@@ -971,24 +979,45 @@ This series only converges for $k<1$, which sets a restriction for fixed-source 
 
 \subsubsection{Fission Source, $k$-Eigenvalue Method}
 
-When a fission source is specified, the simulation will run in a manner different to an external source problem.
+When a fission source is specified, the simulation will run in a manner different to an external source problem.  The neutron source now depends on the neutron population itself, and a method must be used which directly ties the source to the population.  This is done by using any points where neutrons any secondary-producing reactions as source points for subsequent neutron histories.  When neutrons are born from these induced points, they of course must follow the emissions laws specified by the data.  For fission reactions, there is usually a tabulated energy spectrum, which is sampled and interpolated in the data-specified ways, and then scaled to the incoming energy bins via \eqref{energy_scaling}.  The angle is isotropic in the lab frame, and this is easily sampled via \eqref{iso_samp}.
 
+\begin{equation}
+\label{iso_samp}
+\begin{split}
+\phi &= 2 \pi \xi_1 \\
+\theta &= 2 \xi_2 -1
+\end{split}
+\end{equation}
 
+In criticality simulations, the parameter of interest is usually the effective multiplication factor, $k_\mathrm{eff}$.  It is defined by \eqref{k_eff_batch}, where $N_{s,n}$ is the number of source neutrons in the current generation, and $N_{s,n+1}$ is the number of neutrons in the next generation \cite{jaakko}.  Calculating this quantity in a Monte Carlo simulation is straightforward, but generation information must be preserved.  Correct results cannot be obtained if yields from source particles in different generation are used to calculate the number of sources in the next generation.  This is why criticality source simulations are usually run in a batched mode where a preset number of source particles from a single generation are all transported until termination.  The secondary-producing reaction points are then used as the starting points for the next generation.  The generations are not interleaved, and correct values for the multiplication factor can be calculated.
 
-Modeling the fission chain reaction is simple in Monte Carlo simulations when a system is exactly critical.  Since the 
-\cite{jaakko}
+\begin{equation}
+\label{k_eff_batch}
+k_\mathrm{eff} = \frac{N_{s,n+1}}{N_{s,n}}
+\end{equation}
 
-\subsection{Tallies}
+Modeling the fission chain reaction is simple in Monte Carlo simulations when a system is exactly critical.  In batched criticality mode, the next generation of neutrons have starting points which are determined by the previous generation.  When the system is exactly critical, there is a one-to-one mapping of induced secondary neutrons to preset number of source particles to be transported in the next batch.  But when the system is sub- or super-critical, there is no longer a one-to-one mapping and starting points either have to be reused or discarded, respectively.  This is done by using the \emph{k-eigenvalue method}, which used by the Serpent code \cite{jaakko}.  After $k_\mathrm{eff}$ is calculated via \eqref{k_eff_batch}, it is used to renormalized the fission source, i.e. the secondary yield values are divided by $k_\mathrm{eff}$.  This is an analog to dividing the fission source term in \eqref{time_ind_NTE} by $k_\mathrm{eff}$ to enforce the time derivative to be zero.  By dividing the yield values by $k_\mathrm{eff}$, the multiplication factor should be 1, and a one-to-one mapping is recovered.  
 
+Since $k_\mathrm{eff}$ are continuous, calculating an integer value of secondary particles is done stochastically to preserve the aggregate mean.  The renormalized yield, $y_r$, is stochastically rounded based on a random number $\xi$ as shown in  \eqref{stoch_rounding}.  Doing this ensures that over a large batch size, the multiplication factor is renormalized as close to one as possible.  In the case where $y_r$ is slightly less than one, the last few source points from the previous generation are simply reused.  This should not introduce much bias in the results if the source distribution is converged.
 
-\cite{jaakko}
+\begin{equation}
+\label{stoch_rounding}
+\begin{split}
+&y_r = \frac{\mathrm{yield}}{k_\mathrm{eff}} \\
+\mathrm{if}\quad &y_r - \mathrm{floor}(y_r)<\xi \\
+\mathrm{then:}\quad &y_r=\mathrm{ceil}(y_r) \\
+\mathrm{else:}\quad &y_r=\mathrm{floor}(y_r)
+\end{split}
+\end{equation}
 
-
+To start the simulation, a guess must be made for the initial points neutrons are born.  in some codes, one can specify a single initial point where all of the first generation neutrons are born.  As the simulation progresses, the source expands and converges to the true distribution.  The initial batches, or cycles, when the source distribution is far from the correct distribution are therefore discarded.  No quantities are accumulated and the multiplication factors values are not used in calculating the final value.  The discarded cycles only serve to converge the fission source so the accumulated quantities later in the simulation are not biased due to an incorrect source distribution.  In order to accelerated this process, WARP uses a similar method to Serpent to guess the initial source distribution.  The materials in the geometry are all flagged as fissile or non-fissile.  Then and uniform, random distribution of source neutrons are distributed across the geometry.  If the particles lies in a fissile material, it is recorded in a buffer.  This process is repeated until the required amount of source points are accumulated in the starting point buffer.  This method is called the \emph{flat source approximation}, and should require fewer cycles to be discard than the point source method since the initial distribution has spatial extent and fewer cycles will be needed to simply push neutrons into all geometrical regions \cite{jaakko}.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{GPUs}
+
+Now that the simulation methods have been framed,
 
 Part of the reason GPUs are able to perform efficiently is do to their reliance on single instruction, multiple data (SIMD) execution.  This execution method uses the same instructions carried out over multiple pieces of data at the same time.  This reduces the amount of power used in control and therefore more math can be done per watt [citation definitely needed].  The GPU programming model abstracts SIMD execution by using threads, which can be thought of in the traditional sense . There are some tradeoffs, however, including limited on-board memory (currently 12 GB), limited cache and control space, and requiring data parallelism for full utilization.
 
