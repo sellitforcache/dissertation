@@ -300,6 +300,7 @@ else:
 #
 #  rejection
 #
+name = 'rejection_samp'
 accepted_x=[]
 accepted_y=[]
 rejected_x=[]
@@ -313,7 +314,6 @@ for n in range(0,1000):
 	else:
 		accepted_x.append(rand1)
 		accepted_y.append(rand2)
-name = 'rejection_samp'
 fig = pl.figure(figsize=(10,6))
 ax = fig.add_subplot(1,1,1)
 x = np.linspace(0,2*np.pi,512)
@@ -334,4 +334,118 @@ if plot:
 else:
 	print name+'.pdf (PDF due to use of transparency)'
 	fig.savefig(name+'.pdf')
+
+#
+#  random walk
+#
+name = 'random_walk'
+#add figure
+fig = pl.figure()
+ax = Axes3D(fig)
+#box dims
+box_x=1.0
+box_y=1.0
+box_z=1.0
+#color boundaries
+out=0
+color=[0,0,1]
+idist=np.array([0.0,0.0,0.0,0.0,0.0,0.0])
+#make walk
+sigma=3.0
+walk_x=[0]
+walk_y=[0]
+walk_z=[0]
+n=0
+for a in range(0,20):
+	mu=2.0*np.random.random()-1.0
+	phi=2*np.pi*np.random.random()
+	dist=-np.log(np.random.random())/sigma
+	d_x=np.sqrt(1.0-mu*mu)*np.sin(phi)
+	d_y=np.sqrt(1.0-mu*mu)*np.cos(phi)
+	d_z=mu
+	walk_x.append(walk_x[n]+dist*d_x)
+	walk_y.append(walk_y[n]+dist*d_y)
+	walk_z.append(walk_z[n]+dist*d_z)
+	if (not out) and (np.absolute(walk_x[n+1])>box_x or np.absolute(walk_y[n+1])>box_y or np.absolute(walk_z[n+1])>box_z):
+		idist[0]=(-box_x-walk_x[n])/d_x
+		idist[1]=(box_x-walk_x[n])/d_x
+		idist[2]=(-box_y-walk_y[n])/d_y
+		idist[3]=(box_y-walk_y[n])/d_y
+		idist[4]=(-box_z-walk_z[n])/d_z
+		idist[5]=(box_z-walk_z[n])/d_z
+		real_t=np.min(idist[np.nonzero(np.select([np.array(idist)>0],[np.array(idist)]))])
+		walk_x.insert(n+1,real_t*d_x+walk_x[n])
+		walk_y.insert(n+1,real_t*d_y+walk_y[n])
+		walk_z.insert(n+1,real_t*d_z+walk_z[n])
+		ax.plot([walk_x[n],walk_x[n+1]],[walk_y[n],walk_y[n+1]],[walk_z[n],walk_z[n+1]],'.-',color=color)
+		ax.scatter(walk_x[n+1],walk_y[n+1],walk_z[n+1],marker='x',s=200,color=[1,0,0])
+		color=[np.random.random(),np.random.random(),np.random.random()]
+		out=1
+		n=n+1
+	if (out and (np.absolute(walk_x[n+1])<box_x and np.absolute(walk_y[n+1])<box_y and np.absolute(walk_z[n+1])<box_z)):
+		idist[0]=(-box_x-walk_x[n])/d_x
+		idist[1]=(box_x-walk_x[n])/d_x
+		idist[2]=(-box_y-walk_y[n])/d_y
+		idist[3]=(box_y-walk_y[n])/d_y
+		idist[4]=(-box_z-walk_z[n])/d_z
+		idist[5]=(box_z-walk_z[n])/d_z
+		real_t=np.min(idist[np.nonzero(np.select([np.array(idist)>0],[np.array(idist)]))])
+		walk_x.insert(n+1,real_t*d_x+walk_x[n])
+		walk_y.insert(n+1,real_t*d_y+walk_y[n])
+		walk_z.insert(n+1,real_t*d_z+walk_z[n])
+		ax.plot([walk_x[n],walk_x[n+1]],[walk_y[n],walk_y[n+1]],[walk_z[n],walk_z[n+1]],'.-',color=color)
+		ax.scatter(walk_x[n+1],walk_y[n+1],walk_z[n+1],marker='x',s=200,color=[1,0,0])
+		color=[np.random.random(),np.random.random(),np.random.random()]
+		out=0
+		n=n+1
+	ax.plot([walk_x[n],walk_x[n+1]],[walk_y[n],walk_y[n+1]],[walk_z[n],walk_z[n+1]],'.-',color=color)
+	n=n+1
+#plot box
+box_line = 'k--'
+ax.plot([-box_x,box_x],[box_y,box_y],[-box_z,-box_z],box_line)
+ax.plot([box_x,box_x],[box_y,-box_y],[-box_z,-box_z],box_line)
+ax.plot([-box_x,box_x],[-box_y,-box_y],[-box_z,-box_z],box_line)
+ax.plot([-box_x,-box_x],[box_y,-box_y],[-box_z,-box_z],box_line)
+ax.plot([-box_x,box_x],[box_y,box_y],[box_z,box_z],box_line)
+ax.plot([box_x,box_x],[box_y,-box_y],[box_z,box_z],box_line)
+ax.plot([-box_x,box_x],[-box_y,-box_y],[box_z,box_z],box_line)
+ax.plot([-box_x,-box_x],[box_y,-box_y],[box_z,box_z],box_line)
+ax.plot([-box_x,-box_x],[-box_y,-box_y],[-box_z,box_z],box_line)
+ax.plot([box_x,box_x],[-box_y,-box_y],[-box_z,box_z],box_line)
+ax.plot([-box_x,-box_x],[box_y,box_y],[-box_z,box_z],box_line)
+ax.plot([box_x,box_x],[box_y,box_y],[-box_z,box_z],box_line)
+#plot axes
+xspan = np.linspace(-2,2,20)
+yspan = np.linspace(-2,2,20)
+zspan = np.linspace(-2,2,20)
+zero  = np.zeros_like(xspan)
+ax.plot3D(xspan, zero, zero,'k-')
+ax.plot3D(zero, yspan, zero,'k-')
+ax.plot3D(zero, zero, zspan,'k-')
+#labels, etc
+view_multiplier=3.0
+ax.set_xlim(-view_multiplier*box_x,view_multiplier*box_x)
+ax.set_ylim(-view_multiplier*box_y,view_multiplier*box_y)
+ax.set_zlim(-view_multiplier*box_z,view_multiplier*box_z)
+ax.text(xspan.max() *1.1, 0, 0, "$x$", color='k', size=16)
+ax.text(0, yspan.max() *1.05, 0, "$y$", color='k', size=16)
+ax.text(0, 0, zspan.max() *1.05, "$z$", color='k', size=16)
+#plot view
+plot_el=17
+plot_az=-23
+ax.view_init(elev=plot_el, azim=plot_az)
+xlims=ax.get_xlim()
+ylims=ax.get_ylim()
+zlims=ax.get_zlim()
+ax.set_xlim(0.6*(xlims+.5))
+ax.set_ylim(0.6*(ylims+.5))
+ax.set_zlim(0.6*(zlims+.5))
+ax.set_aspect("equal")
+ax.set_axis_off()
+
+if plot:
+	pl.show()
+else:
+	print name+'.eps'
+	fig.savefig(name+'.eps')
 

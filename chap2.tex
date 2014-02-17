@@ -562,13 +562,13 @@ Although discrete methods are readily mapped to computer hardware and execute qu
 
 \section{Monte Carlo}
 
-random walk, surface crossing, etc
-
 The Monte Carlo method takes a different approach in mapping the transport problem to a computer.  Instead of the neutron population being continuous and the spatial, angular, and energy dimensions being discretized, it leaves the dimensions continuous and discretizes the neutron population!   Quantities of interested are then determined by integrating over the neutron population!   This way of integrating the neutron transport equation can be thought of as integrating it ``sideways.''   Deterministic approaches integrate it by discretizing the dimensions and ensuring consistency of the transport equation between the discrete points.  This is the ``standard'' way of integrating the transport equation.  In the Monte Carlo method, the discretized neutron ``shoots through'' the transport equation many times, sweeping out the entire phase space, effectively integrating it when a sum is done over the individual neutron realizations, or \emph{histories}.  It is important to note that the Monte Carlo method does not actually solve the transport equation, per se, but rather is able to \emph{estimate} the solution very well.
+
+random walk, surface crossing, etc
 
 \begin{figure}[h!] 
   \centering
-    \includegraphics[width=0.8\textwidth]{graphics/MC_diagram.pdf}
+    \includegraphics[width=0.8\textwidth]{graphics/random_walk_accepted.eps}
      \caption{The Monte Carlo random walk process. \label{random_walk}}
 \end{figure}
 
@@ -985,7 +985,7 @@ When a fission source is specified, the simulation will run in a manner differen
 \label{iso_samp}
 \begin{split}
 \phi &= 2 \pi \xi_1 \\
-\theta &= 2 \xi_2 -1
+\mu= \cos \theta &= 2 \xi_2 -1
 \end{split}
 \end{equation}
 
