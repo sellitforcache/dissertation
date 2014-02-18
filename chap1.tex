@@ -14,19 +14,86 @@ When applied to neutron transport, the central concept of the Monte Carlo method
 
 \section{Why GPUs?}
 
-GPUs have gradually increased in computational power from the small, job-specific boards of the early 90s to the programmable powerhouses of today.  Compared to CPUs, they have a higher aggregate memory bandwidth, much higher floating-point operations per second (FLOPS), and lower energy consumption per FLOP.  Because one of the main obstacles in exascale computing is power consumption, many new supercomputing platforms are gaining much of their computational capacity by incorporating GPUs into their compute nodes.  Since CPU optimized parallel algorithms are usually not directly portable to GPU architectures (or at least without losing substantial performance), transport codes may need to be rewritten in order to execute efficiently on GPUs.  Unless this is done, nuclear engineers cannot take full advantage of these new supercomputers for reactor simulations.
+GPUs have gradually increased in computational power from the small, job-specific boards of the early 90s to the programmable powerhouses of today.  Compared to CPUs, they have a higher aggregate memory bandwidth, much higher floating-point operations per second (FLOPS), and lower energy consumption per FLOP.  Because one of the main obstacles in exascale computing is power consumption, many new supercomputing platforms are gaining much of their computational capacity by incorporating GPUs into their compute nodes.  In the Novermber 2013 Top500 list, there are 41 GPU-accelerated supercomputers, some of which gain 50\% of their computational capacity from GPU coprocessor cards \cite{top500}.  Supercomputers in the number two and six spots use them as well.  Since CPU optimized parallel algorithms are usually not directly portable to GPU architectures (or at least without losing substantial performance), transport codes may need to be rewritten in order to execute efficiently on GPUs.  Unless this is done, nuclear engineers cannot take full advantage of these new supercomputers for reactor simulations.
 
-Conventional CPU-based parallel Monte Carlo algorithms typically use the approach of one particle history per CPU thread.  Data is accessed when needed and threads execute completely independently of each other.  This is a task-parallel approach, the typical algorithm for which is shown in Figure 1, and works well on CPUs due to their large cache and control sizes (relative to cores) and the lower latency of accessing global memory (smaller penalty for random access).  This approach has been historically called history-based parallelism as well.  To fully utilize the computational power of GPUs, this approach must be modified.  Threads need to execute identical instructions and therefore must be in the same stage of the transport algorithm.  Studies have been done trying to directly port task-parallel Monte Carlo algorithms to GPUs with some success, most notably that of Liu, et. al. [10], and they suggest that a data-parallel approach similar to those used in vector computers should be employed [1, 10].  This approach is also called event-based parallelism since events, such as scattering or surface crossing, are done in parallel for many particles at once.
+Table \ref{gpu_cpu_comp} shows a breakdown of features of both an AMD Opteron Magny-Cours CPU and an NVIDIA Tesla C2075 GPU.  At first glance, it may appear that the GPU completely outstrips the CPU.  It has higher single precision FLOPs (Floating Point OPeration), higher memory bandwidth, and higher concurrent thread capability.  These are all great features, and it seems that these cards would be perfect for running Monte Carlo neutron transport, especially due to the number of threads they can concurrently run.  The concurrent thread number is based on the width of the processor's SIMD lanes, however.  SIMD, or Single Instruction Multiple Data, is a way some processors run in order to lower then number of instructions needed per amount of computation done, which increases both power and computational efficiency.  SIMD requires the same instructions to be carried out over every element  in a concurrently-processed data vector, and Monte Carlo typically breaks this instruction regularity due to its conditional statements based on random numbers.  Therefore, if Monte Carlo algorithms are to be use on GPUs, they must be execute in a careful manner taking into account the limitations of the GPU.
 
-Figure 2 shows the data parallel algorithm used to maintain thread coherence (i.e. executing the same instructions) between GPU threads.  It is similar to the vectorized approach used with the early vector computers, which also were able to use a single-instruction, multiple-data (SIMD) execution model [1, 2].  A single-instruction multiple-thread (SIMT) and SIMD are similar in the sense that identical instructions are carried out across different pieces of data, but SIMT allows threads to act independently, albeit with a performance penalty.   The two main features of Figure 2 are that independent GPU kernel launches are used for each step of the transport chain and that the kernels operate on a large set of particle data (as opposed to transporting one particle at a time).  By doing this, the transport cycle is broken into steps in which a single task, such as determining reaction type or finding boundary intersection, is performed across large dataset of particles and threads can be kept more coherent.
+\begin{table}[h]
+\centering
+\caption{A comparison of a NVIDIA GPU and an Opteron CPU.}
+\label{gpu_cpu_comp}
+\begin{tabular}{| l | r | r |}
+\hline
+Processor & Westmere-EP & Fermi (GF110) \\
+\hline
+\hline
+Processing Elements & 6 cores, 2 issue, & 16 cores, 2 issue, \\
+& 4-way SIMD &  16-way SIMD  \\
+\hline
+Frequency & 3.46GHz &  1.54 Ghz \\
+\hline
+Resident Strands / Threads (max) & 48 & 24576 \\
+\hline
+SP GFLOP/s & 166 & 1577 \\
+\hline
+Mem. Bandwidth &  32 GB/s & 192 GB/s \\
+\hline
+Global Latency & 200-800 clocks & ~50 clocks \\
+\hline
+FLOPs / byte & 12.5  & 16.1 \\
+\hline
+Register Fils & 6kB (?) & 2MB \\
+\hline
+Local Storage / L1 Cache & 192 kB & 1024 kB \\
+\hline
+L2 Cache & 1536 kB & 0.75 MB \\
+\hline
+L3 Cache & 12 MB & - \\
+\hline
+\end{tabular}
+\end{table}
+
+Another considerably undesirable feature of the GPU is that they have very high global memory latency compared to a CPU.  As Table \ref{gpu_cpu_comp} shows, the Fermi card's global memory latency is about an order of magnitude higher than the Operton's.  Since data is accessed in a very random way in Monte Carlo simulations, access regularity can again be broken, and the global access latency could slow a simulation down significantly.  GPUs try to eliminate the effect of their large global latency by pipelining memory access as well as relaying on access regularity.  Pipelining means threads that have their data can execute as other threads are waiting for their data to load.  If many requests are known, the data can be continually loaded as threads start to execute their jobs.  The hope is that the jobs take longer than the memory loads, and eventually all data arrives, and the later threads appear to have zero latency for their memory access.  This is why it is important for GPUs to have such a large number of concurrent threads.  It allows them to pipeline data access and minimize the impact of memory latency.
+
+Another notable feature is that the GPU has greater FLOPs /byte of memory bandwidth ratio.  This implies that GPUs could be used to turn a compute-bound problem into a bandwidth-bound problem.  This may seem like a deficit, but the GPU does, after all, have a higher maximum memory bandwidth, so even though a problem is memory-bound on a GPU, it may still perform better than on a CPU.
+
+Table \ref{gpu_money} shows a comparison of an AMD Opteron Magny-Cours CPU and an NVIDIA Tesla C2075 GPU.  This prices shown are rounded values from purchases made by the UC Berkeley Department Nuclear Engineering.  The CPU price is for a complete server, basically CPUs and RAM.  The disk and  other components are a secondary cost.  The price shown for the GPUs are for the cards only since they can live in a very cheap host server with very little RAM and budget CPUs.  The main benefit from using GPUs is not the capital price per FLOP, but rather the substantially lower electric cost per FLOP.  Also, assuming that a GPU application performs 25 times faster than a single CPU code and the CPU code scales linearly, the capital price per Monte Carlo ``history power,'' or histories run per second, is about 3 times that of CPUs.  Again, this assumes 25 times speedup over a CPU code.  
+
+\begin{table}[h]
+\centering
+\caption{Breakdown of the cost benefits of GPUs}
+\label{gpu_money}
+\begin{tabular}{| l | r | r |}
+\hline
+Processor & 4x Opteron 12-core  & 3x NVIDIA TESLA C2075 \\
+  & @ 2.1 GHz &  (cards only)  \\
+\hline
+\hline
+Price & \$10,000 & \$6,000 \\
+\hline
+Max.TeraFLOP & 0.4 & 3.1 \\
+\hline
+Price / GigaFLOP & \$25 & \$1.94 \\
+\hline
+Price / History Power (10$^3$ h / s) & \$1.00 & \$0.38 \\
+(assuming 25x GPU speedup) & & \\
+\hline
+Thermal Power & 225W & 130W \\
+\hline
+Yearly electricity cost & \$503.70  & \$95.37 \\
+per TeraFLOP (\$.05 / kWh)   & & \\
+\hline
+\end{tabular}
+\end{table}
 
 \section{Added Value}
 
-The aim of this work is first to produce a program that runs accurate continuous energy neutron transport simulations on the GPU in general 3D geometries using standard nuclear data files.  The second goal is to make these simulations as fast as possible.  Producing this program, which has been named WARP, will be the first step in hopefully creating a full featured reactor simulation program that runs on GPU accelerator cards.  The added value in doing this comes from the fact that many supercomputers are gaining power from GPUs and in order for nuclear engineers to take advantage of this new computing power, which they always need more of, a new code must be written to run on them.  Even though GPU computing is still in its very early stages, developing WARP hedges risk for the simulation community against their computational tools becoming under powered or even obsolete.  Conversely, it also exposes a substantial amount of  computing power that couldn't otherwise be used on personal computers, workstations, and laptops.  Targeting GPUs could enable smaller computers to take on substantial reactor simulation tasks, and potentially reduce design iterations for people without access to supercomputers.  Other than being a nod to NVIDIA's terminology, if WARP were an acronym, it would stand for ``weaving all the random particles,'' with the words ``weaving all'' referring to the lockstep way in which ``all the random particles'', i.e. the neutrons, are sorted into coherent bundles and transported.
+Producing this program, which has been named WARP, will be the first step in hopefully creating a full featured reactor simulation program that runs on GPU accelerator cards.  The added value in doing this comes from the fact that many supercomputers are gaining power from GPUs and in order for nuclear engineers to take advantage of this new computing power, which they always need more of, a new code must be written to run on them.  Even though GPU computing is still in its very early stages, developing WARP hedges risk for the simulation community against their computational tools becoming under powered or even obsolete.  Conversely, it also exposes a substantial amount of  computing power that couldn't otherwise be used on personal computers, workstations, and laptops.  Targeting GPUs could enable smaller computers to take on substantial reactor simulation tasks, and potentially reduce design iterations for people without access to supercomputers.  Other than being a nod to NVIDIA's terminology, if WARP were an acronym, it would stand for ``weaving all the random particles,'' with the words ``weaving all'' referring to the lockstep way in which ``all the random particles'', i.e. the neutrons, are sorted into coherent bundles and transported.
 
 \section{Objective}
 
+The aim of this work is first to produce a program (WARP) that runs accurate continuous energy neutron transport simulations on the GPU in general 3D geometries using standard nuclear data files.  This program will be able to run in both fixed source and criticality source modes.  It will also be able to produce neutron spectra.  The second goal is to make these simulations as fast as possible.
 
 \section{Outline}
 
-1 paragraph summaries of each chapter.  will do once they are written!
+1 paragraph summaries of each chapter.  Will do once they are written!
