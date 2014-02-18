@@ -378,7 +378,7 @@ for a in range(0,20):
 		walk_y.insert(n+1,real_t*d_y+walk_y[n])
 		walk_z.insert(n+1,real_t*d_z+walk_z[n])
 		ax.plot([walk_x[n],walk_x[n+1]],[walk_y[n],walk_y[n+1]],[walk_z[n],walk_z[n+1]],'.-',color=color)
-		ax.scatter(walk_x[n+1],walk_y[n+1],walk_z[n+1],marker='x',s=200,color=[1,0,0])
+		ax.scatter(walk_x[n+1],walk_y[n+1],walk_z[n+1],marker='x',s=200,color=[0,1,0])
 		color=[np.random.random(),np.random.random(),np.random.random()]
 		out=1
 		n=n+1
@@ -394,12 +394,14 @@ for a in range(0,20):
 		walk_y.insert(n+1,real_t*d_y+walk_y[n])
 		walk_z.insert(n+1,real_t*d_z+walk_z[n])
 		ax.plot([walk_x[n],walk_x[n+1]],[walk_y[n],walk_y[n+1]],[walk_z[n],walk_z[n+1]],'.-',color=color)
-		ax.scatter(walk_x[n+1],walk_y[n+1],walk_z[n+1],marker='x',s=200,color=[1,0,0])
+		ax.scatter(walk_x[n+1],walk_y[n+1],walk_z[n+1],marker='x',s=200,color=[0,1,0])
 		color=[np.random.random(),np.random.random(),np.random.random()]
 		out=0
 		n=n+1
 	ax.plot([walk_x[n],walk_x[n+1]],[walk_y[n],walk_y[n+1]],[walk_z[n],walk_z[n+1]],'.-',color=color)
 	n=n+1
+# plot terminus x
+ax.scatter(walk_x[n],walk_y[n],walk_z[n],marker='x',s=200,color=[1,0,0])
 #plot box
 box_line = 'k--'
 ax.plot([-box_x,box_x],[box_y,box_y],[-box_z,-box_z],box_line)

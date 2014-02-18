@@ -32,7 +32,6 @@ k_\mathrm{eff} =
 The Monte Carlo method is not a new way to simulate nuclear reactors (or any particle transport problem for that matter) and in it's modern form dates back to 1940 when XXX invented the approach while working on the Manhattan Project[cite]. Uncle in Monaco...  During this time, Henry Metropolis and John Von Neumann...[cite]  Although this may be disputed by some people since is was rumored that Enrico Fermi was basically doing small scale simulations of this kind in his head trying to get the Chicago Pile critical [cite].
 
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Nuclear Interactions}
 \label{subsec:interactions}
@@ -550,8 +549,6 @@ In most situations, the equilibrium state of the neutron population is of intere
  \end{equation}
  
 
- 
-
 \section{Discrete Methods}
 
 The usual method in solving continuous differential and integral equations on a computer is to discretize the domain over which it is being solved.  This can be applied to the neutron transport equation as well.  Since energy is involved in integrals in the neutron transport equation, it can be discretized by integrating over set boundaries and treating the reaction parameters as constant within them.  The same method can be applied to them angular dependence.   The simplest way of discretizing the geometry is to voxelize the domain, laying down a uniform grid in every dimension and treating the material within each voxel as being uniform.  Discrete geometry representation is and area where an lot of error can occur since it is three dimensional and scales can range from millimeters to hundred of meters. 
@@ -564,11 +561,11 @@ Although discrete methods are readily mapped to computer hardware and execute qu
 
 The Monte Carlo method takes a different approach in mapping the transport problem to a computer.  Instead of the neutron population being continuous and the spatial, angular, and energy dimensions being discretized, it leaves the dimensions continuous and discretizes the neutron population!   Quantities of interested are then determined by integrating over the neutron population!   This way of integrating the neutron transport equation can be thought of as integrating it ``sideways.''   Deterministic approaches integrate it by discretizing the dimensions and ensuring consistency of the transport equation between the discrete points.  This is the ``standard'' way of integrating the transport equation.  In the Monte Carlo method, the discretized neutron ``shoots through'' the transport equation many times, sweeping out the entire phase space, effectively integrating it when a sum is done over the individual neutron realizations, or \emph{histories}.  It is important to note that the Monte Carlo method does not actually solve the transport equation, per se, but rather is able to \emph{estimate} the solution very well.
 
-random walk, surface crossing, etc
+The Monte Carlo approach makes a physically analogous ``experiment'' on a computer.  A computer thread ``sits on top'' of a neutron as it makes a \emph{random walk} through the geometry.  The computer thread uses pseudo-random numbers to sample probability distributions that describe the interactions the neutron makes as it travels.  All the assumptions that went into deriving the neutron transport equation still hold, most importantly that neutrons travel in straight lines between interactions, the neutrons are points, and they do not interact with each other.  The other assumption is that interactions happen instantaneously and at a point, i.e. they do occur over a distance.  It is very important how surface crossing detected in the simulation since this is what changes the material data where the probability distributions come from.  WARP, in its current state, uses the traditional form of surface detection and material updates, ray tracing, the details of which will be discussed in Section \ref{sec:prelim}.  When a neutron is sampled to cross a surface, it is placed on the boundary, the material data is updated, and the interaction distance is sampled again with the neutron traveling in the same direction.  Figure \ref{random_walk} shows a cartoon of a random walk of a neutron born in the center of a cube.  The line colors represent a neutron sampling a specific material, the red ``X'' represents an absorption (walk termination), and the green ``X'' represents a surface crossing.
 
 \begin{figure}[h!] 
   \centering
-    \includegraphics[width=0.8\textwidth]{graphics/random_walk_accepted.eps}
+    \includegraphics[width=0.8\textwidth,trim= 0cm 2.5cm 0cm 0cm]{graphics/random_walk_accepted.eps}
      \caption{The Monte Carlo random walk process. \label{random_walk}}
 \end{figure}
 
@@ -576,8 +573,8 @@ There are advantages in using the Monte Carlo method for neutron transport, some
 
 There are considerable drawbacks to using Monte Carlo as well; primarily convergence rates and silent inaccuracies.  Since it is a statistical calculation, it is bound by statistical laws which dictate that the error in Monte Carlo calculations reduces as $1/\sqrt{N}$, where N is the number of histories performed.  Also, since geometries can be large, very small but very influencing volumes can be missed by the neutron random walk if the number of histories is not large enough.  The estimated statistical error may be low at $N$ histories, but there is a chance the entire phase space has not yet been sufficiently sampled to produce accurate results.  Deterministic methods would not have this problem since there will be a discretized point in this small volume, and it will contribute to the overall calculation.  The slow convergence rate can be combated by using parallel computing, however.  Requiring that neutrons do not interact with each other was an assumption that went into deriving the neutron transport equation, and can be exploited in Monte Carlo simulations.  Since each neutron history is completely independent, histories can be run completely in parallel without communication until the results are combined at the end of the simulation.  This leads to very good scaling of parallel calculations, which can be used to reduced run times of large problems to acceptable values.
 
-
 \subsection{Statistics}
+
 To understand how the Monte Carlo method performs this integration, simple equations and derivations and such as calculating $\pi$ can be done.   First, given a continuous random variable $x$ that follows the probability distribution $P$, the mean value can be calculated by taking the first moment as was shown in \eqref{NDF_moments} and is reproduced in \eqref{int_mean}.  But we are interested in determining the mean from a set measurements rather than the underlying distribution.  If we have $N$ independent measurements of quantity $x$, this is simply taking the arithmetic mean, as shown in \eqref{arith_mean}.
 
 \begin{equation}
@@ -745,7 +742,7 @@ a = \frac{P_{i+1}-P_i}{\mu^\prime_{i+1}-\mu^\prime_i} \qquad , \qquad b = P_i - 
 \end{gathered}
 \end{equation}
 
- Which interpolation method is used is specified in the data on a case-by-case basis.
+Which interpolation method is used is specified in the data on a case-by-case basis.
 
 \subsubsection{Distance To Interaction}
 
@@ -1059,6 +1056,7 @@ all my prelim work to motivate this project
 
 
 \subsection{Ray Tracing with OptiX}
+\label{sec:prelim}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
