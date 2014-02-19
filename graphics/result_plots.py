@@ -117,4 +117,29 @@ if plot:
 else:
 	print name+'.eps'
 	fig.savefig(name+'.eps')
+	
+#
+#  prelim geom
+#
+name = 'prelim_geom'	
+fig = pl.figure(figsize=(10,6))
+ax = fig.add_subplot(1,1,1)
+ax.plot([.1,.4,.4,.1,.1],[.1,.1,.4,.4,.1],color=[1, 0, 0])
+ax.plot([.6,.9,.9,.6,.6],[.6,.6,.9,.9,.6],color=[1, 0, 0])
+ax.plot([.1,.4,.4,.1,.1],[.6,.6,.9,.9,.6],color=[1, 0, 0])
+ax.plot([.6,.9,.9,.6,.6],[.1,.1,.4,.4,.1],color=[1, 0, 0])
+ax.text(.23  , .7,  'CELL 4 \n$\Sigma_a=0.6$  \n$\Sigma_s=0.4$')
+ax.text(.23  , .2,  'CELL 1 \n$\Sigma_a=0.0$  \n$\Sigma_s=2.0$')
+ax.text(.675 , .7,  'CELL 3 \n$\Sigma_a=0.6$  \n$\Sigma_s=0.4$')
+ax.text(.675 , .2,  'CELL 2 \n$\Sigma_a=0.6$  \n$\Sigma_s=0.4$')
+ax.text(.45  , .45,'CELL 0 \n$\Sigma_a=0.01$ \n$\Sigma_s=0.4$')
+ax.set_xlim([0, 1])
+ax.set_ylim([0, 1])
+ax.set_xlabel(r'$x$ (cm)')
+ax.set_ylabel(r'$y$ (cm)')
 
+if plot:
+	pl.show()
+else:
+	print name+'.eps'
+	fig.savefig(name+'.eps')
