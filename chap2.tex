@@ -574,6 +574,7 @@ There are advantages in using the Monte Carlo method for neutron transport, some
 There are considerable drawbacks to using Monte Carlo as well; primarily convergence rates and silent inaccuracies.  Since it is a statistical calculation, it is bound by statistical laws which dictate that the error in Monte Carlo calculations reduces as $1/\sqrt{N}$, where N is the number of histories performed.  Also, since geometries can be large, very small but very influencing volumes can be missed by the neutron random walk if the number of histories is not large enough.  The estimated statistical error may be low at $N$ histories, but there is a chance the entire phase space has not yet been sufficiently sampled to produce accurate results.  Deterministic methods would not have this problem since there will be a discretized point in this small volume, and it will contribute to the overall calculation.  The slow convergence rate can be combated by using parallel computing, however.  Requiring that neutrons do not interact with each other was an assumption that went into deriving the neutron transport equation, and can be exploited in Monte Carlo simulations.  Since each neutron history is completely independent, histories can be run completely in parallel without communication until the results are combined at the end of the simulation.  This leads to very good scaling of parallel calculations, which can be used to reduced run times of large problems to acceptable values.
 
 \subsection{Statistics}
+\label{sec:stat}
 
 To understand how the Monte Carlo method performs this integration, simple equations and derivations and such as calculating $\pi$ can be done.   First, given a continuous random variable $x$ that follows the probability distribution $P$, the mean value can be calculated by taking the first moment as was shown in \eqref{NDF_moments} and is reproduced in \eqref{int_mean}.  But we are interested in determining the mean from a set measurements rather than the underlying distribution.  If we have $N$ independent measurements of quantity $x$, this is simply taking the arithmetic mean, as shown in \eqref{arith_mean}.
 
@@ -954,11 +955,48 @@ E^\prime &=  E1  +  ( E_\mathrm{sampled} - E_\mathrm{start})  \frac{ E_b - E_a}{
 
 \subsection{Tallies}
 
+Other than determining the multiplication factor, one of the main purposes of simulation reactors is determining the neutron flux spectrum.  The reaction rates and therefore the power of the reactor are proportional to the flux, making it a very important quantity in determining how a rectors will behave.  Since reactions are explicitly simulated with the  Monte Carlo method, an estimator can be used to estimate the neutron flux.  It does not directly calculate the flux, but relies on the fact that the total reaction rate is proportional to the flux.  If every interaction point is counted within a volume, this number can be used to estimate the volume-averaged flux in that volume.  For a representation on a computer, a discrete set of energy bins $E_1 \rightarrow E_g$ must be specified in order to calculate the flux.  The flux in group $g$ and in volume $j$ is shown in \eqref{flux_discrete}.  The reaction rate in the same volume and energy group is shown in \eqref{RR_discrete}.
+
+\begin{equation}
+\label{flux_discrete}
+\phi_{g,j} =   \frac{1}{V_j (E_{g+1}-E_g)} \int_{V_j} dV \: \int_{E_g}^{E_{g+1}}  dE \: \phi(\boldsymbol{\vec{r}},E) 
+\end{equation}
+
+\begin{equation}
+\label{RR_discrete}
+R_{g,j} = \int_{V_j} dV \: \int_{E_g}^{E_{g+1}}  dE \: \Sigma_t(\boldsymbol{\vec{r}},E) \phi(\boldsymbol{\vec{r}},E)   
+\end{equation}
+
+An expression for an cross section averaged flux is shown in \eqref{flux_from_RR}.  If the cross section can be treated as constant in the volume $V_j$ over the interval $E_g \rightarrow E_g+1$, then $\bar{\phi}_{g,j} = \phi_{g,j}$ and the averaged flux flux can be written as shown in \eqref{flux_const_xs}.
+
+\begin{equation}
+\label{flux_from_RR}
+\begin{split}
+\bar{\phi}_{g,j} = \frac{\int_{V_j} dV \: \int_{E_g}^{E_{g+1}}  dE \: \Sigma_t(\boldsymbol{\vec{r}},E)  \phi(\boldsymbol{\vec{r}},E)}{\int_{V_j} dV \: \int_{E_g}^{E_{g+1}}  dE \: \Sigma_t(\boldsymbol{\vec{r}},E)} = \frac{R_{g,j} }{\int_{V_j} dV \: \int_{E_g}^{E_{g+1}}  dE \: \Sigma_t(\boldsymbol{\vec{r}},E)}
+\end{split}
+\end{equation}
+
+\begin{equation}
+\label{flux_const_xs}
+\begin{split}
+\bar{\phi}_{g,j} &= \frac{R_{g,j} }{(E_{g+1}-E_g)  V_j \Sigma_t^{g,j}} \\
+\end{split}
+\end{equation}
+
+Since the total reaction rate is simply the number of collisions within a volume, 
+
+\begin{equation}
+\label{flux_tally}
+\begin{gathered}
+E_g < E_i < E_{g+1} \\
+R_{g,j} = \sum_i i \\
+\Sigma_t^{g,j} = \sum_i \Sigma_t^j(E_i) \\
+\bar{\phi}_{g,j} = \sum_i \frac{1}{\Sigma_t^j(E_i)}
+\end{gathered}
+\end{equation}
 
 
-
-\cite{jaakko}
-
+An \emph{analog estimator} is physically analogous - reactions are counted directly.  If a reaction has a finite cross section in a material and does not occur while sampling, a reaction rate estimate is impossible to make.  If a \emph{collision estimator} is used instead, this is not longer the case.  A collision estimator differs by using every interaction point, no matter what actual reaction occurs.  This total score is simply weighted by the interaction probability for a particular reaction as shown in \eqref{flux_tally} \cite{jaakko}.  This is equivalent to summing the macroscopic cross section for a particular isotope's reaction instead of the material's total cross section.  Of course, tallies are subject to the statistics mentioned in the statistics subsection.
 
 
 \subsection{Neutron Sources}
