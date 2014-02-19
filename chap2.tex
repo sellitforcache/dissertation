@@ -955,6 +955,8 @@ E^\prime &=  E1  +  ( E_\mathrm{sampled} - E_\mathrm{start})  \frac{ E_b - E_a}{
 \subsection{Tallies}
 
 
+
+
 \cite{jaakko}
 
 
@@ -990,10 +992,10 @@ In criticality simulations, the parameter of interest is usually the effective m
 
 \begin{equation}
 \label{k_eff_batch}
-k_\mathrm{eff} = \frac{N_{s,n+1}}{N_{s,n}}
+k_{\mathrm{eff},n} = \frac{N_{s,n+1}}{N_{s,n}}
 \end{equation}
 
-Modeling the fission chain reaction is simple in Monte Carlo simulations when a system is exactly critical.  In batched criticality mode, the next generation of neutrons have starting points which are determined by the previous generation.  When the system is exactly critical, there is a one-to-one mapping of induced secondary neutrons to preset number of source particles to be transported in the next batch.  But when the system is sub- or super-critical, there is no longer a one-to-one mapping and starting points either have to be reused or discarded, respectively.  This is done by using the \emph{k-eigenvalue method}, which used by the Serpent code \cite{jaakko}.  After $k_\mathrm{eff}$ is calculated via \eqref{k_eff_batch}, it is used to renormalized the fission source, i.e. the secondary yield values are divided by $k_\mathrm{eff}$.  This is an analog to dividing the fission source term in \eqref{time_ind_NTE} by $k_\mathrm{eff}$ to enforce the time derivative to be zero.  By dividing the yield values by $k_\mathrm{eff}$, the multiplication factor should be 1, and a one-to-one mapping is recovered.  
+Modeling the fission chain reaction is simple in Monte Carlo simulations when a system is exactly critical.  In batched criticality mode, the next generation of neutrons have starting points which are determined by the previous generation.  When the system is exactly critical, there is a one-to-one mapping of induced secondary neutrons to preset number of source particles to be transported in the next batch.  But when the system is sub- or super-critical, there is no longer a one-to-one mapping and starting points either have to be reused or discarded, respectively.  This is done by using the \emph{k-eigenvalue method}, which used by the Serpent code \cite{jaakko}.  After $k_\mathrm{eff}$ is calculated via \eqref{k_eff_batch}, it is used to renormalized the fission source of the next generation, i.e. the secondary yield values are divided by $k_\mathrm{eff}$.  This is an analog to dividing the fission source term in \eqref{time_ind_NTE} by $k_\mathrm{eff}$ to enforce the time derivative to be zero.  By dividing the yield values by $k_\mathrm{eff}$, the multiplication factor should be 1, and a one-to-one mapping is recovered.  
 
 Since $k_\mathrm{eff}$ are continuous, calculating an integer value of secondary particles is done stochastically to preserve the aggregate mean.  The renormalized yield, $y_r$, is stochastically rounded based on a random number $\xi$ as shown in  \eqref{stoch_rounding}.  Doing this ensures that over a large batch size, the multiplication factor is renormalized as close to one as possible.  In the case where $y_r$ is slightly less than one, the last few source points from the previous generation are simply reused.  This should not introduce much bias in the results if the source distribution is converged.
 
@@ -1008,6 +1010,16 @@ Since $k_\mathrm{eff}$ are continuous, calculating an integer value of secondary
 \end{equation}
 
 To start the simulation, a guess must be made for the initial points neutrons are born.  in some codes, one can specify a single initial point where all of the first generation neutrons are born.  As the simulation progresses, the source expands and converges to the true distribution.  The initial batches, or cycles, when the source distribution is far from the correct distribution are therefore discarded.  No quantities are accumulated and the multiplication factors values are not used in calculating the final value.  The discarded cycles only serve to converge the fission source so the accumulated quantities later in the simulation are not biased due to an incorrect source distribution.  In order to accelerated this process, WARP uses a similar method to Serpent to guess the initial source distribution.  The materials in the geometry are all flagged as fissile or non-fissile.  Then and uniform, random distribution of source neutrons are distributed across the geometry.  If the particles lies in a fissile material, it is recorded in a buffer.  This process is repeated until the required amount of source points are accumulated in the starting point buffer.  This method is called the \emph{flat source approximation}, and should require fewer cycles to be discard than the point source method since the initial distribution has spatial extent and fewer cycles will be needed to simply push neutrons into all geometrical regions \cite{jaakko}.
+
+When all the cycles are complete, the individual estimates of $k_\mathrm{eff}$ are averaged to make a final estimate for the system.  This is typically called the \emph{generation estimate} of $k_\mathrm{eff}$ \cite{jaakko}.  As the simulation runs, a recursion relation can be made so the values for every cycle does not need to be stored individually.  Expressions for the generation estimate are shown in \eqref{k_eff_final}.  It may be of interest to keep values for every cycle in order to perform statistical checks to assure convergence, however.
+
+\begin{equation}
+\label{k_eff_final}
+\begin{split}
+\bar{k}_{\mathrm{eff},n} &= \frac{1}{n} \sum_{i=1}^{n} k_{\mathrm{eff},i} \\
+\bar{k}_{\mathrm{eff},n} &= \frac{1}{n} \left[ k_{\mathrm{eff},n} + (n-1) \bar{k}_{\mathrm{eff},n-1}  \right]
+\end{split}
+\end{equation}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
