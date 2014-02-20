@@ -1074,11 +1074,11 @@ When all the cycles are complete, the individual estimates of $k_\mathrm{eff}$ a
 
 \section{GPUs}
 
-Now that the simulation methods have been framed,
+Now that the mathematical theory and simulation methods have been framed, the hardware will be discussed.  As mentioned in the introduction, GPUs are an emerging technology in supercomputing.  Their name, graphics processing units, tells their history.  They started as very specific use coprocessor cards on computers in the early 1990s.  These cards did one job:  process graphics to be displayed on a monitor, a work-intensive job that could be offloaded from the main CPU to the graphics card, freeing up CPU resources and improving the overall performance of the computer.  Most graphics computations require linear algebra operations on large datasets (projections, transforms, shading, etc.), so they were tailored to do these jobs very well and were not able to do much else.  They were not programmable, APIs had to be used to send data to them and operations were performed in standard way.  This was not a problem since the GPU/CPU system was balanced.  The CPU did the complicated jobs and the GPU took care of the large, but simple ones.  Since the turn of the century, CPU speeds have plateaued due to power density.  Power dissipation in a processor goes as $P=fCV^2$, where $f$ is frequency, $C$ is capacitance, and $V$ is voltage.  There is a minimum voltage needed to avoid thermally-induced errors, and the capacitance is related to the process size of the chip.  There is a minimum to both values, and a maximum for power dissipation of the processor (or power density since this is about a single unit).  This relation sets a maximum frequency of the processor (and also why overclockers must use exotic cooling methods to get their frequencies high).  This ceiling was been reached, but CPU manufacturers continued to increase performance by including multiple processor cores on their chips.  Moore's Law is basically in effect, and the number of transistors on the chip are doubling every 18 or so months.  These transistors are in the form of additional cores or in parallel resources, and chips are becoming wider, not faster.  This spreads the heat created in the chips out, and it is possible to dissipate it, i.e. the overall power dissipation increases, but the power density does not.  GPUs had been operating this way for many years, and the similarities between CPU tasks and GPU tasks became blurred.  This lead GPU manufacturers to ask the question, why not make the GPUs programmable?  Supercomputing had especially become massively parallel, and making supercomputers was a lucrative business.  They had been making high performance parallel processors for many years, and it was time to break into the supercomputing realm.
 
-GPU history, coprocessor, first uses, best at
+In doing so, they crated the first programmable, general purpose GPU.  But the GPU executes differently than a CPU and there needed to be some sort of interface between the two, so CUDA was created.  
 
-move to now, supercomputing, programmable
+power efficiency and parallelism
 
 \subsection{Architecture}
 
@@ -1092,16 +1092,15 @@ A single-instruction multiple-thread (SIMT) and SIMD are similar in the sense th
 
 \subsection{CUDA}
 
-Compute Unified Device Architecture
-
 execution model
 
 kernels
 
-
 \subsection{Memory}
 
 speed, levels, etc. limitations 
+
+memory bandwidth, double/single, graphs
 
 \begin{figure}[h!] 
   \centering
