@@ -1,6 +1,12 @@
 \chapter{GPU Implementation}
 
+Conventional CPU-based parallel Monte Carlo algorithms typically use the approach of one particle history per CPU thread.  Data is accessed when needed and threads execute completely independently of each other.  This is a task-parallel approach, the typical algorithm for which is shown in Figure 1, and works well on CPUs due to their large cache and control sizes (relative to cores) and the lower latency of accessing global memory (smaller penalty for random access).  This approach has been historically called history-based parallelism as well.  To fully utilize the computational power of GPUs, this approach must be modified.  Threads need to execute identical instructions and therefore must be in the same stage of the transport algorithm.  Studies have been done trying to directly port task-parallel Monte Carlo algorithms to GPUs with some success, most notably that of Liu, et. al. \cite{tianyu}, and they suggest that a data-parallel approach similar to those used in vector computers should be employed \cite{tianyu,vector}.  This approach is also called event-based parallelism since events, such as scattering or surface crossing, are done in parallel for many particles at once.  
+
+Figure 2 shows the data parallel algorithm used to maintain thread coherence (i.e. executing the same instructions) between GPU threads.  It is similar to the vectorized approach used with the early vector computers, which also were able to use a single-instruction, multiple-data (SIMD) execution model \cite{vector,vujic_vector}.  The two main features of Figure 2 are that independent GPU kernel launches are used for each step of the transport chain and that the kernels operate on a large set of particle data (as opposed to transporting one particle at a time).  By doing this, the transport cycle is broken into steps in which a single task, such as determining reaction type or finding boundary intersection, is performed across large dataset of particles and threads can be kept more coherent.
+
 typical task-based MC.  data-parallel MC - wide but single task, homework grading, weaving!
+
+written in C/C++ with some Python, relies on XXX libraries
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
