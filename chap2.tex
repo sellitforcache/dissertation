@@ -1082,13 +1082,21 @@ Now that the mathematical theory and simulation methods have been framed, the ha
      \caption{The maximum theoretical GigaFLOPs of various NVIDIA GPUs vs. flagship Intel processors \cite{cuda}. \label{computational_cap}}
 \end{figure}
 
-To break into the supercomputing market, they crated the first programmable, general purpose GPU which focused on power efficiency and parallelism.  As figure \ref{computational_cap} shows, the maximum theoretical computational capacity of NVIDA GPUs has been increasing faster than that of CPUs.  The single-precision performance is much better than the double-precision, however.  The traditional role of GPUs as graphics accelerators did not require double precision capabilities, which is why double precision performance is emphasized.  Double precision arithmetic is supported on devices with compute capability of 1.3 (?) and above, and is The same ratio is kept with geforce fermies. Tesla (and I think Quadro) fermies combine 2 single precision FPUs to get a double precision FPU (getting 16 cores per SM instead of 32),  CPUs basically get free double precision.
+To break into the supercomputing market, they crated the first programmable, general purpose GPU which focused on power efficiency and parallelism.  As figure \ref{computational_cap} shows, the maximum theoretical computational capacity of NVIDA GPUs has been increasing faster than that of CPUs.  The single-precision performance is much better than the double-precision, however.  The traditional role of GPUs as graphics accelerators did not require double precision capabilities, which is why double precision performance is emphasized.  Double precision arithmetic is supported on devices with compute capability of 1.3 and above, but gaming cards in the GeForce series have fewer double precision units than the high-end Tesla cards.  The Tesla cards have substantially more double precision units than the GeForce cards, which is why GeForce double precision is not shown \cite{fermi}.  As Figure \ref{computational_cap} also shows, CPUs have almost equivalent single and double precision performance. 
 
 But the GPU executes differently than a CPU and is a separate piece of hardware.  There needed to be an interface between the GPU and CPU and an easy way to program them, so CUDA was created.  The next subsections will talk about the details of GPU execution and how CUDA allows them to be programmed. 
 
 \subsection{Architecture}
 
-Many multiprocessors, difference from CPUs, transistor space
+A NVIDIA GPU's basic processing unit is called a multiprocessor.  These multiprocessors house many individual computational cores and can process jobs independently.  Figure \ref{fermi_SM} shows the architecture of a Fermi family NVIDIA GPU.  
+
+\begin{figure}[h!] 
+  \centering
+    \includegraphics[width=0.3\textwidth]{graphics/fermi_SM.eps}
+     \caption{The architecture of a Fermi multiprocessor \cite{cuda}. \label{fermi_SM}}
+\end{figure}
+
+transistor space
 
 \begin{figure}[h!] 
   \centering
@@ -1096,22 +1104,27 @@ Many multiprocessors, difference from CPUs, transistor space
      \caption{Relative transistor space use in GPUs and CPUs \cite{cuda}. \label{cuda_transistors}}
 \end{figure}
 
+Part of the reason GPUs are able to perform efficiently is do to their reliance on single instruction, multiple data (SIMD) execution.  This execution method uses the same instructions simultaneously carried out over multiple pieces of data.  This reduces the amount of power used in control and therefore more math can be done per watt, which is the main why they are being used in supercomputers \cite{citation_definitely_needed}.  The GPU programming model abstracts SIMD execution by using threads, which can be thought of in the traditional sense. There are some tradeoffs for this power efficiency, however, such as requiring relatively simple tasks due to limited cache and control space and requiring data parallelism for full utilization.  Single-instruction multiple-thread (SIMT) and SIMD are similar in the sense that identical instructions are carried out across different pieces of data, but SIMT allows threads to act independently, albeit with a performance penalty.   When a thread in a multiprocessor executes different instruction than the other resident threads, the multiprocessor masks it from execution, executes the identically-executing threads, then masks the identically-executing threads and executes the \emph{divergent} thread.  This effectively serializes operations if they require different instructions.  This masking and serializing makes many empty spaces in the SIMD lanes of the multiprocessor, and thus can incur severe performance penalties.  The magnitude of the penalty depends on the rate at which data is being delivered to the multiprocessor, of course, since work can only be done if data is present.  If the multiprocessor can completes all jobs, even if they need some serialization, before the next set of data arrives, then the penalty will be invisible \cite{cuda}.
+
+\subsection{CUDA}
+
+CUDA is NVIDIA's proprietary GPU programming platform.  It makes minimal additions to C/C++, and any C programming would be very comfortable programming in it.  It was chosen over OpenCL, the open source GPU programming platform, due to CUDA's greater feature support, stability, easy of programming, wider community usage, and ability to use new, cutting-edge features in NVIDIA GPUs that OpenCL is not.
+
+The overarching theme for CUDA is that a host CPU thread directs the GPUs operation.  Data must be transferred from the host to the GPU's global memory over the PCIe bus, \emph{kernels} are launched to performs computations based o the transferred data, then control returns to the host thread.  ``Kernels'' are CUDA's parallel programs that each thread carried out over the data.  That being said, they must be independent tasks in the sense that their execution order does not matter.  Blocks of threads have the same interleaving requirement.  Blocks of threads are executed simultaneously on a multiprocessor.  The group of all blocks is a called a ``grid.''  The grid is analogous to the entire GPU device, blocks are analogous to the multiprocessors, and threads are analogous to the individual cores. Figure \ref{cuda_grid_launch} shows the host-device execution and the organization of threads into blocks and blocks into the grid.
+
 \begin{figure}[h!] 
   \centering
-    \includegraphics[width=0.3\textwidth]{graphics/fermi_SM.eps}
-     \caption{The memory spaces in CUDA and NVIDIA GPUs \cite{cuda}. \label{fermi_SM}}
+    \includegraphics[width=0.4\textwidth,trim= 0cm 2.5cm 0cm 0cm]{graphics/CUDA_grid_launch.eps}
+     \caption{ Host-device execution in CUDA and the organization of threads into blocks and blocks into the grid \cite{cuda_ptx_isa}. \label{cuda_grid_launch}}
 \end{figure}
 
-Part of the reason GPUs are able to perform efficiently is do to their reliance on single instruction, multiple data (SIMD) execution.  This execution method uses the same instructions simultaneously carried out over multiple pieces of data.  This reduces the amount of power used in control and therefore more math can be done per watt, which is the main why they are being used in supercomputers \cite{citation_definitely_needed}.  The GPU programming model abstracts SIMD execution by using threads, which can be thought of in the traditional sense. There are some tradeoffs for this power efficiency, however, including limited on-board memory (currently 12 GB), limited cache and control space, and requiring data parallelism for full utilization.  Single-instruction multiple-thread (SIMT) and SIMD are similar in the sense that identical instructions are carried out across different pieces of data, but SIMT allows threads to act independently, albeit with a performance penalty.   When a thread in a multiprocessor executes different instruction than the other resident threads, the multiprocessor masks it from execution, executes the identically-executing threads, then masks the identically-executing threads and executes the \emph{divergent} thread.  This effectively serializes operations if they require different instructions.  This masking and serializing makes many empty spaces in the SIMD lanes of the multiprocessor, and thus can incur severe performance penalties.  The magnitude of the pentaly depends on the rate at which data is being delivered to the multiprocessor, of course, since work can only be done if data is present.  If the multiprocessor can completes all jobs, even if they need some serialization, before the next set of data arrives, then the penalty will be invisible.
+Grids and block dimensions can be 1D, 2D or 3D arrays, which simply influences how the data is indexed.  Every thread has unique variables, ``threadIdx'' and ``blockIdx,'' that are automatically generated upon kernel launch.  The grid dimensions (the number of blocks in each grid dimension) and the block dimensions (the number of threads in each block dimension) are also broadcast to every thread.  Based on these quantities, a unique thread identification number can be computer and used to access the data.   For example, if the grid is 2x2 and blocks are 4x4, a unique thread coordinate can be computed by doing id$_y$ = blockIdx.y * blockDim.y + threadIdx.y and id$_x$ = blockIdx.x * blockDim.x + threadIdx.x.  If the grid is 1D as well as the blocks, indexing is much simpler, e.g. id = blockIdx.x*blockDim.x+threadIdx.x.
 
-Also, GPUs have even higher global memory latency than CPUs, from 200 on newer cards up to 800 clock cycles on older cards, compared to about 50 cycles on a typical CPU.  ?? It is also important to remember than GPUs are clocked much slower than CPUs, so the memory latency performance issue is even greater \cite{cpu_latency,cuda}. 
-
+When blocks are executed in a multiprocessor, they are scheduled in smaller units that are 32 threads wide called \emph{warps}.  Warps are what abstract SIMD execution, and everything thread in a warp must execute the same instructions or they split are serialized.
 
 \subsection{Memory}
 
-speed, levels, etc. limitations 
-
-memory bandwidth, double/single, graphs
+High bandwidth is necessary to feed the many hungry mouths of the arithmetic units and to maintain high computational throughput.  Most optimization work done of GPUs involves relieving memory bottlenecks.  The bandwidths of recent Intel CPUs and NVIDIA GPUs are shown in Figure \ref{bandwidth}, and it can be seen that GPU's bandwidth far exceeds the CPU's.  It is important to remember that this is maximum \emph{aggregate} bandwidth, however, not the bandwidth available to each individual multiprocessor.   
 
 \begin{figure}[h!] 
   \centering
@@ -1119,13 +1132,23 @@ memory bandwidth, double/single, graphs
      \caption{The memory spaces in CUDA and NVIDIA GPUs \cite{cuda}. \label{bandwidth}}
 \end{figure}
 
+In order to maximize bandwidth and take advantage of spatial locality in memory, the memory subsystem on a GPU is also SIMD-like, as are most modern CPU subsystems.  When a thread requests a piece of data, not just the piece that is request is delivered by the subsystem, but rather a chunk of aligned data that contains the requested piece.  If the other values in load are not used, memory bandwidth is lost.  For best performance, CUDA requires adjacent threads to access adjacent pieces of data.  This way, memory transactions are ``coalesced.''   In coalesced transactions, every piece of data in the memory payload is used and bandwidth is maximized \cite{cuda}.  Figure \ref{coalesced} shows is graphically, and helps convey and important subtlety.  If a thread needs to load an entire array, it is better to interleave values in memory so that adjacent memory is accessed at the \emph{same time} by neighboring threads rather than adjacent data is loaded sequentially by a single thread.
 
 \begin{figure}[h!] 
   \centering
-    \includegraphics[width=0.4\textwidth,trim= 0cm 2.5cm 0cm 0cm]{graphics/CUDA_grid_launch.eps}
-     \caption{The memory spaces in CUDA and NVIDIA GPUs \cite{cuda_ptx_isa}. \label{cuda_grid_launch}}
+    \includegraphics[width=0.8\textwidth]{graphics/coalesced.eps}
+     \caption{Memory transactions of CUDA threads.  Coalesced access on the left and non-coalesced access on the right \cite{programming_massively}. \label{coalesced}}
 \end{figure}
 
+GPUs have even higher global memory latency than CPUs, from 200 on newer cards up to 800 clock cycles on older cards, compared to about 50 cycles on a typical CPU.  CPUs, which are for serial execution, want low latency memory access and do this through multilevel cache structures and large control spaces that allow them to do out of order and speculative execution.  GPUs, which are geared for throughput, want high bandwidth and hide latency by pipelining many threads.  More transistor space is allocated for computation rather than for trying to minimize memory latency, which is hidden though parallelism.  Figure \ref{pipeline} shows how GPU threads are pipelined to hide latency whereas CPUs rely on low latency to quickly execute different threads in series.  This is GPUs performance best when as many threads as possible are launched.
+
+\begin{figure}[h!] 
+  \centering
+    \includegraphics[width=\textwidth]{graphics/pipeline.eps}
+     \caption{Pipelining many threads in order to hide high memory latency \cite{cuda_gtc_pres}. \label{pipeline}}
+\end{figure}
+
+Even though there are fewer levels of cache in a GPU than a CPU, there are still many different spaces, each of which have different properties.  The global memory space is the largest and has the greatest latency (~200 memory clock cycles).  This is the amount of total RAM specified for each card, which can be as small as 512MB for very low-end cards, up to 12GB for the largest high-end card.  This memory space is accessible by all threads in all blocks.  The next level down is the shared memory space.  This acts as a user-programmable cache, and is not used unless explicitly coded.  It resides on the multiprocessor and has very low latency (on the order of 1 processor clock cycle), and the data can be seen by all threads within a block, hence the ``shared'' name.  It can allow intra-block communication  without incurring the high penalty of global memory transactions and can improve performance by acting as a cache and storing any data that is reused by threads.  The next level down is the local memory, which is thread-specific.  It is not really local in the sense that it is actually stored in global memory, but in Fermi and newer architectures, it is cached by a  L1 cache on the multiprocessor.  It serves to hold any data that the registers cannot hold.  The registers, the lowest level of memory, are what the arithmetic units directly load their data from.  They are fast, but have a limited size, which is why local memory is used to page them.  A Fermi GPU  has a large register file (2MB), but each multiprocessor only has 128k, which is further subdivided by each thread (maximum register size per thread is 63).
 
 \begin{figure}[h!] 
   \centering
@@ -1133,14 +1156,8 @@ memory bandwidth, double/single, graphs
      \caption{The memory spaces in CUDA and NVIDIA GPUs \cite{cuda}. \label{cuda_mem}}
 \end{figure}
 
-\subsection{CUDA}
+The other memory spaces are the constant memory and the texture memory, which are both visible to all threads in all blocks.  They aren't truly separate spaces, but rather global memory that is handled differently.  Storing data in the constant space means that it cannot be written to, hence the ``constant'' name, but it is cached so data reuse by threads can result in a cache hit and the global memory itself does not need to be queried \cite{cuda}.  it is limited to 64kB, however, and is cached by 8kB caches on each multiprocessor, so large datasets cannot be stored in constant memory.  It also performs best when values are broadcast to all threads.  Texture memory memory, on the other hand, is also cached but its cache is optimized for 2D spatial locality in the texture coordinate system instead of actual memory locality, and it also does not have a maximum size.  Another feature of the texture memory is that is can perform low precision linear interpolation in the same transaction as a read.
 
-
-
-
-execution model
-
-kernels
 
 \subsection{OptiX}
 
@@ -1150,7 +1167,24 @@ optix stuff
 
 \section{Previous Works}
 
-talk about the work that other people did
+Although there has been much research done on Monte Carlo neutron transport, there is relatively very little about performing in on GPUs due to GPGPUs being a new technology.
+
+differences from Nelson, look at assumptions table
+	full cross sections, scattering, all reaction types, all physics
+	no Q values used for inelastic!
+	therefore comparisons against production codes
+	data parallel (couldn’t find any use of vectorization like he says…) — SOA instead of AOS type access,
+	sorting
+	optix, general geometry input
+	unionized grid, cross section tabulation
+	random number generation
+	general input processing
+	no nesting capability, nesting must be explicitly defined
+	fixed nu
+differences from other studies, LIU, china
+	stanford guy - photons, cross sections
+	cross sections, all assume constant, not realistic since memory bandwidth impact is huge on GPU
+	geometry of course
 
 \section{Preliminary Studies}
 
