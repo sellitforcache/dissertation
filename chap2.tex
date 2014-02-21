@@ -1158,10 +1158,25 @@ Even though there are fewer levels of cache in a GPU than a CPU, there are still
 
 The other memory spaces are the constant memory and the texture memory, which are both visible to all threads in all blocks.  They aren't truly separate spaces, but rather global memory that is handled differently.  Storing data in the constant space means that it cannot be written to, hence the ``constant'' name, but it is cached so data reuse by threads can result in a cache hit and the global memory itself does not need to be queried \cite{cuda}.  it is limited to 64kB, however, and is cached by 8kB caches on each multiprocessor, so large datasets cannot be stored in constant memory.  It also performs best when values are broadcast to all threads.  Texture memory memory, on the other hand, is also cached but its cache is optimized for 2D spatial locality in the texture coordinate system instead of actual memory locality, and it also does not have a maximum size.  Another feature of the texture memory is that is can perform low precision linear interpolation in the same transaction as a read.
 
+\section{OptiX}
 
-\subsection{OptiX}
+In order the save time and effort, NVIDIA's OptiX ray tracing framework is used by WARP for the geometry representation, surface detection, and material queries on the GPU.  It is a framework, not a ray tracing library itself.  The programmer must write all intersection programs for the geometry primitives as well as the hit programs.  OptiX simply provides the mathematical and computer science glue between the user-programmed ray tracing elements.  Besides its flexibility, OptiX provides optimizations that would require many months for a single developer to replicate in handwritten code.  It's main optimization is automatically producing high-quality acceleration structures for traversing the primitives in the geometry.  In this section, the general properties and workings of OptiX will be presented.  Details about its implementation in WARP will be discussed in Chapter \ref{chap:imp}.
 
-optix stuff
+\subsection{OptiX Programs}
+
+As stated before, the developer must provide all the programs for OptiX.  These various programs are compiled to .ptx files, the paths to which are given the the OptiX API at compile time and are loaded by the executable at run time \cite{optix}.  Figure \ref{optix_flow} shows the control flow in OptiX.  The ray generation program is like a main function in the ray tracer. It initializes rays, their starting points and directions, as well as specifies the data that they report.  Once this is done, the trace is done, which traverses the geometry
+
+\begin{figure}[h!] 
+  \centering
+    \includegraphics[width=0.5\textwidth]{graphics/optix_flow.eps}
+     \caption{The memory spaces in CUDA and NVIDIA GPUs \cite{optix_paper}. \label{optix_flow}}
+\end{figure}
+
+\subsection{Geometry and Intersection Programs}
+
+
+\subsection{Acceleration Structures}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
