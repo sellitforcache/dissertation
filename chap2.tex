@@ -1164,12 +1164,27 @@ In order the save time and effort, NVIDIA's OptiX ray tracing framework is used 
 
 \subsection{OptiX Programs}
 
-As stated before, the developer must provide all the programs for OptiX.  These various programs are compiled to .ptx files, the paths to which are given the the OptiX API at compile time and are loaded by the executable at run time \cite{optix}.  Figure \ref{optix_flow} shows the control flow in OptiX.  The ray generation program is like a main function in the ray tracer. It initializes rays, their starting points and directions, as well as specifies the data that they report.  Once this is done, the trace is done, which traverses the geometry
+As stated before, the developer must provide all the programs for OptiX.  These various programs are compiled to .ptx files, the paths to which are given the the OptiX API (application programming interface) at compile time and are loaded by the executable at run time \cite{optix}.  Figure \ref{optix_flow} shows the control flow in OptiX.  The launch is just like a CUDA kernel launch.  The API checks to make sure all the necessary data is present on the card, then launches kernels internally to carry out the trace on the GPU.
 
 \begin{figure}[h!] 
   \centering
     \includegraphics[width=0.5\textwidth]{graphics/optix_flow.eps}
      \caption{The memory spaces in CUDA and NVIDIA GPUs \cite{optix_paper}. \label{optix_flow}}
+\end{figure}
+
+The ``ray generation'' program is like a main function in the ray tracer. It initializes rays, their starting points and directions, as well as specifies the data that they report.  Once this is done, the trace is executed, which traverses the geometry and find intersection points.  If \emph{any} geometry primitive is intersected, the ``any hit'' program is executed.  This program is typically used for determining areas that are completely occluded from the light source in graphics rendering problems.  As OptiX queries the primitives along a ray, it tightens an interval on $t$, the path length of the parameterized ray.  The equation for a parameterized ray is shown in \eqref{parameterized_ray}, where $\vec{r}_P$ is the end point of the ray, $\vec{r}_O$ is the origin point of the ray, and $\vec{r}_D$ is the directional unit vector of the ray.
+
+\begin{equation}
+\label{parameterized_ray}
+\begin{split}
+\vec{r}_P = \vec{r}_O + t \vec{r}_D 
+\end{split}
+\end{equation}
+
+\begin{figure}[h!] 
+  \centering
+    \includegraphics[width=0.5\textwidth]{graphics/ray_surface.eps}
+     \caption{Ray-surface intersection:  A sphere and a parameterized ray. \label{ray_surface}}
 \end{figure}
 
 \subsection{Geometry and Intersection Programs}
