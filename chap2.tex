@@ -1297,4 +1297,8 @@ all my prelim work to motivate this project
 
 \section{Scope in Detail}
 
+The preliminary studies show that thread divergence can be effectively reduce with CUDPP without incurring huge costs, large datasets need to be run, XXX acceleration structure in OptiX performs best for randomly-oriented distributions of rays. 
 
+Since most data will be access randomly no matter what, the layout will be regularized as much as possible and the particles will be sorted by reaction, sweeping out completed particles and grouping similarly-interacting particles together to maximize warp coherence and occupancy.  Since histories complete randomly, history data access will become sparse even if sweeping out is not done, and the radix sort will preserve monotonically increasing thread IDs within a reaction group, so it's impact on data access should be small, and the only cost be that of performing the operation.
+
+From here on, it will be expanding the preliminary studies.  OptiX will be used for 3D geometry representation, physics routines that use real cross section data will be made in CUDA, the compaction routine in CUDPP will be substituted for a radix sort, tallies will be implemented, as will criticality and fixed source methods.  These expansion will yield WARP, a program for continuous energy Monte Carlo neutron transport on GPUs in general 3D geometries, which will be compared for accuracy and execution speed against Serpent and MCNP.
