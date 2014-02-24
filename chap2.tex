@@ -1238,8 +1238,17 @@ The final, and arguably most important, part of the node graph is the accelerati
 
 The basic idea behind acceleration structures is that they provide a way to decompose the scene geometry into a hierarchical graph.  Once this is done, parts of the scene which rays aren't close to intersecting can be pruned from the set of actual geometry primitives a ray must query to find intersection points \cite{optix}.  OptiX provides different types of acceleration structures, namely, bounding volume hierarchy (BVH) trees and k-dimensional (k-d) trees.
 
+BVH is object-centric in the sense that it places boundaries around groups of objects.  Each leaf of the tree can contain one or more objects. K-d trees are space-centric in the sense that they partition the space objects lie in.  They are binary trees which partitions each volume into two smaller volumes until the lowest leaves only contain a portion of a single object.  Figure \ref{bvh_kd} shows how BVH and k-d trees partition the objects and the space, respectively.  BVH trees have the benefit of being shallower, and therefore fast to traverse, but some objects' higher bounding volumes can overlap, leading to situation where both subtrees must be queried.
 
+\begin{figure}[h!] 
+\centering
+\includegraphics[width=0.8\textwidth, trim= 8cm 0cm 0cm 0cm ]{graphics/bvh_kd.eps}
+\caption{Partitioning schemes on the top with the resulting trees on the bottom. A BVH tree is on the left and a k-d tree is on the right. (courtesy WikiMedia commons)  \label{bvh_kd}}
+\end{figure}
 
+The benefit of these structures is that they can be queried in $\log(N)$ time rather than in linear time since major portions of the geometry are \cite{something}.  OptiX automatically builds theses trees over the geometry without any user input other than to specify the type.  The different types have tradeoffs with size, build speed, and performance, but since WARP's geometry is static and relatively simple compared to photorealistic rendering jobs, the build speed and size have negligible impact, so the highest performance structure is used, which happens to be a a split bounding volume hierarchy (SBVH).  
+
+The typical geometry representation in Monte Carlo neutron transport codes is combinatorial geometry, which uses union and intersection operations on the surface sense  of a point in relation to second-order polynomials.  This kind of algorithm is linear with the number of \emph{surfaces} present in the geometry, so using OptiX in complicated geometries should provide provide a performance boost to geometry routines, especially compared to MCNP, which uses ray tracing as well as combinatorial geometry.  Serpent only uses Woodcock tracking for neutrons, and surface intersections are never calculated.  It also uses ``universes'' to provide some level of acceleration structure to primitive replication.  In using them, a neutron is determined to be in a larger cell occupied by another, nonzero universe.  On this is determined, the neutron is transformed into the higher level universe and the geometry there is queried.  This operation is done recursively until the actual material the neutron is traveling in is determined \cite{jaakko}[MUST CHECK THIS FOR TRUTH].  In effect, using ``universes'' in this way is like traversing a k-d tree, and it is unclear how Serpent will compare against WARP in this regard a priori and will be benchmarked in the results section (Chapter \ref{chap:results}).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
