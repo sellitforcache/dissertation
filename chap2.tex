@@ -1164,7 +1164,7 @@ In order the save time and effort, NVIDIA's OptiX ray tracing framework is used 
 
 \subsection{OptiX Programs}
 
-As stated before, the developer must provide all the programs for OptiX.  These various programs are compiled to .ptx files, the paths to which are given the the OptiX API (application programming interface) at compile time and are loaded by the executable at run time \cite{optix}.  Figure \ref{optix_flow} shows the control flow in OptiX.  The launch is just like a CUDA kernel launch.  The API checks to make sure all the necessary data is present on the card, then launches kernels internally to carry out the trace on the GPU.
+As stated before, the developer must provide all the programs for OptiX.  These various programs are compiled to .ptx files, the paths to which are given the the OptiX API (application programming interface) at compile time and are loaded by the executable at run time \cite{optix}.  They are compiled to ptx since it is a ``virtual assembly language'' and can be easily interpreted by GPU and required no further compilation.  Figure \ref{optix_flow} shows the control flow in OptiX.  The launch is just like a CUDA kernel launch.  The API checks to make sure all the necessary data is present on the card, then launches kernels internally to carry out the trace on the GPU.
 
 \begin{figure}[h!] 
   \centering
@@ -1172,7 +1172,7 @@ As stated before, the developer must provide all the programs for OptiX.  These 
      \caption{The memory spaces in CUDA and NVIDIA GPUs \cite{optix_paper}. \label{optix_flow}}
 \end{figure}
 
-The ``ray generation'' program is like a main function in the ray tracer. It initializes rays, their starting points and directions, as well as specifies the data that they report.  Once this is done, the trace is executed, which traverses the geometry and find intersection points.  If \emph{any} geometry primitive is intersected, the ``any hit'' program is executed.  This program is typically used for determining areas that are completely occluded from the light source in graphics rendering problems.  As OptiX queries the primitives along a ray, it tightens an interval on $t$, the path length of the parameterized ray.  The equation for a parameterized ray is shown in \eqref{parameterized_ray}, where $\vec{r}_P$ is the end point of the ray, $\vec{r}_O$ is the origin point of the ray, and $\vec{r}_D$ is the directional unit vector of the ray.
+The ``ray generation'' program is like a main function in the ray tracer. It initializes rays, their starting points and directions, as well as specifies the data that they report.  Once this is done, the trace is executed, which traverses the geometry and find intersection points.  If \emph{any} geometry primitive is intersected, the ``any hit'' program is executed.  This program is typically used for determining areas that are completely occluded from the light source in graphics rendering problems, therefore terminating the trace, but normally this program just returns and allows the trace to continue.  As OptiX queries the primitives along a ray, it tightens an interval on $t$, the path length of the parameterized ray.  The equation for a parameterized ray is shown in \eqref{parameterized_ray}, where $\vec{r}_P$ is the end point of the ray, $\vec{r}_O$ is the origin point of the ray, and $\vec{r}_D$ is the directional unit vector of the ray.  Figure \ref{ray_surface} shows an illustration of a ray-surface intersection.
 
 \begin{equation}
 \label{parameterized_ray}
@@ -1187,8 +1187,29 @@ The ``ray generation'' program is like a main function in the ray tracer. It ini
      \caption{Ray-surface intersection:  A sphere and a parameterized ray. \label{ray_surface}}
 \end{figure}
 
+When the $t$ interval becomes tight enough to determine the closest hit, the ``closest hit'' program is executed.  This program typically returns the closest intersection point to the ray generation program, which then uses this information to shade a pixel in an image, or in WARP's case, determines if a neutron travels past a surface.  Miss programs tell a ray what to do if it does not intersect any primitives.  In rendering, this usually maps to a scene background image.  Since a material must always be defined in WARP, a miss simply throws an error.
+
 \subsection{Geometry and Intersection Programs}
 
+Geometrical primitives in OptiX are represented by their intersection programs.  Intersection programs provide two purposes - to calculate the exact intersection points between a ray and a primitive and to provide axis-aligned bounding boxes around the primitives.  These bounding boxes must completely contain the underlying primitive, but be as small as possible for best performance.  They are queried when the acceleration structure is built over the geometry, which is discussed in the next subsection.  Their main purpose is to calculate the intersection points, which must be reported back in terms of the $t$ value.  For example, the equation for a sphere is $r^2=x^2+y^2+z^2$.  Substituting \eqref{parameterized_ray} into this equation and solving for $t$ yields \eqref{ray_sphere}.  Since a sphere is a closed surface, there are two intersection points.  The nearer of the two is reported back by the intersection program.
+
+\begin{equation}
+\label{ray_sphere}
+\begin{split}
+a &= \vec{r}_D \cdot \vec{r}_D \\
+b &= 2 \vec{r}_O \cdot \vec{r}_D \\
+c &= \vec{r}_O \cdot \vec{r}_O - r^2 \\
+t &= \frac{-b \pm \sqrt{b^2-4ac}}{2a}
+\end{split}
+\end{equation}
+
+The framework by which geometric primitives are arranged into a scene is very flexible in OptiX.  Figure \ref{node_graph}
+
+ \begin{figure}[h!] 
+  \centering
+    \includegraphics[width=0.8\textwidth]{graphics/node_graph.eps}
+     \caption{Node graph used for geometry representation in OptiX \cite{optix}. \label{node_graph}}
+\end{figure}
 
 \subsection{Acceleration Structures}
 
@@ -1211,10 +1232,13 @@ differences from Nelson, look at assumptions table
 	general input processing
 	no nesting capability, nesting must be explicitly defined
 	fixed nu
+	
 differences from other studies, LIU, china
 	stanford guy - photons, cross sections
 	cross sections, all assume constant, not realistic since memory bandwidth impact is huge on GPU
 	geometry of course
+	
+openmc
 
 \section{Preliminary Studies}
 
