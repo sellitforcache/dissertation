@@ -1191,7 +1191,7 @@ When the $t$ interval becomes tight enough to determine the closest hit, the ``c
 
 \subsection{Geometry and Intersection Programs}
 
-Geometrical primitives in OptiX are represented by their intersection programs.  Intersection programs provide two purposes - to calculate the exact intersection points between a ray and a primitive and to provide axis-aligned bounding boxes around the primitives.  These bounding boxes must completely contain the underlying primitive, but be as small as possible for best performance.  They are queried when the acceleration structure is built over the geometry, which is discussed in the next subsection.  Their main purpose is to calculate the intersection points, which must be reported back in terms of the $t$ value.  For example, the equation for a sphere is $r^2=x^2+y^2+z^2$.  Substituting \eqref{parameterized_ray} into this equation and solving for $t$ yields \eqref{ray_sphere}.  Since a sphere is a closed surface, there are two intersection points.  The nearer of the two is reported back by the intersection program.
+Geometrical primitives in OptiX are represented by their intersection programs.  Intersection programs provide two purposes - to calculate the exact intersection points between a ray and a primitive and to provide axis-aligned bounding boxes around the primitives.  These bounding boxes must completely contain the underlying primitive, but be as small as possible for best performance.  They are queried when the acceleration structure is built over the geometry, which is discussed in the next subsection.  
 
 \begin{equation}
 \label{ray_sphere}
@@ -1203,7 +1203,7 @@ t &= \frac{-b \pm \sqrt{b^2-4ac}}{2a}
 \end{split}
 \end{equation}
 
-The framework by which geometric primitives are arranged into a scene is very flexible in OptiX.  Figure \ref{node_graph}
+Their main purpose is to calculate the intersection points, which must be reported back in terms of the $t$ value.  For example, the equation for a sphere is $r^2=x^2+y^2+z^2$.  Substituting \eqref{parameterized_ray} into this equation and solving for $t$ yields \eqref{ray_sphere}.  Since a sphere is a closed surface, there are two intersection points.  The nearer of the two is reported back by the intersection program.
 
  \begin{figure}[h!] 
   \centering
@@ -1211,7 +1211,34 @@ The framework by which geometric primitives are arranged into a scene is very fl
      \caption{Node graph used for geometry representation in OptiX \cite{optix}. \label{node_graph}}
 \end{figure}
 
+The framework by which geometric primitives are arranged into a scene is very flexible in OptiX.  Figure \ref{node_graph} shows the node graph representation of the geometry that OptiX traverses while tracing.   A ``group'' can have children of any kind, whereas a ``geometry group'' can only have ``geometry instance'' children.  A ``geometry instance'' is a object that combines a geometry primitive and a ``material.''  The material is simply the closest and any hit programs for a ray type.  OptiX can handle different ray types, typically one for radiance and one for shadow, but WARP only needs radiance.  This way a geometry can be attached to multiple different materials to handle different ray types.  A root node, or ``entry point,'' must be specified before a trace can begin.  This root node is where all rays begin their graph traversal \cite{optix}.
+
+There are two special node types that can have geometry group children - a selector node and a transform node.  Both do exactly what they appear to.  A selector node will decide which geometry group to send a ray down based on some type of criterion.  This criterion can be based on a  global variable that is assigned before a trace or a piece of data that is determined during the trace itself.  It gives the framework more flexibility for the types of problems it can handle and the ease at which solutions can be implemented.  A transform node transforms the underlying geometry based on a affine transformation matrix.  This node type can be useful for specifying only one geometry instance node which is then instanced throughout the scene with different transform nodes.  In can also be used to move geometry based on time.  Therefore, it can be used to make movies in rendering, but for WARP's purposes it could potentially be used for calculating the effects of geometric perturbations or even introducing time-dependent simulations.  When transform nodes are specified, they must be attached to a geometry group and be given an affine transformation matrix.  In three dimensions, it is a 4x4 matrix which can specify rotation, scale, translation, and shear.  A matrix for simultaneous translation rotation is shown in \eqref{affine} where $dx$, $dy$, and $dz$ are translations in $x$, $y$, and $z$, respectively; and $\theta$ is a rotation around the $z$ axis, i.e. a rotation in the $x$-$y$ plane \cite{affine}.  Of course, other matrices can be specified.
+
+\begin{equation}
+\label{affine}
+\vec{x} = \left[ \begin{array}{c}
+x \\
+y\\
+z\\
+0 \\ \end{array} 
+ \right] \qquad
+M = \left[ \begin{array}{cccc}
+\cos \theta & -\sin \theta & 0 & dx \\
+\sin \theta & \cos \theta & 0 &  dy\\
+0 & 0 & 1 & dz\\
+0 & 0 & 0 & 0\\
+\end{array} \right]  \qquad
+M \vec{x} = \vec{x}^\prime
+\end{equation}
+
+The final, and arguably most important, part of the node graph is the acceleration object.  This node specifies the acceleration data structure that is attached to each group or geometry group and \emph{must} be present for rays to traverse these groups.  Groups and geometry groups can shared acceleration objects, but if any underlying geometry is changed, the structure must be rebuild for both groups sharing the acceleration object, not only the portions that changed.  Simpler acceleration object layouts typically have better performance, however, since the acceleration objects higher up in the graph can only treat groups further down in terms of their coarsest outer limits \cite{optix}.
+
 \subsection{Acceleration Structures}
+
+The basic idea behind acceleration structures is that they provide a way to decompose the scene geometry into a hierarchical graph.  Once this is done, parts of the scene which rays aren't close to intersecting can be pruned from the set of actual geometry primitives a ray must query to find intersection points \cite{optix}.  OptiX provides different types of acceleration structures, namely, bounding volume hierarchy (BVH) trees and k-dimensional (k-d) trees.
+
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1223,6 +1250,7 @@ Although there has been much research done on Monte Carlo neutron transport, the
 differences from Nelson, look at assumptions table
 	full cross sections, scattering, all reaction types, all physics
 	no Q values used for inelastic!
+	fixed nu
 	therefore comparisons against production codes
 	data parallel (couldn’t find any use of vectorization like he says…) — SOA instead of AOS type access,
 	sorting
@@ -1231,7 +1259,6 @@ differences from Nelson, look at assumptions table
 	random number generation
 	general input processing
 	no nesting capability, nesting must be explicitly defined
-	fixed nu
 	
 differences from other studies, LIU, china
 	stanford guy - photons, cross sections
@@ -1241,6 +1268,7 @@ differences from other studies, LIU, china
 openmc
 
 \section{Preliminary Studies}
+\label{sec:prelim}
 
 all my prelim work to motivate this project
 
@@ -1254,7 +1282,7 @@ all my prelim work to motivate this project
 
 
 \subsection{Ray Tracing with OptiX}
-\label{sec:prelim}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
