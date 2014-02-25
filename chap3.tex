@@ -5,6 +5,19 @@ Conventional CPU-based parallel Monte Carlo algorithms typically use the approac
 
 Figure 2 shows the data parallel algorithm used to maintain thread coherence (i.e. executing the same instructions) between GPU threads.  It is similar to the vectorized approach used with the early vector computers, which also were able to use a single-instruction, multiple-data (SIMD) execution model \cite{vector,vujic_vector}.  The two main features of Figure 2 are that independent GPU kernel launches are used for each step of the transport chain and that the kernels operate on a large set of particle data (as opposed to transporting one particle at a time).  By doing this, the transport cycle is broken into steps in which a single task, such as determining reaction type or finding boundary intersection, is performed across large dataset of particles and threads can be kept more coherent.
 
+\begin{figure}[h!] 
+\centering
+\includegraphics[width=0.8\textwidth]{graphics/task_based_alg.eps}
+\caption{Task- or history-based Monte Carlo. \label{task_based_alg} }
+\end{figure}
+
+\begin{figure}[h!] 
+\centering
+\includegraphics[width=0.8\textwidth]{graphics/event_based_alg.eps}
+\caption{Event-based Monte Carlo. \label{event_based_alg} }
+\end{figure}
+
+
 typical task-based MC.  data-parallel MC - wide but single task, homework grading, weaving!
 
 written in C/C++ with some Python, relies on XXX libraries

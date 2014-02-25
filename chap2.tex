@@ -1108,7 +1108,7 @@ Part of the reason GPUs are able to perform efficiently is do to their reliance 
 
 \subsection{CUDA}
 
-CUDA is NVIDIA's proprietary GPU programming platform.  It makes minimal additions to C/C++, and any C programming would be very comfortable programming in it.  It was chosen over OpenCL, the open source GPU programming platform, due to CUDA's greater feature support, stability, easy of programming, wider community usage, and ability to use new, cutting-edge features in NVIDIA GPUs that OpenCL is not.
+CUDA was first released in 2006 as NVIDIA's proprietary GPU programming platform.  It makes minimal additions to C/C++, and any C programming would be very comfortable programming in it.  It was chosen over OpenCL, the open source GPU programming platform, due to CUDA's greater feature support, stability, easy of programming, wider community usage, and ability to use new, cutting-edge features in NVIDIA GPUs that OpenCL is not.
 
 The overarching theme for CUDA is that a host CPU thread directs the GPUs operation.  Data must be transferred from the host to the GPU's global memory over the PCIe bus, \emph{kernels} are launched to performs computations based o the transferred data, then control returns to the host thread.  ``Kernels'' are CUDA's parallel programs that each thread carried out over the data.  That being said, they must be independent tasks in the sense that their execution order does not matter.  Blocks of threads have the same interleaving requirement.  Blocks of threads are executed simultaneously on a multiprocessor.  The group of all blocks is a called a ``grid.''  The grid is analogous to the entire GPU device, blocks are analogous to the multiprocessors, and threads are analogous to the individual cores. Figure \ref{cuda_grid_launch} shows the host-device execution and the organization of threads into blocks and blocks into the grid.
 
@@ -1221,7 +1221,7 @@ There are two special node types that can have geometry group children - a selec
 x \\
 y\\
 z\\
-0 \\ \end{array} 
+1 \\ \end{array} 
  \right] \qquad
 M = \left[ \begin{array}{cccc}
 \cos \theta & -\sin \theta & 0 & dx \\
@@ -1243,7 +1243,7 @@ BVH is object-centric in the sense that it places boundaries around groups of ob
 \begin{figure}[h!] 
 \centering
 \includegraphics[width=0.8\textwidth, trim= 8cm 0cm 0cm 0cm ]{graphics/bvh_kd.eps}
-\caption{Partitioning schemes on the top with the resulting trees on the bottom. A BVH tree is on the left and a k-d tree is on the right. (courtesy WikiMedia commons)  \label{bvh_kd}}
+\caption{Partitioning schemes (top) with the resulting trees (bottom). A BVH tree is on the left and a k-d tree is on the right. (courtesy WikiMedia commons)  \label{bvh_kd}}
 \end{figure}
 
 The benefit of these structures is that they can be queried in $\log(N)$ time rather than in linear time since major portions of the geometry are \cite{something}.  OptiX automatically builds theses trees over the geometry without any user input other than to specify the type.  The different types have tradeoffs with size, build speed, and performance, but since WARP's geometry is static and relatively simple compared to photorealistic rendering jobs, the build speed and size have negligible impact, so the highest performance structure is used, which happens to be a a split bounding volume hierarchy (SBVH).  
@@ -1254,25 +1254,37 @@ The typical geometry representation in Monte Carlo neutron transport codes is co
 
 \section{Previous Works}
 
-Although there has been much research done on Monte Carlo neutron transport, there is relatively very little about performing in on GPUs due to GPGPUs being a new technology.
+The impetus for developing WARP was the research done by Martin and Brown in 1984 and by Vuji\'{c} and Martin in 1991.  In the 1984 paper, a method for mapping the Monte Carlo problem onto SIMD vector computers is described.  The essential idea is to bank the neutrons into vectors based on their required operation.  If a neutron is scattering, it's data is placed in the scattering buffer.  If a neutron needs to do a surface crossing calculation, it is put in the crossing buffer, and so on.  Once a buffer becomes full, it is processed in a SIMD fashion by the vector computer.  This was a very different way of performing a Monte Carlo simulation at the time.  Almost all computers were strictly serial, and SIMD lanes were only available in supercomputers.  Therefore the pervasive method was the history-based method, where neutrons are tracked for their entire lifetime in series.  this new approach was named ``event-based'' Monte Carlo, since the neutron events are tracked and processed as a group \cite{vector}.  Since GPUs are massively parallel and rely on SIMD, an event-based algorithm seems to be the appropriate approach to GPU-accelerated neutron transport.  In the 1991 paper, a vectorized approach is applied to the collision probability method (CPM), which is a deterministic way to solve the integral form of the NTE. \cite{vujic_vector}
 
-differences from Nelson, look at assumptions table
-	full cross sections, scattering, all reaction types, all physics
-	no Q values used for inelastic!
-	fixed nu
+Vectorizing the Monte Carlo algorithm should allow for GPU execution, but a paper by Zhang also shows that be remapping data references, the thread divergence in GPU warps can be minimized.  This paper provides a simple way to ``vectorize'' the GPU data without actually moving data itself \cite{on_the_fly_remapping}.  Of course this method may lead to sparse data access, but this will happen in a Monte Carlo algorithm regardless, so it may be of use to reduce thread divergence and increase the number of active warps per active cycle on the GPU.  The remapping method is one of the preliminary studies done in the next subsection.
+
+Although there has been much research done on Monte Carlo neutron transport, there is relatively very little about performing it on GPUs due to GPGPUs being a new technology.  There have been two significant developments, however.  
+
+One is by Adam Gregory Nelson, who published work on a GPU accelerated Monte Carlo neutron transport code he wrote for his Master's research at the Pennsylvania State University.  In his thesis, he report on developing a history-based Monte Carlo Neutron transport code, LADON, and an event-based Monte Carlo Neutron transport code, CERBERUS.  Both codes have CPU versions that have the extension ``c'' and GPU versions which have the extension ``g.''  Comparing both the codes, Nelson was able to attain a 24x speedup between LADONc and LADONg, and a 1.13x speedup between CERBERUSc and CERBERUSg \cite{nelson}.  These results are very encouraging and show that significant speedups can be realized by performing Monte Carlo neutron transport on the GPU, but discouraging since the event-based speedups were so poor.  Nelson also states that the poor performance of CERBERUS was due to the sorting of data was done on the CPU and certain sections of his algorithm serialized execution completely.  Due to this, he abandoned it and most of the thesis is about LADON.  
+
+There are also a handful of assumptions in his implementation that require him to make one-to-one comparisons to an identical CPU version.  LANDON and CERBERUS use point-wise cross sections, but they are not read from ACE formatted data files, they do not perform any discrete inelastic scattering,  $\nu$ is fixed at 2.53.  Comparing them against production codes like MCNP and Serpent could not be done, since the results may not be close enough to know the physics is accurate.  
+
+The codes seem to also be quite inflexible.  They can 
+
 	therefore comparisons against production codes
 	data parallel (couldn’t find any use of vectorization like he says…) — SOA instead of AOS type access,
-	sorting
+	sorting, event-based did not use parallel sorting algorithms
 	optix, general geometry input
 	unionized grid, cross section tabulation
 	random number generation
 	general input processing
 	no nesting capability, nesting must be explicitly defined
 	
+	
 differences from other studies, LIU, china
+
+\cite{henderson} \cite{qixu}
+
 	stanford guy - photons, cross sections
 	cross sections, all assume constant, not realistic since memory bandwidth impact is huge on GPU
 	geometry of course
+	
+WARP will read ACE-formatted data, perform all reaction types as prescribed by them, use a Serpent-like unionized energy grid to regularize data access, use an event-based transport algorithm with parallelized operations for sorts and reductions, use OptiX for general 3D geometry representation, and use a SOA for neutron history data.
 	
 openmc
 
