@@ -33,7 +33,7 @@ The Monte Carlo method is not a new way to simulate nuclear reactors (or any par
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Nuclear Interactions}
+\section{Nuclear Interactions}
 \label{subsec:interactions}
 
 The core of a Monte Carlo simulation is explicitly modeling the individual interactions the neutron undergoes as it moves through matter.  At the highest level, these reactions can be broken down into two categories, elastic reactions and inelastic reactions.  Elastic reactions are those where both momentum and kinetic energy are conserved, i.e. ones where any energy the neutron loses is given to the target nucleus.  Inelastic reactions are those that conserve momentum but do not conserve kinetic energy, i.e. ones where the kinetic energy of the particles can be converted to a vibrational mode of the target nucleus, etc.  These reactions are further divided by the number and type of secondary particles they produce.  Reactions that produce no secondary neutrons are called ``disappearance'' reactions since the neutron effectively disappears, reactions that produce a single neutron are typically called scattering reactions since they effectively change the incoming neutron's energy and direction, and reaction the produce more than one particle are simply called ``secondary-producing'' reactions. Table \ref{nuc_reaction_summary} show a summary of the reaction classifications, and it can be seen that elastic scattering is the only elastic reaction.   
@@ -111,7 +111,7 @@ It is important to note the complexity shown in uranium-235 in the 0.1eV to 40ke
 
 In the next subsections, the characteristics and kinematics of the different reaction types are explained.
 
-\subsubsection{Elastic Scattering}
+\subsection{Elastic Scattering}
 
 Elastic scattering conserves both the momentum and the kinetic energy of the reacting particles and occurs when the neutron does not enter the nucleus, only bounces off of it's potential field.  Since there is only a single exiting particle, elastic scattering is a two-body interaction and the exiting energies can be determined if the angle between the exiting particle is known.  This problem is greatly simplified if the interacting particles' velocities are transformed into the center-of-mass (CM) frame, where net momentum is zero. The velocity of the CM is defined in \eqref{vCM} where $m$ and $M$ are the neutron's and the target's respective masses, $v$ and $V$ are their respective velocity vectors, and $A$ is the ratio of the target's mass to the neutron's mass (also know as the ``atomic weight ratio'' or AWR).  The derivation from here follows closely with that in ref \cite{jaakko}.
 
@@ -191,7 +191,7 @@ If the polar and azimuthal rotation angles, $\theta$ and $\phi$, respectively, a
 \end{equation}
 
 
-\subsubsection{Inelastic Level Scattering}
+\subsection{Inelastic Level Scattering}
 
 Inelastic scattering is the other type of scattering a neutron can undergo where kinetic energy is no longer conserved.  An amount of energy is either released from the reaction to the particles, or more commonly, taken from the particles and lost to the reaction.  In neutron-nucleus collisions, the target nucleus can be excited to a higher energy state than its ground state if the colliding neutron has a high enough energy to do so.  If it does and the collision excites the nucleus, a discrete amount of energy equal to the energy of the excited state is lost to the reaction.  These excited states typically do not have long half lives, and a gamma ray is emitted when the nucleus relaxes to its ground state.  This type of reaction is called inelastic level scattering due to a an excited energy \emph{level} becoming occupied by the target nucleus.  
 
@@ -203,18 +203,18 @@ Since it is still a two-body interaction, the kinematics of the reaction are ide
      \caption{The energy levels of lead-XXX\cite{}. \label{Elevels}}
 \end{figure}
 
-\subsubsection{Inelastic Continuum Scattering}
+\subsection{Inelastic Continuum Scattering}
 
 At energies above the distinct levels there lies a continuum in the nuclear energy states.  This isn't truly a ``continuum'' in the strictest sense, but the energy levels become so close together they they effectively form a domain where energy can take continuous values.  Unlike the discrete $Q$ values corresponding to a single excited state used in inelastic level scattering, the $Q$ value of the reaction now follows a distribution.  
 
 In bound nuclei, S(a,b)
 
-\subsubsection{Disappearance Reactions}
+\subsection{Disappearance Reactions}
 
 Unlike scattering reactions, where the energy and direction of the neutron is changed but continues to transport, \emph{disappearance} reactions remove a free neutron.  Typically this \emph{capture} of a neutron leaves the daughter nucleus in an excited state, which them relaxes to ground state by emitting a gamma ray.
 
 
-\subsubsection{Fission}
+\subsection{Fission}
 
 Fission means ``the splitting splitting of something into two parts'' in the literal sense of the word.  This is exactly what nuclear fission is as well.  It is when a nucleus splits into two smaller nuclei, called \emph{fission fragments}.  When heavy nuclei undergo fission, they release energy, and typically emit a few other particles, including neutrons.  That this reaction releases energy is the reason heavy elements, like uranium, can be used as an energy source.  This is because the fission fragments have a higher binding energy per nucleon compared to the parent nucleus.  Figure \ref{binding_e_per_nuc} shows the average binding energy per nucleon for a wide range of isotopes.  Note that the peak of the curve is at Iron-56, the most tightly bound nucleus, and that heavier nuclides are lower than it.  Fission splits the parent into two lighter nuclides, and since the fragments are more tightly bound, the excess binding energy from the parent is released.  The released energy isn't simply deposited as heat directly, however, it is released in a range of forms.  Fission doesn't just release some energy, it releases a substantial amount of it.  Uranium-235, for example, releases a total of 192.9$\pm$0.5 \emph{MeV} per fission \cite{duderstadt}.  Compared to chemical energy sources where the energy released per reaction is on the order of 1\emph{eV}.  Fission energy yield is 8 orders of magnitude larger!  Not all of this energy is converted to heat, bit a substantial amount is.  Table \ref{fission_dist} shows the fraction of this total energy that is given to each entity.  Note that a significant fraction is given to neutrinos, which is essentially lost due to their very small interaction cross section.  The kinetic energy of the fission fragments has the majority of the energy, and since they are heavy and charged, their energy is deposited as heat very near to the fission site.  Other particles, light photons and neutrons, carry some of the fission energy further away from the fission site, but their energy mostly still ends up as heat.
   
@@ -264,14 +264,14 @@ Figure \ref{nu_compare} shows the energy dependence of the total fission neutron
 
 Fission spectrum?
 
-\subsubsection{Other Inelastic Secondary-Producing Reactions}
+\subsection{Other Inelastic Secondary-Producing Reactions}
 
 This category encompasses all the other reactions neutrons undergo.  There are two types, ones that produce secondary neutrons in some amount and those that do not.  Those that do not may still produce other particles, like alpha particles, tritons, protons, et cetera.  Since they do not produce secondary neutrons, however, they are basically equivalent to a disappearance reaction in the scope of neutron transport.  Even though they aren't capture reactions, they can contribute significantly to an isotope's absorption of neutrons.  Figure \ref{xs_e_dependence_li} shows that the (n,$^3$H) in lithium-6 is by far the main component of the total cross section and makes it a very strong absorber of low energy neutrons.  Boron-10 is another great example of this.  Its (n,$\alpha$) reaction has a very high cross section for low energy neutrons, and it is widely used in thermal spectrum reactors in safety and control systems.
 
 Of the reactions that produce secondary neutrons, the (n,2n) reaction is most significant, due to it having the lowest threshold energy.  At higher incident neutron energies, (n,3n) and even (n,4n) can become possible.  Other particle combinations are possible as well, such as (n,n$\alpha$), and these reactions act like an inelastic scatter interaction where the relationship between scattering angle and energy no longer applies due to there being three bodies to distribute energy to instead of only two.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Temperature Effects}
+\section{Temperature Effects}
 \label{sec:temp}
 
 Thus, far there has only been mention of the target nuclide's by how it manifests itself in the 1/$v$ behavior of cross sections at low energy.  Most of the time, it is a good assumption that the thermal motion of the target nuclide is negligible.  Thermal energy is on the order of .01 eV, and this is a good assumption when neutrons are at MeV range energies, but when they scatter and lose energy, they can come near the thermal energy of the material.  When this happens, the target nuclide no longer appears stationary, and assuming that it has zero velocity in scattering calculations is inaccurate.  MCNP sets the threshold at 400kT, which corresponds to about 10 eV for materials at room temperature, above which the target nuclide can be assumed stationary.  Below this threshold, it is important to model thermal effects.  If this wasn't done, a neutron could keep scattering off of zero-energy targets and it's energy could approach zero, which is not physical.  Neutrons can only scatter down to a state where they are in thermal equilibrium with the material they are traveling through.  This creates a ``thermal peak'' at low energies where neutrons collect, especially in materials where the scattering cross section is large and neutrons scatter many times before they are absorbed.
@@ -284,7 +284,7 @@ Thus, far there has only been mention of the target nuclide's by how it manifest
 \end{figure}
 
 
-\subsubsection{Doppler Effect}
+\subsection{Doppler Effect}
 
 
 The other effect that thermal motion has is the \emph{Doppler effect}.  This is where resonances are broadened as temperature increases due to the thermal distribution becoming wider.  The effect is also known as \emph{Doppler broadening} for this reason.  Figure \ref{MB_dist} shows the Maxwell-Boltzmann distributions at various temperatures for a heavy particle and for a light particle.  This is the distribution of speeds particles in a ``gas'' have if they only interact by scattering off of one another.  Most solids can be modeled as a dense gas when there are no strong anisotropies in their structure, which is why modeling the target velocities in this way is called the ``free gas model.''  Note that the broadening effect is much more pronounced for light nuclei.  
@@ -317,7 +317,7 @@ of the paper!
 Then say some things about it once you get details, particularly that it is an expensive operation
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Nuclear Data}
+\section{Nuclear Data}
 
 Cross section data is distributed by the Department of Energy in \emph{ENDF} files.  ENDF stands for ``evaluated nuclear data file,'' and can contain data for nuclear decay, photons, atomic relaxation, fission yields, thermal neutron scattering, and charged particle reactions as well as neutron reactions.  They are called ``evaluated'' because an organization decides, or evaluates, which experimental data is the highest quality and will be included in the final dataset.  They also decide how to represent regimes that haven't been measured yet by comparing simulation results to experiments.   The first data released was ENDF/B-I in 1968 and the latest set is ENDF/B-VII, which was released in 2006.  They have a standard format that dates back to when the data was stored on magnetic tapes, and are sometimes referred to as ``tapes'' to this day.  The format is rather archaic and contains a lot of redundant information about record locations which was useful when the tape head had to physically move between points in the tape.  
 
@@ -330,7 +330,7 @@ Cross section data is distributed by the Department of Energy in \emph{ENDF} fil
 Many Monte Carlo codes read ACE formatted data rather than the original ENDF file.  ACE stands for ``a compact ENDF'' and strips out a lot of the extra information unnecessary for neutron transport.  As Figure \ref{data_levels} shows, ACE files not only contain cross sections, but also angle and energy distributions used in scattering and fission.  ENDF assigns a number to each type of reaction called the \emph{MT} number.  Table \ref{MT_numbers}, taken from a LANL website, shows the major numbers \cite{MTnums}.  It can clearly be seen that there are many reactions a neutron can undergo, most of which have very energy strong dependance.  Most of the complexity in modeling nuclear reactors comes from the fact that the data needed to model neutrons is very complicated.  It may be the most important part of the simulation, it is what ties the calculations to reality.  If inaccurate data is used, the results will not have any physical meaning, and the simulation becomes a mathematical exercise. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Neutron Transport}
+\section{Neutron Transport}
 
 Now that the events which can happen to neutrons have been outlined, we will move to describing the neutron population itself.  Since the neutron population in reactors is large, on the order of $10^{XXX}/\mathrm{cm}^3$, and the neutrons themselves have very small radii, about $1.75\times10^{-17}$ cm, the distribution of neutrons can be treated as an continuum.  We will eventually derive the \emph{neutron transport equation}, which is a linearized version of the Boltzmann transport equation.  It is linear since it is assumed that neutrons do not interact with each other.  This is usually a good assumption in normal matter since the neutron density present in reactors is many orders of magnitude smaller than the material density and neutrons are much more likely to interact with it than each other.  
 
@@ -1266,15 +1266,15 @@ There are also a handful of assumptions in his implementation that require him t
 
 The GPU implementation may not be ideal either, since Nelson uses an array of structures data (AOS) layout instead of a structure of arrays layout (SOA), which is not ideal for coalesced loads, as was shown in Figure \ref{coalesced}, as he states himself.  CERBERUS also seems to not employ parallel algorithms other than for transport.  None of the underlying operations necessary for implementing event-based Monte Carlo were parallelized effectively.  The cross section data was also simply left as vectors in device memory and was not reformatted in any way to optimize the access pattern on the GPU.
 
-The second major study done was that by Liu, et al.  In his first publication, a GPU is used to perform an multiplication factor calculation.  Very simple geometry is used, a bare slab and a bare sphere, and on group cross sections are used.  The fission source operations and sorting are also done on the CPU rather than the GPU.  Despite using the CPU to do these tasks, Liu reports a speedup over an identical CPU version of 7x for the bare sphere and 33x for the bare slab using a history-based algorithm for transport \cite{tianyu}.  Further results were presented at the SNA+MC 2013 conference, where Archer, a general purpose Monte Carlo radiation transport code developed at Rensselaer Polytechnic Institute, was modified to run an event-based criticality simulation in a 1D slab.  They conclude that control flow efficiency is increased, but gloabl memory transactions are increased dramatically, the GPU is not kept busy when the number of particles is small, and performance is about 10x less than a history-based implementation \cite{tianyu_snamc}.  No details about the implementation are given other than that data references are remapped like in the presentation I made at the ANS Winter Meeting in November of 2012 \cite{bergmann_ans_winter}.  These issues will also be addressed by WARP and shown in the preliminary studies.
+The second major study done was that by Liu, et al.  In his first publication, a GPU is used to perform an multiplication factor calculation.  Very simple geometry is used, a bare slab and a bare sphere, and on group cross sections are used.  The fission source operations and sorting are also done on the CPU rather than the GPU.  Despite using the CPU to do these tasks, Liu reports a speedup over an identical CPU version of 7x for the bare sphere and 33x for the bare slab using a history-based algorithm for transport \cite{tianyu}.  Further results were presented at the SNA+MC 2013 conference, where Archer, a general purpose Monte Carlo radiation transport code developed at Rensselaer Polytechnic Institute, was modified to run an event-based criticality simulation in a 1D slab.  They conclude that control flow efficiency is increased, but global memory transactions are increased dramatically, the GPU is not kept busy when the number of particles is small, and performance is about 10x less than a history-based implementation \cite{tianyu_snamc}.  No details about the implementation are given other than that data references are remapped like in the presentation I made at the ANS Winter Meeting in November of 2012 \cite{bergmann_ans_winter}.  These issues will also be addressed by WARP and shown in the preliminary studies.
 
 Henderson has also implemented a GPU-accelerated algorithm for photon transport in Geant4.   He uses interpolated cross sections, which are very smooth and small compared to those used in neutron transport.  The geometry treatment is also a voxelized approach, well-suited for reading in CT scan data, which his project focused on.  He also only needed to consider water as a material since the human body is basically water.  Criticality was also not considered, for obvious reasons. Secondary electrons were transported however, but does not change the transport from being fixed source. He uses a history-based approach, using the shared memory as a stack of to-be-transported photons and electrons, basically transforming the SM into its own small independent processor ( like a CPU).  He also emphasizes the positive effect of using a SOA access pattern, reporting 3-4x speedup over AOS.  Henderson was able to achieve a total speedup of around 50-60x over the standard Geant4 routines \cite{henderson}.
 
-A team from Tsinghua University has also been adding GPU acceleration to their in-house Monte Carlo code RMC. RMC is being developed as a drop-in replacement for MCNP since MCNP is export-controlled and very difficult for Chinese universities to obtain (source code might be impossible to obtain).  They've published some of their results, including an eigenvalue test and geometry routine test.  The eigenvalue test uses algorithms similar to those used by Liu and Henderson.  They use static geometry, single group cross sections, and a pop-stack hisotrry-based transport algorithm.  They were able to obstain a 113x speedup over a CPU version without doing a flux tally and 36x speedup doing a flux tally \cite{qixu_ans_winter}   The geometry routine test offloads the geometry processing routines of RMC to a GPU, where they were able to get 5-50x speedup over all-CPU RMC as the number of fuel rods in their geometry went from 25 to 625.  Again, one group cross sections were used \cite{qixu}.
+A team from Tsinghua University has also been adding GPU acceleration to their in-house Monte Carlo code RMC. RMC is being developed as a drop-in replacement for MCNP since MCNP is export-controlled and very difficult for Chinese universities to obtain (source code might be impossible to obtain).  They've published some of their results, including an eigenvalue test and geometry routine test.  The eigenvalue test uses algorithms similar to those used by Liu and Henderson.  They use static geometry, single group cross sections, and a pop-stack history-based transport algorithm.  They were able to obtain a 113x speedup over a CPU version without doing a flux tally and 36x speedup doing a flux tally \cite{qixu_ans_winter}   The geometry routine test offloads the geometry processing routines of RMC to a GPU, where they were able to get 5-50x speedup over all-CPU RMC as the number of fuel rods in their geometry went from 25 to 625.  Again, one group cross sections were used \cite{qixu}.
 
 WARP aims to be much more general and accurate than all previous codes as well as employing efficient parallel algorithms in order to have a completely GPU-accelerated code.  It will read ACE-formatted data, perform all reaction types as prescribed by them, use a Serpent-like unionized energy grid to regularize data access, use an event-based transport algorithm with parallelized operations for sorts and sums, use OptiX for general 3D geometry representation (without explicit nesting), use a SOA for neutron history data, and perform \emph{all} operations on the GPU unless strictly forbidden for some reason (the benefit of which will be discussed later).
 	
-OpenMC is also under development by NVIDIA themselves to be run on the GPU.  Progress was presented at the 2014 GPU Technology Conference (GTC) \cite{openmc_gtc}.
+OpenMC is also under development to run on GPUs by NVIDIA themselves.  Progress was presented at the 2014 GPU Technology Conference (GTC) \cite{openmc_gtc}.
 
 \section{Preliminary Studies}
 \label{sec:prelim}
@@ -1287,6 +1287,18 @@ all my prelim work to motivate this project
   \centering
     \includegraphics[width=0.8\textwidth]{graphics/prelim_geom.eps}
      \caption{The 2D geometry of the scattering test \cite{cuda}. \label{prelim_geom} }
+\end{figure}
+
+\begin{figure}[h!] 
+  \centering
+    \includegraphics[width=0.8\textwidth]{graphics/prelim_speedup.eps}
+     \caption{The 2D geometry of the scattering test \cite{cuda}. \label{prelim_speedup} }
+\end{figure}
+
+\begin{figure}[h!] 
+  \centering
+    \includegraphics[width=0.8\textwidth]{graphics/prelim_batches.eps}
+     \caption{The 2D geometry of the scattering test \cite{cuda}. \label{prelim_batches} }
 \end{figure}
 
 
