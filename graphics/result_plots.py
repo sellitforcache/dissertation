@@ -848,12 +848,12 @@ active_large=np.array([
 name = 'prelim_speedup'	
 fig = pl.figure(figsize=(10,6))
 ax = fig.add_subplot(1,1,1)
-ax.semilogx(N,np.divide(cpu,gpu_task_128),'r-',label='Task 128 t/b')
-ax.semilogx(N,np.divide(cpu,gpu_task_512),'r--',label='Task 512 t/b')
-ax.semilogx(N,np.divide(cpu,gpu_data_batch_128),'g-',label='Event, Batch 128 t/b')
-ax.semilogx(N,np.divide(cpu,gpu_data_batch_512),'g--',label='Event, Batch 512 t/b')
-ax.semilogx(N,np.divide(cpu,gpu_data_large_128),'b-',label='Event, Remap 128 t/b')
-ax.semilogx(N,np.divide(cpu,gpu_data_large_512),'b--',label='Event, Remap 512 t/b')
+ax.semilogx(N,np.divide(cpu,gpu_task_128),'k-',label='Task 128 t/b')
+ax.semilogx(N,np.divide(cpu,gpu_task_512),'k--',label='Task 512 t/b')
+ax.semilogx(N,np.divide(cpu,gpu_data_batch_128),'b-',label='Event, Batch 128 t/b')
+ax.semilogx(N,np.divide(cpu,gpu_data_batch_512),'b--',label='Event, Batch 512 t/b')
+ax.semilogx(N,np.divide(cpu,gpu_data_large_128),'r-',label='Event, Remap 128 t/b')
+ax.semilogx(N,np.divide(cpu,gpu_data_large_512),'r--',label='Event, Remap 512 t/b')
 handles, labels = ax.get_legend_handles_labels()
 ax.legend(handles, labels, loc=2)
 pl.grid(True)
@@ -884,4 +884,31 @@ else:
 	print name+'.eps'
 	fig.savefig(name+'.eps')
 
+#
+#  control divergence
+#
+name = 'prelim_divergence' 
+f=open('divergence2','r')
+divergence2=[]
+for n in f:
+    divergence2.append(float(n))
+divergence2=np.array(divergence2)
+fig = pl.figure(figsize=(10,6))
+ax = fig.add_subplot(1,1,1)
+ax.plot(np.absolute(divergence2),'r-',label='Remap')
+ax.plot([1,divergence2.__len__()],[np.mean(np.absolute(divergence2)),np.mean(np.absolute(divergence2))],'b-',label='Batch')
+ax.plot([1,divergence2.__len__()],[79.4581,79.4581],'k-',label='Task')
+handles, labels = ax.get_legend_handles_labels()
+ax.legend(handles, labels, loc=1)
+pl.grid(True)
+ax.set_xlabel(r'Iteration')
+ax.set_ylabel(r'\% Control Flow Divergence')
+ax.set_ylim([0,100])
+ax.set_xlim([0,divergence2.__len__()])
+
+if plot:
+    pl.show()
+else:
+    print name+'.eps'
+    fig.savefig(name+'.eps')
 

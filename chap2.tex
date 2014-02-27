@@ -1317,9 +1317,9 @@ Two different implementations were made using a event-based algorithm, one which
      \caption{Mapping thread IDs to active data through a remapping vector \label{remapping} }
 \end{figure}
 
-Figure \ref{prelim_speedup} shows the speedup factors, $F_s=t_\mathrm{CPU}/t_\mathrm{GPU}$, of the GPU implementations over the CPU implementation versus the number of particles run.  The task-parallel implementation performs best, with a maximum speedup of around 29x.  The remapping implementation has the next best performance, with about a 20x speedup over the CPU.  It's performance plateaus, unlike the batched event-based implementation.  It's performance departs from the remapping implementation at $10^5$ particles and even starts to deteriorate between $10^6$ and $10^7$ particles.  This is due to the transport having to be done in batches at this point.  The simulations were done on a Tesla C2075 card, which has Fermi architecture and a maximum block number of 65,536 for a 1D grid.  Multiplying this by 128 or 512 threads per block gives maximum total number of threads of 8,388,608 and 33,554,432, respectively.  These numbers are where the batching implementation must break the transport into multiple batches.  This is also where the task-based implementation must break transport into batches, but the effect is unnoticeable since it only implies a second kernel launch instead of hundreds more.  This limit was lifted in devices with compute capability of 3.0 and up, where the maximum 1D grid size was increased to $10^{27}-1$.
+Figure \ref{prelim_speedup} shows the speedup factors, $F_s=t_\mathrm{CPU}/t_\mathrm{GPU}$, of the GPU implementations over the CPU implementation versus the number of particles run.  The task-parallel implementation performs best, with a maximum speedup of around 29x.  The remapping implementation has the next best performance, with about a 20x speedup over the CPU.  It's performance plateaus, unlike the batched event-based implementation.  It's performance departs from the remapping implementation at $10^5$ particles and even starts to deteriorate between $10^6$ and $10^7$ particles.  This is due to the transport having to be done in batches at this point.  The simulations were done on a Tesla C2075 card, which has Fermi architecture and a maximum block number of 65,536 for a 1D grid.  Multiplying this by 128 or 512 threads per block gives maximum total number of threads of 8,388,608 and 33,554,432, respectively.  These numbers are where the batching implementation must break the transport into multiple batches.  This is also where the task-based implementation must break transport into batches, but the effect is unnoticeable since it only implies a second kernel launch instead of hundreds more.  This limit was lifted in devices with compute capability of 3.0 and up, where the maximum 1D grid size was increased to ($10^{27}-1$) \cite{cuda}.  The speedup plot also shows another important feature - that speedup plateaus at a large number of histories.  This is due to the car'd ability to hide memory latencies through pipelining when there are many many active threads.  
 
-The speedup plot also shows another important feature - that speedup plateaus at a large number of histories.
+The number of threads per block seems to make little difference in the event-based implementations, but makes a very large difference in the task-based implementation.  Increasing the number of threads per block from 128 to 512 reduces the performance from a 28x speedup to a 20x speedup, comparable to the event-based implementations.  The reason for this happening is most likely registers spilling to local memory since there are more threads resident in a multiprocessor and more variables need to be stored in the registers.
 
 \begin{figure}[h!] 
   \centering
@@ -1327,14 +1327,30 @@ The speedup plot also shows another important feature - that speedup plateaus at
      \caption{Speedup factors of the GPU implementations over the CPU implementation. \label{prelim_speedup} }
 \end{figure}
 
-Figure \ref{prelim_active}
+Figure \ref{prelim_active} shows the number of active histories per transport iteration for the batches and remapping implementations.  Since the remapping implementation eliminates all references to terminated particles, the data loaded into the threads blocks is all active and no threads return without doing work.  The figure clearly shows that the blocks are kept full until the end of the simulation when the remain number of particles becomes less than the maximum number of threads.  It also shows how quickly particles are depleted from the blocks.  In this simple case, most interactions happen in cell 0 by far, and particles are absorbed almost identically to \eqref{depleted}, where $i$ is the iteration number and $\Sigma_a/\Sigma_t$ is the absorption probability in cell 0.   Figure \ref{prelim_active} does not reflect the time taken by each iteration, however.  The iterations with more particles take longer than those with fewer for both implementations.  More particles are transported per time in full iterations, however, as evidenced by the greater speedups of the remapping algorithm in Figure \ref{prelim_speedup}.
+
+\begin{equation}
+\label{depleted}
+\frac{N}{N_0}=\exp \left(-\frac{\Sigma_a}{\Sigma_t} i \right)
+\end{equation}
 
 \begin{figure}[h!] 
   \centering
     \includegraphics[width=0.8\textwidth]{graphics/prelim_active.eps}
-     \caption{The number of actively transporting threads for the event-based GPU implmentations. \label{prelim_active} }
+     \caption{The number of actively transporting threads for the event-based GPU implementations. \label{prelim_active} }
 \end{figure}
 
+The most likely reasons that the task-based implementation outperforms the event-based is due the simplicity of the problem and the communication and setup overhead associated with many kernels being launched from the host.  Since the problem is so simple, all the data fits into local memory and the latencies associated with accessing global memory often are hidden.  The purpose of this 
+
+\begin{figure}[h!] 
+  \centering
+    \includegraphics[width=0.8\textwidth]{graphics/prelim_divergence.eps}
+     \caption{The \% of control flow divergence of the task- and event-based GPU implementations (UPDATE). \label{prelim_divergence} }
+\end{figure}
+
+Library use and task-based is incompatible. would need to treat each SM as a CPU, use a stack-popping method.
+
+Conclusions
 
 \subsection{Ray Tracing with OptiX}
 
