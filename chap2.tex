@@ -1340,7 +1340,7 @@ Figure \ref{prelim_active} shows the number of active histories per transport it
      \caption{The number of actively transporting threads for the event-based GPU implementations. \label{prelim_active} }
 \end{figure}
 
-The most likely reasons that the task-based implementation outperforms the event-based is due the simplicity of the problem and the communication and setup overhead associated with many kernels being launched from the host.  Since the problem is so simple, all the data fits into local memory and the latencies associated with accessing global memory often are hidden.  The purpose of this 
+The most likely reasons that the task-based implementation outperforms the event-based is due the simplicity of the problem and the communication and setup overhead associated with many kernels being launched from the host.  Since the problem is so simple, all the data fits into local memory and the latencies associated with accessing global memory often are hidden.  The purpose of this study was to eliminate memory transaction and only focus on thread divergence, but memory transactions will have a very large impact when real cross sections and geometries are used.  Also only having two reactions means threads only diverge when they terminate.  WARP will have many reactions types to deal with, and divergence will be a greater problem.  This also allows threads in a block to almost always be in the same step of the transport algorithm, further eliminating divergence implicitly.  Despite this, the study does show that control flow divergence is greatly reduced by using an event-based algorithm, as shown by Figure \ref{prelim_divergence}.  The overhead of calling kernels many times in the event-based implementations is most likely the reason for the poorer performances.
 
 \begin{figure}[h!] 
   \centering
@@ -1348,11 +1348,14 @@ The most likely reasons that the task-based implementation outperforms the event
      \caption{The \% of control flow divergence of the task- and event-based GPU implementations (UPDATE). \label{prelim_divergence} }
 \end{figure}
 
-Library use and task-based is incompatible. would need to treat each SM as a CPU, use a stack-popping method.
+Another consideration pointed out by this study is that library use and the task-based algorithm are incompatible.  Libraries currently available for the GPU carry out a single task on a dataset, they are not coded for single-thread operation and must be launched as their own kernels.  Having threads in different states wouldn't allow the library routines to be dropped in and carried out consistently across all the active particle data.  Also, much of the performance from optimized algorithms comes from thread blocks cooperating, and using a task-based algorithm would be like treating each SM as a separate CPU (using a stack-popping method) and would minimize the benefits of divide-and-conquer algorithms.
 
-Conclusions
+From this preliminary 2D mono-energetic scattering study, it can be concluded that using an event-based algorithm with a compaction/sort algorithm to eliminate terminated particles from being accessed by thread blocks drastically reduces control flow divergence and keeps warps coherent.  There is a cost for adopting this algorithm, however, namely the overhead of kernel launches.  How these factors compete in WARP will be shown in the results in Chapter \ref{chap:results}.  Warp will adopt the event-based algorithm in hopes that thread coherency and its benefits (maximal load coalescing, little warp serialization) will outweigh launch overhead in when real data is used and so libraries can be used to perform complicated parallel tasks.
 
 \subsection{Ray Tracing with OptiX}
+
+
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
