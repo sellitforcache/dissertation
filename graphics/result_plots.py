@@ -148,98 +148,32 @@ else:
 #  2d prelim results 
 #
 
-N=np.array([1e2,1e3,1e4,1e5,1e6,1e7,2e7,3e7,5e7,9e7])
+N=np.array([2000000,3000000 ,4000000 ,5000000 ,6000000 ,7000000 ,8000000 ,9000000 ,10000000,20000000,30000000,40000000,50000000,60000000,70000000,80000000,90000000])
 
-cpu=np.array([np.mean([0.000296,0.000249]),
-     np.mean([0.002485,0.002431]),
-     np.mean([0.024242,0.024404]),
-     np.mean([0.242053,0.243017]),
-     np.mean([2.421229,2.408955]),
-     np.mean([24.059603,24.210554]),
-     np.mean([48.281131,48.479846]),
-     np.mean([72.289331,72.674503]),
-     np.mean([120.620987,120.744410 ]),
-     np.mean([218.651450,217.087858 ])])
+cpu=[]
+gpu_task_128=[]
+gpu_task_512=[]
+gpu_data_batch_128=[]
+gpu_data_batch_512=[]
+gpu_data_large_128=[]
+gpu_data_large_512=[]
 
-gpu_task_128=np.array([  np.mean([0.000632,0.000598,0.000696 ]),
-                np.mean([0.000900,0.001018,0.000701 ]),
-                np.mean([0.001686,0.001526,0.001646 ]),
-                np.mean([0.009362,0.009155,0.009156 ]),
-                np.mean([0.085693,0.085703,0.085670 ]),
-                np.mean([0.851322,0.851531,0.852025 ]),
-                np.mean([1.703503,1.703256,1.702110 ]),
-                np.mean([2.554006,2.553515,2.552910 ]),
-                np.mean([4.255345,4.255233 ]),
-                np.mean([7.663975 ]),])
+f_cpu				=open('prelim/timing_cpu1')
+f_gpu_task_128		=open('prelim/timing_gpu_128')
+f_gpu_task_512		=open('prelim/timing_gpu_512')
+f_gpu_data_batch_128=open('prelim/timing_gpu5_128')
+f_gpu_data_batch_512=open('prelim/timing_gpu5_512')
+f_gpu_data_large_128=open('prelim/timing_gpu6_128')
+f_gpu_data_large_512=open('prelim/timing_gpu6_512')
 
-gpu_task_512=np.array([  np.mean([0.000960 ]),
-                np.mean([0.000907 ]),
-                np.mean([0.002097 ]),
-                np.mean([0.013404 ]),
-                np.mean([0.130678 ]),
-                np.mean([1.301773 ]),
-                np.mean([2.599201 ]),
-                np.mean([3.897249 ]),
-                np.mean([6.502696 ]),
-                np.mean([11.699717 ]),])
-
-gpu_data_remap_128=np.array([    np.mean([0.019172 ]),
-                        np.mean([0.003512 ]),
-                        np.mean([0.007006 ]),
-                        np.mean([0.019632 ]),
-                        np.mean([0.132473 ]),
-                        np.mean([1.943982 ]),
-                        np.mean([5.011398 ]),
-                        np.mean([7.955287 ]),
-                        np.mean([13.896977 ]),
-                        np.mean([24.734211 ]),])
-
-            
-gpu_data_batch_128=np.array([    np.mean([0.001787,0.001751 ]),
-                        np.mean([0.002582 ]),
-                        np.mean([0.004709 ]),
-                        np.mean([0.018582 ]),
-                        np.mean([0.156778 ]),
-                        np.mean([2.027734 ]),
-                        np.mean([5.273526 ]),
-                        np.mean([8.496894 ]),
-                        np.mean([15.025722 ]),
-                        np.mean([ ]),])
-
-gpu_data_batch_512=np.array([    np.mean([0.001305 ]),
-                        np.mean([0.002899 ]),
-                        np.mean([0.004187 ]),
-                        np.mean([0.022578 ]),
-                        np.mean([0.194196 ]),
-                        np.mean([1.946018 ]),
-                        np.mean([3.944908 ]),
-                        np.mean([5.819015 ]),
-                        np.mean([14.426105 ]),
-                        np.mean([ ]),])
-            
-
-gpu_data_large_128=np.array([  np.mean([0.001745 ]),
-                np.mean([0.004338 ]),
-                np.mean([0.005246 ]),
-                np.mean([0.017606 ]),
-                np.mean([0.123069 ]),
-                np.mean([1.287993 ]),
-                np.mean([2.474710 ]),
-                np.mean([3.807573 ]),
-                np.mean([6.358311 ]),
-                np.mean([ ]),])
-
-gpu_data_large_512=np.array([    np.mean([0.001764 ]),
-                        np.mean([0.002900 ]),
-                        np.mean([0.005836 ]),
-                        np.mean([0.016890 ]),
-                        np.mean([0.127925 ]),
-                        np.mean([1.262911 ]),
-                        np.mean([2.652309 ]),
-                        np.mean([4.002110 ]),
-                        np.mean([6.548943 ]),
-                        np.mean([ ]),])
-                        
+cpu					=np.array(f_cpu.read().split()					,dtype=float)
+gpu_task_128		=np.array(f_gpu_task_128.read().split()			,dtype=float)
+gpu_task_512		=np.array(f_gpu_task_512.read().split()			,dtype=float)
+gpu_data_batch_128	=np.array(f_gpu_data_batch_128.read().split()	,dtype=float)
+gpu_data_batch_512	=np.array(f_gpu_data_batch_512.read().split()	,dtype=float)
+gpu_data_large_128	=np.array(f_gpu_data_large_128.read().split()	,dtype=float)	
+gpu_data_large_512	=np.array(f_gpu_data_large_512.read().split()	,dtype=float)
+         
 active_batch=np.array([
 8388480,
 6989971,
