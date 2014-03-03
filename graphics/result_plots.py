@@ -47,42 +47,43 @@ def get_serpent_det(filepath):
 #
 #  scatter error
 #
-name = 'scattering_error'
-tally      = np.loadtxt('/Users/rmb/code/gpu-cpp/isowater.tally')
-tallybins  = np.loadtxt('/Users/rmb/code/gpu-cpp/isowater.tallybins')
-serpdata   = get_serpent_det('/Users/rmb/code/serpent-benchmark/nonfiss_mono2_det0.m')
-widths=np.diff(tallybins)
-avg=(tallybins[:-1]+tallybins[1:])/2
-#newflux = np.multiply(tally[:-1,1],tally[:-1,0])
-#newflux = np.divide(newflux,np.add(tally[:-1,1],1.0))
-newflux=np.array(tally[:,0])
-newflux=np.divide(newflux,widths)
-newflux=np.multiply(newflux,avg)
-#newflux=np.divide(newflux,40e5)
-newflux=np.divide(newflux,np.max(newflux))
-
-serpE=np.array(serpdata['DETfluxlogE'][:,2])
-serpF=np.array(serpdata['DETfluxlog'][:,10])
-serpF=np.divide(serpdata['DETfluxlog'][:,10],np.max(serpdata['DETfluxlog'][:,10]))
-serpE = np.squeeze(np.asarray(serpE))
-serpF = np.squeeze(np.asarray(serpF))
-
-fig = pl.figure(figsize=(10,6))
-ax = fig.add_subplot(1,1,1)
-p1=ax.semilogx(serpE,serpF,'b',avg,newflux,'r',linestyle='steps-mid')
-ax.set_xlabel('Energy (MeV)')
-ax.set_ylabel('Normalized Flux/Lethary')
-ax.set_title('4e6 histories 1x1x1m block of water @ 1 g/cc.  2MeV point source @ (0,0,0)')
-pl.legend(p1,['Serpent 2.1.15','WARP'],loc=2)
-ax.set_ylim([0,.06])
-ax.set_xlim([1e-2,3])
-pl.grid(True)
-
-if plot:
-	pl.show()
-else:
-	print name+'.eps'
-	fig.savefig(name+'.eps')
+if(os.path.isfile('/Users/rmb/code/gpu-cpp/isowater.tally')):
+	name = 'scattering_error'
+	tally      = np.loadtxt('/Users/rmb/code/gpu-cpp/isowater.tally')
+	tallybins  = np.loadtxt('/Users/rmb/code/gpu-cpp/isowater.tallybins')
+	serpdata   = get_serpent_det('/Users/rmb/code/serpent-benchmark/nonfiss_mono2_det0.m')
+	widths=np.diff(tallybins)
+	avg=(tallybins[:-1]+tallybins[1:])/2
+	#newflux = np.multiply(tally[:-1,1],tally[:-1,0])
+	#newflux = np.divide(newflux,np.add(tally[:-1,1],1.0))
+	newflux=np.array(tally[:,0])
+	newflux=np.divide(newflux,widths)
+	newflux=np.multiply(newflux,avg)
+	#newflux=np.divide(newflux,40e5)
+	newflux=np.divide(newflux,np.max(newflux))
+	
+	serpE=np.array(serpdata['DETfluxlogE'][:,2])
+	serpF=np.array(serpdata['DETfluxlog'][:,10])
+	serpF=np.divide(serpdata['DETfluxlog'][:,10],np.max(serpdata['DETfluxlog'][:,10]))
+	serpE = np.squeeze(np.asarray(serpE))
+	serpF = np.squeeze(np.asarray(serpF))
+	
+	fig = pl.figure(figsize=(10,6))
+	ax = fig.add_subplot(1,1,1)
+	p1=ax.semilogx(serpE,serpF,'b',avg,newflux,'r',linestyle='steps-mid')
+	ax.set_xlabel('Energy (MeV)')
+	ax.set_ylabel('Normalized Flux/Lethary')
+	ax.set_title('4e6 histories 1x1x1m block of water @ 1 g/cc.  2MeV point source @ (0,0,0)')
+	pl.legend(p1,['Serpent 2.1.15','WARP'],loc=2)
+	ax.set_ylim([0,.06])
+	ax.set_xlim([1e-2,3])
+	pl.grid(True)
+	
+	if plot:
+		pl.show()
+	else:
+		print name+'.eps'
+		fig.savefig(name+'.eps')
 
 #
 #  scatter anisotropy
@@ -148,7 +149,7 @@ else:
 #  2d prelim results 
 #
 
-N=np.array([2000000,3000000 ,4000000 ,5000000 ,6000000 ,7000000 ,8000000 ,9000000 ,10000000,20000000,30000000,40000000,50000000,60000000,70000000,80000000,90000000])
+N=np.array([100, 300      ,800      ,1000     ,3000     ,8000     ,10000    ,30000    ,80000     ,100000   ,300000   ,800000    ,1000000  ,2000000  , 3000000 ,4000000 , 5000000 ,6000000 ,7000000 ,8000000 ,9000000 ,10000000,20000000,30000000,40000000,50000000,60000000,70000000,80000000,90000000])
 
 cpu=[]
 gpu_task_128=[]
@@ -158,15 +159,22 @@ gpu_data_batch_512=[]
 gpu_data_large_128=[]
 gpu_data_large_512=[]
 
-f_cpu				=open('prelim/timing_cpu1')
-f_gpu_task_128		=open('prelim/timing_gpu_128')
-f_gpu_task_512		=open('prelim/timing_gpu_512')
-f_gpu_data_batch_128=open('prelim/timing_gpu5_128')
-f_gpu_data_batch_512=open('prelim/timing_gpu5_512')
-f_gpu_data_large_128=open('prelim/timing_gpu6_128')
-f_gpu_data_large_512=open('prelim/timing_gpu6_512')
+f_cpu1				=open('prelim/timings-scatter/timing_cpu_128_sm_20')
+f_cpu2				=open('prelim/timings-scatter/timing_cpu_512_sm_20')
+f_cpu3				=open('prelim/timings-scatter/timing_cpu_128_sm_30')
+f_cpu4				=open('prelim/timings-scatter/timing_cpu_512_sm_30')
+f_gpu_task_128		=open('prelim/timings-scatter/timing_gpu_128_sm_20')
+f_gpu_task_512		=open('prelim/timings-scatter/timing_gpu_512_sm_20')
+f_gpu_data_batch_128=open('prelim/timings-scatter/timing_gpu5_128_sm_20')
+f_gpu_data_batch_512=open('prelim/timings-scatter/timing_gpu5_512_sm_20')
+f_gpu_data_large_128=open('prelim/timings-scatter/timing_gpu6_128_sm_20')
+f_gpu_data_large_512=open('prelim/timings-scatter/timing_gpu6_512_sm_20')
 
-cpu					=np.array(f_cpu.read().split()					,dtype=float)
+cpu1				=np.array(f_cpu1.read().split()					,dtype=float)
+cpu2				=np.array(f_cpu2.read().split()					,dtype=float)
+cpu3				=np.array(f_cpu3.read().split()					,dtype=float)
+cpu4				=np.array(f_cpu4.read().split()					,dtype=float)
+cpu 				=(cpu1+cpu2+cpu3+cpu4)/4.0;
 gpu_task_128		=np.array(f_gpu_task_128.read().split()			,dtype=float)
 gpu_task_512		=np.array(f_gpu_task_512.read().split()			,dtype=float)
 gpu_data_batch_128	=np.array(f_gpu_data_batch_128.read().split()	,dtype=float)
