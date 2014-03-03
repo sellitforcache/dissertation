@@ -1317,7 +1317,7 @@ Two different implementations were made using a event-based algorithm, one which
      \caption{Mapping thread IDs to active data through a remapping vector \label{remapping} }
 \end{figure}
 
-Figure \ref{prelim_speedup} shows the speedup factors, $F_s=t_\mathrm{CPU}/t_\mathrm{GPU}$, of the GPU implementations over the CPU implementation versus the number of particles run.  The task-parallel implementation performs best, with a maximum speedup of around 29x.  The remapping implementation has the next best performance, with about a 20x speedup over the CPU.  It's performance plateaus, unlike the batched event-based implementation.  It's performance departs from the remapping implementation at $10^5$ particles and even starts to deteriorate between $10^6$ and $10^7$ particles.  This is due to the transport having to be done in batches at this point.  The simulations were done on a Tesla C2075 card, which has Fermi architecture and a maximum block number of 65,536 for a 1D grid.  Multiplying this by 128 or 512 threads per block gives maximum total number of threads of 8,388,608 and 33,554,432, respectively.  These numbers are where the batching implementation must break the transport into multiple batches.  This is also where the task-based implementation must break transport into batches, but the effect is unnoticeable since it only implies a second kernel launch instead of hundreds more.  This limit was lifted in devices with compute capability of 3.0 and up, where the maximum 1D grid size was increased to ($10^{27}-1$) \cite{cuda}.  The speedup plot also shows another important feature - that speedup plateaus at a large number of histories.  This is due to the car'd ability to hide memory latencies through pipelining when there are many many active threads.  
+Figure \ref{prelim_speedup} shows the speedup factors, $F_s=t_\mathrm{CPU}/t_\mathrm{GPU}$, of the GPU implementations over the CPU implementation versus the number of particles run.  This benchmark was run on a server with a 8-core AMD Opteron 6128 CPU clocked at 2.0GHz, and there different NVIDIA cards - a Tesla K20, a Tesla C2075, and a GeForce 480 GTX.  The following results were obtained from running the GPU implementations on the Teslta K20.  The task-parallel implementation performs best, with a maximum speedup of around 29x.  The remapping implementation has the next best performance, with about a 20x speedup over the CPU.  It's performance plateaus, unlike the batched event-based implementation.  It's performance departs from the remapping implementation at $10^5$ particles and even starts to deteriorate between $10^6$ and $10^7$ particles.  This is due to the transport having to be done in batches at this point.  The simulations were done on a Tesla C2075 card, which has Fermi architecture and a maximum block number of 65,536 for a 1D grid.  Multiplying this by 128 or 512 threads per block gives maximum total number of threads of 8,388,608 and 33,554,432, respectively.  These numbers are where the batching implementation must break the transport into multiple batches.  This is also where the task-based implementation must break transport into batches, but the effect is unnoticeable since it only implies a second kernel launch instead of hundreds more.  This limit was lifted in devices with compute capability of 3.0 and up, where the maximum 1D grid size was increased to ($10^{27}-1$) \cite{cuda}.  The speedup plot also shows another important feature - that speedup plateaus at a large number of histories.  This is due to the car'd ability to hide memory latencies through pipelining when there are many many active threads.  
 
 The number of threads per block seems to make little difference in the event-based implementations, but makes a very large difference in the task-based implementation.  Increasing the number of threads per block from 128 to 512 reduces the performance from a 28x speedup to a 20x speedup, comparable to the event-based implementations.  The reason for this happening is most likely registers spilling to local memory since there are more threads resident in a multiprocessor and more variables need to be stored in the registers.
 
@@ -1354,25 +1354,23 @@ From this preliminary 2D mono-energetic scattering study, it can be concluded th
 
 \subsection{Ray Tracing with OptiX}
 
-outline
+Another preliminary study was preformed in order to determine the performance of OptiX when ray tracing from randomized points as well as to find the optimal OptiX configuration for WARP.  In rendering, rays are initialized in a uniform array, but the flexibility from writing custom ray generation program in OptiX allows for arbitrary starting points and directions to be used.
 
-whereami
+\subsubsection{Point-in-Polygon / Material Query}
 
 \begin{figure}[h!] 
   \centering
     \includegraphics[width=1.0\textwidth]{graphics/whereami.eps}
-     \caption{The point-in-polygon-like algorithm for determining the entering cell number using ray tracing \label{whereami} }
+     \caption{The point-in-polygon-like algorithm for determining the entering cell number by using ray tracing \label{whereami} }
 \end{figure}
 
-test geometries - square, assembly, super large assembly - to see scaling, show cross sectional, shows that the routines works for resolving cell numbers.  also say that material is directly associated with the cell, so a lookup doesn't need to be performed afterwards
+An important job for the geometry routine in a Monte Carlo neutron transport code is to determine the cell and material IDs of a particle based only on it's coordinates.  This is very important in Woodcock tracking, since surface intersections are not calculated and this material query it is the only place where geometrical information enters into the simulation.  In WARP and other ray-tracing codes, material information is only updated when a neutron sampled interaction distance is greater than the near surface distance.  In this situation, the neutron is placed on the boundary, the material information is updated for the new material, and the interaction distance is sampled again using the same direction of flight as before.  WARP will use and algorithm to determine the entering cell number by using ray tracing, since all the geometrical information is stored in the OptiX context.  This will also mean the material query will be able to take advantage of the OptiX acceleration structures, and should scale well (logarithmic).
 
-\begin{figure}[h!] 
-  \centering
-    \includegraphics[width=0.5\textwidth]{graphics/geom_test.png}
-     \caption{Raster image of an $x$-$y$ cross section of the smaller assembly geometry created by using the PIP algorithm \label{raster_image} }
-\end{figure}
+The material query algorithm is shown in Figure \ref{whereami}.  An ordered list of surface intersections is generated by iteratively ray tracing and adding the closest surface number to the hit list.  Tracing is terminated when a predefined outer cell is intersected which all other cells are inside of.  Since all surfaces are closed, the ray will intersect any cell surface twice that it isn't nested in.  When the list is made, the double entries are removed, which yields a list of cells the neutron is nested in.  The first entry will be its current cell and the second entry will be the cell it is entering into.  It is important to make the scene epsilon an appropriate value for the geometry if this algorithm is to be used effectively.  The scene epsilon determines the minimum intersection distance possible, i.e. the distance away from the source point which intersections are allowed to occur.  This prevents self-intersections from happening due to numerical inaccuracies.  The mathematical cell descriptions are exact, but the number representing them are not, and if they are treated as exact, a situation can occur where a neutron is placed at a boundary, but it is actually slightly behind the boundary due to floating-point roundoff.  When the next trace is started, the ray intersects the boundary it has already intersected with instead of tracing into the next cell.  Giving OptiX a scene epsilon guarantees the trace starts after the very near boundary, and accurate results are calculated.
 
-primitive and transform based instancing, go into how each works, mesh-based primitives.  two pictures for each, the node graphs 
+This algorithm is very similar to the ray casting point-in-polygon algorithm which determines if a point is inside or outside of an arbitrary polygon by counting the number of times it crosses a surface.  An even number means it is outside and an odd number means it is inside.  This algorithm is almost the same, but it keeps track of cell numbers instead of binary logic for one surface.  This way, the nesting of a neutron can a be determined and the entering cell can be found.  Both of these algorithms take advantage of the cell being closed, and in this sense is similar to Gauss's Law or the divergence theorem which states the flux integrated around a surface will be nonzero only if the surface contains a source.  This material query algorithm is like a discrete form where the neutron's position is the source point and the cells are the integrating surfaces.
+
+\subsubsection{Instancing}
 
 \begin{figure}[h!] 
   \centering
@@ -1380,11 +1378,48 @@ primitive and transform based instancing, go into how each works, mesh-based pri
      \caption{The OptiX node graph using transform instancing \label{transform_instancing} }
 \end{figure}
 
+Nuclear reactors can have very complicated geometries, but they basically rely a simple shapes that are repeated in arrays.  There are a few ways in which identical cells can be instanced in OptiX.  the first and most convenient is to define a single primitive in it's own coordinate system, then use a transform node (shown in Figure \ref{node_graph}) in the OptiX node graph to transform the primitive to it's actual position via an affine transformation matrix.  The resulting node graph is shown in Figure \ref{transform_instancing} for a scene that has three boxes in it.  As a reminder, a GeometryInstance objects ties a hit program to the spatial geometry data in the geometry primitive object, acceleration objects are attached to all group objects, and transform objects can only have children that are Group or GeometryGroup objects which is why each GeometryInstance must have its own GeometryGroup.
+
+Transform instancing is convenient since only a single primitive needs to be defined.  If another instance is needed, one can simply apply a transform matrix to it and all the work is done by OptiX.  This scheme has a lot of overhead, however, since each instance has it's own group and its own acceleration object, producing a deeper node graph than necessary.
+
 \begin{figure}[h!] 
   \centering
     \includegraphics[width=0.4\textwidth]{graphics/primitive_instancing.eps}
      \caption{The OptiX node graph using mesh primitive instancing. \label{primitive_instancing} }
 \end{figure}
+
+An alternative instancing method is using mesh-based primitives.  In this scheme, is still a single geometry primitive, but now the primitive is attached to an array of spatial data (and OptiX buffer) that contains the dimensions of each individual primitive.  The transform node no is longer used, since it would transform the whole group instead of a single primitive.   The transforms must be applied to the data beforehand and written into the buffer as separate primitives.  This method produces a shallower node graph with only two acceleration objects and a single GeometryGroup for \emph{all boxes}.  These numbers would not change even if there where 200 boxes in the scene, only the number of data elements on the very bottom of the graph would change.  This is called mesh instancing since the data structure was envisioned for the many triangular surfaces in meshes of complex objects rather than for individual instancing of separate, simple objects.
+
+One goal of this study is to determine which of these instancing methods has better performance and will ultimately be used in WARP.
+
+\subsubsection{Test Geometries}
+
+Three different geometries were used in the test - a simple square, an assembly-like hexagonal array of cylinders, an assembly of the same size, but with two interleaved arrays, and a much larger version of the assembly-like geometry. These cases were chosen to highlight the scaling and to see the performance of the instancing schemes in common nuclear reactor like scenarios.  Figure \ref{raster_images} shows the geometry for the interleaved assembly and the large assembly.  These figures were created by OptiX by performing a cell number query as prescribed in the previous section.  
+
+\begin{figure}[h!]
+\centering
+\begin{subfigure}{.5\textwidth}
+  \centering
+  \includegraphics[width=.9\linewidth]{graphics/geom_test.png}
+  \caption{The interleaved assembly}
+  \label{fig:sub1}
+\end{subfigure}%
+\begin{subfigure}{.5\textwidth}
+  \centering
+  \includegraphics[width=.9\linewidth]{graphics/geom_test.png}
+  \caption{The large assembly}
+  \label{fig:sub2}
+\end{subfigure}
+\caption{Raster images of $x$-$y$ cross sections of the geometry created by using the PIP cell/material query algorithm \label{raster_images}}
+\label{fig:test}
+\end{figure}
+
+The cell numbers are mapped to colors in the image, and since there are no errors, it appears the routine is working and the algorithm can calculate the cell numbers.  A nice feature of OptiX is that variables can be attached to each geometry primitive.  In addition to the cell ID number, the materiel ID is also attached, so the material query can be done directly by OptiX rather than determining the cell number, then having to do an additional lookup or hash afterwards.
+
+\subsubsection{Results}
+
+
+
 
 
 
