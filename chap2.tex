@@ -1350,11 +1350,41 @@ The most likely reasons that the task-based implementation outperforms the event
 
 Another consideration pointed out by this study is that library use and the task-based algorithm are incompatible.  Libraries currently available for the GPU carry out a single task on a dataset, they are not coded for single-thread operation and must be launched as their own kernels.  Having threads in different states wouldn't allow the library routines to be dropped in and carried out consistently across all the active particle data.  Also, much of the performance from optimized algorithms comes from thread blocks cooperating, and using a task-based algorithm would be like treating each SM as a separate CPU (using a stack-popping method) and would minimize the benefits of divide-and-conquer algorithms.
 
-From this preliminary 2D mono-energetic scattering study, it can be concluded that using an event-based algorithm with a compaction/sort algorithm to eliminate terminated particles from being accessed by thread blocks drastically reduces control flow divergence and keeps warps coherent.  There is a cost for adopting this algorithm, however, namely the overhead of kernel launches.  How these factors compete in WARP will be shown in the results in Chapter \ref{chap:results}.  Warp will adopt the event-based algorithm in hopes that thread coherency and its benefits (maximal load coalescing, little warp serialization) will outweigh launch overhead in when real data is used and so libraries can be used to perform complicated parallel tasks.
+From this preliminary 2D mono-energetic scattering study, it can be concluded that using an event-based algorithm with a compaction/sort algorithm to eliminate terminated particles from being accessed by thread blocks drastically reduces control flow divergence and keeps warps coherent.  There is a cost for adopting this algorithm, however, namely the overhead of kernel launches.  How these factors compete in WARP will be shown in the results in Chapter \ref{chap:results}.  WARP will adopt the event-based algorithm in hopes that thread coherency and its benefits (maximal load coalescing, little warp serialization) will outweigh launch overhead in when real data is used, as well as to allow library usage in complicated parallel tasks.
 
 \subsection{Ray Tracing with OptiX}
 
+outline
 
+whereami
+
+\begin{figure}[h!] 
+  \centering
+    \includegraphics[width=1.0\textwidth]{graphics/whereami.eps}
+     \caption{The point-in-polygon-like algorithm for determining the entering cell number using ray tracing \label{whereami} }
+\end{figure}
+
+test geometries - square, assembly, super large assembly - to see scaling, show cross sectional, shows that the routines works for resolving cell numbers.  also say that material is directly associated with the cell, so a lookup doesn't need to be performed afterwards
+
+\begin{figure}[h!] 
+  \centering
+    \includegraphics[width=0.5\textwidth]{graphics/geom_test.png}
+     \caption{Raster image of an $x$-$y$ cross section of the smaller assembly geometry created by using the PIP algorithm \label{raster_image} }
+\end{figure}
+
+primitive and transform based instancing, go into how each works, mesh-based primitives.  two pictures for each, the node graphs 
+
+\begin{figure}[h!] 
+  \centering
+    \includegraphics[width=0.8\textwidth]{graphics/transform_instancing.eps}
+     \caption{The OptiX node graph using transform instancing \label{transform_instancing} }
+\end{figure}
+
+\begin{figure}[h!] 
+  \centering
+    \includegraphics[width=0.4\textwidth]{graphics/primitive_instancing.eps}
+     \caption{The OptiX node graph using mesh primitive instancing. \label{primitive_instancing} }
+\end{figure}
 
 
 
