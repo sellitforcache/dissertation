@@ -859,7 +859,19 @@ else:
 #  optix test
 #
 name = 'prelim_optix' 
-N=np.array([])
+N=np.array([10000,
+30000 ,
+80000 ,
+100000 ,
+300000 ,
+800000 ,
+1000000 ,
+3000000 ,
+8000000 ,
+10000000 ,
+30000000 ,
+80000000 ,
+100000000])
 f_interleaved = open('prelim/timings-optix/interleaved_log')
 interleaved=np.array(f_cpu1.read().split()[0::4]					,dtype=float)
 fig = pl.figure(figsize=(10,6))
