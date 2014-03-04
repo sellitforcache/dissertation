@@ -854,3 +854,28 @@ else:
     print name+'.eps'
     fig.savefig(name+'.eps')
 
+
+#
+#  optix test
+#
+name = 'prelim_optix' 
+N=np.array([])
+f_interleaved = open('prelim/timings-optix/interleaved_log')
+interleaved=np.array(f_cpu1.read().split()[0::4]					,dtype=float)
+fig = pl.figure(figsize=(10,6))
+ax = fig.add_subplot(1,1,1)
+ax.plot(,'r-',label='Interleaved')
+handles, labels = ax.get_legend_handles_labels()
+ax.legend(handles, labels, loc=1)
+pl.grid(True)
+ax.set_xlabel(r'Iteration')
+ax.set_ylabel(r'\% Control Flow Divergence')
+ax.set_ylim([0,100])
+ax.set_xlim([0,divergence2.__len__()])
+
+if plot:
+    pl.show()
+else:
+    print name+'.eps'
+    fig.savefig(name+'.eps')
+
