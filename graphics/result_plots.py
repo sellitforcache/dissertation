@@ -859,21 +859,15 @@ else:
 #  optix test
 #
 name = 'prelim_optix' 
-N=np.array([10000,
-30000 ,
-80000 ,
-100000 ,
-300000 ,
-800000 ,
-1000000 ,
-3000000 ,
-8000000 ,
-10000000 ,
-30000000 ,
-80000000 ,
-100000000])
-f_interleaved = open('prelim/timings-optix/interleaved_log')
-interleaved=np.array(f_cpu1.read().split()[0::4]					,dtype=float)
+N=np.array([10000, 30000 ,80000 ,100000 ,300000 ,800000 ,1000000 ,3000000 ,8000000 ,10000000 ,30000000 ,80000000 , 100000000])
+f_interleaved_sbvh 	= open('prelim/timings-optix/interleaved_sbvh')
+f_interleaved_bvh 	= open('prelim/timings-optix/interleaved_bvh')
+f_large_sbvh 		= open('prelim/timings-optix/large_sbvh')
+f_large_bvh 		= open('prelim/timings-optix/large_bvh')
+interleaved_sbvh 	= np.array(f_interleaved_sbvh.read().split()[0::4]	,dtype=float)
+interleaved_bvh 	= np.array(f_interleaved_bvh.read().split()[0::4]	,dtype=float)
+large_sbvh 			= np.array(f_large_sbvh.read().split()[0::4]		,dtype=float)
+large_bvh 			= np.array(f_large_bvh.read().split()[0::4]			,dtype=float)
 fig = pl.figure(figsize=(10,6))
 ax = fig.add_subplot(1,1,1)
 ax.plot(,'r-',label='Interleaved')
