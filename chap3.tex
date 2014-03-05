@@ -187,8 +187,6 @@ Since most data will be access randomly no matter what, the layout will be regul
 
 As stated before, WARP will read ACE-formatted data, perform all reaction types as prescribed by them, use a Serpent-like unionized energy grid to regularize data access, use an event-based transport algorithm with parallelized operations for sorts and sums, use OptiX for general 3D geometry representation (without explicit nesting), use a SOA for neutron history data, and perform all operations on the GPU unless strictly forbidden.  From here on, it will be expanding the preliminary studies.  OptiX will be used for 3D geometry representation, physics routines that use real cross section data will be made in CUDA, the compaction routine in CUDPP will be substituted for a radix sort, tallies will be implemented, as will criticality and fixed source methods.  These expansion will yield WARP, a program for continuous energy Monte Carlo neutron transport on GPUs in general 3D geometries, which will be compared for accuracy and execution speed against Serpent and MCNP.
 
-typical task-based MC.  data-parallel MC - wide but single task, homework grading, weaving!
-
 written in C/C++ with some Python, relies on XXX libraries
 
 single vs double precision, justification physics wise and of course cost and performance wise.
@@ -203,13 +201,26 @@ brief introduction, not using S(a,b) or unresolved resonance parameters at this 
 
 \subsection{unionized}
 
+\begin{figure}[h!] 
+\centering
+\includegraphics[width=0.5\textwidth]{graphics/unionized.eps}
+\caption{Unionizing two cross section vectors. \label{unionized_layout} }
+\end{figure}
+
+
 unionized glory, why its good and bad \cite{jaakko}.
 
 constant memory, not much improvement according to nelson
 
 \subsection{linked lists}
 
-how to resolve the data heterogeny problem without having massive data replication
+\begin{figure}[h!] 
+\centering
+\includegraphics[width=0.5\textwidth]{graphics/unionized_pointers.eps}
+\caption{Making a link to distribution data in the unionized dataset. \label{unionized_pointers} }
+\end{figure}
+
+how to resolve the data heterogeneity problem without having massive data replication
 
 float4, have to implement, should be relatively easy
 
