@@ -992,18 +992,20 @@ else:
     print name+'.eps'
     fig.savefig(name+'.eps')
 
+
 name = 'prelim_optix_scaling' 
 N_p = 100000000.0
 R_o_xfrm = np.array([])
-R_o_prim = N_p / np.array([],dtype=float)
-N_o = np.array([633,1803,3573])
-print R_o_prim
-ax.semilogx(N_o,R_o_prim,'b-',label='BVH, Prim')
+R_o_prim = N_p / np.array([2.60002136E-01,2.31999969E+00,3.63000488E+00,4.44000244E+00,4.40000153E+00,4.95999908E+00,6.09000397E+00,6.40000153E+00,6.50000000E+00,6.15000153E+00],dtype=float)
+N_o = np.array([1,2,3,9,21,129, 633 ,2613 ,10623,42843],dtype=float)
+fig = pl.figure(figsize=(10,6))
+ax = fig.add_subplot(1,1,1)
+ax.loglog(N_o,R_o_prim,'b-',label='BVH, Prim')
 handles, labels = ax.get_legend_handles_labels()
-ax.legend(handles, labels, loc=4)
+ax.legend(handles, labels, loc=1)
 pl.grid(True)
 ax.set_title('Tesla K20')
-ax.set_xlabel(r'NUmber of Objects')
+ax.set_xlabel(r'Number of Objects')
 ax.set_ylabel(r'Ray Trace Rate (Particles/Second)')
 
 if plot:
