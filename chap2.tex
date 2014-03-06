@@ -1,5 +1,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Background}
+\label{chap:background}
 
 In this chapter, details regarding the simulation theory are gone over.  
 
@@ -327,7 +328,7 @@ Cross section data is distributed by the Department of Energy in \emph{ENDF} fil
      \caption{Hierarchy in ACE formatted neutron data libraries.  \label{data_levels}}
 \end{figure}
 
-Many Monte Carlo codes read ACE formatted data rather than the original ENDF file.  ACE stands for ``a compact ENDF'' and strips out a lot of the extra information unnecessary for neutron transport.  As Figure \ref{data_levels} shows, ACE files not only contain cross sections, but also angle and energy distributions used in scattering and fission.  ENDF assigns a number to each type of reaction called the \emph{MT} number.  Table \ref{MT_numbers}, taken from a LANL website, shows the major numbers \cite{MTnums}.  It can clearly be seen that there are many reactions a neutron can undergo, most of which have very energy strong dependance.  Most of the complexity in modeling nuclear reactors comes from the fact that the data needed to model neutrons is very complicated.  It may be the most important part of the simulation, it is what ties the calculations to reality.  If inaccurate data is used, the results will not have any physical meaning, and the simulation becomes a mathematical exercise. 
+Many Monte Carlo codes read ACE formatted data rather than the original ENDF file.  ACE stands for ``a compact ENDF'' and strips out a lot of the extra information unnecessary for neutron transport.  ENDF tapes also contain information that is valuable for charged particles and photons as well as neutrons, and this information is discarded for neutron transport.  As Figure \ref{data_levels} shows, ACE files not only contain cross sections, but also angle and energy distributions used in scattering and fission.  ENDF assigns a number to each type of reaction called the \emph{MT} number.  Table \ref{MT_numbers}, taken from a LANL website, shows the major numbers \cite{MTnums}.  It can clearly be seen that there are many reactions a neutron can undergo, most of which have very energy strong dependance.  Most of the complexity in modeling nuclear reactors comes from the fact that the data needed to model neutrons is very complicated.  It may be the most important part of the simulation, it is what ties the calculations to reality.  If inaccurate data is used, the results will not have any physical meaning, and the simulation becomes a mathematical exercise. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Neutron Transport}

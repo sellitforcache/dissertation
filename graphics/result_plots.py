@@ -151,36 +151,51 @@ else:
 
 N=np.array([100, 300      ,800      ,1000     ,3000     ,8000     ,10000    ,30000    ,80000     ,100000   ,300000   ,800000    ,1000000  ,2000000  , 3000000 ,4000000 , 5000000 ,6000000 ,7000000 ,8000000 ,9000000 ,10000000,20000000,30000000,40000000,50000000,60000000,70000000,80000000,90000000])
 
-cpu=[]
-gpu_task_128=[]
-gpu_task_512=[]
-gpu_data_batch_128=[]
-gpu_data_batch_512=[]
-gpu_data_large_128=[]
-gpu_data_large_512=[]
+f_cpu1				=open('prelim/timings-scatter/k20_timing_cpu_128_sm_20')
+f_cpu2				=open('prelim/timings-scatter/k20_timing_cpu_512_sm_20')
+f_cpu3				=open('prelim/timings-scatter/k20_timing_cpu_128_sm_30')
+f_cpu4				=open('prelim/timings-scatter/k20_timing_cpu_512_sm_30')
+f_gpu_task_128		=open('prelim/timings-scatter/k20_timing_gpu_128_sm_20')
+f_gpu_task_512		=open('prelim/timings-scatter/k20_timing_gpu_512_sm_20')
+f_gpu_data_batch_128=open('prelim/timings-scatter/k20_timing_gpu5_128_sm_20')
+f_gpu_data_batch_512=open('prelim/timings-scatter/k20_timing_gpu5_512_sm_20')
+f_gpu_data_large_128=open('prelim/timings-scatter/k20_timing_gpu6_128_sm_20')
+f_gpu_data_large_512=open('prelim/timings-scatter/k20_timing_gpu6_512_sm_20')
 
-f_cpu1				=open('prelim/timings-scatter/timing_cpu_128_sm_20')
-f_cpu2				=open('prelim/timings-scatter/timing_cpu_512_sm_20')
-f_cpu3				=open('prelim/timings-scatter/timing_cpu_128_sm_30')
-f_cpu4				=open('prelim/timings-scatter/timing_cpu_512_sm_30')
-f_gpu_task_128		=open('prelim/timings-scatter/timing_gpu_128_sm_20')
-f_gpu_task_512		=open('prelim/timings-scatter/timing_gpu_512_sm_20')
-f_gpu_data_batch_128=open('prelim/timings-scatter/timing_gpu5_128_sm_20')
-f_gpu_data_batch_512=open('prelim/timings-scatter/timing_gpu5_512_sm_20')
-f_gpu_data_large_128=open('prelim/timings-scatter/timing_gpu6_128_sm_20')
-f_gpu_data_large_512=open('prelim/timings-scatter/timing_gpu6_512_sm_20')
+cpu1					=np.array(f_cpu1.read().split()					,dtype=float)
+cpu2					=np.array(f_cpu2.read().split()					,dtype=float)
+cpu3					=np.array(f_cpu3.read().split()					,dtype=float)
+cpu4					=np.array(f_cpu4.read().split()					,dtype=float)
+k20_gpu_task_128		=np.array(f_gpu_task_128.read().split()			,dtype=float)
+k20_gpu_task_512		=np.array(f_gpu_task_512.read().split()			,dtype=float)
+k20_gpu_data_batch_128	=np.array(f_gpu_data_batch_128.read().split()	,dtype=float)
+k20_gpu_data_batch_512	=np.array(f_gpu_data_batch_512.read().split()	,dtype=float)
+k20_gpu_data_large_128	=np.array(f_gpu_data_large_128.read().split()	,dtype=float)	
+k20_gpu_data_large_512	=np.array(f_gpu_data_large_512.read().split()	,dtype=float)
 
-cpu1				=np.array(f_cpu1.read().split()					,dtype=float)
-cpu2				=np.array(f_cpu2.read().split()					,dtype=float)
-cpu3				=np.array(f_cpu3.read().split()					,dtype=float)
-cpu4				=np.array(f_cpu4.read().split()					,dtype=float)
-cpu 				=(cpu1+cpu2+cpu3+cpu4)/4.0;
-gpu_task_128		=np.array(f_gpu_task_128.read().split()			,dtype=float)
-gpu_task_512		=np.array(f_gpu_task_512.read().split()			,dtype=float)
-gpu_data_batch_128	=np.array(f_gpu_data_batch_128.read().split()	,dtype=float)
-gpu_data_batch_512	=np.array(f_gpu_data_batch_512.read().split()	,dtype=float)
-gpu_data_large_128	=np.array(f_gpu_data_large_128.read().split()	,dtype=float)	
-gpu_data_large_512	=np.array(f_gpu_data_large_512.read().split()	,dtype=float)
+#f_cpu1				=open('prelim/timings-scatter/c2075_timing_cpu_128_sm_20')
+#f_cpu2				=open('prelim/timings-scatter/c2075_timing_cpu_512_sm_20')
+#f_cpu3				=open('prelim/timings-scatter/c2075_timing_cpu_128_sm_30')
+#f_cpu4				=open('prelim/timings-scatter/c2075_timing_cpu_512_sm_30')
+#f_gpu_task_128		=open('prelim/timings-scatter/c2075_timing_gpu_128_sm_20')
+#f_gpu_task_512		=open('prelim/timings-scatter/c2075_timing_gpu_512_sm_20')
+#f_gpu_data_batch_128=open('prelim/timings-scatter/c2075_timing_gpu5_128_sm_20')
+#f_gpu_data_batch_512=open('prelim/timings-scatter/c2075_timing_gpu5_512_sm_20')
+#f_gpu_data_large_128=open('prelim/timings-scatter/c2075_timing_gpu6_128_sm_20')
+#f_gpu_data_large_512=open('prelim/timings-scatter/c2075_timing_gpu6_512_sm_20')
+#
+#cpu5						=np.array(f_cpu1.read().split()					,dtype=float)
+#cpu6						=np.array(f_cpu2.read().split()					,dtype=float)
+#cpu7						=np.array(f_cpu3.read().split()					,dtype=float)
+#cpu8						=np.array(f_cpu4.read().split()					,dtype=float)
+#c2075_gpu_task_128			=np.array(f_gpu_task_128.read().split()			,dtype=float)
+#c2075_gpu_task_512			=np.array(f_gpu_task_512.read().split()			,dtype=float)
+#c2075_gpu_data_batch_128	=np.array(f_gpu_data_batch_128.read().split()	,dtype=float)
+#c2075_gpu_data_batch_512	=np.array(f_gpu_data_batch_512.read().split()	,dtype=float)
+#c2075_gpu_data_large_128	=np.array(f_gpu_data_large_128.read().split()	,dtype=float)	
+#c2075_gpu_data_large_512	=np.array(f_gpu_data_large_512.read().split()	,dtype=float)
+
+cpu =(cpu1+cpu2+cpu3+cpu4+cpu5+cpu6+cpu7+cpu8)/4.0;
          
 active_batch=np.array([
 8388480,
@@ -787,18 +802,41 @@ active_large=np.array([
 1])
 
 
-name = 'prelim_speedup'	
+name = 'prelim_speedup_k20'	
 fig = pl.figure(figsize=(10,6))
 ax = fig.add_subplot(1,1,1)
-ax.semilogx(N,np.divide(cpu,gpu_task_128),'k-',label='Task 128 t/b')
-ax.semilogx(N,np.divide(cpu,gpu_task_512),'k--',label='Task 512 t/b')
-ax.semilogx(N,np.divide(cpu,gpu_data_batch_128),'b-',label='Event, Batch 128 t/b')
-ax.semilogx(N,np.divide(cpu,gpu_data_batch_512),'b--',label='Event, Batch 512 t/b')
-ax.semilogx(N,np.divide(cpu,gpu_data_large_128),'r-',label='Event, Remap 128 t/b')
-ax.semilogx(N,np.divide(cpu,gpu_data_large_512),'r--',label='Event, Remap 512 t/b')
+ax.semilogx(N,np.divide(cpu,k20_gpu_task_128),'k-',label='Task 128 t/b')
+ax.semilogx(N,np.divide(cpu,k20_gpu_task_512),'k--',label='Task 512 t/b')
+ax.semilogx(N,np.divide(cpu,k20_gpu_data_batch_128),'b-',label='Event, Batch 128 t/b')
+ax.semilogx(N,np.divide(cpu,k20_gpu_data_batch_512),'b--',label='Event, Batch 512 t/b')
+ax.semilogx(N,np.divide(cpu,k20_gpu_data_large_128),'r-',label='Event, Remap 128 t/b')
+ax.semilogx(N,np.divide(cpu,k20_gpu_data_large_512),'r--',label='Event, Remap 512 t/b')
 handles, labels = ax.get_legend_handles_labels()
 ax.legend(handles, labels, loc=2)
 pl.grid(True)
+ax.set_title(r'Tesla K20')
+ax.set_xlabel(r'Dataset size (histories)')
+ax.set_ylabel(r'Speedup over serial CPU')
+
+if plot:
+	pl.show()
+else:
+	print name+'.eps'
+	fig.savefig(name+'.eps')
+
+name = 'prelim_speedup_c2075'	
+fig = pl.figure(figsize=(10,6))
+ax = fig.add_subplot(1,1,1)
+ax.semilogx(N,np.divide(cpu,c2075_gpu_task_128),'k-',label='Task 128 t/b')
+ax.semilogx(N,np.divide(cpu,c2075_gpu_task_512),'k--',label='Task 512 t/b')
+ax.semilogx(N,np.divide(cpu,c2075_gpu_data_batch_128),'b-',label='Event, Batch 128 t/b')
+ax.semilogx(N,np.divide(cpu,c2075_gpu_data_batch_512),'b--',label='Event, Batch 512 t/b')
+ax.semilogx(N,np.divide(cpu,c2075_gpu_data_large_128),'r-',label='Event, Remap 128 t/b')
+ax.semilogx(N,np.divide(cpu,c2075_gpu_data_large_512),'r--',label='Event, Remap 512 t/b')
+handles, labels = ax.get_legend_handles_labels()
+ax.legend(handles, labels, loc=2)
+pl.grid(True)
+ax.set_title(r'Tesla C2075')
 ax.set_xlabel(r'Dataset size (histories)')
 ax.set_ylabel(r'Speedup over serial CPU')
 
@@ -928,8 +966,8 @@ else:
 name = 'prelim_optix_k20' 
 N_k20 							= np.array([10000, 30000 ,80000 ,100000 ,300000 ,800000 ,1000000 ,3000000 ,8000000 ,10000000 ,30000000 ,80000000 , 100000000])
 f_k20_interleaved_sbvh_prim 	= open('prelim/timings-optix/k20_interleaved_sbvh_prim')
-f_k20_interleaved_bvh_prim 	= open('prelim/timings-optix/k20_interleaved_bvh_prim')
-f_k20_large_sbvh_prim 		= open('prelim/timings-optix/k20_large_sbvh_prim')
+f_k20_interleaved_bvh_prim 		= open('prelim/timings-optix/k20_interleaved_bvh_prim')
+f_k20_large_sbvh_prim 			= open('prelim/timings-optix/k20_large_sbvh_prim')
 f_k20_large_bvh_prim 			= open('prelim/timings-optix/k20_large_bvh_prim')
 f_k20_assembly_sbvh_prim 		= open('prelim/timings-optix/k20_assembly_sbvh_prim')
 f_k20_assembly_bvh_prim 		= open('prelim/timings-optix/k20_assembly_bvh_prim')
@@ -995,12 +1033,13 @@ else:
 
 name = 'prelim_optix_scaling' 
 N_p = 100000000.0
-R_o_xfrm = np.array([])
+R_o_xfrm = np.array([4.59999084E-01,3.76999664E+00,6.97000122E+00,7.75999451E+00,7.63999939E+00,8.13999939E+00,8.84000397E+00,9.16000366E+00])
 R_o_prim = N_p / np.array([2.60002136E-01,2.31999969E+00,3.63000488E+00,4.44000244E+00,4.40000153E+00,4.95999908E+00,6.09000397E+00,6.40000153E+00,6.50000000E+00,6.15000153E+00],dtype=float)
 N_o = np.array([1,2,3,9,21,129, 633 ,2613 ,10623,42843],dtype=float)
 fig = pl.figure(figsize=(10,6))
 ax = fig.add_subplot(1,1,1)
 ax.loglog(N_o,R_o_prim,'b-',label='BVH, Prim')
+ax.loglog(N_o[:8],R_o_xfrm,'b-',label='BVH, Xfrm')
 handles, labels = ax.get_legend_handles_labels()
 ax.legend(handles, labels, loc=1)
 pl.grid(True)
