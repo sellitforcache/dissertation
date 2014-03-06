@@ -1,0 +1,10 @@
+big_assembly Bvh 1000000 1 		1.00002289E-02
+big_assembly Bvh 1000000 2 		2.99997330E-02
+big_assembly Bvh 1000000 3 		3.99999619E-02
+big_assembly Bvh 1000000 9 		5.00001907E-02
+big_assembly Bvh 1000000 21 	3.99999619E-02
+big_assembly Bvh 1000000 129 	3.99999619E-02
+big_assembly Bvh 1000000 633 	6.00004196E-02
+big_assembly Bvh 1000000 2613 	7.00001717E-02
+big_assembly Bvh 1000000 10623 	6.99996948E-02
+big_assembly Bvh 1000000 42843 	5.99994659E-02

@@ -161,7 +161,7 @@ Figure \ref{prelim_optix_k20} shows the ray trace rates for running these geomet
      \caption{Trace rates of a NVIDIA Tesla K20 performing cell queries with the PIP algorithm. \label{prelim_optix_k20} }
 \end{figure}
 
-The interleaved assembly is also the geometry with the least amount of objects.  Another study was done to show the scaling of the two instancing types.  In these traces, a cell query was again done from a uniformly random and isotropic distribution of source points.  The number of source points was set to $8\times10^7$ for every trace in order to ensure being on the trace rate plateau shown in in Figure \ref{prelim_optix_k20}.  A BVH acceleration structure was also used, since this structure showed the best performance.  The geometry used was another hexagonal lattice of cylinders, identical to the assembly and large assemblies test geometries, only with more elements.  The volume, pitch to diameter ratio, and aspect ratios of the large cells were kept constant, but the cylinder radii were halved while doubling the number of elements on a edge.  Figure \ref{prelim_optix_scaling} shows the results of the scaling test, and it can be seen that XXX.  Traces were also done in a cell containing no objects, and rates were on the order of ten times faster,
+The interleaved assembly is also the geometry with the least amount of objects.  Another study was done to show the scaling of the two instancing types.  In these traces, a cell query was again done from a uniformly random and isotropic distribution of source points.  The number of source points was set to $8\times10^7$ for every trace in order to ensure being on the trace rate plateau shown in in Figure \ref{prelim_optix_k20}.  A BVH acceleration structure was also used, since this structure showed the best performance.  The geometry used was another hexagonal lattice of cylinders, identical to the assembly and large assemblies test geometries, only with more elements.  The volume, pitch to diameter ratio, and aspect ratios of the large cells were kept constant, but the cylinder radii were halved while doubling the number of elements on a edge.  Figure \ref{prelim_optix_scaling} shows the results of the scaling test, and it can be seen that the ray trace rates for both primitive and transform instancing plateau after about $10^3$ objects in the scene.  Primitive instancing still outperforms transform instancing, especially at very large numbers of objects.  It should be noted that the trace rates for the two dataset sizes start quite different for one object, then converge to equal performance at large object numbers, where the trace becomes more dependent on acceleration traversal rather than output buffer access (where smaller size makes a difference when there are few objects).  Traces were also done in a cell containing no objects, and rates were on the order of ten times faster, which is apparent in the scaling figure.
 
 \begin{figure}[h!] 
   \centering
@@ -169,17 +169,20 @@ The interleaved assembly is also the geometry with the least amount of objects. 
      \caption{Trace rate scaling on a NVIDIA Tesla K20 performing cell queries with the PIP algorithm. \label{prelim_optix_scaling} }
 \end{figure}
 
-Using transform instancing did not work for cell numbers above XXX cells.  Host memory consumption became too great and the process would be terminated.  This is why transform instancing trace stops at XXX cells in Figure \ref{prelim_optix_scaling}.  Structure construction prior to the trace also became very slow, presumably due to the independent acceleration objects attached to every instance and the overhead of computing all the affine transformations at acceleration structure build time.
+Using transform instancing did not work for cell numbers somewhere between 2613 and 10623 cells for the $10^8$ dataset size, and is why transform instancing trace stops at 2613 cells in Figure \ref{prelim_optix_scaling}.   Host memory consumption became too great and the process would be terminated.  Structure construction prior to the trace also became very slow compared to primitive instancing, presumably due to the independent acceleration objects attached to every instance and the overhead of computing all the affine transformations at acceleration structure build time.
 
-Also, traces were done where the direction of every particle was in the negative $z$ direction, since this is the direction with the fewest number of surfaces between the source particles and the boundary cell.  Performance was increased marginally, but this can only be taken advantage in geometries where there is a direction of least heterogeneity (like lattices).
+Also, traces were done where the direction of every particle was in the negative $z$ direction, since this is the direction with the fewest number of surfaces between the source particles and the boundary cell.  Performance was increased marginally, but this can only be taken advantage in geometries where there is a direction of least heterogeneity (like 2D lattices).
 
-Figure \ref{prelim_optix_G650M} shows the same benchmark, but run on a NVIDIA GeForce GT 650M, the discrete graphics card in a MacBook Pro, Mid-2012 Retina model.  The same trends can be observed, except that overall trace rate is much slower, which is not surprising, and that the impact of transform instancing is very pronounced in runs with fewer particles.  This study was done to simply show the performance of a smaller, non-compute card compared to that of the Tesla card.
+Figure \ref{prelim_optix_G650M} shows the trace rate versus dataset size benchmark, but run on a NVIDIA GeForce GT 650M, the discrete graphics card in a MacBook Pro, Mid-2012 Retina model.  The same trends can be observed, except that overall trace rate is much slower, which is not surprising, and that the impact of transform instancing is very pronounced in runs with fewer particles.  This study was done to simply show the performance of a smaller, non-compute card compared to that of the Tesla card.
 
 \begin{figure}[h!] 
   \centering
     \includegraphics[width=0.8\textwidth]{graphics/prelim_optix_G650M.eps}
      \caption{Trace rates of a NVIDIA GeForce GT 650M performing cell queries with the PIP algorithm. \label{prelim_optix_G650M} }
 \end{figure}
+
+From these preliminary results, it can be concluded that XXX.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -255,31 +258,11 @@ It is convenient that the values are monotonically increasing, but since the arr
 
 binary search here? more logN?  quad tree?  approximate function for initial guess?
 
-\subsection{Geometry Representation}
-
-stuff about geom and "where am I?"
-
-\subsubsection{OptiX}
-
-details about ray tracing, how a hit program works
-
-\subsubsection{Acceleration Structures}
-
-Importance of logN
-
-
-\subsubsection{Scaling}
-
-geometry instancing performance tests
-
-optix scaling toy problem - need to have very large sets in order to hide overhead
-
-
 \subsection{Pseudo-Random Numbers}
 
-use of rejection sampling disqualifies precomputation of random number, plus it is very bandwith intensive to do so!
+use of rejection sampling disqualifies pre computation of random number, plus it is very bandwith intensive to do so!
 
-using lcrng keeps global access down and improves performance greatly
+using lcrng keeps global access down and improves performance greatly, but curand is used outside of cycle to make sure no correlated numbers are used as intermediate seeds.
 
 \subsection{Macroscopic}
 
