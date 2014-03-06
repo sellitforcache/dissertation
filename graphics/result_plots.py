@@ -195,7 +195,7 @@ k20_gpu_data_large_512	=np.array(f_gpu_data_large_512.read().split()	,dtype=floa
 #c2075_gpu_data_large_128	=np.array(f_gpu_data_large_128.read().split()	,dtype=float)	
 #c2075_gpu_data_large_512	=np.array(f_gpu_data_large_512.read().split()	,dtype=float)
 
-cpu =(cpu1+cpu2+cpu3+cpu4+cpu5+cpu6+cpu7+cpu8)/4.0;
+cpu =(cpu1+cpu2+cpu3+cpu4)/4.0#+cpu5+cpu6+cpu7+cpu8)/8.0;
          
 active_batch=np.array([
 8388480,
@@ -824,27 +824,27 @@ else:
 	print name+'.eps'
 	fig.savefig(name+'.eps')
 
-name = 'prelim_speedup_c2075'	
-fig = pl.figure(figsize=(10,6))
-ax = fig.add_subplot(1,1,1)
-ax.semilogx(N,np.divide(cpu,c2075_gpu_task_128),'k-',label='Task 128 t/b')
-ax.semilogx(N,np.divide(cpu,c2075_gpu_task_512),'k--',label='Task 512 t/b')
-ax.semilogx(N,np.divide(cpu,c2075_gpu_data_batch_128),'b-',label='Event, Batch 128 t/b')
-ax.semilogx(N,np.divide(cpu,c2075_gpu_data_batch_512),'b--',label='Event, Batch 512 t/b')
-ax.semilogx(N,np.divide(cpu,c2075_gpu_data_large_128),'r-',label='Event, Remap 128 t/b')
-ax.semilogx(N,np.divide(cpu,c2075_gpu_data_large_512),'r--',label='Event, Remap 512 t/b')
-handles, labels = ax.get_legend_handles_labels()
-ax.legend(handles, labels, loc=2)
-pl.grid(True)
-ax.set_title(r'Tesla C2075')
-ax.set_xlabel(r'Dataset size (histories)')
-ax.set_ylabel(r'Speedup over serial CPU')
-
-if plot:
-	pl.show()
-else:
-	print name+'.eps'
-	fig.savefig(name+'.eps')
+#name = 'prelim_speedup_c2075'	
+#fig = pl.figure(figsize=(10,6))
+#ax = fig.add_subplot(1,1,1)
+#ax.semilogx(N,np.divide(cpu,c2075_gpu_task_128),'k-',label='Task 128 t/b')
+#ax.semilogx(N,np.divide(cpu,c2075_gpu_task_512),'k--',label='Task 512 t/b')
+#ax.semilogx(N,np.divide(cpu,c2075_gpu_data_batch_128),'b-',label='Event, Batch 128 t/b')
+#ax.semilogx(N,np.divide(cpu,c2075_gpu_data_batch_512),'b--',label='Event, Batch 512 t/b')
+#ax.semilogx(N,np.divide(cpu,c2075_gpu_data_large_128),'r-',label='Event, Remap 128 t/b')
+#ax.semilogx(N,np.divide(cpu,c2075_gpu_data_large_512),'r--',label='Event, Remap 512 t/b')
+#handles, labels = ax.get_legend_handles_labels()
+#ax.legend(handles, labels, loc=2)
+#pl.grid(True)
+#ax.set_title(r'Tesla C2075')
+#ax.set_xlabel(r'Dataset size (histories)')
+#ax.set_ylabel(r'Speedup over serial CPU')
+#
+#if plot:
+#	pl.show()
+#else:
+#	print name+'.eps'
+#	fig.savefig(name+'.eps')
 
 	
 name = 'prelim_active'	
@@ -1032,14 +1032,18 @@ else:
 
 
 name = 'prelim_optix_scaling' 
-N_p = 100000000.0
-R_o_xfrm = np.array([4.59999084E-01,3.76999664E+00,6.97000122E+00,7.75999451E+00,7.63999939E+00,8.13999939E+00,8.84000397E+00,9.16000366E+00])
-R_o_prim = N_p / np.array([2.60002136E-01,2.31999969E+00,3.63000488E+00,4.44000244E+00,4.40000153E+00,4.95999908E+00,6.09000397E+00,6.40000153E+00,6.50000000E+00,6.15000153E+00],dtype=float)
+N_p 			= 100000000.0
+R_o_xfrm 		= N_p / np.array([4.59999084E-01,3.76999664E+00,6.97000122E+00,7.75999451E+00,7.63999939E+00,8.13999939E+00,8.84000397E+00,9.16000366E+00],dtype=float)
+R_o_prim 		= N_p / np.array([2.60002136E-01,2.31999969E+00,3.63000488E+00,4.44000244E+00,4.40000153E+00,4.95999908E+00,6.09000397E+00,6.40000153E+00,6.50000000E+00,6.15000153E+00],dtype=float)
+R_o_xfrm_small 	= N_p / np.array([],dtype=float)
+R_o_prim_small 	= N_p / np.array([],dtype=float)
 N_o = np.array([1,2,3,9,21,129, 633 ,2613 ,10623,42843],dtype=float)
 fig = pl.figure(figsize=(10,6))
 ax = fig.add_subplot(1,1,1)
-ax.loglog(N_o,R_o_prim,'b-',label='BVH, Prim')
-ax.loglog(N_o[:8],R_o_xfrm,'b-',label='BVH, Xfrm')
+ax.loglog(N_o,R_o_prim,'b-',label=r'BVH, $10^8$, Prim')
+ax.loglog(N_o[:8],R_o_xfrm,'r-',label=r'BVH, $10^8$, Xfrm')
+ax.loglog(N_o,R_o_prim_small,'b-',label=r'BVH, $10^8$, Prim')
+ax.loglog(N_o,R_o_xfrm_small,'r-',label=r'BVH, $10^8$, Xfrm')
 handles, labels = ax.get_legend_handles_labels()
 ax.legend(handles, labels, loc=1)
 pl.grid(True)
