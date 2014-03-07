@@ -206,7 +206,7 @@ As described in Chapter \ref{chap:background}, the nuclear data required in Mont
 
 It is particularly troublesome that each cross section has its own independent energy grid.  Using point-wise data for continuous energy simulations requires an interpolation be performed between points, and to do this, the code must somehow scan the energy grid array to find the points between which the neutron's energy falls.  If every isotope has its own grid, this search must be done for every isotope, and can become very expensive.  This is why the unionized energy grid structure, like that implemented in Serpent, is used by WARP.
 
-Unionizing the cross sections simply means that the energy grids of the cross sections are all unionized into a single, larger vector which every isotope can use.  Doing this makes holes the the data, however, but these are filled by linear interpolation.  Since linear interpolation is always used to interpolate the cross sections, no information is lost and the cross sections are preserved.  The resulting dataset is larger than the sum of the individual cross sections, however, since it contains redundant data.  This is the tradeoff between regularizing the data in this way as opposed to accessing the energy grids separately.  Figure \ref{unionized_layout} shows the unionization process with two small, arbitrary energy grids and their corresponding cross section vectors.
+Unionizing the cross sections simply means that the energy grids of the cross sections are all unionized into a single, larger vector which every isotope can use, i.e. many 1D vectors and transformed into a single 2D matrix indexed by incoming energy and MT reaction number.  Doing this makes holes the the data, however, but these are filled by linear interpolation.  Since linear interpolation is always used to interpolate the cross sections, no information is lost and the cross sections are preserved.  The resulting dataset is larger than the sum of the individual cross sections, however, since it contains redundant data.  This is the tradeoff between regularizing the data in this way as opposed to accessing the energy grids separately.  The dataset will use more memory, but will be much easier to search.  Figure \ref{unionized_layout} shows the unionization process with two small, arbitrary energy grids and their corresponding cross section vectors.  The colors in the unionized energy grid represent which isotope the grid value came from, the green cross section data blocks are interpolated values, and the red blocks are placeholder zeros to preserve thresholds.
 
 \begin{figure}[h!] 
 \centering
@@ -214,12 +214,14 @@ Unionizing the cross sections simply means that the energy grids of the cross se
 \caption{Unionizing two cross section vectors. \label{unionized_layout} }
 \end{figure}
 
+With the cross sections unionized in this way, once the bounding energy indices, $E_i<E<E_{i+1}$ , are found by single search, the cross section values for every isotope can be read along a single row.  This format reduces the number of energy searches needed as well as promotes data locality by keeping all the data points for all isotopes this range adjacent to each other in memory (if row-major matrix format is used).  On CPUs, this can be read as cache line and accessed quickly by the cores.  On a GPU, since a thread needs to read the entire line in sequence in order to compute the macroscopic cross section on-the-fly, the memory loads are no coalesced and memory bandwidth is wasted (adjacent threads do no access adjacent memory at the same time).  How WARP computes the macroscopic cross section is explained later.  To mitigate this inefficiency, the data can be recast to use the  \lstinline{float4} datatype, which is a vector type that is 16 byes long.  When requested, the entire 16 bytes will be loaded in one transaction rather than 4 separate transactions, maximizing bandwidth and minimizing the number of global requests (and reducing the impact of latency).
 
-unionized glory, why its good and bad \cite{jaakko}.
+\subsection{Distribution Data as a Linked List}
 
-constant memory, not much improvement according to nelson
+The cross section data can be regularized with the above method, but there are other data distributions that WARP needs to conduct accurate simulations.  The most prevalent of which are scattering matrices which give tabulated probability distributions for outgoing CM angle $\mu$ and incident neutron energy.  Since these matrices have their own incoming energy grid these values can be unionized into the cross section dataset as well.  This transforms many 2D scattering matrices into a 3D matrix indexed by incoming energy, outgoing $\mu$, and reaction MT number.  Since the energy grid of the scattering matrices are often much, much coarser than the main cross section energy grid, this operation produces a \emph{very large} amount of redundant data.  It was attempted with uranium-235, and resulted in a 3D matrix that was 6.4GB (30991 energy grid points, 598 $\mu$ CDF points, 51 reactions).  This is just for a single isotope and just for the angular distributions of all reactions, and the dataset already cannot fit on the on-card DRAM on most GPU cards.  
 
-\subsection{Distribution Data as Linked Lists}
+After determining that unionizing with the main energy grid was an unacceptable method, another approach was tested where the energy grids of the scattering matrices were unionized between themselves, but not with the main energy grid.  This would reduce the amount of redundant data, but would require an additional search be made on the unionized scattering matrix energy grid.  The memory usage of this method with uranium-235 was reduced to 12MB (103 energy grid points, 598 $\mu$ CDF points, 51 reactions).  When tested with uranium-235 and -238, usage for the scattering data increased to 68MB (171 energy grid points, 1072 $\mu$ CDF points, 97 reactions).  When tested with uranium-235, uranium-238, oxygen-16, and hydrogen-1, usage became 1.1GB (1325 energy grid points, 1237 $\mu$ CDF points, 170 reactions).  Therefore, this method was also deemed to costly.  The distributions have to be left in their original formats, especially on GPUs where storage space much more limited compared to CPUs.
+
 
 \begin{figure}[h!] 
 \centering
@@ -227,15 +229,35 @@ constant memory, not much improvement according to nelson
 \caption{Making a link to distribution data in the unionized dataset. \label{unionized_pointers} }
 \end{figure}
 
-how to resolve the data heterogeneity problem without having massive data replication
+After these failed attempts how to resolve the data heterogeneity problem, a method was formulated to eliminate the secondary energy search without having massive data replication.  This 
 
-float4, have to implement, should be relatively easy
+float4 can also be used here
+
+Cross	secFons	are	
+unionized	
+?? Make	a	duplicate	table	
+that	has	the	distribuFon	
+pointer	at	that	energy	
+?? Similar	to	a	linked	list!	
+?? Only	triples	the	size	of	
+the	cross	secFon	grid		
+?? 1	copy	for	angular		
+?? 1	copy	for	energy	
+?? The	whole	table	is	
+needed	anyway,	so	not	
+unionizing	is	OK	
+?? Only	opFon,	impact	will	
+be	seen
 
 \subsection{Embedded Python}
 
 PyNE
 
 amazing Python C API
+
+The unionized cross section dataset is resident in the global memory 
+
+constant memory, too small and not much improvement according to nelson (cache miss penalty)
 
 not using S(a,b) or unresolved resonance parameters at this point
 
@@ -256,6 +278,26 @@ breakdown of tasks into sub-tasks, actually going through how data is stored, ac
 
 It is convenient that the values are monotonically increasing, but since the array is composed of floating point values with arbitrary spacing, an inverse function cannot made to calculate an index in $O(1)$ time.   A naive approach would be to scan the array from be beginning, performing comparisons along the way, and therefore calculating the cross section array index in $O(n)$ time, where $n$ is the number of elements in the array.
 
+Binary	search	
+?? O(log(N))	
+?? No	storage	
+?? Lots	of	global	access	
+?? Good	enough?	
+?? Simple	Lookup	Vector	
+?? O(1)	
+?? Linearize	so	every	bin	is	hit	at	least	
+once	by	a	line	
+?? dx	=	smallest	di?erence	in	grid	
+?? 20MeV/dx	~	1014		LLL	
+?? Very	high	order	polynomials?	
+?? Accuracy?	
+?? Time?	
+?? Use	line	or	polynomial	as	iniFal	
+guess	for	binary	search	to	decrease	
+loads?	
+?? Is	there	a	way	to	e?ciently	hash	a	
+range	of	?oats	to	an	integer?
+
 binary search here? more logN?  quad tree?  approximate function for initial guess?
 
 \subsection{Pseudo-Random Numbers}
@@ -266,11 +308,13 @@ using lcrng keeps global access down and improves performance greatly, but curan
 
 \subsection{Macroscopic}
 
-material
+does whole material, samples isotope
+
+WARP computes macro
 
 \subsection{Microscopic}
 
-nuclide
+nuclide, samples reaction
 
 \subsection{Interactions}
 
