@@ -245,15 +245,19 @@ After these failed attempts how to resolve the data heterogeneity problem, a met
 
 \subsection{Embedded Python}
 
-PyNE
+The data layout has been described, but not how the data is loaded or reformatted.  An initial effort was made to write a ACE-parsing script in C from scratch, but this was abandoned in favor of using the ACE module of the PyNE package and not reinventing the wheel.  The PyNE (Python for Nuclear Engineering) package ``is a suite of tools to aid in computational nuclear science \& engineering. PyNE seeks to provide native implementations of common nuclear algorithms, as well as Python bindings and I/O support for other industry standard nuclear codes.''  It contains a Python module that can parse ACE data files into python objects which can be more easily handled than flat data arrays.  This module was written by Paul Romano as a preliminary project for OpenMC, whose ACE library was later written in Fortran based on the methods developed in this Python module.  
 
-amazing Python C API
+Some parts of PyNE have a C++ API as well as a Python API, but this is not the case for the ACE module.  It was originally written in Python, not C++, so it has no C++ API.  This created a problem for WARP, since it is written in C/C++, and could not directly make use of the ACE module.  Fortunately, there is a very effective C API for Python!  This API allows one to initialize and run a Python instance from a C program.  In WARP, this API is used to start a python instance where PyNE can be used to load cross sections from ACE data files.  NumPy is then used to unionize the energy grids of the requested isotopes and perform the linear interpolation to fill in the gaps.  Once this is done, the Python instance returns the NumPy array to WARP as a C data structure.  The data is copied to an internal array and the Python object is cleared.  WARP then loops through the unionized array, requesting distribution data from the Python instance.  The scattering and energy distribution data is also copied for the requested energy range in a similar fashion, and a device pointer for the distribution is written into the scattering and energy pointer matrices.  When all the needed data has been copied over to WARP, the Python instance is terminated and its memory freed.  Since the unionized energy grid is an index of the matrix that needs to be searched before a row of the unionized cross section matrix can be accessed, it is stored as its own contiguous array rather than a column of the matrix.  Figures \ref{unionized_layout} and \ref{unionized_pointers} show it as a column simply for illustrative purposes.
 
-The unionized cross section dataset is resident in the global memory 
+The unionized cross section dataset in WARP is resident in the global memory of the GPU.  Storing it in constant memory would seem to make sense, but since it is limited to 64kB, the entire dataset simply cannot be stored here.  Texture memory was also considered, as this could possibly contain all the data, but it is optimized for 2D data locality, whereas the dataset format is mostly access linear fashion across rows and randomly across columns (since energy-changing reactions are sampled randomly).  Both the constant and texture memory spaces are cached, so the inescapable  random access inherent in Monte Carlo simulations may make cached access worse than non-cached due to cache miss penalties.  This effect was not studied in the initial development of WARP, however.  Nelson reports using the constant memory space in his simulations, with little to no performance improvement \cite{nelson}.  Using the texture memory to store the cross section matrix might benefit from the free linear interpolation that can be performed with the texture element load, however.
 
-constant memory, too small and not much improvement according to nelson (cache miss penalty)
+In its current state, WARP does not use the thermal scattering (S($\alpha,$$\beta$)) tables or unresolved resonance parameters.   These tables improve the physical fidelity of the simulation, but these features can be turned off in production codes and direct comparisons ca be made without them.  Their incorporation may lead to more divergent program flow, but this is left as a area of future work.
 
-not using S(a,b) or unresolved resonance parameters at this point
+\subsection{Python Wrapper}
+
+SWIG, Nikola, in progress
+
+Python/C/Python layering?!
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
