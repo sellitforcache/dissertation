@@ -255,9 +255,7 @@ In its current state, WARP does not use the thermal scattering (S($\alpha,$$\bet
 
 \subsection{Python Wrapper}
 
-SWIG, Nikola, in progress
-
-Python/C/Python layering?!
+Work is also underway for wrapping the WARP shared library with Python.  This would be done via SWIG, a piece of software that automatically wraps compiled languages like C/C++ in high-level scripting languages.  This is being done for convenience and usability reasons.  With the C++ classes exposed in Python, the main() function can be replaced with a Python script, eliminating the need to recompile WARP applications when different geometries or or parameters are needed.  This also deviates from the standard flat text input file structure that most Monte Carlo codes use.  Flat text input relies on keywords and adds a layer where input files need to be parsed and data structures built in the application from the information parsed from them.  Using Python to directly access the classes and their data removes this layer, and allows a user to build complex applications.  Since the results would also be resident in a Python session, they would be easily available to the user in their native format for potting scripts or analysis tools.  In text file based output, this information needs to be parsed out with a user written function or done by hand, leading to areas where human error can enter the analysis.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
