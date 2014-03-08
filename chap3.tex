@@ -263,8 +263,14 @@ Work is also underway for wrapping the WARP shared library with Python.  This wo
 
 \begin{figure}[h!] 
 \centering
-\includegraphics[width=0.9\textwidth]{graphics/warp_pipeline.eps}
-\caption{WARP transport loop. \label{warp_pipeline} }
+\includegraphics[width=0.9\textwidth]{graphics/warp_inner_loop.eps}
+\caption{WARP inner transport loop that is executed until all neutrons in a batch are completed. \label{warp_inner_loop} }
+\end{figure}
+
+\begin{figure}[h!] 
+\centering
+\includegraphics[width=0.9\textwidth]{graphics/warp_outer_loop.eps}
+\caption{WARP outer transport loop that is executed in between neutron batches. \label{warp_outer_loop} }
 \end{figure}
 
 
