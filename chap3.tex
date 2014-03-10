@@ -319,15 +319,20 @@ c &= 7
 
 LCRNGs are based on integer numbers which must be converted to floats when the numbers are needed.  This is done by simply dividing my the modulus value $m$.  OpenMC uses a similar version, but since WARP uses single precision, different values were needed.   One was chosen close to the full 32-bit range for maximum floating point resolution.  Having a modulus as a power of two is very convenient as well since the modulus can be performed by bit truncation rather than a full modulus operation \cite{openmc}.  In other words, the operation can be done by a bitwise AND operation between $a x_{n-1} + c$ and $2^{30}-1$, which in binary is all ones below the 30th bit.
 
-Using a LCRNG keeps global access down and improves performance greatly, since a ginle seed value is loaded at the start of the transport loop, stored in fast registers, then written back at the end of the loop.  CURAND is used outside of cycle to advance the seed back with the Mersenne Twister algorithm (which has a period of $2^{19937} ? 1$) to make sure no correlated numbers are used as intermediate seeds.
+Using a LCRNG keeps global access down and improves performance greatly, since a single seed value is loaded at the start of the transport loop, stored in fast registers, then written back at the end of the loop.  CURAND is used outside of cycle to advance the seed back with the Mersenne Twister algorithm (which has a period of $2^{19937} ? 1$) to make sure no correlated numbers are used as intermediate seeds.
 
 \subsection{Macroscopic}
 
-From here the macroscopic kernel is launched which computes the total macroscopic cross section for the material, samples the interaction distance, which isotope the neutron interacts with, moves the neutron to the nearer of the interaction/intersection distance, and sets the neutrons reaction number to the resample flag if the intersection is closer.
+The macroscopic kernel in WARP computes all values related to macroscopic cross sections.  These include total macroscopic cross section for the material, interaction distance, which isotope the neutron interacts with, moving the neutron to the nearer of the interaction/intersection distance, and setting the neutrons reaction number to the resample flag if the intersection is closer.  
 
-does things related to the macroscopic cross section whole material, samples isotope, material mask
+Since the isotopes total cross sections are stored together in the unionized cross section matrix, the total macroscopic cross section can scan the contiguous row of this part of the matrix, interpolating the value between $i$ and $i+1$, which was found by the grid search kernel.  The interpolated values are multiplied the values by the atom density vector (in atoms/barn-cm, which contains a zero for isotopes not present) and the sum is accumulated as shown in \eqref{macro_vector}.  When the material vector has been completely scanned and total cross section is computed, the array is scanned again, but this time a random number is used to determined which isotope the neutron interacts with via \eqref{isotope_selection}.
 
-WARP computes macro
+\begin{equation}
+\Sigma_t(E) = \sum_{k=0}^{N_\mathrm{isotopes}} M_k \: \Sigma_{t,k}(E)
+\label{macro_vector}
+\end{equation}
+
+The material's total macroscopic cross section is also written to an array so the flux tally routine does not have to recompute it, which would take many more global memory transactions than loading it from the array.  Next, the interaction distance is sampled via \eqref{first_col_samp} and is compared against the nearest surface distance, which was computed with OptiX in the first step of the transport loop.  If the interaction distance is nearer, the neutron's coordinates changed to this location.  If the surface is closer, the neutron is moved to the surface and its reaction number is changed to the resample flag value, which will cause it to skip all other kernels until OptiX determines the new material and resets its reaction flag.
 
 \subsection{Microscopic}
 
