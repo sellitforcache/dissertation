@@ -279,7 +279,7 @@ The outer loop, shown in Figure \ref{warp_outer_loop}, uses the result from the 
 
 Fixed source runs do not have an outer loop since the source is not dependent on the flux and does not need to be reconstructed based on the yields of the last batch.  If there is enough memory available, the entire number of requested neutrons are initialized based on the source definition.  The neutrons are transported simultaneously, and any secondary neutrons produced from fission or (n,2/3/4n) reactions are popped into the history vector at the end of the inner loop to be transported with the original source particles in the next pass of the loop.
 
-\subsection{Grid Search}
+\subsection{Grid Search Kernel}
 
 Much effort has been done in order to require one search on the main unionized energy grid to find the index $i$ which satisfies $E_i<E<E_{i+1}$, but the best algorithm to do so has not been established.  It is convenient that the values in the energy grid are monotonically increasing, but since the array is composed of floating point values with arbitrary spacing, an inverse function cannot made to calculate an index in $O(1)$ time.   A naive approach would be to scan the array from be beginning, performing comparisons along the way, and therefore calculating the cross section array index in $O(n)$ time, where $n$ is the number of elements in the array.  This method does not scale well, however, and will not be considered.  
 
@@ -321,7 +321,7 @@ LCRNGs are based on integer numbers which must be converted to floats when the n
 
 Using a LCRNG keeps global access down and improves performance greatly, since a single seed value is loaded at the start of the transport loop, stored in fast registers, then written back at the end of the loop.  CURAND is used outside of cycle to advance the seed back with the Mersenne Twister algorithm (which has a period of $2^{19937} ? 1$) to make sure no correlated numbers are used as intermediate seeds.
 
-\subsection{Macroscopic}
+\subsection{Macroscopic Kernel}
 
 The macroscopic kernel in WARP computes all values related to macroscopic cross sections.  These include total macroscopic cross section for the material, interaction distance, which isotope the neutron interacts with, moving the neutron to the nearer of the interaction/intersection distance, and setting the neutrons reaction number to the resample flag if the intersection is closer.  
 
@@ -334,7 +334,7 @@ Since the isotopes total cross sections are stored together in the unionized cro
 
 The material's total macroscopic cross section is also written to an array so the flux tally routine does not have to recompute it, which would take many more global memory transactions than loading it from the array.  Next, the interaction distance is sampled via \eqref{first_col_samp} and is compared against the nearest surface distance, which was computed with OptiX in the first step of the transport loop.  If the interaction distance is nearer, the neutron's coordinates changed to this location.  If the surface is closer, the neutron is moved to the surface and its reaction number is changed to the resample flag value, which will cause it to skip all other kernels until OptiX determines the new material and resets its reaction flag.
 
-\subsection{Flux Tally}
+\subsection{Flux Tally Kernel}
 
 The flux tally kernel simply scores the predefined tally bins via \eqref{flux_tally}.  Currently, WARP only allows evenly spaced logarithmic bins since their indices can be calculated analytically (as opposed to an arbitrary input grid).  The tally index $j$ out of $N_\mathrm{tally}$ bins for a neutron with energy $E$ is calculated via \eqref{tally_index}.  Since multiple threads could be adding to the element located at $j$, atomic operations are used to perform to sum, specifically the atomicAdd() function.  Atomic functions perform the load-compute-store operations in a single, uninterruptible transaction.  This eliminates the risk of data races occurring.
 
@@ -343,27 +343,27 @@ j = \mathrm{floor} \left( \frac{ \log \left( \frac{E}{E_\mathrm{min}} \right)} {
 \label{tally_index}
 \end{equation}
 
-\subsection{Microscopic}
+\subsection{Microscopic Kernel}
 
-Unlike the macroscopic kernel, the microscopic kernel only has one job - to determine which reaction the neutron undergoes in the isotope it has been sampled to interact with.  This is done by scanning the isotope's subrow in the unionized cross section matrix as show in \eqref{micro_vector}.
+Unlike the macroscopic kernel, the microscopic kernel only has one job - to determine which reaction the neutron undergoes in the isotope it has been sampled to interact with.  This is done by scanning the isotope's subrow in the unionized cross section matrix as show in \eqref{micro_vector}.  $N_{\mathrm{start},k}$ is the starting index of the row for isotope $k$, $N_{\mathrm{end},k}$ is the index of its last reaction cross section, and $\sigma_{t,k}(E)$ is isotope $k$'s total microscopic cross section.  The starting and ending indices for an isotope are precomputed and stored in a separate array.  For most runs, this array and the material isotope density array can be stored in fast shared memory.
 
 \begin{equation}
- PDF_m = \sum_{m=N_{\mathrm{start},k}}^{N_{\mathrm{end},k} } \sigma_{i,m}
+\begin{gathered}
+m <  N_{\mathrm{end},k}\\
+ PDF_m = \frac{1}{\sigma_{t,k}(E)} \sum_{z=N_{\mathrm{start},k}}^{z=m}  \sigma_{i,z}(E)
+ \end{gathered}
 \label{micro_vector}
 \end{equation}
 
-\subsection{Interactions}
+Once the reaction $m$ is sampled, the sorting routine is launches to remap data references and sweep completed histories out, then reaction kernels can be launched to carry out the individual reactions.
 
-Scattering
+\subsection{Interaction Kernels}
 
-Rodriguez rotation
-
-Secondary-Producing
-
-Disappearance
+There are only four reaction kernels since all disappearance reactions are taken care of in the radix sort.  That only leaves the three different kinds of scattering ((n,2/3/4n) reactions follow laws of continuum scattering but have a yield which is taken care of in the pop routine) and fission.  The scattering reactions change the direction and energy of the neutrons, and their distributions are sampled as outlined in Section \ref{sec:stat}.  Here is where the pointer array becomes useful.  The row $i$ and column $m$ of the unionized cross section matrix have been determined, and the scattering kernels simply need access these coordinates in the scattering and energy pointer matrices to load the appropriate distribution data.  No additional searching needs to be done.
 
 \subsubsection{Concurrent Kernels}
 
+As mentioned previously, the reaction kernels should never access overlapping data, so they can all be launched concurrently.  NVIDIA cards with a compute capacity of 2.0 and higher support up to 16 concurrent kernel launches.  This is done by submitting these kernel launches to nonzero execution streams by declaring additional streams to be present and passing the stream objects to the kernel launches as an extra launch parameter.  Kernels launched without an explicit stream are launched on the default stream 0, which are are synchronous (program flow does not continue on the host until the launch is complete).  If kernel synchronization is important after execution completes (as it is here, reactions must be carried out before the OptiX trace), the streams must be synchronized with a an explicit stream synchronization command or with a synchronous operation like a cudaMemcpy().
 
 \subsection{Parallel Operations}
 
