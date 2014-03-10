@@ -303,17 +303,29 @@ WARP currently uses a simple binary search algorithm due to its logarithmic scal
 
 \subsection{Pseudo-Random Numbers}
 
-use of rejection sampling disqualifies pre computation of random number, plus it is very bandwith intensive to do so!
+Random numbers are the basis of the Monte Carlo method, and generating them must be done efficiently.  Since these numbers must be computed, they are not strictly random, but rather pseudo-random since they are randomly distributed but can be deterministically computed.  NVIDIA provides a random number library called CURAND which can generate large arrays of randomly distributed numbers.  Initially, WARP precomputed all the random numbers it would need for a single transport loop iteration.  This could be done since a direct sampling methods were used everywhere (which was incorrect for the target velocity in scattering) and there was a maximum number of numbers required.  The threads would simply access rand number values stored in this giant array (about 20 numbers were needed per thread).  This is a very bandwidth-intensive way to access random numbers since they are always written and read from global memory.  In these early implmentations, the random number generation and access was taking about a quarter of the transport loop time.  In addition, the introduction of the correct rejection sampling method for the target velocity disqualifies precomputation since there no longer was an absolute maximum amount of numbers needed.
 
-using lcrng keeps global access down and improves performance greatly, but curand is used outside of cycle to make sure no correlated numbers are used as intermediate seeds.
+Taking these points into consideration, it was decided to use a linear congruential random number generator (LCRNG) for computing random numbers in the transport kernels.  It allows the kernels to generate random numbers with the recursion relations shown in \eqref{lcrng}.  The values $a$, $c$, and $m$ are taken from Pierre L'Ecuyer's manual for configurations with a high figure of merit \cite{lcrng}.   
 
-\cite{lcrng}
+\begin{equation}
+\begin{split}
+x_{n} &= a x_{n-1} + c \mod m  \\
+a &= 116646453 \\
+m &=  2^{30} \\
+c &= 7
+\end{split}
+\label{lcrng}
+\end{equation}
+
+LCRNGs are based on integer numbers which must be converted to floats when the numbers are needed.  This is done by simply dividing my the modulus value $m$.  OpenMC uses a similar version, but since WARP uses single precision, different values were needed.   One was chosen close to the full 32-bit range for maximum floating point resolution.  Having a modulus as a power of two is very convenient as well since the modulus can be performed by bit truncation rather than a full modulus operation \cite{openmc}.  In other words, the operation can be done by a bitwise AND operation between $a x_{n-1} + c$ and $2^{30}-1$, which in binary is all ones below the 30th bit.
+
+Using a LCRNG keeps global access down and improves performance greatly, since a ginle seed value is loaded at the start of the transport loop, stored in fast registers, then written back at the end of the loop.  CURAND is used outside of cycle to advance the seed back with the Mersenne Twister algorithm (which has a period of $2^{19937} ? 1$) to make sure no correlated numbers are used as intermediate seeds.
 
 \subsection{Macroscopic}
 
 From here the macroscopic kernel is launched which computes the total macroscopic cross section for the material, samples the interaction distance, which isotope the neutron interacts with, moves the neutron to the nearer of the interaction/intersection distance, and sets the neutrons reaction number to the resample flag if the intersection is closer.
 
-does things related to the macroscopic cross section whole material, samples isotope
+does things related to the macroscopic cross section whole material, samples isotope, material mask
 
 WARP computes macro
 
@@ -323,17 +335,16 @@ nuclide, samples reaction
 
 \subsection{Interactions}
 
-\subsubsection{Scattering}
+Scattering
 
 Rodriguez rotation
 
-\subsubsection{Secondary-Producing}
+Secondary-Producing
 
-
-\subsubsection{Disappearance}
-
+Disappearance
 
 \subsubsection{Concurrent Kernels}
+
 
 \subsection{Parallel Operations}
 
