@@ -334,6 +334,15 @@ Since the isotopes total cross sections are stored together in the unionized cro
 
 The material's total macroscopic cross section is also written to an array so the flux tally routine does not have to recompute it, which would take many more global memory transactions than loading it from the array.  Next, the interaction distance is sampled via \eqref{first_col_samp} and is compared against the nearest surface distance, which was computed with OptiX in the first step of the transport loop.  If the interaction distance is nearer, the neutron's coordinates changed to this location.  If the surface is closer, the neutron is moved to the surface and its reaction number is changed to the resample flag value, which will cause it to skip all other kernels until OptiX determines the new material and resets its reaction flag.
 
+\subsection{Flux Tally}
+
+The flux tally kernel simply scores the predefined tally bins via \eqref{flux_tally}.  Currently, WARP only allows evenly spaced logarithmic bins since their indices can be calculated analytically (as opposed to an arbitrary input grid).  The tally index $j$ out of $N_\mathrm{tally}$ bins for a neutron with energy $E$ is calculated via \eqref{tally_index}.  Since multiple threads could be adding to the element located at $j$, atomic operations are used to perform to sum, specifically the atomicAdd() function.  Atomic functions perform the load-compute-store operations in a single, uninterruptible transaction.  This eliminates the risk of data races occurring.
+
+\begin{equation}
+j = \mathrm{floor} \left( \frac{ \log \left( \frac{E}{E_\mathrm{min}} \right)} { \log \left( \frac{E_\mathrm{max}}{E_\mathrm{min}} \right)} (N_\mathrm{tally}-1) \right)
+\label{tally_index}
+\end{equation}
+
 \subsection{Microscopic}
 
 nuclide, samples reaction
