@@ -281,29 +281,29 @@ Fixed source runs do not have an outer loop since the source is not dependent on
 
 \subsection{Grid Search}
 
-Once this is known, a kernel is launched to do a search on the unionized energy grid to determine the index $i$ which satisfies $E_i<E<E_{i+1}$.
+Much effort has been done in order to require one search on the main unionized energy grid to find the index $i$ which satisfies $E_i<E<E_{i+1}$, but the best algorithm to do so has not been established.  It is convenient that the values in the energy grid are monotonically increasing, but since the array is composed of floating point values with arbitrary spacing, an inverse function cannot made to calculate an index in $O(1)$ time.   A naive approach would be to scan the array from be beginning, performing comparisons along the way, and therefore calculating the cross section array index in $O(n)$ time, where $n$ is the number of elements in the array.  This method does not scale well, however, and will not be considered.  
 
-It is convenient that the values are monotonically increasing, but since the array is composed of floating point values with arbitrary spacing, an inverse function cannot made to calculate an index in $O(1)$ time.   A naive approach would be to scan the array from be beginning, performing comparisons along the way, and therefore calculating the cross section array index in $O(n)$ time, where $n$ is the number of elements in the array.
+The binary search 
 
-Binary	search	
-?? O(log(N))	
+ O(log(N))	
 ?? No	storage	
 ?? Lots	of	global	access	
 ?? Good	enough?	
+
+Many methods were considered in the development of Serpent, most notably reconstructing the unionized dataset with a evenly-spaced grid whose indices could be calculated analytically.  The cross sections are linearly interpolated, or alternatively set to the lower point value, between the new regular grid.  The reported effects introduce more uncertainty into the results since information is lost around tightly-grouped energy points at resonances, but allow quick search times.  Another approach described in Serpent overlays a regular grid over the original unionized data which contains pointers to the cross section data within the interval.  With this structure, the small overlay bins are calculated 
+
+
 ?? Simple	Lookup	Vector	
 ?? O(1)	
 ?? Linearize	so	every	bin	is	hit	at	least	
 once	by	a	line	
 ?? dx	=	smallest	di?erence	in	grid	
-?? 20MeV/dx	~	1014		LLL	
-?? Very	high	order	polynomials?	
-?? Accuracy?	
-?? Time?	
-?? Use	line	or	polynomial	as	iniFal	
+?? 20MeV/dx for u235	~	10^14 way too big	
+
+
+Use	line	or	polynomial	as	iniFal	
 guess	for	binary	search	to	decrease	
 loads?	
-?? Is	there	a	way	to	e?ciently	hash	a	
-range	of	?oats	to	an	integer?
 
 binary search here? more logN?  quad tree?  approximate function for initial guess?
 
