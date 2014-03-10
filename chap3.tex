@@ -345,7 +345,12 @@ j = \mathrm{floor} \left( \frac{ \log \left( \frac{E}{E_\mathrm{min}} \right)} {
 
 \subsection{Microscopic}
 
-nuclide, samples reaction
+Unlike the macroscopic kernel, the microscopic kernel only has one job - to determine which reaction the neutron undergoes in the isotope it has been sampled to interact with.  This is done by scanning the isotope's subrow in the unionized cross section matrix as show in \eqref{micro_vector}.
+
+\begin{equation}
+ PDF_m = \sum_{m=N_{\mathrm{start},k}}^{N_{\mathrm{end},k} } \sigma_{i,m}
+\label{micro_vector}
+\end{equation}
 
 \subsection{Interactions}
 
@@ -364,11 +369,9 @@ Disappearance
 
 CUDPP, reductions, sums, and sorts - sorting by reaction to keep warps full, memory implications
 
-\subsubsection{Fixed source subcritical multiplication}
+\subsubsection{Radix Sort}
 
-necessary to be subcritical.
-
-pop can pop source particles in to keep population constant until NPS exceeded...
+stuff
 
 \subsubsection{Criticality}
 
@@ -377,6 +380,15 @@ cannot simply pop, unless generation number is associated, then data can be gene
 does pop work in supercritical? yes, divide by keff, rebase kernel
 
 need to do generations since the source update is generation-dependent, can this be changed?
+
+
+\subsubsection{Fixed source subcritical multiplication}
+
+necessary to be subcritical.
+
+pop can pop source particles in to keep population constant until NPS exceeded...
+
+
 
 
 
