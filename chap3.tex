@@ -401,16 +401,12 @@ p_n = \sum_0^{n-1} \: x_i
 \label{prefix_sum}
 \end{equation}
 
-after the prefix sum is done, the source pop kernel is launched.  A thread is launched for every element of the history dataset, and If a thread encounters a yield value of zero, it returns.  If a nonzero value is encountered, the thread samples $y_j$ secondary particles and writes them into the history data from $p_j$ to $p_j+y_j$.  Since th yields have been rebased, this should either just fall short or slightly over the total dataset size, $N_d$.  Of course, the yield vectors are immediately set to zero for all particles in the next generation.
+after the prefix sum is done, the source pop kernel is launched.  A thread is launched for every element of the history dataset, and If a thread encounters a yield value of zero, it returns.  If a nonzero value is encountered, the thread samples $y_j$ secondary particles and writes them into the history data from $p_j$ to $p_j+y_j$.  Since the yields have been rebased, this should either just fall short or slightly over the total dataset size, $N_d$.  Of course, the yield vectors are immediately set to zero for all particles in the next generation.
+
+Having to keep generational information to determine $k_\mathrm{eff}$ and the next generation's source distribution forces criticality calculations to use a batch-like transport approach.  Transport on the GPU becomes inefficient when few active neutrons remain in the dataset.  Formulating a way where generations did not need to be run in series could benefit the GPU greatly.  A potential way would be to associate generational information to neutrons, transporting them as in a fixed-source problem, then post-processing the results to determine $k_\mathrm{eff}$. 
 
 \subsubsection{Fixed Source \& Subcritical Multiplication}
 
-necessary to be subcritical.
-
-pop can pop source particles in to keep population constant until NPS exceeded..
-
-cannot simply pop for criticality, unless generation number is associated, then data can be generated and post-processed?  fine for fixed since generations do not matter, multiplication factor is irrelevant, response is desired.
-
-need to do generations since the source update is generation-dependent, can this be changed?
+In fixed source mode, the secondary particles can be popped back into the active particle dataset at the end of the inner loop since generational information is not needed and only the system response to the pulse is desired.  In this mode, the number of source neutrons is given as an input, and memory allowing, a dataset of source neutrons this size is made.  These neutrons and transported and any secondary-producing reactions are popped back into the actively transporting dataset.  This is done by performing a compaction operation on the \emph{completed} dataset indices and a prefix sum is done on the yield vector.  A pop routine is done similar to a criticality source run, but the threads with a nonzero yield write into the indices where a neutron has been terminated, which specified by writing into indices $p_j$ to $p_j+y_j$ of the compaction vector instead of $p_j$ to $p_j+y_j$ of the dataset itself.  This reactivates terminated particle data for transporting secondary neutrons.  Of course, the terminated neutron data is all replaced by data appropriately sampled for the secondary neutron reaction.  As mentioned previously, it is necessary to be subcritical in fixed source mode, or subsequent generations will grow instead of shrink and the total number of neutrons needing to be transported to calculate the response will diverge.
 
 
