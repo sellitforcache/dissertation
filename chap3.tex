@@ -269,7 +269,7 @@ Now that the necessary data has been loaded and reformatted in a GPU-friendly wa
 \caption{WARP inner transport loop that is executed until all neutrons in a batch are completed. \label{warp_inner_loop} }
 \end{figure}
 
-The outer loop, shown in Figure \ref{warp_outer_loop}, uses the result from the inner loop to set up the next batch of neutrons.  The inner loop serves to determine the yields of the batch's neutrons.  The yield array is then reduced to determine the multiplication factor, $k_\mathrm{eff}$, of the batch.  The yields are then divided by this value to make the yield as close to one as possible without biasing the fission point distribution.  Since dividing by $k_\mathrm{eff}$ most likely will not yield a integer, the rebased yield is sampled bewteen the bounding integers to preserve the mean across many neutrons.  After the yields are rebased, a prefix sum is performed on the yield array.  This value for each particle's element of the prefix sum is the total number of fission neutrons before it.  Since this is known, the ``pop'' routine can insert the sampled fission neutrons into the next batch's history vector with no risk of writing into the same element.  Since the yields were rebased to make $k_\mathrm{eff}\approx1$, the pop kernel will also fill the the entire history vector with newly-sampled fission neutrons.  Once the pop samples the fission spectrum, it inserts particles into to history vector a points where fission occurred, but with a new energy and an isotropically sampled direction, and the inner loop transports the new batch.
+The outer loop, shown in Figure \ref{warp_outer_loop}, uses the result from the inner loop to set up the next batch of neutrons.  The inner loop serves to determine the yields of the batch's neutrons.  The yield array is then reduced to determine the multiplication factor, $k_\mathrm{eff}$, of the batch.  The yields are then divided by this value to make the yield as close to one as possible without biasing the fission point distribution.  Since dividing by $k_\mathrm{eff}$ most likely will not yield a integer, the rebased yield is sampled between the bounding integers to preserve the mean across many neutrons.  After the yields are rebased, a prefix sum is performed on the yield array.  This value for each particle's element of the prefix sum is the total number of fission neutrons before it.  Since this is known, the ``pop'' routine can insert the sampled fission neutrons into the next batch's history vector with no risk of writing into the same element.  Since the yields were rebased to make $k_\mathrm{eff}\approx1$, the pop kernel will also fill the the entire history vector with newly-sampled fission neutrons.  Once the pop samples the fission spectrum, it inserts particles into to history vector a points where fission occurred, but with a new energy and an isotropically sampled direction, and the inner loop transports the new batch.
 
 \begin{figure}[h!] 
 \centering
@@ -303,7 +303,7 @@ WARP currently uses a simple binary search algorithm due to its logarithmic scal
 
 \subsection{Pseudo-Random Numbers}
 
-Random numbers are the basis of the Monte Carlo method, and generating them must be done efficiently.  Since these numbers must be computed, they are not strictly random, but rather pseudo-random since they are randomly distributed but can be deterministically computed.  NVIDIA provides a random number library called CURAND which can generate large arrays of randomly distributed numbers.  Initially, WARP precomputed all the random numbers it would need for a single transport loop iteration.  This could be done since a direct sampling methods were used everywhere (which was incorrect for the target velocity in scattering) and there was a maximum number of numbers required.  The threads would simply access rand number values stored in this giant array (about 20 numbers were needed per thread).  This is a very bandwidth-intensive way to access random numbers since they are always written and read from global memory.  In these early implmentations, the random number generation and access was taking about a quarter of the transport loop time.  In addition, the introduction of the correct rejection sampling method for the target velocity disqualifies precomputation since there no longer was an absolute maximum amount of numbers needed.
+Random numbers are the basis of the Monte Carlo method, and generating them must be done efficiently.  Since these numbers must be computed, they are not strictly random, but rather pseudo-random since they are randomly distributed but can be deterministically computed.  NVIDIA provides a random number library called CURAND which can generate large arrays of randomly distributed numbers.  Initially, WARP precomputed all the random numbers it would need for a single transport loop iteration.  This could be done since a direct sampling methods were used everywhere (which was incorrect for the target velocity in scattering) and there was a maximum number of numbers required.  The threads would simply access rand number values stored in this giant array (about 20 numbers were needed per thread).  This is a very bandwidth-intensive way to access random numbers since they are always written and read from global memory.  In these early implementations, the random number generation and access was taking about a quarter of the transport loop time.  In addition, the introduction of the correct rejection sampling method for the target velocity disqualifies precomputation since there no longer was an absolute maximum amount of numbers needed.
 
 Taking these points into consideration, it was decided to use a linear congruential random number generator (LCRNG) for computing random numbers in the transport kernels.  It allows the kernels to generate random numbers with the recursion relations shown in \eqref{lcrng}.  The values $a$, $c$, and $m$ are taken from Pierre L'Ecuyer's manual for configurations with a high figure of merit \cite{lcrng}.   
 
@@ -369,7 +369,7 @@ Kernels launched without an explicit stream are launched on the default stream 0
 
 \subsection{Parallel Operations}
 
-The array-wide parallel operations in WARP are done with the CUDPP library.  The functions used are reductions for calculating $k_\mathrm{eff}$, prefix sums for calculating the indices for the source pop kernels, and sorts for keeping warps coherent and full after the microscopic kernel.
+The array-wide parallel operations in WARP are done with the CUDPP library.  The functions used are reductions for calculating $k_\mathrm{eff}$ via \eqref{k_eff_batch}, prefix sums for calculating the indices for the source pop kernels, and sorts for keeping warps coherent and full after the microscopic kernel.
 
 \subsubsection{Remapping with Radix Sort}
 
@@ -381,26 +381,39 @@ Since the reaction numbers are integers, they can be sorted by very efficient al
 \caption{A radix key-value sort creating a remapping vector. \label{radix_sort} }
 \end{figure}
 
-There is one more piece of information that is needed to launch the reaction kernels concurrently - the number of particles undergoing each type of reaction.  This is determined by launching a comparison kernel on the sorted array which detects the places where the reaction numbers change.  More details here once this is actually completed.
+There is one more piece of information that is needed to launch the reaction kernels concurrently - the number of particles undergoing each type of reaction.  This is determined by launching a comparison kernel on the sorted array which detects the places where the reaction numbers change.  
 
-\subsubsection{Criticality}
+More details here once this is actually completed.
+
+
+\subsubsection{Criticality Source}
+
+As was mentioned previously, when the simulation is run in criticality mode, the source points for neutron batches depend on the fission points in the previous batch.  But if $k_\mathrm{eff}$ is not equal to one, each source neutron no longer corresponds to a secondary neutron.  This is the same problem in the time-independent NTE, where getting rid of the time dependent term causes the equation to be inconsistent if the multiplication factor is not one.  To remedy this, the fission source term is divided by the multiplication factor to force the equations to be consistent (assuming the multiplication factor is known).  Similarly, the fission yield vector of a batch of neutrons can be renormalized to artificially make the multiplication factor one by rearranging \eqref{k_eff_batch} as shown in \eqref{k_eff_rebase} where $n$ is the batch number $N_f$ is the number of secondary particles from both fission and (n,2/3/4n) reactions.
+
+\begin{equation}
+\label{k_eff_rebase}
+\frac{N_{f,n}}{k_{\mathrm{eff},n}} \Rightarrow N_{s,n+1} = N_{s,n}
+\end{equation}
+
+Yields must be integers however, since WARP
+
+stochastic rounding
 
 cannot simply pop, unless generation number is associated, then data can be generated and post-processed?
 
-does pop work in supercritical? yes, divide by keff, rebase kernel
+\begin{equation}
+y_n = \sum_0^{n-1} \: x_i
+\label{prefix_sum}
+\end{equation}
 
 need to do generations since the source update is generation-dependent, can this be changed?
 
 
-\subsubsection{Fixed source subcritical multiplication}
+
+\subsubsection{Fixed Source \& Subcritical Multiplication}
 
 necessary to be subcritical.
 
 pop can pop source particles in to keep population constant until NPS exceeded...
-
-
-
-
-
 
 
