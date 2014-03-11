@@ -363,15 +363,25 @@ There are only four reaction kernels since all disappearance reactions are taken
 
 \subsubsection{Concurrent Kernels}
 
-As mentioned previously, the reaction kernels should never access overlapping data, so they can all be launched concurrently.  NVIDIA cards with a compute capacity of 2.0 and higher support up to 16 concurrent kernel launches.  This is done by submitting these kernel launches to nonzero execution streams by declaring additional streams to be present and passing the stream objects to the kernel launches as an extra launch parameter.  Kernels launched without an explicit stream are launched on the default stream 0, which are are synchronous (program flow does not continue on the host until the launch is complete).  If kernel synchronization is important after execution completes (as it is here, reactions must be carried out before the OptiX trace), the streams must be synchronized with a an explicit stream synchronization command or with a synchronous operation like a cudaMemcpy().
+As mentioned previously, the reaction kernels should never access overlapping data, so they can all be launched concurrently.  NVIDIA cards with a compute capacity of 2.0 and higher support up to 16 concurrent kernel launches.  This is done by submitting these kernel launches to nonzero execution streams by declaring additional streams to be present and passing the stream objects to the kernel launches as an extra launch parameter.  Kernels launched on different streams can be executed concurrently and their blocks can be interleaved, which is why it is very important for them to act on independent data.
+
+Kernels launched without an explicit stream are launched on the default stream 0, which are are synchronous (program flow does not continue on the host until the launch is complete).  If kernel synchronization is important after execution completes (as it is here, reactions must be carried out before the OptiX trace), the streams must be synchronized with a an explicit stream synchronization command or with a synchronous operation like a cudaMemcpy().
 
 \subsection{Parallel Operations}
 
-CUDPP, reductions, sums, and sorts - sorting by reaction to keep warps full, memory implications
+The array-wide parallel operations in WARP are done with the CUDPP library.  The functions used are reductions for calculating $k_\mathrm{eff}$, prefix sums for calculating the indices for the source pop kernels, and sorts for keeping warps coherent and full after the microscopic kernel.
 
-\subsubsection{Radix Sort}
+\subsubsection{Remapping with Radix Sort}
 
-stuff
+Since the reaction numbers are integers, they can be sorted by very efficient algorithms like a radix sort which performs in $O(kn)$, where $n$ is the number of values to be sorted and $k$ is the number of significant digits of the values.  In WARP, there are less than 999 reaction types, so $k=3$.  The reaction number encodings in WARP are shown in Table \ref{WARP_numbers}.  Since reaction 999 represents a terminated particle, the sort will push all the completed history references to the end of the remapping vector.  Figure \ref{radix_sort} shows how the radix sort will arrange the remap vector and how threads will be mapped to the data.  CUDPP's radix sort conveniently sorts for key-value pairs, and WARP uses the reaction numbers as keys and the data index as values, effectively creating a remap vector.
+
+\begin{figure}[h!] 
+\centering
+\includegraphics[width=1.0\textwidth]{graphics/remapping_horiz.eps}
+\caption{A radix key-value sort creating a remapping vector. \label{radix_sort} }
+\end{figure}
+
+There is one more piece of information that is needed to launch the reaction kernels concurrently - the number of particles undergoing each type of reaction.  This is determined by launching a comparison kernel on the sorted array which detects the places where the reaction numbers change.  More details here once this is actually completed.
 
 \subsubsection{Criticality}
 
