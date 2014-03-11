@@ -305,7 +305,7 @@ WARP currently uses a simple binary search algorithm due to its logarithmic scal
 
 Random numbers are the basis of the Monte Carlo method, and generating them must be done efficiently.  Since these numbers must be computed, they are not strictly random, but rather pseudo-random since they are randomly distributed but can be deterministically computed.  NVIDIA provides a random number library called CURAND which can generate large arrays of randomly distributed numbers.  Initially, WARP precomputed all the random numbers it would need for a single transport loop iteration.  This could be done since a direct sampling methods were used everywhere (which was incorrect for the target velocity in scattering) and there was a maximum number of numbers required.  The threads would simply access rand number values stored in this giant array (about 20 numbers were needed per thread).  This is a very bandwidth-intensive way to access random numbers since they are always written and read from global memory.  In these early implementations, the random number generation and access was taking about a quarter of the transport loop time.  In addition, the introduction of the correct rejection sampling method for the target velocity disqualifies precomputation since there no longer was an absolute maximum amount of numbers needed.
 
-Taking these points into consideration, it was decided to use a linear congruential random number generator (LCRNG) for computing random numbers in the transport kernels.  It allows the kernels to generate random numbers with the recursion relations shown in \eqref{lcrng}.  The values $a$, $c$, and $m$ are taken from Pierre L'Ecuyer's manual for configurations with a high figure of merit \cite{lcrng}.   
+Taking these points into consideration, it was decided to use a linear congruential random number generator (LCRNG) for computing random numbers in the transport kernels.  It allows the kernels to generate random numbers with the recursion relations shown in \eqref{lcrng}, where $x_{n-1}$ is the previous random number.  The values $a$, $c$, and $m$ are taken from Pierre L'Ecuyer's manual for configurations with a high figure of merit \cite{lcrng}.   
 
 \begin{equation}
 \begin{split}
@@ -381,39 +381,36 @@ Since the reaction numbers are integers, they can be sorted by very efficient al
 \caption{A radix key-value sort creating a remapping vector. \label{radix_sort} }
 \end{figure}
 
-There is one more piece of information that is needed to launch the reaction kernels concurrently - the number of particles undergoing each type of reaction.  This is determined by launching a comparison kernel on the sorted array which detects the places where the reaction numbers change.  
-
-More details here once this is actually completed.
-
+There is one more piece of information that is needed to launch the reaction kernels concurrently - the number of particles undergoing each type of reaction.  This is determined by launching a comparison kernel on the sorted array which detects the places where the reaction numbers change.  The algorithm to do this is a simple adjacent comparison.  If there are $N$ elements in the array, $N-1$ threads are launched which load values tid and tid+1.  If the values are different, tid is the last index of a reaction type.  Since there are coarse boundaries for the reaction kernels, only 4 transitions need to be recorded can copied back to the host.  The groups are MT=2 for the elastic kernel, MT=18-21 and MT=38 for fission, MT=51-90 for discrete inelastic scattering, and MT=91 for continuum scattering.  Reactions with MT numbers larger than 91 do not produce secondary neutrons and are treated as capture.  MT=11-45 not including the fission numbers can usually be treated as continuum scattering (ENDF law 44), but may not be true for all isotopes.  Finer-grained reaction kernels may be a future development point of WARP.  If a launched thread lies on a boundary, it writes its index into a vector containing  8 elements, the start and end indices for the 4 reaction kernels.  Since there is only two boundary for each reaction group, this can be done without atomic operations since only one thread should ever write to an element.
 
 \subsubsection{Criticality Source}
 
-As was mentioned previously, when the simulation is run in criticality mode, the source points for neutron batches depend on the fission points in the previous batch.  But if $k_\mathrm{eff}$ is not equal to one, each source neutron no longer corresponds to a secondary neutron.  This is the same problem in the time-independent NTE, where getting rid of the time dependent term causes the equation to be inconsistent if the multiplication factor is not one.  To remedy this, the fission source term is divided by the multiplication factor to force the equations to be consistent (assuming the multiplication factor is known).  Similarly, the fission yield vector of a batch of neutrons can be renormalized to artificially make the multiplication factor one by rearranging \eqref{k_eff_batch} as shown in \eqref{k_eff_rebase} where $n$ is the batch number $N_f$ is the number of secondary particles from both fission and (n,2/3/4n) reactions.
+As was mentioned previously, when the simulation is run in criticality mode, the source points for neutron batches depend on the fission points in the previous batch.  But if $k_\mathrm{eff}$ is not equal to one, each source neutron no longer corresponds to a secondary neutron.  This is the same problem in the time-independent NTE, where getting rid of the time dependent term causes the equation to be inconsistent if the multiplication factor is not one.  To remedy this, the fission source term is divided by the multiplication factor to force the equations to be consistent (assuming the multiplication factor is known).  Similarly, the fission yield vector of a batch of neutrons can be renormalized to artificially make the multiplication factor equal to unity by rearranging \eqref{k_eff_batch} as shown in \eqref{k_eff_rebase} where $n$ is the batch number, $N_d$ is the length of the dataset, $y_j$ is the secondary neutron yield of particle $j$, and $N_f$ is the total number of secondary neutrons.
 
 \begin{equation}
 \label{k_eff_rebase}
-\frac{N_{f,n}}{k_{\mathrm{eff},n}} \Rightarrow N_{s,n+1} = N_{s,n}
+\sum_{j=0}^{N_d}  \frac{y_j }{k_{\mathrm{eff},n}} = \frac{N_{f,n}}{k_{\mathrm{eff},n}} \Rightarrow N_{s,n+1} = N_{s,n}
 \end{equation}
 
-Yields must be integers however, since WARP
+Since WARP handless all neutrons with equal importance, yields must be integers, but $y_j/k_\mathrm{eff}$ rarely will be.  Stochastic rounding is used to round $y_j/k_\mathrm{eff}$ to the lower integer with probability $y_j/k_\mathrm{eff} - \mathrm{floor}(y_j/k_\mathrm{eff})$.  Since yields range from 2-5 neutrons, there will be many individual instances of each original yield and in the entire dataset, and yields will approach the mean $y_j/k_\mathrm{eff}$.
 
-stochastic rounding
-
-cannot simply pop, unless generation number is associated, then data can be generated and post-processed?
+Once the yield vector is rebased by dividing by $k_\mathrm{eff}$ and stochastically rounding to a nearest integer, a prefix sum is done on the yield vector.  An exclusive prefix sum, or exclusive scan as CUDPP calls it, contains the sum of all the array values before index $j$ at index $j$ as shown in \eqref{prefix_sum}.  Such a vector can be used in the pop kernel, which writes the secondary particle data into the next batch's initial data based on the yield vector.
 
 \begin{equation}
-y_n = \sum_0^{n-1} \: x_i
+p_n = \sum_0^{n-1} \: x_i
 \label{prefix_sum}
 \end{equation}
 
-need to do generations since the source update is generation-dependent, can this be changed?
-
-
+after the prefix sum is done, the source pop kernel is launched.  A thread is launched for every element of the history dataset, and If a thread encounters a yield value of zero, it returns.  If a nonzero value is encountered, the thread samples $y_j$ secondary particles and writes them into the history data from $p_j$ to $p_j+y_j$.  Since th yields have been rebased, this should either just fall short or slightly over the total dataset size, $N_d$.  Of course, the yield vectors are immediately set to zero for all particles in the next generation.
 
 \subsubsection{Fixed Source \& Subcritical Multiplication}
 
 necessary to be subcritical.
 
-pop can pop source particles in to keep population constant until NPS exceeded...
+pop can pop source particles in to keep population constant until NPS exceeded..
+
+cannot simply pop for criticality, unless generation number is associated, then data can be generated and post-processed?  fine for fixed since generations do not matter, multiplication factor is irrelevant, response is desired.
+
+need to do generations since the source update is generation-dependent, can this be changed?
 
 
