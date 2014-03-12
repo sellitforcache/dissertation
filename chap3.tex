@@ -319,7 +319,7 @@ c &= 7
 
 LCRNGs are based on integer numbers which must be converted to floats when the numbers are needed.  This is done by simply dividing my the modulus value $m$.  OpenMC uses a similar version, but since WARP uses single precision, different values were needed.   One was chosen close to the full 32-bit range for maximum floating point resolution.  Having a modulus as a power of two is very convenient as well since the modulus can be performed by bit truncation rather than a full modulus operation \cite{openmc}.  In other words, the operation can be done by a bitwise AND operation between $a x_{n-1} + c$ and $2^{30}-1$, which in binary is all ones below the 30th bit.
 
-Using a LCRNG keeps global access down and improves performance greatly, since a single seed value is loaded at the start of the transport loop, stored in fast registers, then written back at the end of the loop.  CURAND is used outside of cycle to advance the seed back with the Mersenne Twister algorithm (which has a period of $2^{19937} ? 1$) to make sure no correlated numbers are used as intermediate seeds.
+Using a LCRNG keeps global access down and improves performance greatly, since a single seed value is loaded at the start of the transport loop, stored in fast registers, then written back at the end of the loop.  CURAND is used outside of cycle to advance the seed bank with the Mersenne Twister algorithm (which has a period of $2^{19937} - 1$) to make sure no correlated numbers are used as intermediate seeds.
 
 \subsection{Macroscopic Kernel}
 

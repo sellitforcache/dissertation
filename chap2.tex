@@ -13,7 +13,7 @@ The fission chain reaction is sustained from the fact that when a uranium (or ot
 
 \subsection{Point Kinetics}
 
-The most important parameter of a nuclear reactor is its effective multiplication factor, $k_\mathrm{eff}$, which is the ratio of subsequent neutron generations.  This number can partly describes the rate of change of the neutron population if the average neutron lifetime is know.  If a reactor is treated as a point, i.e. with no dimensional dependence, the rate of change of its neutron population can be described with the differential equation shown in \eqref{point_kin2}. 
+The most important parameter of a nuclear reactor is its effective multiplication factor, $k_\mathrm{eff}$, which is the ratio of subsequent neutron generations.  This number can partly describes the rate of change of the neutron population if the average neutron lifetime is know.  If a reactor is treated as a point, i.e. with no dimensional dependence, the rate of change of its neutron population can be described with the differential equation shown in \eqref{point_kin2} where $N(t)$ is the neutron population at time $t$ and $l_p$ is the average neutron lifetime \cite{}. 
 
 \begin{equation}
 \label{point_kin1}
@@ -25,7 +25,7 @@ N(t+l_p) \simeq N(t)+l_p \frac{dN(t)}{dt} = k_\mathrm{eff} N(t)
 \frac{dN(t)}{dt} \simeq \frac{k_\mathrm{eff} -1}{l_p}N(t)
 \end{equation}
 
-The solution to this equation is show in in \eqref{reactor_period},  
+The solution to this equation is show in in \eqref{reactor_period}.  The neutron lifetime is usually treated as constant since it mostly depends on the material present in the reactor (which change very slowly compared to the neutron population), so the only parameter that influences the reaction period $T$ is $k_\mathrm{eff}$.  When the meultiplication factor is unity, the reactor period is infinity, implying that the neutron population is in a steady state.  When it is less than one, the period is negative, implying that the neutron population will decrease.  The converse it true when it is positive.  Then the period is positive and the neutron population increases with time.
 
 \begin{equation}
 \label{reactor_period}
@@ -35,13 +35,28 @@ T &= \frac{l_p}{k_\mathrm{eff} -1}
 \end{split}
 \end{equation}
 
-\subsection{Seven Factor Formula}
+\subsection{Six Factor Formula}
 
- 7 factors
+From a qualitative standpoint, there are six factors that can influence the multiplication factor: 
+
+\begin{equation}
+\label{six_ff}
+k_\mathrm{eff}  = \eta f p  \epsilon P_\mathrm{FNL} P_\mathrm{TNL}
+\end{equation}
+
+\begin{figure}[h!]
+  \centering
+    \includegraphics[width=0.8\textwidth]{graphics/six_ff.eps}
+     \caption{The reaction chain represented by six factor formula. \label{six_ff}}
+\end{figure}
 
 
-
-
+Thermal Fission Factor
+The thermal utilization factor
+The resonance escape probability
+The fast fission factor 
+The fast non-leakage probability	
+The thermal non-leakage probability
 
 
 
