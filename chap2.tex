@@ -9,17 +9,37 @@ In this chapter, details regarding the simulation theory are gone over.
 
 reactors in general, LWR, fast breeders, GenIV, waste streams, power conversion, coupling between TH, need for fast simulations in oder to do convergence iterations
 
-fission chain reaction, 
-
-\subsection{Seven Factor Formula}
- 7 factors
+The fission chain reaction is sustained from the fact that when a uranium (or other fissile heavy metal) nucleus fissions, 2 or more neutrons are released.  If, on average, one of these neutrons goes on to induce another fission, the system in which the fissions are occurring is \emph{critical}, or able to maintain a constant neutron population and fission reaction rate (i.e. power) without any external neutron sources.
 
 \subsection{Point Kinetics}
 
+The most important parameter of a nuclear reactor is its effective multiplication factor, $k_\mathrm{eff}$, which is the ratio of subsequent neutron generations.  This number can partly describes the rate of change of the neutron population if the average neutron lifetime is know.  If a reactor is treated as a point, i.e. with no dimensional dependence, the rate of change of its neutron population can be described with the differential equation shown in \eqref{point_kin2}. 
+
 \begin{equation}
-\label{keff}
-k_\mathrm{eff} = 
+\label{point_kin1}
+N(t+l_p) \simeq N(t)+l_p \frac{dN(t)}{dt} = k_\mathrm{eff} N(t) 
 \end{equation}
+
+\begin{equation}
+\label{point_kin2}
+\frac{dN(t)}{dt} \simeq \frac{k_\mathrm{eff} -1}{l_p}N(t)
+\end{equation}
+
+The solution to this equation is show in in \eqref{reactor_period},  
+
+\begin{equation}
+\label{reactor_period}
+\begin{split}
+N(t) &= N_0 \exp \left( \frac{t}{T} \right) \\
+T &= \frac{l_p}{k_\mathrm{eff} -1}
+\end{split}
+\end{equation}
+
+\subsection{Seven Factor Formula}
+
+ 7 factors
+
+
 
 
 
@@ -30,7 +50,7 @@ k_\mathrm{eff} =
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{History}
 
-The Monte Carlo method is not a new way to simulate nuclear reactors (or any particle transport problem for that matter) and in it's modern form dates back to 1940 when XXX invented the approach while working on the Manhattan Project[cite]. Uncle in Monaco...  During this time, Henry Metropolis and John Von Neumann...[cite]  Although this may be disputed by some people since is was rumored that Enrico Fermi was basically doing small scale simulations of this kind in his head trying to get the Chicago Pile critical [cite].
+The Monte Carlo method is not a new way to simulate nuclear reactors (or any particle transport problem for that matter) and in it's modern form dates back to 1940 when XXX invented the approach while working on the Manhattan Project[cite]. Uncle in Monaco...  During this time, Henry Metropolis and John Von Neumann...[cite]  Although this may be disputed by some people since is was rumored that Enrico Fermi was basically doing small scale simulations of this kind in his head trying to get the Chicago Pile critical [cite].  This approach is very intuitive, however, if one knows the underlying physics as the Monte Carlo method strives to recreate an ``experiment' on the computer.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1247,7 +1267,7 @@ BVH is object-centric in the sense that it places boundaries around groups of ob
 \caption{Partitioning schemes (top) with the resulting trees (bottom). A BVH tree is on the left and a k-d tree is on the right. (courtesy WikiMedia commons)  \label{bvh_kd}}
 \end{figure}
 
-The benefit of these structures is that they can be queried in $\log(N)$ time rather than in linear time since major portions of the geometry are \cite{something}.  OptiX automatically builds theses trees over the geometry without any user input other than to specify the type.  The different types have tradeoffs with size, build speed, and performance, but since WARP's geometry is static and relatively simple compared to photorealistic rendering jobs, the build speed and size have negligible impact, so the highest performance structure is used, which happens to be a a split bounding volume hierarchy (SBVH).  
+The benefit of these structures is that they can be queried in $\log(N)$ time rather than in linear time since major portions of the geometry are \cite{something}.  OptiX automatically builds theses trees over the geometry without any user input other than to specify the type.  The different types have tradeoffs with size, build speed, and performance, but since WARP's geometry is static and relatively simple compared to photorealistic rendering jobs, the build speed and size have negligible impact, so the highest performance structure is used is WARP.  Which structure prevodes the best performance is the goal of one of the preliminary studies in Section \ref{sec:prelim}.  
 
 The typical geometry representation in Monte Carlo neutron transport codes is combinatorial geometry, which uses union and intersection operations on the surface sense  of a point in relation to second-order polynomials.  This kind of algorithm is linear with the number of \emph{surfaces} present in the geometry, so using OptiX in complicated geometries should provide provide a performance boost to geometry routines, especially compared to MCNP, which uses ray tracing as well as combinatorial geometry.  Serpent only uses Woodcock tracking for neutrons, and surface intersections are never calculated.  It also uses ``universes'' to provide some level of acceleration structure to primitive replication.  In using them, a neutron is determined to be in a larger cell occupied by another, nonzero universe.  On this is determined, the neutron is transformed into the higher level universe and the geometry there is queried.  This operation is done recursively until the actual material the neutron is traveling in is determined \cite{jaakko}[MUST CHECK THIS FOR TRUTH].  In effect, using ``universes'' in this way is like traversing a k-d tree, and it is unclear how Serpent will compare against WARP in this regard a priori and will be benchmarked in the results section (Chapter \ref{chap:results}).
 
