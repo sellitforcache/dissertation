@@ -7,6 +7,8 @@
 % you don't get any numbering.  You probably won't be using any of
 % these commands in the abstract anyway.
 
+PLACEHOLDER, TAKEN FROM PAPER
+
 General purpose Graphical Processing Units (GPUs) are an emerging computational tool, sporting very high memory bandwidth and computational throughput compared to standard CPUs.  There are some drawbacks, however, including limited memory (currently 6 GB) and requiring data parallelism for full utilization.  Since all threads in a GPU thread block must execute the same instructions, having conditional statements based on random numbers can cause threads to be serialized. This can cause resource under-utilization.  For example, in particle transport where a particle history is assigned to each thread, thread divergence mainly arises through particles undergoing different reactions based on the results of cross section sampling.
 
 Conventional CPU Monte Carlo algorithms typically use the approach of one particle history per CPU thread.  Data is accessed when needed and threads execute completely independently of each other.  This is a task parallel approach.  To fully utilize the computational power of GPUs, this approach must be modified.  Threads need to execute identical instructions and therefore must be in the same stage of the transport algorithm. 

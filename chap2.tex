@@ -11,9 +11,9 @@ reactors in general, LWR, fast breeders, GenIV, waste streams, power conversion,
 
 The fission chain reaction is sustained from the fact that when a uranium (or other fissile heavy metal) nucleus fissions, 2 or more neutrons are released.  If, on average, one of these neutrons goes on to induce another fission, the system in which the fissions are occurring is \emph{critical}, or able to maintain a constant neutron population and fission reaction rate (i.e. power) without any external neutron sources.
 
-\subsection{Point Kinetics}
+\subsection{Point Kinetics, Multiplication Factor}
 
-The most important parameter of a nuclear reactor is its effective multiplication factor, $k_\mathrm{eff}$, which is the ratio of subsequent neutron generations.  This number can partly describes the rate of change of the neutron population if the average neutron lifetime is know.  If a reactor is treated as a point, i.e. with no dimensional dependence, the rate of change of its neutron population can be described with the differential equation shown in \eqref{point_kin2} where $N(t)$ is the neutron population at time $t$ and $l_p$ is the average neutron lifetime \cite{}. 
+The most important parameter of a nuclear reactor is its effective multiplication factor, $k_\mathrm{eff}$, which is the ratio of subsequent neutron generations.  This number can partly describes the rate of change of the neutron population if the average neutron lifetime is know.  If a reactor is treated as a point, i.e. with no dimensional dependence, the rate of change of its neutron population can be described with the differential equation shown in \eqref{point_kin2} where $N(t)$ is the neutron population at time $t$ and $l_p$ is the average neutron lifetime \cite{duderstadt}. 
 
 \begin{equation}
 \label{point_kin1}
@@ -25,7 +25,7 @@ N(t+l_p) \simeq N(t)+l_p \frac{dN(t)}{dt} = k_\mathrm{eff} N(t)
 \frac{dN(t)}{dt} \simeq \frac{k_\mathrm{eff} -1}{l_p}N(t)
 \end{equation}
 
-The solution to this equation is show in in \eqref{reactor_period}.  The neutron lifetime is usually treated as constant since it mostly depends on the material present in the reactor (which change very slowly compared to the neutron population), so the only parameter that influences the reaction period $T$ is $k_\mathrm{eff}$.  When the meultiplication factor is unity, the reactor period is infinity, implying that the neutron population is in a steady state.  When it is less than one, the period is negative, implying that the neutron population will decrease.  The converse it true when it is positive.  Then the period is positive and the neutron population increases with time.
+The solution to this equation is show in in \eqref{reactor_period}.  The neutron lifetime is usually treated as constant since it mostly depends on the material present in the reactor (which change very slowly compared to the neutron population), so the only parameter that influences the reaction period $T$ is $k_\mathrm{eff}$.  When the multiplication factor is unity, the reactor period is infinity, implying that the neutron population is in a steady state.  When it is less than one, the period is negative, implying that the neutron population will decrease.  The converse it true when it is positive.  Then the period is positive and the neutron population increases with time.
 
 \begin{equation}
 \label{reactor_period}
@@ -37,12 +37,22 @@ T &= \frac{l_p}{k_\mathrm{eff} -1}
 
 \subsection{Six Factor Formula}
 
-From a qualitative standpoint, there are six factors that can influence the multiplication factor: 
+The multiplication factor is the most important parameter in a nuclear reactor because it dictates the time rate of change of its power.  It is a global number, and a lot of physics gets integrated into it.  From a high level, there are six factors that can influence the multiplication factor: 
+the thermal fission factor, $\eta$, or the average number of neutrons produced per thermal fission;
+the thermal utilization factor, $f$, or the probability that an absorbed thermal neutron was absorbed by a fissile nuclide;
+the resonance escape probability, $p$, or the probability that neutrons are not captures in large resonances as they scatter from high energy; 
+the fast fission factor, $\epsilon$, the ratio of all fission neutrons to those born from thermal fissions;
+the fast non-leakage probability, $P_\mathrm{FNL}$, the probability that high-energy neutrons will not leak out of the system;
+the thermal non-leakage probability, $P_\mathrm{TNL}$, the probability that low-energy neutrons will not leak out of the system.
+
+Multiplying all these factors together yields the number of neutrons born from fission given a single entering neutron, i.e. the multiplication factor.  This formula, known as the ``six factor formula,'' is shown in \eqref{six_ff_eq}.  Many physics factors go into each of the formula's factors, like geometrical configuration, cross section energy dependence, material composition, and scattering kinematics, to name a few major components.
 
 \begin{equation}
-\label{six_ff}
+\label{six_ff_eq}
 k_\mathrm{eff}  = \eta f p  \epsilon P_\mathrm{FNL} P_\mathrm{TNL}
 \end{equation}
+
+A graphical interpretation of the six factor formula is shown in Figure \ref{six_ff}.
 
 \begin{figure}[h!]
   \centering
@@ -50,22 +60,13 @@ k_\mathrm{eff}  = \eta f p  \epsilon P_\mathrm{FNL} P_\mathrm{TNL}
      \caption{The reaction chain represented by six factor formula. \label{six_ff}}
 \end{figure}
 
-
-Thermal Fission Factor
-The thermal utilization factor
-The resonance escape probability
-The fast fission factor 
-The fast non-leakage probability	
-The thermal non-leakage probability
-
-
-
+relate it to MC since it is basically single-group MC
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{History}
 
-The Monte Carlo method is not a new way to simulate nuclear reactors (or any particle transport problem for that matter) and in it's modern form dates back to 1940 when XXX invented the approach while working on the Manhattan Project[cite]. Uncle in Monaco...  During this time, Henry Metropolis and John Von Neumann...[cite]  Although this may be disputed by some people since is was rumored that Enrico Fermi was basically doing small scale simulations of this kind in his head trying to get the Chicago Pile critical [cite].  This approach is very intuitive, however, if one knows the underlying physics as the Monte Carlo method strives to recreate an ``experiment' on the computer.
+The Monte Carlo method is not a new way to simulate nuclear reactors (or any particle transport problem for that matter) and in it's modern form dates back to 1940 when XXX invented the approach while working on the Manhattan Project \cite{}. Uncle in Monaco...  During this time, Henry Metropolis and John Von Neumann...[cite]  Although this may be disputed by some people since is was rumored that Enrico Fermi was basically doing small scale simulations of this kind in his head trying to get the Chicago Pile critical \cite{}.  This approach is very intuitive, however, if one knows the underlying physics as the Monte Carlo method strives to recreate an ``experiment' on the computer by directly simulating every interaction neutrons make as they do their random walk through matter.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
