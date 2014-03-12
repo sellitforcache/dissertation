@@ -2,6 +2,66 @@
 \label{chap:results}
 
 
-criticality - bare sphere, homogenized cube,  small array, large array
+criticality - godiva, homogenized cube,  small array, large array
 fixed source - water slab, accelerator driven subcritical?
 compare w serpent and mcnp
+
+\begin{figure}[h!] 
+\centering
+\includegraphics[width=0.8\textwidth]{graphics/homfuel_spec.eps}
+\caption{Spectrum comparison in a homogenized block of UO$_2$ and water. \label{homfuel_spec} }
+\end{figure}
+
+\begin{figure}[h!] 
+\centering
+\includegraphics[width=0.8\textwidth]{graphics/homfuel_spec_err.eps}
+\caption{Error of the spectrum calculated by WARP relative to that of Serpent in a homogenized block of UO$_2$ and water. \label{homfuel_spec_err} }
+\end{figure}
+
+\begin{table}[h]
+\centering
+\caption{Summary of $k_\mathrm{eff}$ results of the WARP benchmarks.}
+\label{benchmark_summary}
+\begin{tabular}{| l | r | r | r | r | r |}
+ \hline
+ Benchmark & MCNP 6.1 & Serpent 2.1.18 & WARP & $\Delta$ M & $\Delta$ S  \\
+\hline
+\hline
+\multicolumn{6}{|l|}{Godiva}  \\
+\hline
+ $k_\mathrm{eff}$ & & 0.931719 & 0.932709 & & -99 pcm  \\
+ \hline
+ Runtime               & & 7.26108 m & 1.23576 m  & & 5.876 \\
+ \hline
+ \hline
+\multicolumn{6}{|l|}{Homogenized Block }\\
+\hline
+ $k_\mathrm{eff}$ & & 0.931719 & 0.932709 & & -99 pcm   \\
+ \hline
+ Runtime               & & 7.26108 m & 1.23576 m & & 5.876 \\
+ \hline
+  \hline
+\multicolumn{6}{|l|}{Pin Cell}\\
+\hline
+ $k_\mathrm{eff}$ & & 0.931719 & 0.932709 & & -99 pcm    \\
+ \hline
+ Runtime               & & 7.26108 m & 1.23576 m & & 5.876  \\
+ \hline
+  \hline
+\multicolumn{6}{|l|}{Small Assembly}\\
+\hline
+ $k_\mathrm{eff}$ & & 0.931719 & 0.932709 & & -99 pcm  \\
+ \hline
+ Runtime               & & 7.26108 m & 1.23576 m  & & 5.876 \\
+ \hline
+  \hline
+\multicolumn{6}{|l|}{Large Assembly}\\
+\hline
+ $k_\mathrm{eff}$ & & 0.931719 & 0.932709 & & -99 pcm   \\
+ \hline
+ Runtime               & & 7.26108 m & 1.23576 m & & 5.876  \\
+ \hline
+\end{tabular}
+\end{table}
+
+
