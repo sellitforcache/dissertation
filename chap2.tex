@@ -1231,14 +1231,14 @@ Geometrical primitives in OptiX are represented by their intersection programs. 
 \begin{equation}
 \label{ray_sphere}
 \begin{split}
-a &= \vec{r}_D \cdot \vec{r}_D \\
-b &= 2 \vec{r}_O \cdot \vec{r}_D \\
+a &= \vec{r}_D \cdot \vec{r}_D = 1\\
+b &= 2 \vec{r}_O \cdot \vec{r}_D = 2b_2\\
 c &= \vec{r}_O \cdot \vec{r}_O - r^2 \\
-t &= \frac{-b \pm \sqrt{b^2-4ac}}{2a}
+t &= \frac{-b \pm \sqrt{b^2-4ac}}{2a} = -b_2 \pm \sqrt{b_2^2-c}
 \end{split}
 \end{equation}
 
-Their main purpose is to calculate the intersection points, which must be reported back in terms of the $t$ value.  For example, the equation for a sphere is $r^2=x^2+y^2+z^2$.  Substituting \eqref{parameterized_ray} into this equation and solving for $t$ yields \eqref{ray_sphere}.  Since a sphere is a closed surface, there are two intersection points.  The nearer of the two is reported back by the intersection program.
+Their main purpose is to calculate the intersection points, which must be reported back in terms of the $t$ value.  For example, the equation for a sphere is $r^2=x^2+y^2+z^2$.  Substituting \eqref{parameterized_ray} into this equation and solving for $t$ yields \eqref{ray_sphere}.  Since a sphere is a closed surface, there are two intersection points.  The smallest nonnegative value is reported back by the intersection program.
 
  \begin{figure}[h!] 
   \centering

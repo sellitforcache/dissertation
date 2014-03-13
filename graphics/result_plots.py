@@ -162,12 +162,13 @@ f_gpu_data_large_512=open('prelim/timings-scatter/timings-0.1/timing_gpu6_512_0.
 
 cpu1					=np.array(f_cpu1.read().split()					,dtype=float)
 cpu2					=np.array(f_cpu2.read().split()					,dtype=float)
-gpu_task_128_01		=np.array(f_gpu_task_128.read().split()			,dtype=float)
-gpu_task_512_01		=np.array(f_gpu_task_512.read().split()			,dtype=float)
+gpu_task_128_01			=np.array(f_gpu_task_128.read().split()			,dtype=float)
+gpu_task_512_01			=np.array(f_gpu_task_512.read().split()			,dtype=float)
 gpu_data_batch_128_01	=np.array(f_gpu_data_batch_128.read().split()	,dtype=float)
 gpu_data_batch_512_01	=np.array(f_gpu_data_batch_512.read().split()	,dtype=float)
 gpu_data_large_128_01	=np.array(f_gpu_data_large_128.read().split()	,dtype=float)	
 gpu_data_large_512_01	=np.array(f_gpu_data_large_512.read().split()	,dtype=float)
+cpu_01 =(cpu1+cpu2)/2.0
 
 f_cpu1				=open('prelim/timings-scatter/timings-0.01/timing_cpu_128_0.01_sm_20')
 f_cpu2				=open('prelim/timings-scatter/timings-0.01/timing_cpu_512_0.01_sm_20')
@@ -186,8 +187,7 @@ gpu_data_batch_128_001	=np.array(f_gpu_data_batch_128.read().split()	,dtype=floa
 gpu_data_batch_512_001	=np.array(f_gpu_data_batch_512.read().split()	,dtype=float)
 gpu_data_large_128_001	=np.array(f_gpu_data_large_128.read().split()	,dtype=float)	
 gpu_data_large_512_001	=np.array(f_gpu_data_large_512.read().split()	,dtype=float)
-
-cpu =(cpu1+cpu2+cpu3+cpu4)/4.0
+cpu_001 =(cpu3+cpu4)/2.0
          
 active_batch=np.array([
 8388480,
@@ -797,12 +797,12 @@ active_large=np.array([
 name = 'prelim_speedup_01_k20'	
 fig = pl.figure(figsize=(10,6))
 ax = fig.add_subplot(1,1,1)
-ax.semilogx(N,np.divide(cpu,gpu_task_128_01),'k-',label='Task 128 t/b')
-ax.semilogx(N,np.divide(cpu,gpu_task_512_01),'k--',label='Task 512 t/b')
-ax.semilogx(N,np.divide(cpu,gpu_data_batch_128_01),'b-',label='Event, Batch 128 t/b')
-ax.semilogx(N,np.divide(cpu,gpu_data_batch_512_01),'b--',label='Event, Batch 512 t/b')
-ax.semilogx(N,np.divide(cpu,gpu_data_large_128_01),'r-',label='Event, Remap 128 t/b')
-ax.semilogx(N,np.divide(cpu,gpu_data_large_512_01),'r--',label='Event, Remap 512 t/b')
+ax.semilogx(N,np.divide(cpu_01,gpu_task_128_01),'k-',label='Task 128 t/b')
+ax.semilogx(N,np.divide(cpu_01,gpu_task_512_01),'k--',label='Task 512 t/b')
+ax.semilogx(N,np.divide(cpu_01,gpu_data_batch_128_01),'b-',label='Event, Batch 128 t/b')
+ax.semilogx(N,np.divide(cpu_01,gpu_data_batch_512_01),'b--',label='Event, Batch 512 t/b')
+ax.semilogx(N,np.divide(cpu_01,gpu_data_large_128_01),'r-',label='Event, Remap 128 t/b')
+ax.semilogx(N,np.divide(cpu_01,gpu_data_large_512_01),'r--',label='Event, Remap 512 t/b')
 handles, labels = ax.get_legend_handles_labels()
 ax.legend(handles, labels, loc=2)
 pl.grid(True)
@@ -819,12 +819,12 @@ else:
 name = 'prelim_speedup_001_k20'	
 fig = pl.figure(figsize=(10,6))
 ax = fig.add_subplot(1,1,1)
-ax.semilogx(N,np.divide(cpu,gpu_task_128_001),'k-',label='Task 128 t/b')
-ax.semilogx(N,np.divide(cpu,gpu_task_512_001),'k--',label='Task 512 t/b')
-ax.semilogx(N,np.divide(cpu,gpu_data_batch_128_001),'b-',label='Event, Batch 128 t/b')
-ax.semilogx(N,np.divide(cpu,gpu_data_batch_512_001),'b--',label='Event, Batch 512 t/b')
-ax.semilogx(N,np.divide(cpu,gpu_data_large_128_001),'r-',label='Event, Remap 128 t/b')
-ax.semilogx(N,np.divide(cpu,gpu_data_large_512_001),'r--',label='Event, Remap 512 t/b')
+ax.semilogx(N,np.divide(cpu_001,gpu_task_128_001),'k-',label='Task 128 t/b')
+ax.semilogx(N,np.divide(cpu_001,gpu_task_512_001),'k--',label='Task 512 t/b')
+ax.semilogx(N,np.divide(cpu_001,gpu_data_batch_128_001),'b-',label='Event, Batch 128 t/b')
+ax.semilogx(N,np.divide(cpu_001,gpu_data_batch_512_001),'b--',label='Event, Batch 512 t/b')
+ax.semilogx(N,np.divide(cpu_001,gpu_data_large_128_001),'r-',label='Event, Remap 128 t/b')
+ax.semilogx(N,np.divide(cpu_001,gpu_data_large_512_001),'r--',label='Event, Remap 512 t/b')
 handles, labels = ax.get_legend_handles_labels()
 ax.legend(handles, labels, loc=2)
 pl.grid(True)
