@@ -45,23 +45,21 @@ the fast fission factor, $\epsilon$, the ratio of all fission neutrons to those 
 the fast non-leakage probability, $P_\mathrm{FNL}$, the probability that high-energy neutrons will not leak out of the system;
 the thermal non-leakage probability, $P_\mathrm{TNL}$, the probability that low-energy neutrons will not leak out of the system.
 
-Multiplying all these factors together yields the number of neutrons born from fission given a single entering neutron, i.e. the multiplication factor.  This formula, known as the ``six factor formula,'' is shown in \eqref{six_ff_eq}.  Many physics factors go into each of the formula's factors, like geometrical configuration, cross section energy dependence, material composition, and scattering kinematics, to name a few major components.
+Multiplying all these factors together yields the number of neutrons born from fission given a single entering neutron, i.e. the multiplication factor.  This formula, known as the ``six factor formula,'' is shown in \eqref{six_ff_eq}.  Many physics factors go into each of the formula's factors, like geometrical configuration, cross section energy dependence, material composition, and scattering kinematics, to name a few major components.  A graphical interpretation of the six factor formula is shown in Figure \ref{six_ff_chain}.
 
 \begin{equation}
 \label{six_ff_eq}
 k_\mathrm{eff}  = \eta f p  \epsilon P_\mathrm{FNL} P_\mathrm{TNL}
 \end{equation}
 
-A graphical interpretation of the six factor formula is shown in Figure \ref{six_ff}.
 
 \begin{figure}[h!]
   \centering
     \includegraphics[width=0.8\textwidth]{graphics/six_ff.eps}
-     \caption{The reaction chain represented by six factor formula. \label{six_ff}}
+     \caption{The reaction chain represented by probabilities in the six factor formula. \label{six_ff_chain}}
 \end{figure}
 
-relate it to MC since it is basically single-group MC
-
+The six factor formula relates to the Monte Carlo method since it is basically dimensionally-average Monte Carlo.  In other words, it describes what happens to the average neutron, and an individual neutron's lifetime, or ``history,'' could be simulated by sampling the constant probabilities that the factors represent as shown in Figure \ref{six_ff_chain}.  After a large group, or ensemble, of these histories is assembled, they can be averaged to determine the multiplication factor.  This is the basic idea of Monte Carlo neutron transport.  The results are trivial in this case, since there is no dimensionally in the problem and the probabilities are constant and the multiplication can be found analytically, but the six factor formula is way to think about the process without complicating it with dimensionality.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{History}
