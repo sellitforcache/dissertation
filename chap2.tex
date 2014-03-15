@@ -64,16 +64,13 @@ The six factor formula relates to the Monte Carlo method since it is basically d
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{History}
 
-The Monte Carlo method is not a new way to simulate nuclear reactors (or any particle transport problem for that matter) and in it's modern form dates back to 1940 when XXX invented the approach while working on the Manhattan Project \cite{}. Uncle in Monaco...  During this time, Henry Metropolis and John Von Neumann...[cite]  Although this may be disputed by some people since is was rumored that Enrico Fermi was basically doing small scale simulations of this kind in his head trying to get the Chicago Pile critical \cite{}.  This approach is very intuitive, however, if one knows the underlying physics as the Monte Carlo method strives to recreate an ``experiment' on the computer by directly simulating every interaction neutrons make as they do their random walk through matter.
-
+The Monte Carlo method is not a new way to simulate nuclear reactors (or any particle transport problem for that matter) and in it's modern form dates back to 1940 when XXX invented the approach while working on the Manhattan Project \cite{}. Uncle in Monaco...  During this time, Henry Metropolis and John Von Neumann...\cite{}  Although this may be disputed by some people since is was rumored that Enrico Fermi was basically doing small scale simulations of this kind in his head trying to get the Chicago Pile critical \cite{}.  This approach is very intuitive, however, if one knows the underlying physics as the Monte Carlo method strives to recreate an ``experiment' on the computer by directly simulating every interaction neutrons make as they do their random walk through matter.  More here if necessary...
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Nuclear Interactions}
 \label{subsec:interactions}
 
 The core of a Monte Carlo simulation is explicitly modeling the individual interactions the neutron undergoes as it moves through matter.  At the highest level, these reactions can be broken down into two categories, elastic reactions and inelastic reactions.  Elastic reactions are those where both momentum and kinetic energy are conserved, i.e. ones where any energy the neutron loses is given to the target nucleus.  Inelastic reactions are those that conserve momentum but do not conserve kinetic energy, i.e. ones where the kinetic energy of the particles can be converted to a vibrational mode of the target nucleus, etc.  These reactions are further divided by the number and type of secondary particles they produce.  Reactions that produce no secondary neutrons are called ``disappearance'' reactions since the neutron effectively disappears, reactions that produce a single neutron are typically called scattering reactions since they effectively change the incoming neutron's energy and direction, and reaction the produce more than one particle are simply called ``secondary-producing'' reactions. Table \ref{nuc_reaction_summary} show a summary of the reaction classifications, and it can be seen that elastic scattering is the only elastic reaction.   
-
-potential scattering vs compound nucleus.
 
 \begin{table}[h]
 \centering
@@ -242,7 +239,7 @@ Since it is still a two-body interaction, the kinematics of the reaction are ide
 
 At energies above the distinct levels there lies a continuum in the nuclear energy states.  This isn't truly a ``continuum'' in the strictest sense, but the energy levels become so close together they they effectively form a domain where energy can take continuous values.  Unlike the discrete $Q$ values corresponding to a single excited state used in inelastic level scattering, the $Q$ value of the reaction now follows a distribution.  
 
-In bound nuclei, S(a,b)
+In bound nuclei, S(a,b),  compound nucleus?
 
 \subsection{Disappearance Reactions}
 
