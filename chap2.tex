@@ -671,9 +671,9 @@ Var(\bar{X}_i) = Var\left(\frac{1}{N}\sum_{i=0}^N x_i \right) = \frac{1}{N^2} \s
  \frac{\sigma_N^2}{N} = \frac{1}{N(N-1)} \left( \sum_i^N x_i^2- N\bar{X}_N^2 \right) = \frac{1}{(N-1)} \left( \frac{1}{N} \sum_i^N x_i^2 - \left(   \frac{1}{N} \sum_i^N x_i \right)   \right)
 \end{equation}
 
-It should be noted that \eqref{sum_var_1} implies that the standard deviation of the mean always scales as $1/\sqrt{N}$.  This is a blessing and a burden in that it means any calculation will variance of the mean will go to zero, or the sample mean will converge to the true mean, as long it is run long enough and enough samples are collected, but that it will converge as $1/\sqrt{N}$, which is slow.
+It should be noted that \eqref{sum_var_1} implies that the standard deviation of the mean always scales as $1/\sqrt{N}$.  This is a blessing and a burden in that it means any calculation's variance of the mean will go to zero, i.e. the sample mean will converge to the true mean, as long it is run long enough and enough samples are collected, but that it will converge as $1/\sqrt{N}$, which is slow.
 
-Since the central limit theorem states that it is normally distributed, we can make use of the well-know properties of the normal distribution, namely the confidence interval.  The normal distribution has well-defined confidence intervals: 68\% of the population will lie within a single standard deviation, $\sigma$, and 95.5\% will lie within $2\sigma$.  From this knowledge, an expression for the realtive error can be written.  The expression for the relative error shown in \eqref{rel_err} is for the 68\% confidence level, and simply needs to be doubled for the 95\% level \cite{MCNP}\cite{jaakko}.
+Since the central limit theorem states that it is normally distributed, we can make use of the well-know properties of the normal distribution, namely the confidence interval.  The normal distribution has well-defined confidence intervals: 68\% of the population will lie within a single standard deviation, $\sigma$, and 95.5\% will lie within $2\sigma$.  From this knowledge, an expression for the realtive error can be written.  The expression for the relative error shown in \eqref{rel_err} is for the 68\% confidence level, and simply needs to be doubled for the 95\% level \cite{mcnp}\cite{jaakko}.
 
 \begin{equation}
 \label{rel_err}
