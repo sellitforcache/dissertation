@@ -5,13 +5,28 @@
 \centering
 \caption{Reaction number encodings in WARP.}
 \label{WARP_rxn_numbers}
-\begin{tabular}{| l c |}
+\begin{tabular}{| l | c |}
 \hline
 Number &  Description \\
 \hline
-1-117	  &   Reaction described by MT number  \\
-888 	& done flag \\
-999	&   Resample	\\
+2, 50-91	  &   Scatter reaction \\
+& unmodified from standard MT number  \\
+\hline
+800 &  Resample flag \\
+&  History is skipped until OptiX determines the material \\
+\hline
+811-845 & Secondary-producing disappearance reactions \\
+ & that have NOT yet been processed by the fission kernel \\
+\hline
+911-945 & Secondary-producing disappearance reactions \\
+& that have been processed, history terminated \\
+\hline
+997	&  OptiX miss (error) \\
+\hline
+999	&   Leakage	\\
+\hline
+$>$1102 & Absorption reactions \\
+& 1000 added to standard MT number\\
 \hline
 \end{tabular}
 \end{table}
@@ -20,13 +35,16 @@ Number &  Description \\
 \centering
 \caption{Geometric primitive number encodings in WARP.}
 \label{WARP_geom_numbers}
-\begin{tabular}{| l c |}
+\begin{tabular}{| l | c |}
 \hline
 Number &  Description \\
 \hline
 1	  &   Cuboid  \\
-2 	& Cylinder \\
-3	&   Hex	\\
+\hline
+2 	&  Z-parallel finite cylinder \\
+\hline
+3	&   Hexagonal prism	\\
+\hline
 4     & Sphere \\
 \hline
 \end{tabular}
