@@ -368,7 +368,7 @@ Now that the events which can happen to neutrons have been outlined, we will mov
 
 Other than eliminating neutron self interaction, there are a handful of other assumptions that go into the equation that will hold true for the rest of the derivations.  One that follows veery closely is that neutrons are assumed to be points in space, so even at very high densities they sill will not interact with each other, and later when we start to discretize spaces, neutrons cannot be in more than one unique volume by overlapping.  The next assumption is that any relativistic effects are negligible.  The energies of importance in reactor physics are below 10MeV, which is about where they start to become non-negligible for neutrons.  Since neutrons are neutral and have long interaction distances compared to their radii, they are also assumed to move in straight lines between collisions.  Materials are also assumed to be in thermal equilibrium and have isotropic properties.  Materials like graphic and water do not have isotropic properties when it comes to scattering, however.  As will be explained later, this can be corrected by adjusting the scattering kernel.
 
-\subsubsection{Neutron Balance Equation}
+\subsection{Neutron Balance Equation}
 
 \begin{figure}[h!] 
   \centering
@@ -391,7 +391,7 @@ Before any explicit terms need to defined to capture the necessary physics of th
 Now that this equation has been written, we can start to explicitly define the terms.  One quantity has already been touched upon - the neutron density.  The neutron density is the fundamental quantity in reactor physics.  This is shown in \eqref{NBE} as $n$, but in the subsequent sections its dependencies will be elaborated on, as will all other dependencies.
 
 
-\subsubsection{Neutron Distribution Function}
+\subsection{Neutron Distribution Function}
 
 The \emph{neutron distribution function} simply describes the number of neutrons present in each differential quantity it represents.  The most detailed version is differential in space, angle, energy (or velocity), and time, and has inverse units of these dimensions.  In other words, it describes a density in each of it components.  In the subsequent derivations, the spatial, or position vector will be represented by $\boldsymbol{\vec{r}}$, the angular vector by $\boldsymbol{\hat{\Omega}}$, energy by $E$, and time by $t$.  The angle vector is a unit vector that specifies direction only, not magnitude.  It is easiest to express the directional vector as a unit vector in spherical coordinates $(\theta, \phi)$, the polar angle and the azimuthal angle, respectively.  Their cartesian projections are given by \eqref{ang_cart} and shown in Figure \ref{ang_relations}.
 
@@ -429,7 +429,7 @@ N_V = \int_0^\infty \int_{\boldsymbol{\hat{\Omega}}} \int_{V} n(\boldsymbol{\vec
 \bar{E} = \int_0^\infty \int_{\boldsymbol{\hat{\Omega}}} \int_{V} E n(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E) dV d\boldsymbol{\hat{\Omega}} dE
 \end{equation}
 
-\subsubsection{Reaction Rates}
+\subsection{Reaction Rates}
 
 A \emph{reaction rate} is the rate at which a certain reaction is happening in a volume.  If we go to a pulse-type scenario once more, we have $N_\mathrm{p}$ particles which travel at speed $v$ in one direction.  If $\Sigma$ is the interaction probability per unit length, multiplying it by the speed gives the probability of interaction per second, or the \emph{collision rate}.  Since there are $N$ particles, multiplying the rate by it gives the overall reaction rate, $N_\mathrm{p} v \Sigma$, of the pulse in an infinite medium.  If $N$ is now substituted for the neutron distribution function instead of a pulse, the expression now becomes the reaction rate per distribution differential, or the \emph{reaction rate density}.  This expression is shown in \eqref{RR} and is the first building block of the \emph{neutron balance equation}.
 
@@ -454,7 +454,7 @@ dn(x) = - v \Sigma A n(x)dx  \qquad \Rightarrow \qquad  \frac{dI(x)}{dx}= - \Sig
 \end{equation}
 
 
-\subsubsection{Angular and Scalar Flux}
+\subsection{Angular and Scalar Flux}
 
 Since the reactions rate density is dependent on the cross section and the velocity multiplied by the neutron distribution, this quantity is redefined as the \emph{angular flux} as shown in \eqref{ang_flux}.  Flux meaning that it represents a rate at which particles are passing through a surface, and angular meaning that it is differential in angle.  Again, since the reactions rates depend on this quantity, the neutron transport problem is usually written in terms of the angular flux, which is then solved for instead of the neutron distribution.
 
@@ -482,7 +482,7 @@ Scattering and neutron movement have angular dependence, but reaction cross sect
 \frac{\partial }{\partial t}n(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) = \frac{\partial }{\partial t}  \frac{v(E)}{v(E)} n(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) =  \frac{\partial }{\partial t}  \frac{\psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t)}{v(E)} = \frac{1}{v(E)} \frac{\partial }{\partial t}\psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t)
 \end{equation}
 
-\subsubsection{Scattering}
+\subsection{Scattering}
 
 Scattering is highly dependent on angle and energy and requires as more detailed cross section than disappearance reactions.  Elastic scattering has a fixed relation between outgoing energy and angle, but inelastic scattering does not.  Scattering moves a neutrons energy and angle, so to be completely general in describing it, the cross section is assumed to not only ne dependent on incoming energy like all other cross sections, but also on outgoing energy, incoming angle, and outgoing angle.  Since two quantities are being related before and after a scattering event, the scattering cross section is considered \emph{doubly differential} and is sometimes called the \emph{scattering kernel} whereas the integrated value which only depends on incoming energy is called the scattering cross section.   An expression for the scattering kernel is shown in \eqref{scattering_DD_xs} with the incoming values primed.
 
@@ -505,7 +505,7 @@ R_{s, \mathrm{loss}}( \boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t ) = \Si
 R_{s, \mathrm{source}}(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) = \int_0^\infty  \int_{4\pi} \Sigma_s(E^\prime \rightarrow E,\boldsymbol{\hat{\Omega}}^\prime \rightarrow \boldsymbol{\hat{\Omega}}) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}}^\prime,E^\prime,t) d\boldsymbol{\hat{\Omega}}^\prime dE^\prime
  \end{equation}
  
- \subsubsection{Fission Source}
+ \subsection{Fission Source}
 
 The nuclear chain reaction is sustained by fission reactions producing neutrons, so it is essential to model it in any material that has fissionable isotopes.  There are three determining factors for the fission source.  The first is the fission reaction rate, which is represented by the flux multiplied by the fission cross section.  The second is the fission spectrum, which is represented by $\chi$.  Neutrons born from fission are not emitted at a single energy, and the fission spectrum describes the probability for a neutron to be emitted at a certain energy.  The energy spectrum is weakly dependent of the incoming neutron energy, which higher incoming energies producing more higher energy neutrons.  This dependence only starts making a significant difference in spectrum shape at energies above 10MeV, higher than energies usually seen in a reactor.  This is why the fission spectrum is usually treated as being independent of incoming neutron energy.  The spectra of uranium-235 and plutonium-239 for fission induced by a 0.5 MeV neutron are shown in Figure \ref{fiss_spec}, and it can be seen that plutonium-239 produces more high energy neutrons.  The last parameter is the average number of neutrons emitted in a fission event, or the \emph{fission yield}, represented by $\nu$, and is relatively flat until about 1MeV, as was shown in Figure \ref{nu_compare}.  Since 1MeV is within the typical energy range present in nuclear reactions, it is treated as a function of energy.
 
@@ -523,7 +523,7 @@ To write an expression for the fission source, or the number of fission neutrons
  \end{equation}
 
 
-\subsubsection{Streaming}
+\subsection{Streaming}
 
 So far all that has been  touched on is how neutrons within a volume move in angle and energy or are removed outright.  Now we will go over how they move in space, and to do this we consider a surface $S$ around our differential volume.  We want to find an expression for the net number of neutrons passing through this surface and this will be our net leakage term (incoming minus outgoing).  The angular neutron flux describes the number of neutrons crossing a differential surface at angle $\boldsymbol{\hat{\Omega}}$, but in order to perform any vector operations on it, we must multiply it by the unit vector.  We can then write and expression for the leakage by performing a surface integral over the current and surface normal's dot product, shown in \eqref{leakage_surface}.
 
@@ -545,7 +545,7 @@ So far all that has been  touched on is how neutrons within a volume move in ang
  \end{equation}
  
 
-\subsubsection{Neutron Transport Equation}
+\subsection{Neutron Transport Equation}
 
 Now all the terms of \eqref{NBE} have been explicitly defined.  Substituting them all in yields \eqref{NTE}, the \emph{neutron transport equation}, written here with the neutron sinks on the left side and the neutron sources on the right side.  An additional external source term, $S_{\mathrm{external}}$, has been added to account for any sources not induced by the neutron flux itself, i.e. external sources.  
 
@@ -564,7 +564,7 @@ Now all the terms of \eqref{NBE} have been explicitly defined.  Substituting the
  
  The neutron transport equation in this form is an integro-differential equation since it has both derivates and integrals in it.  It's spatial parts are differential, whereas its angular and energy parts are integral.  It is linear and relatively easy to solve for simple geometries and reaction parameters.  The complexity in solving it comes from the complex energy dependence of the reaction parameters and the large and complex domains over which it must be solved in order to capture all the relevant physics.  The reaction parameters can span more then 12 orders of magnitude, from $1\times 10 ^{-11}$ to $1\times 10 ^{1}$ MeV and above, and the geometries involved can include millions of individual material regions with many different mixtures of material within them.
  
- \subsubsection{Time Independent Neutron Transport Equation}
+ \subsection{Time Independent Neutron Transport Equation}
 
 In most situations, the equilibrium state of the neutron population is of interest.  By setting all time derivates to zero, \eqref{NTE} becomes the time-independent neutron transport equation shown in \eqref{time_ind_NTE}.  Another parameter has been introduced, the effective multiplication factor, $k_\mathrm{eff}$, which was described earlier using the seven factor formula.  It is introduced here since by forcing the time derivates to be zero, it is implied that the multiplication factor must be equal to one.  The material and geometric properties of a problem may say otherwise, however, and failing to divide the fission source by the effective multiplication factor could make time independent equation inconsistent.  Of course, there will be no inequality if the source and sink terms are actually balanced and $k_\mathrm{eff}$ calculated from \eqref{NTE} is one.
 
