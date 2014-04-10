@@ -6,7 +6,7 @@ In this chapter, all GPU implementations will be explained in detail, both the p
 \section{Preliminary Studies}
 \label{sec:prelim}
 
-Before any serious coding efforts were undertaken, a pair of smaller preliminary studies were done to determine the feasibility of doing Monte Carlo neutron transport on GPUs.  The first study was attempting to to perform a simple, 2D, mono-energetic scattering game on a GPU.  The second study was a test of the OptiX framework to see if it could handle randomized ray tracing and still have acceptable performance.
+Before any serious coding efforts were undertaken, a pair of smaller preliminary studies were done to determine the feasibility of doing Monte Carlo neutron transport on GPUs.  The first study was attempting to to perform a simple, 2D, mono-energetic scattering game on a GPU.  The second study was a test of the OptiX framework to see if it could handle randomized ray tracing and still have acceptable performance. In both of the following studies and in WARP itself, CUDA 5.0 and OptiX 3.0.1 were used.
 
 \subsection{2D Scattering Game}
 
@@ -16,7 +16,7 @@ Before any serious coding efforts were undertaken, a pair of smaller preliminary
      \caption{The 2D geometry of the scattering test. \label{prelim_geom} }
 \end{figure}
 
-The goal of the 2D mono-energetic scattering game was to highlight if a sorted or unsorted event-based algorithm was best for controlling thread divergence on a GPU, to the see the relative performance of the history- and event-based GPU implementations to an identical serial CPU version, and to determine if the performance of the CUDPP (CUDA Parallel Primitives) library is adequate for use in WARP.   A set of three GPU implementations were written using CUDA C, and a single CPU implementation was written using C.
+The goal of the 2D mono-energetic scattering game was to highlight if a sorted or unsorted event-based algorithm was best for controlling thread divergence on a GPU, to the see the relative performance of the history- and event-based GPU implementations to an identical serial CPU version, and to determine if the performance of the CUDPP (CUDA Parallel Primitives) library is adequate for use in WARP.   A set of three GPU implementations were written using CUDA C, and a single CPU implementation was written using C.  
 
 In the simulation, only two reaction types are possible - scattering and absorption.  Scattering is treated isotropically, and since it is mono-energetic, scattering only serves to change the direction of a particle.  The geometry of the game is simple in order to highlight how the reaction divergence is handled rather than how geometry routines effect performance.   The geometry used in the game is shown in Figure \ref{prelim_geom}.  There are five different cells, which are all square, and particles can only move in the $x$-$y$ plane.  Each cell has different reaction cross sections, and cell 0 extends to infinity, but has a nonzero absorption cross section so particles cannot scatter forever.  Particles are initialized with a uniform, random distribution in cell 1, which has no absorption cross section so they must cross a cell boundary at least once.  Since the cells are few and square, the ``where am I?'' operation that determines the cell number (and therefore the cross sections) each particle is in can be done with simple, hardcoded logic comparisons.
 

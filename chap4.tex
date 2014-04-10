@@ -6,21 +6,13 @@ criticality - godiva, homogenized cube, single pin,  small array, large array
 fixed source - water slab, accelerator driven subcritical?
 compare w serpent and mcnp
 
-\begin{figure}[h!] 
-\centering
-\includegraphics[width=0.8\textwidth]{graphics/homfuel_spec.eps}
-\caption{Spectrum comparison in a homogenized block of UO$_2$ and water. \label{homfuel_spec} }
-\end{figure}
+collision estimator values are shown for serpent and mcnp (since this is what warp uses as well)
 
-\begin{figure}[h!] 
-\centering
-\includegraphics[width=0.8\textwidth]{graphics/homfuel_spec_err.eps}
-\caption{Error of the spectrum calculated by WARP relative to that of Serpent in a homogenized block of UO$_2$ and water. \label{homfuel_spec_err} }
-\end{figure}
+computer stats
 
 \begin{table}[h]
 \centering
-\caption{Summary of $k_\mathrm{eff}$ results of the WARP benchmarks.}
+\caption{Summary of $k_\mathrm{eff}$ results of the WARP benchmarks with 20/40 discarded/active criticality cycles and $10^5$ histories per cycle.}
 \label{benchmark_summary}
 \begin{tabular}{| l | r | r | r | r | r |}
  \hline
@@ -29,9 +21,49 @@ compare w serpent and mcnp
 \hline
 \multicolumn{6}{|l|}{Godiva}  \\
 \hline
+ $k_\mathrm{eff}$ & 1.027509$\pm$0.0005 & 1.02888$\pm$0.00052 & 1.02789 & 137 pcm & -99 pcm  \\
+ \hline
+ Runtime               & 2.35 m & 9.4741 m & 0.2752 m & 8.54  & 34.4  \\
+ \hline
+ \hline
+\multicolumn{6}{|l|}{Homogenized Block }\\
+\hline
+ $k_\mathrm{eff}$ & & 0.931719 & 0.932709 & & -99 pcm   \\
+ \hline
+ Runtime               & 21.54 m & 7.26108 m & 1.23576 m & & 5.876 \\
+ \hline
+  \hline
+\multicolumn{6}{|l|}{Pin Cell}\\
+\hline
+ $k_\mathrm{eff}$ & 0.10775$\pm$0.00015 &  &  & & -99 pcm    \\
+ \hline
+ Runtime               & 16.40 m & 7.26108 m & 1.23576 m & & 5.876  \\
+ \hline
+  \hline
+\multicolumn{6}{|l|}{15-sided Hex Assembly}\\
+\hline
  $k_\mathrm{eff}$ & & 0.931719 & 0.932709 & & -99 pcm  \\
  \hline
- Runtime               & & 7.26108 m & 1.23576 m  & & 5.876 \\
+ Runtime               & 27.70 m & 7.26108 m & 1.23576 m  & & 5.876 \\
+ \hline
+\end{tabular}
+\end{table}
+
+
+\begin{table}[h]
+\centering
+\caption{Summary of $k_\mathrm{eff}$ results of the WARP benchmarks with 20/40 discarded/active criticality cycles and $10^6$ histories per cycle.}
+\label{benchmark_summary}
+\begin{tabular}{| l | r | r | r | r | r |}
+ \hline
+ Benchmark & MCNP 6.1 & Serpent 2.1.18 & WARP & $\Delta$ M & $\Delta$ S  \\
+\hline
+\hline
+\multicolumn{6}{|l|}{Godiva}  \\
+\hline
+ $k_\mathrm{eff}$ & 1.027509$\pm$0.0005 & 1.02888$\pm$0.00052 & 1.02789 & 137 pcm & -99 pcm  \\
+ \hline
+ Runtime               & 2.35 m & 9.4741 m & 0.2752 m & 8.54  & 34.4  \\
  \hline
  \hline
 \multicolumn{6}{|l|}{Homogenized Block }\\
@@ -48,20 +80,89 @@ compare w serpent and mcnp
  Runtime               & & 7.26108 m & 1.23576 m & & 5.876  \\
  \hline
   \hline
-\multicolumn{6}{|l|}{Small Assembly}\\
+\multicolumn{6}{|l|}{15-sided Hex Assembly}\\
 \hline
  $k_\mathrm{eff}$ & & 0.931719 & 0.932709 & & -99 pcm  \\
  \hline
  Runtime               & & 7.26108 m & 1.23576 m  & & 5.876 \\
  \hline
-  \hline
-\multicolumn{6}{|l|}{Large Assembly}\\
-\hline
- $k_\mathrm{eff}$ & & 0.931719 & 0.932709 & & -99 pcm   \\
- \hline
- Runtime               & & 7.26108 m & 1.23576 m & & 5.876  \\
- \hline
 \end{tabular}
 \end{table}
 
+\begin{figure}[h!] 
+\centering
+\includegraphics[width=0.8\textwidth]{graphics/godiva_spec.eps}
+\caption{Spectrum comparison in a ``godiva'' bare pu-239 sphere.. \label{godiva_spec} }
+\end{figure}
+
+\begin{figure}[h!] 
+\centering
+\includegraphics[width=0.8\textwidth]{graphics/godiva_spec_err.eps}
+\caption{Error of the spectrum calculated by WARP relative to that of Serpent in a ``godiva'' bare pu-239 sphere.. \label{godiva_spec_err} }
+\end{figure}
+
+\begin{figure}[h!] 
+\centering
+\includegraphics[width=0.8\textwidth]{graphics/godiva_fiss.eps}
+\caption{Fission source distribution of a ``godiva'' bare pu-239 sphere. \label{godiva_fiss} }
+\end{figure}
+
+\begin{figure}[h!] 
+\centering
+\includegraphics[width=0.8\textwidth]{graphics/homfuel_spec_err.eps}
+\caption{Error of the spectrum calculated by WARP relative to that of Serpent in a homogenized block of UO$_2$ and water. \label{homfuel_spec_err} }
+\end{figure}
+
+\begin{figure}[h!] 
+\centering
+\includegraphics[width=0.8\textwidth]{graphics/homfuel_spec.eps}
+\caption{Spectrum comparison in a homogenized block of UO$_2$ and water. \label{homfuel_spec} }
+\end{figure}
+
+\begin{figure}[h!] 
+\centering
+\includegraphics[width=0.8\textwidth]{graphics/homfuel_fiss.eps}
+\caption{Fission source distribution of a homogenized block of UO$_2$ and water. \label{homfuel_fiss} }
+\end{figure}
+
+\begin{figure}[h!] 
+\centering
+\includegraphics[width=0.8\textwidth]{graphics/pincell_spec.eps}
+\caption{Spectrum comparison in a single UO$_2$ pin surrounded by a block of water. \label{pincell_spec} }
+\end{figure}
+
+\begin{figure}[h!] 
+\centering
+\includegraphics[width=0.8\textwidth]{graphics/pincell_spec_err.eps}
+\caption{Error of the spectrum calculated by WARP relative to that of Serpent in a single UO$_2$ pin surrounded by a block of water. \label{pincell_spec_err} }
+\end{figure}
+
+\begin{figure}[h!] 
+\centering
+\includegraphics[width=0.8\textwidth]{graphics/pincell_fiss.eps}
+\caption{Fission source distribution of a single UO$_2$ pin surrounded by a block of water. \label{pincell_fiss} }
+\end{figure}
+
+\begin{figure}[h!] 
+\centering
+\includegraphics[width=0.8\textwidth]{graphics/assembly_spec.eps}
+\caption{Spectrum comparison in the most upper left UO$_2$ pin of a 15-sided hex pin array in water. \label{assembly_spec} }
+\end{figure}
+
+\begin{figure}[h!] 
+\centering
+\includegraphics[width=0.8\textwidth]{graphics/assembly_spec_err.eps}
+\caption{Error of the spectrum calculated by WARP relative to that of Serpent in the most upper left UO$_2$ pin of a 15-sided hex pin array in water. \label{assembly_spec_err} }
+\end{figure}
+
+\begin{figure}[h!] 
+\centering
+\includegraphics[width=0.8\textwidth]{graphics/assembly_fiss.eps}
+\caption{Fission source distribution of an array of UO$_2$ pins in water. \label{assembly_fiss} }
+\end{figure}
+
+simple geometry serpent is slow since woodcock makes it sample the geom much more before leaking?, mcnp and warp can instantly leak it?  shouldn't be seen in the homogenized case... yep!
+
+
+profiler stuff
 
