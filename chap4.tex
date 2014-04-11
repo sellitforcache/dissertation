@@ -12,6 +12,8 @@ computer stats
 
 define pcm
 
+\section{Multiplication Factors and Runtimes}
+
 \begin{table}[h]
 \centering
 \caption{Summary of $k_\mathrm{eff}$ single-run results of the WARP benchmarks with 20/40 discarded/active criticality cycles and $10^5$ histories per cycle.}
@@ -91,104 +93,62 @@ define pcm
 \end{tabular}
 \end{table}
 
-\begin{figure}[h!] 
-\centering
-\includegraphics[width=0.8\textwidth]{graphics/finalresults/godiva_spec.eps}
-\caption{Spectrum comparison in a ``godiva'' bare pu-239 sphere.. \label{godiva_spec} }
-\end{figure}
+\subsection{Spectra and Fission Distributions}
 
 \begin{figure}[h!] 
 \centering
-\includegraphics[width=0.8\textwidth]{graphics/finalresults/godiva_spec_err.eps}
-\caption{Error of the spectrum calculated by WARP relative to that of Serpent in a ``godiva'' bare pu-239 sphere.. \label{godiva_spec_err} }
+\includegraphics[width=\textwidth]{graphics/finalresults/godiva_spec.eps}
+\caption{Spectrum comparison in a ``jezebel'' bare pu-239 sphere.. \label{godiva_spec} }
 \end{figure}
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width=\textwidth]{graphics/finalresults/godiva_fiss.eps}
-\caption{Fission source distribution of a ``godiva'' bare pu-239 sphere. \label{godiva_fiss} }
+\includegraphics[width=\textwidth,trim= 2cm 0cm 2cm 0cm]{graphics/finalresults/godiva_fiss.eps}
+\caption{Fission source distribution of a ``jezebel'' bare pu-239 sphere. \label{godiva_fiss} }
 \end{figure}
 
 \begin{figure}[h!] 
 \centering
-\includegraphics[width=0.8\textwidth]{graphics/finalresults/homfuel_spec_err.eps}
-\caption{Error of the spectrum calculated by WARP relative to that of Serpent in a homogenized block of UO$_2$ and water. \label{homfuel_spec_err} }
-\end{figure}
-
-\begin{figure}[h!] 
-\centering
-\includegraphics[width=0.8\textwidth]{graphics/finalresults/homfuel_spec.eps}
+\includegraphics[width=\textwidth]{graphics/finalresults/homfuel_spec.eps}
 \caption{Spectrum comparison in a homogenized block of UO$_2$ and water. \label{homfuel_spec} }
 \end{figure}
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width=\textwidth]{graphics/finalresults/homfuel_fiss.eps}
+\includegraphics[width=\textwidth,trim= 2cm 0cm 2cm 0cm]{graphics/finalresults/homfuel_fiss.eps}
 \caption{Fission source distribution of a homogenized block of UO$_2$ and water. \label{homfuel_fiss} }
 \end{figure}
 
 \begin{figure}[h!] 
 \centering
-\includegraphics[width=0.8\textwidth]{graphics/finalresults/pincell_spec.eps}
+\includegraphics[width=\textwidth]{graphics/finalresults/pincell_spec.eps}
 \caption{Spectrum comparison in a single UO$_2$ pin surrounded by a block of water. \label{pincell_spec} }
-\end{figure}
-
-\begin{figure}[h!] 
-\centering
-\includegraphics[width=0.8\textwidth]{graphics/finalresults/pincell_spec_err.eps}
-\caption{Error of the spectrum calculated by WARP relative to that of Serpent in a single UO$_2$ pin surrounded by a block of water. \label{pincell_spec_err} }
 \end{figure}
 
 \begin{figure}[h!]
 \centering
-\begin{subfigure}{.5\textwidth}
-  \centering
-  \includegraphics[width=\linewidth]{graphics/finalresults/pincell_fiss1.eps}
-  \caption{$x-y$ slice, $z$ collapsed}
-  \label{fig:sub1}
-\end{subfigure}%
-\begin{subfigure}{.5\textwidth}
-  \centering
-  \includegraphics[width=\linewidth]{graphics/finalresults/pincell_fiss2.eps}
-  \caption{$x-z$ slice, $y$ collapsed}
-  \label{fig:sub2}
-\end{subfigure}
+\includegraphics[width=.8\textwidth]{graphics/finalresults/pincell_fiss.eps}
 \caption{Fission source distribution of a single UO$_2$ pin surrounded by a block of water. \label{pincell_fiss} }
 \end{figure}
 
 \begin{figure}[h!] 
 \centering
-\includegraphics[width=0.8\textwidth]{graphics/finalresults/assembly_spec.eps}
+\includegraphics[width=\textwidth]{graphics/finalresults/assembly_spec.eps}
 \caption{Spectrum comparison in the center UO$_2$ pin of a 15-sided hex pin array in water. \label{assembly_spec} }
-\end{figure}
-
-\begin{figure}[h!] 
-\centering
-\includegraphics[width=0.8\textwidth]{graphics/finalresults/assembly_spec_err.eps}
-\caption{Error of the spectrum calculated by WARP relative to that of Serpent in the center UO$_2$ pin of a 15-sided hex pin array in water. \label{assembly_spec_err} }
 \end{figure}
 
 \begin{figure}[h!]
 \centering
-\begin{subfigure}{.5\textwidth}
-  \centering
-  \includegraphics[width=\linewidth]{graphics/finalresults/assembly_fiss1.eps}
-  \caption{$x-y$ slice, $z$ collapsed}
-  \label{fig:sub1}
-\end{subfigure}%
-\begin{subfigure}{.5\textwidth}
-  \centering
-  \includegraphics[width=\linewidth]{graphics/finalresults/assembly_fiss2.eps}
-  \caption{$x-z$ slice, $y$ collapsed}
-  \label{fig:sub2}
-\end{subfigure}
+\includegraphics[width=\textwidth,trim= 2cm 0cm 2cm 0cm]{graphics/finalresults/assembly_fiss.eps}
 \caption{Fission source distribution of an array of UO$_2$ pins in water. \label{assembly_fiss} }
 \end{figure}
 
-combine the combo plots into one in python subplots instead of having two large plots.  will then include more color and only one colormap.  also the titles onw't be redundant.  Make error plots a thin subplot below the flux plot, can more easily line them up and takes of less space!
-
 simple geometry serpent is slow since woodcock makes it sample the geom much more before leaking?, mcnp and warp can instantly leak it?  shouldn't be seen in the homogenized case... yep!
 
+\section{Fixed Source}
 
-profiler stuff
+
+
+
+\section{Run Profiles}
 
