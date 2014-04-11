@@ -105,18 +105,7 @@ define pcm
 
 \begin{figure}[h!]
 \centering
-\begin{subfigure}{.5\textwidth}
-  \centering
-  \includegraphics[width=\linewidth]{graphics/finalresults/godiva_fiss1.eps}
-  \caption{$x-y$ slice, $z$ collapsed}
-  \label{fig:sub1}
-\end{subfigure}%
-\begin{subfigure}{.5\textwidth}
-  \centering
-  \includegraphics[width=\linewidth]{graphics/finalresults/godiva_fiss2.eps}
-  \caption{$x-z$ slice, $y$ collapsed}
-  \label{fig:sub2}
-\end{subfigure}
+\includegraphics[width=\textwidth]{graphics/finalresults/godiva_fiss.eps}
 \caption{Fission source distribution of a ``godiva'' bare pu-239 sphere. \label{godiva_fiss} }
 \end{figure}
 
@@ -134,18 +123,7 @@ define pcm
 
 \begin{figure}[h!]
 \centering
-\begin{subfigure}{.5\textwidth}
-  \centering
-  \includegraphics[width=\linewidth]{graphics/finalresults/homfuel_fiss1.eps}
-  \caption{$x-y$ slice, $z$ collapsed}
-  \label{fig:sub1}
-\end{subfigure}%
-\begin{subfigure}{.5\textwidth}
-  \centering
-  \includegraphics[width=\linewidth]{graphics/finalresults/homfuel_fiss2.eps}
-  \caption{$x-z$ slice, $y$ collapsed}
-  \label{fig:sub2}
-\end{subfigure}
+\includegraphics[width=\textwidth]{graphics/finalresults/homfuel_fiss.eps}
 \caption{Fission source distribution of a homogenized block of UO$_2$ and water. \label{homfuel_fiss} }
 \end{figure}
 
@@ -207,7 +185,7 @@ define pcm
 \caption{Fission source distribution of an array of UO$_2$ pins in water. \label{assembly_fiss} }
 \end{figure}
 
-combine the combo plots into one in python subplots instead of having two large plots.  will then include more color and only one colormap
+combine the combo plots into one in python subplots instead of having two large plots.  will then include more color and only one colormap.  also the titles onw't be redundant.  Make error plots a thin subplot below the flux plot, can more easily line them up and takes of less space!
 
 simple geometry serpent is slow since woodcock makes it sample the geom much more before leaking?, mcnp and warp can instantly leak it?  shouldn't be seen in the homogenized case... yep!
 

@@ -1,10 +1,11 @@
 #! /usr/bin/python
-import pylab
 import sys
 import numpy
 import os
 import re
 from matplotlib.colors import LogNorm
+import matplotlib.gridspec as gridspec
+import matplotlib.pyplot as plt 
 
 from termcolor import colored
 from pyne import ace
@@ -145,22 +146,14 @@ xmin = ymin = -1000
 xmax = ymax =  1000
 data=np.array(open("gpu-benchmark/homfuel.fission_points").read().split(),dtype=float)
 data=np.reshape(data,(-1,4))
-fig = pl.figure(figsize=(8,6))
-ax = fig.add_subplot(1,1,1)
+fig = pl.figure(figsize=(16,6))
+ax = fig.add_subplot(1,2,1)
 ax.hist2d(data[:,0], data[:,1], range=[[xmin, xmax], [ymin, ymax]], bins=256 , normed=True)#norm=LogNorm())
-fig.colorbar(ax.get_images()[0], ax=ax, ticks=np.linspace(0,.005,11), cmap=pl.cm.jet, label='Relative Probability')  #, norm=pl.matplotlib.colors.Normalize(vmin=5, vmax=10))
+#fig.colorbar(ax.get_images()[0], ax=ax, ticks=np.linspace(0,.005,11), cmap=pl.cm.jet, label='Relative Probability')  #, norm=pl.matplotlib.colors.Normalize(vmin=5, vmax=10))
 ax.set_xlabel('x (cm)')
 ax.set_ylabel('y (cm)')
 ax.grid('on',color='k')
 pl.axis('equal')
-ax.set_title(title)
-
-if plot:
-	pl.show()
-else:
-	print 'homfuel_fiss1.eps'
-	fig.savefig('homfuel_fiss1.eps')
-
 
 xmin = -1000
 xmax =  1000
@@ -168,21 +161,23 @@ ymin = -1000
 ymax =  1000
 data=np.array(open("gpu-benchmark/homfuel.fission_points").read().split(),dtype=float)
 data=np.reshape(data,(-1,4))
-fig = pl.figure(figsize=(8,6))
-ax = fig.add_subplot(1,1,1)
+ax = fig.add_subplot(1,2,2)
 ax.hist2d(data[:,0], data[:,2], range=[[xmin, xmax], [ymin, ymax]], bins=256 , normed=True)#norm=LogNorm())
-fig.colorbar(ax.get_images()[0], ax=ax, ticks=np.linspace(0,.005,11), cmap=pl.cm.jet, label='Relative Probability')  #, norm=pl.matplotlib.colors.Normalize(vmin=5, vmax=10))
+#fig.colorbar(ax.get_images()[0], ax=ax, ticks=np.linspace(0,.005,11), cmap=pl.cm.jet, label='Relative Probability')  #, norm=pl.matplotlib.colors.Normalize(vmin=5, vmax=10))
 ax.set_xlabel('x (cm)')
-ax.set_ylabel('y (cm)')
+ax.set_ylabel('z (cm)')
 ax.grid('on',color='k')
 pl.axis('equal')
-ax.set_title(title)
+#pl.set_title(title)
+fig.subplots_adjust(right=0.8)
+cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
+fig.colorbar(ax.get_images()[0], cax=cbar_ax)
 
 if plot:
 	pl.show()
 else:
-	print 'homfuel_fiss2.eps'
-	fig.savefig('homfuel_fiss2.eps')
+	print 'homfuel_fiss.eps'
+	fig.savefig('homfuel_fiss.eps')
 
 
 
@@ -264,25 +259,22 @@ else:
 	print 'pincell_spec_err.eps'
 	fig.savefig('pincell_spec_err.eps')
 
+
+fig = pl.figure(figsize=(8,6))
+gs = gridspec.GridSpec(1, 2, width_ratios=[10, 1]) 
+ax0 = plt.subplot(gs[0])
+ax1 = plt.subplot(gs[1])
+
 xmin = ymin = -2
 xmax = ymax =  2
 data=np.array(open("gpu-benchmark/pincell.fission_points").read().split(),dtype=float)
 data=np.reshape(data,(-1,4))
-fig = pl.figure(figsize=(8,6))
-ax = fig.add_subplot(1,1,1)
-ax.hist2d(data[:,0], data[:,1], range=[[xmin, xmax], [ymin, ymax]], bins=256 , normed=True)#norm=LogNorm())
-fig.colorbar(ax.get_images()[0], ax=ax, ticks=np.linspace(0,.005,11), cmap=pl.cm.jet, label='Relative Probability')  #, norm=pl.matplotlib.colors.Normalize(vmin=5, vmax=10))
-ax.set_xlabel('x (cm)')
-ax.set_ylabel('y (cm)')
-ax.grid('on',color='k')
-pl.axis('equal')
-ax.set_title(title)
-
-if plot:
-	pl.show()
-else:
-	print 'pincell_fiss1.eps'
-	fig.savefig('pincell_fiss1.eps')
+#ax0 = fig.add_subplot(1,1,1)
+ax0.hist2d(data[:,0], data[:,1], range=[[xmin, xmax], [ymin, ymax]], bins=256 , normed=True)#norm=LogNorm())
+ax0.set_xlabel('x (cm)')
+ax0.set_ylabel('y (cm)')
+ax0.grid('on',color='k')
+#pl.axis('equal')
 
 xmin = -2
 xmax =  2
@@ -290,21 +282,21 @@ ymin = -21
 ymax =  21
 data=np.array(open("gpu-benchmark/pincell.fission_points").read().split(),dtype=float)
 data=np.reshape(data,(-1,4))
-fig = pl.figure(figsize=(6,6))
-ax = fig.add_subplot(1,1,1)
-ax.hist2d(data[:,0], data[:,2], range=[[xmin, xmax], [ymin, ymax]], bins=256 , normed=True)#norm=LogNorm())
-fig.colorbar(ax.get_images()[0], ax=ax, ticks=np.linspace(0,.005,11), cmap=pl.cm.jet, label='Relative Probability')  #, norm=pl.matplotlib.colors.Normalize(vmin=5, vmax=10))
-ax.set_xlabel('x (cm)')
-ax.set_ylabel('y (cm)')
-ax.grid('on',color='k')
-pl.axis('equal')
-ax.set_title(title)
+#ax1 = fig.add_subplot(1,1,1)
+ax1.hist2d(data[:,0], data[:,2], range=[[xmin, xmax], [ymin, ymax]], bins=256 , normed=True)#norm=LogNorm())
+ax1.set_xlabel('x (cm)')
+ax1.set_ylabel('z (cm)')
+ax1.grid('on',color='k')
+#pl.axis('equal')
+fig.subplots_adjust(right=0.8)
+cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
+fig.colorbar(ax0.get_images()[0], cax=cbar_ax)
 
 if plot:
 	pl.show()
 else:
-	print 'pincell_fiss2.eps'
-	fig.savefig('pincell_fiss2.eps')
+	print 'pincell_fiss.eps'
+	fig.savefig('pincell_fiss.eps')
 
 
 #
@@ -386,21 +378,14 @@ xmin = ymin = -7
 xmax = ymax =  7
 data=np.array(open("gpu-benchmark/godiva.fission_points").read().split(),dtype=float)
 data=np.reshape(data,(-1,4))
-fig = pl.figure(figsize=(8,6))
-ax = fig.add_subplot(1,1,1)
+fig = pl.figure(figsize=(16,6))
+ax = fig.add_subplot(1,2,1)
 ax.hist2d(data[:,0], data[:,1], range=[[xmin, xmax], [ymin, ymax]], bins=256 , normed=True)#norm=LogNorm())
-fig.colorbar(ax.get_images()[0], ax=ax, ticks=np.linspace(0,.005,11), cmap=pl.cm.jet, label='Relative Probability')  #, norm=pl.matplotlib.colors.Normalize(vmin=5, vmax=10))
+#fig.colorbar(ax.get_images()[0], ax=ax, ticks=np.linspace(0,.005,11), cmap=pl.cm.jet, label='Relative Probability')  #, norm=pl.matplotlib.colors.Normalize(vmin=5, vmax=10))
 ax.set_xlabel('x (cm)')
 ax.set_ylabel('y (cm)')
 ax.grid('on',color='k')
 pl.axis('equal')
-ax.set_title(title)
-
-if plot:
-	pl.show()
-else:
-	print 'godiva_fiss1.eps'
-	fig.savefig('godiva_fiss1.eps')
 
 xmin = -7
 xmax =  7
@@ -408,21 +393,24 @@ ymin = -7
 ymax =  7
 data=np.array(open("gpu-benchmark/godiva.fission_points").read().split(),dtype=float)
 data=np.reshape(data,(-1,4))
-fig = pl.figure(figsize=(8,6))
-ax = fig.add_subplot(1,1,1)
+ax = fig.add_subplot(1,2,2)
 ax.hist2d(data[:,0], data[:,2], range=[[xmin, xmax], [ymin, ymax]], bins=256 , normed=True)#norm=LogNorm())
-fig.colorbar(ax.get_images()[0], ax=ax, ticks=np.linspace(0,.005,11), cmap=pl.cm.jet, label='Relative Probability')  #, norm=pl.matplotlib.colors.Normalize(vmin=5, vmax=10))
+#fig.colorbar(ax.get_images()[0], ax=ax, ticks=np.linspace(0,.005,11), cmap=pl.cm.jet, label='Relative Probability')  #, norm=pl.matplotlib.colors.Normalize(vmin=5, vmax=10))
 ax.set_xlabel('x (cm)')
-ax.set_ylabel('y (cm)')
+ax.set_ylabel('z (cm)')
 ax.grid('on',color='k')
 pl.axis('equal')
-ax.set_title(title)
+#pl.set_title(title)
+fig.subplots_adjust(right=0.8)
+cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
+fig.colorbar(ax.get_images()[0], cax=cbar_ax)
 
 if plot:
 	pl.show()
 else:
-	print 'godiva_fiss2.eps'
-	fig.savefig('godiva_fiss2.eps')
+	print 'godiva_fiss.eps'
+	fig.savefig('godiva_fiss.eps')
+
 
 
 #
