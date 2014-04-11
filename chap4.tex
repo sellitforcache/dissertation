@@ -10,9 +10,11 @@ collision estimator values are shown for serpent and mcnp (since this is what wa
 
 computer stats
 
+define pcm
+
 \begin{table}[h]
 \centering
-\caption{Summary of $k_\mathrm{eff}$ results of the WARP benchmarks with 20/40 discarded/active criticality cycles and $10^5$ histories per cycle.}
+\caption{Summary of $k_\mathrm{eff}$ single-run results of the WARP benchmarks with 20/40 discarded/active criticality cycles and $10^5$ histories per cycle.}
 \label{benchmark_summary}
 \begin{tabular}{| l | r | r | r | r | r |}
  \hline
@@ -52,7 +54,7 @@ computer stats
 
 \begin{table}[h]
 \centering
-\caption{Summary of $k_\mathrm{eff}$ results of the WARP benchmarks with 20/40 discarded/active criticality cycles and $10^6$ histories per cycle.}
+\caption{Summary of $k_\mathrm{eff}$ single-run results of the WARP benchmarks with 20/40 discarded/active criticality cycles and $10^6$ histories per cycle.}
 \label{benchmark_summary}
 \begin{tabular}{| l | r | r | r | r | r |}
  \hline
@@ -106,13 +108,13 @@ computer stats
 \begin{subfigure}{.5\textwidth}
   \centering
   \includegraphics[width=\linewidth]{graphics/finalresults/godiva_fiss1.eps}
-  \caption{The interleaved assembly}
+  \caption{$x-y$ slice, $z$ collapsed}
   \label{fig:sub1}
 \end{subfigure}%
 \begin{subfigure}{.5\textwidth}
   \centering
   \includegraphics[width=\linewidth]{graphics/finalresults/godiva_fiss2.eps}
-  \caption{The large assembly}
+  \caption{$x-z$ slice, $y$ collapsed}
   \label{fig:sub2}
 \end{subfigure}
 \caption{Fission source distribution of a ``godiva'' bare pu-239 sphere. \label{godiva_fiss} }
@@ -135,13 +137,13 @@ computer stats
 \begin{subfigure}{.5\textwidth}
   \centering
   \includegraphics[width=\linewidth]{graphics/finalresults/homfuel_fiss1.eps}
-  \caption{The interleaved assembly}
+  \caption{$x-y$ slice, $z$ collapsed}
   \label{fig:sub1}
 \end{subfigure}%
 \begin{subfigure}{.5\textwidth}
   \centering
   \includegraphics[width=\linewidth]{graphics/finalresults/homfuel_fiss2.eps}
-  \caption{The large assembly}
+  \caption{$x-z$ slice, $y$ collapsed}
   \label{fig:sub2}
 \end{subfigure}
 \caption{Fission source distribution of a homogenized block of UO$_2$ and water. \label{homfuel_fiss} }
@@ -164,13 +166,13 @@ computer stats
 \begin{subfigure}{.5\textwidth}
   \centering
   \includegraphics[width=\linewidth]{graphics/finalresults/pincell_fiss1.eps}
-  \caption{The interleaved assembly}
+  \caption{$x-y$ slice, $z$ collapsed}
   \label{fig:sub1}
 \end{subfigure}%
 \begin{subfigure}{.5\textwidth}
   \centering
   \includegraphics[width=\linewidth]{graphics/finalresults/pincell_fiss2.eps}
-  \caption{The large assembly}
+  \caption{$x-z$ slice, $y$ collapsed}
   \label{fig:sub2}
 \end{subfigure}
 \caption{Fission source distribution of a single UO$_2$ pin surrounded by a block of water. \label{pincell_fiss} }
@@ -193,13 +195,13 @@ computer stats
 \begin{subfigure}{.5\textwidth}
   \centering
   \includegraphics[width=\linewidth]{graphics/finalresults/assembly_fiss1.eps}
-  \caption{The interleaved assembly}
+  \caption{$x-y$ slice, $z$ collapsed}
   \label{fig:sub1}
 \end{subfigure}%
 \begin{subfigure}{.5\textwidth}
   \centering
   \includegraphics[width=\linewidth]{graphics/finalresults/assembly_fiss2.eps}
-  \caption{The large assembly}
+  \caption{$x-z$ slice, $y$ collapsed}
   \label{fig:sub2}
 \end{subfigure}
 \caption{Fission source distribution of an array of UO$_2$ pins in water. \label{assembly_fiss} }

@@ -121,11 +121,12 @@ else:
 
 fig = pylab.figure(figsize=(10,6))
 ax = fig.add_subplot(1,1,1)
-ax.semilogx(serpE,serpErr,'b',linestyle='steps-mid',label='Serpent Rel. Err.')
-ax.semilogx(mcnp_avg,mcnp_err,'k',linestyle='steps-mid',label='MCNP 6.1 Rel. Err.')
-ax.semilogx(avg,warp_err,'r',linestyle='steps-mid',label='WARP Rel. Err.')
-ax.semilogx(serpE,numpy.divide(serpF-newflux,serpF),'g',linestyle='steps-mid',label='Flux Relative Error vs. Serpent')
+#ax.semilogx(serpE,serpErr,'b',linestyle='steps-mid',label='Serpent Rel. Err.')
+#ax.semilogx(mcnp_avg,mcnp_err,'k',linestyle='steps-mid',label='MCNP 6.1 Rel. Err.')
+#ax.semilogx(avg,warp_err,'r',linestyle='steps-mid',label='WARP Rel. Err.')
+ax.semilogx(serpE,numpy.divide(serpF-newflux,serpF),'b',linestyle='steps-mid',label='Flux Relative Error vs. Serpent')
 ax.set_xlabel('Energy (MeV)')
+ax.set_ylabel('Relative Error')
 ax.set_title(title)
 handles, labels = ax.get_legend_handles_labels()
 ax.legend(handles,labels,loc=2)
@@ -144,9 +145,9 @@ xmin = ymin = -1000
 xmax = ymax =  1000
 data=np.array(open("gpu-benchmark/homfuel.fission_points").read().split(),dtype=float)
 data=np.reshape(data,(-1,4))
-fig = pl.figure(figsize=(10,6))
+fig = pl.figure(figsize=(8,6))
 ax = fig.add_subplot(1,1,1)
-ax.hist2d(data[:,0], data[:,1], range=[[xmin, xmax], [ymin, ymax]], bins=1024 , normed=True)#norm=LogNorm())
+ax.hist2d(data[:,0], data[:,1], range=[[xmin, xmax], [ymin, ymax]], bins=256 , normed=True)#norm=LogNorm())
 fig.colorbar(ax.get_images()[0], ax=ax, ticks=np.linspace(0,.005,11), cmap=pl.cm.jet, label='Relative Probability')  #, norm=pl.matplotlib.colors.Normalize(vmin=5, vmax=10))
 ax.set_xlabel('x (cm)')
 ax.set_ylabel('y (cm)')
@@ -167,9 +168,9 @@ ymin = -1000
 ymax =  1000
 data=np.array(open("gpu-benchmark/homfuel.fission_points").read().split(),dtype=float)
 data=np.reshape(data,(-1,4))
-fig = pl.figure(figsize=(10,6))
+fig = pl.figure(figsize=(8,6))
 ax = fig.add_subplot(1,1,1)
-ax.hist2d(data[:,0], data[:,2], range=[[xmin, xmax], [ymin, ymax]], bins=1024 , normed=True)#norm=LogNorm())
+ax.hist2d(data[:,0], data[:,2], range=[[xmin, xmax], [ymin, ymax]], bins=256 , normed=True)#norm=LogNorm())
 fig.colorbar(ax.get_images()[0], ax=ax, ticks=np.linspace(0,.005,11), cmap=pl.cm.jet, label='Relative Probability')  #, norm=pl.matplotlib.colors.Normalize(vmin=5, vmax=10))
 ax.set_xlabel('x (cm)')
 ax.set_ylabel('y (cm)')
@@ -182,6 +183,8 @@ if plot:
 else:
 	print 'homfuel_fiss2.eps'
 	fig.savefig('homfuel_fiss2.eps')
+
+
 
 
 
@@ -220,7 +223,7 @@ serpE = numpy.squeeze(numpy.asarray(serpE))
 serpErr = numpy.squeeze(numpy.asarray(serpErr))
 serpF = numpy.squeeze(numpy.asarray(serpF))
 
-fig = pylab.figure(figsize=(10,6))
+fig = pylab.figure(figsize=(8,6))
 ax = fig.add_subplot(1,1,1)
 ax.semilogx(serpE,serpF,'b',linestyle='steps-mid',label='Serpent 2.1.15')
 ax.semilogx(mcnp_avg,mcnp_newflux,'k',linestyle='steps-mid',label='MCNP 6.1')
@@ -241,11 +244,12 @@ else:
 
 fig = pylab.figure(figsize=(10,6))
 ax = fig.add_subplot(1,1,1)
-ax.semilogx(serpE,serpErr,'b',linestyle='steps-mid',label='Serpent Rel. Err.')
-ax.semilogx(mcnp_avg,mcnp_err,'k',linestyle='steps-mid',label='MCNP 6.1 Rel. Err.')
-ax.semilogx(avg,warp_err,'r',linestyle='steps-mid',label='WARP Rel. Err.')
-ax.semilogx(serpE,numpy.divide(serpF-newflux,serpF),'g',linestyle='steps-mid',label='Flux Relative Error vs. Serpent')
+#ax.semilogx(serpE,serpErr,'b',linestyle='steps-mid',label='Serpent Rel. Err.')
+#ax.semilogx(mcnp_avg,mcnp_err,'k',linestyle='steps-mid',label='MCNP 6.1 Rel. Err.')
+#ax.semilogx(avg,warp_err,'r',linestyle='steps-mid',label='WARP Rel. Err.')
+ax.semilogx(serpE,numpy.divide(serpF-newflux,serpF),'b',linestyle='steps-mid',label='Flux Relative Error vs. Serpent')
 ax.set_xlabel('Energy (MeV)')
+ax.set_ylabel('Relative Error')
 ax.set_title(title)
 handles, labels = ax.get_legend_handles_labels()
 ax.legend(handles,labels,loc=2)
@@ -260,13 +264,13 @@ else:
 	print 'pincell_spec_err.eps'
 	fig.savefig('pincell_spec_err.eps')
 
-xmin = ymin = -5
-xmax = ymax =  5
+xmin = ymin = -2
+xmax = ymax =  2
 data=np.array(open("gpu-benchmark/pincell.fission_points").read().split(),dtype=float)
 data=np.reshape(data,(-1,4))
-fig = pl.figure(figsize=(10,6))
+fig = pl.figure(figsize=(8,6))
 ax = fig.add_subplot(1,1,1)
-ax.hist2d(data[:,0], data[:,1], range=[[xmin, xmax], [ymin, ymax]], bins=1024 , normed=True)#norm=LogNorm())
+ax.hist2d(data[:,0], data[:,1], range=[[xmin, xmax], [ymin, ymax]], bins=256 , normed=True)#norm=LogNorm())
 fig.colorbar(ax.get_images()[0], ax=ax, ticks=np.linspace(0,.005,11), cmap=pl.cm.jet, label='Relative Probability')  #, norm=pl.matplotlib.colors.Normalize(vmin=5, vmax=10))
 ax.set_xlabel('x (cm)')
 ax.set_ylabel('y (cm)')
@@ -280,15 +284,15 @@ else:
 	print 'pincell_fiss1.eps'
 	fig.savefig('pincell_fiss1.eps')
 
-xmin = -5
-xmax =  5
-ymin = -45
-ymax =  45
+xmin = -2
+xmax =  2
+ymin = -21
+ymax =  21
 data=np.array(open("gpu-benchmark/pincell.fission_points").read().split(),dtype=float)
 data=np.reshape(data,(-1,4))
-fig = pl.figure(figsize=(10,6))
+fig = pl.figure(figsize=(6,6))
 ax = fig.add_subplot(1,1,1)
-ax.hist2d(data[:,0], data[:,2], range=[[xmin, xmax], [ymin, ymax]], bins=1024 , normed=True)#norm=LogNorm())
+ax.hist2d(data[:,0], data[:,2], range=[[xmin, xmax], [ymin, ymax]], bins=256 , normed=True)#norm=LogNorm())
 fig.colorbar(ax.get_images()[0], ax=ax, ticks=np.linspace(0,.005,11), cmap=pl.cm.jet, label='Relative Probability')  #, norm=pl.matplotlib.colors.Normalize(vmin=5, vmax=10))
 ax.set_xlabel('x (cm)')
 ax.set_ylabel('y (cm)')
@@ -358,11 +362,12 @@ else:
 
 fig = pylab.figure(figsize=(10,6))
 ax = fig.add_subplot(1,1,1)
-ax.semilogx(serpE,serpErr,'b',linestyle='steps-mid',label='Serpent Rel. Err.')
-ax.semilogx(mcnp_avg,mcnp_err,'k',linestyle='steps-mid',label='MCNP 6.1 Rel. Err.')
-ax.semilogx(avg,warp_err,'r',linestyle='steps-mid',label='WARP Rel. Err.')
-ax.semilogx(serpE,numpy.divide(serpF-newflux,serpF),'g',linestyle='steps-mid',label='Flux Relative Error vs. Serpent')
+#ax.semilogx(serpE,serpErr,'b',linestyle='steps-mid',label='Serpent Rel. Err.')
+#ax.semilogx(mcnp_avg,mcnp_err,'k',linestyle='steps-mid',label='MCNP 6.1 Rel. Err.')
+#ax.semilogx(avg,warp_err,'r',linestyle='steps-mid',label='WARP Rel. Err.')
+ax.semilogx(serpE,numpy.divide(serpF-newflux,serpF),'b',linestyle='steps-mid',label='Flux Relative Error vs. Serpent')
 ax.set_xlabel('Energy (MeV)')
+ax.set_ylabel('Relative Error')
 ax.set_title(title)
 handles, labels = ax.get_legend_handles_labels()
 ax.legend(handles,labels,loc=2)
@@ -381,9 +386,9 @@ xmin = ymin = -7
 xmax = ymax =  7
 data=np.array(open("gpu-benchmark/godiva.fission_points").read().split(),dtype=float)
 data=np.reshape(data,(-1,4))
-fig = pl.figure(figsize=(10,6))
+fig = pl.figure(figsize=(8,6))
 ax = fig.add_subplot(1,1,1)
-ax.hist2d(data[:,0], data[:,1], range=[[xmin, xmax], [ymin, ymax]], bins=1024 , normed=True)#norm=LogNorm())
+ax.hist2d(data[:,0], data[:,1], range=[[xmin, xmax], [ymin, ymax]], bins=256 , normed=True)#norm=LogNorm())
 fig.colorbar(ax.get_images()[0], ax=ax, ticks=np.linspace(0,.005,11), cmap=pl.cm.jet, label='Relative Probability')  #, norm=pl.matplotlib.colors.Normalize(vmin=5, vmax=10))
 ax.set_xlabel('x (cm)')
 ax.set_ylabel('y (cm)')
@@ -403,9 +408,9 @@ ymin = -7
 ymax =  7
 data=np.array(open("gpu-benchmark/godiva.fission_points").read().split(),dtype=float)
 data=np.reshape(data,(-1,4))
-fig = pl.figure(figsize=(10,6))
+fig = pl.figure(figsize=(8,6))
 ax = fig.add_subplot(1,1,1)
-ax.hist2d(data[:,0], data[:,2], range=[[xmin, xmax], [ymin, ymax]], bins=1024 , normed=True)#norm=LogNorm())
+ax.hist2d(data[:,0], data[:,2], range=[[xmin, xmax], [ymin, ymax]], bins=256 , normed=True)#norm=LogNorm())
 fig.colorbar(ax.get_images()[0], ax=ax, ticks=np.linspace(0,.005,11), cmap=pl.cm.jet, label='Relative Probability')  #, norm=pl.matplotlib.colors.Normalize(vmin=5, vmax=10))
 ax.set_xlabel('x (cm)')
 ax.set_ylabel('y (cm)')
@@ -475,17 +480,18 @@ else:
 
 fig = pylab.figure(figsize=(10,6))
 ax = fig.add_subplot(1,1,1)
-ax.semilogx(serpE,serpErr,'b',linestyle='steps-mid',label='Serpent Rel. Err.')
-ax.semilogx(mcnp_avg,mcnp_err,'k',linestyle='steps-mid',label='MCNP 6.1 Rel. Err.')
-ax.semilogx(avg,warp_err,'r',linestyle='steps-mid',label='WARP Rel. Err.')
-ax.semilogx(serpE,numpy.divide(serpF-newflux,serpF),'g',linestyle='steps-mid',label='Flux Relative Error vs. Serpent')
+#ax.semilogx(serpE,serpErr,'b',linestyle='steps-mid',label='Serpent Rel. Err.')
+#ax.semilogx(mcnp_avg,mcnp_err,'k',linestyle='steps-mid',label='MCNP 6.1 Rel. Err.')
+#ax.semilogx(avg,warp_err,'r',linestyle='steps-mid',label='WARP Rel. Err.')
+ax.semilogx(serpE,numpy.divide(serpF-newflux,serpF),'b',linestyle='steps-mid',label='Flux Relative Error vs. Serpent')
 ax.set_xlabel('Energy (MeV)')
+ax.set_ylabel('Relative Error')
 ax.set_title(title)
 handles, labels = ax.get_legend_handles_labels()
 ax.legend(handles,labels,loc=2)
 #pylab.ylim([0,.25])
 ax.set_xlim([1e-11,20])
-ax.set_ylim([-1e-1,1e-1])
+ax.set_ylim([-2e-1,2e-1])
 ax.grid(True)
 
 if plot:
@@ -494,13 +500,15 @@ else:
 	print 'assembly_spec_err.eps'
 	fig.savefig('assembly_spec_err.eps')
 
-xmin = ymin = -45
-xmax = ymax =  45
+xmin = -40
+xmax =  40
+ymin = -30
+ymax =  30
 data=np.array(open("gpu-benchmark/assembly.fission_points").read().split(),dtype=float)
 data=np.reshape(data,(-1,4))
 fig = pl.figure(figsize=(10,6))
 ax = fig.add_subplot(1,1,1)
-ax.hist2d(data[:,0], data[:,1], range=[[xmin, xmax], [ymin, ymax]], bins=1024 , normed=True)#norm=LogNorm())
+ax.hist2d(data[:,0], data[:,1], range=[[xmin, xmax], [ymin, ymax]], bins=256 , normed=True)#norm=LogNorm())
 fig.colorbar(ax.get_images()[0], ax=ax, ticks=np.linspace(0,.005,11), cmap=pl.cm.jet, label='Relative Probability')  #, norm=pl.matplotlib.colors.Normalize(vmin=5, vmax=10))
 ax.set_xlabel('x (cm)')
 ax.set_ylabel('y (cm)')
@@ -514,15 +522,15 @@ else:
 	print 'assembly_fiss1.eps'
 	fig.savefig('assembly_fiss1.eps')
 
-xmin = -45
-xmax =  45
-ymin = -45
-ymax =  45
+xmin = -35
+xmax =  35
+ymin = -21
+ymax =  21
 data=np.array(open("gpu-benchmark/assembly.fission_points").read().split(),dtype=float)
 data=np.reshape(data,(-1,4))
-fig = pl.figure(figsize=(10,6))
+fig = pl.figure(figsize=(13,6))
 ax = fig.add_subplot(1,1,1)
-ax.hist2d(data[:,0], data[:,2], range=[[xmin, xmax], [ymin, ymax]], bins=1024 , normed=True)#norm=LogNorm())
+ax.hist2d(data[:,0], data[:,2], range=[[xmin, xmax], [ymin, ymax]], bins=256 , normed=True)#norm=LogNorm())
 fig.colorbar(ax.get_images()[0], ax=ax, ticks=np.linspace(0,.005,11), cmap=pl.cm.jet, label='Relative Probability')  #, norm=pl.matplotlib.colors.Normalize(vmin=5, vmax=10))
 ax.set_xlabel('x (cm)')
 ax.set_ylabel('y (cm)')
@@ -535,5 +543,8 @@ if plot:
 else:
 	print 'assembly_fiss2.eps'
 	fig.savefig('assembly_fiss2.eps')
+
+
+
 
 
