@@ -21,7 +21,7 @@ define pcm
  Benchmark & MCNP 6.1 & Serpent 2.1.18 & WARP & $\Delta$ M & $\Delta$ S  \\
 \hline
 \hline
-\multicolumn{6}{|l|}{Godiva}  \\
+\multicolumn{6}{|l|}{Jezebel}  \\
 \hline
  $k_\mathrm{eff}$ & 1.027509$\pm$0.0005 & 1.02748$\pm$0.00052 & 1.02789 & -38.1 pcm & -41 pcm  \\
  \hline
@@ -44,9 +44,9 @@ define pcm
   \hline
 \multicolumn{6}{|l|}{15-sided Hex Assembly}\\
 \hline
- $k_\mathrm{eff}$ & 1.437465$\pm$0.0004 & 1.44834$\pm$0.00051 & 1.4454 & -794 pcm & 294 pcm  \\
+ $k_\mathrm{eff}$ & 1.437465$\pm$0.0004 & 1.44704$\pm$0.00046 & 1.4442 & -673 pcm & 284 pcm  \\
  \hline
- Runtime               & 25.41 m &  26.0505 m &  3.45633 m  & 7.4 & 7.5  \\
+ Runtime               & 25.34 m &  26.3349 m &  3.2395 m  & 7.8 & 8.1  \\
  \hline
 \end{tabular}
 \end{table}
@@ -61,7 +61,7 @@ define pcm
  Benchmark & MCNP 6.1 & Serpent 2.1.18 & WARP & $\Delta$ M & $\Delta$ S  \\
 \hline
 \hline
-\multicolumn{6}{|l|}{Godiva}  \\
+\multicolumn{6}{|l|}{Jezebel}  \\
 \hline
  $k_\mathrm{eff}$ & 1.027957$\pm$0.0001 & $\pm$ &  &  &   \\
  \hline
@@ -181,13 +181,13 @@ define pcm
 \begin{figure}[h!] 
 \centering
 \includegraphics[width=0.8\textwidth]{graphics/finalresults/assembly_spec.eps}
-\caption{Spectrum comparison in the most upper left UO$_2$ pin of a 15-sided hex pin array in water. \label{assembly_spec} }
+\caption{Spectrum comparison in the center UO$_2$ pin of a 15-sided hex pin array in water. \label{assembly_spec} }
 \end{figure}
 
 \begin{figure}[h!] 
 \centering
 \includegraphics[width=0.8\textwidth]{graphics/finalresults/assembly_spec_err.eps}
-\caption{Error of the spectrum calculated by WARP relative to that of Serpent in the most upper left UO$_2$ pin of a 15-sided hex pin array in water. \label{assembly_spec_err} }
+\caption{Error of the spectrum calculated by WARP relative to that of Serpent in the center UO$_2$ pin of a 15-sided hex pin array in water. \label{assembly_spec_err} }
 \end{figure}
 
 \begin{figure}[h!]
@@ -207,7 +207,7 @@ define pcm
 \caption{Fission source distribution of an array of UO$_2$ pins in water. \label{assembly_fiss} }
 \end{figure}
 
-
+combine the combo plots into one in python subplots instead of having two large plots.  will then include more color and only one colormap
 
 simple geometry serpent is slow since woodcock makes it sample the geom much more before leaking?, mcnp and warp can instantly leak it?  shouldn't be seen in the homogenized case... yep!
 
