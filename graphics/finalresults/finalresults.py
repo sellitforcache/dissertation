@@ -53,8 +53,21 @@ def get_mcnp_mctal(filepath):
 #
 #  Get input arguments
 #
-plot = len(sys.argv)-1
+arglen = len(sys.argv)
+if arglen==2 and sys.argv[1] == 'plot':
+	plot=1
+	case=''
+if arglen==2 and sys.argv[1] != 'plot':
+	plot=0
+	case=sys.argv[1]
+elif arglen==3 and sys.argv[1] == 'plot':
+	plot=1
+	case=sys.argv[2]
 
+if case=='':
+	reso=256
+else:
+	reso=512
 
 #
 #  set latex and font
@@ -71,10 +84,10 @@ else:
 #
 #  homogenized
 #
-tally      = numpy.loadtxt('gpu-benchmark/homfuel.tally')
-tallybins  = numpy.loadtxt('gpu-benchmark/homfuel.tallybins')
-serpdata   = get_serpent_det('serpent-benchmark/homfuel_det0.m')
-mcnpdata   = get_mcnp_mctal('mcnp-benchmark/homfuel.tally')
+tally      = numpy.loadtxt('gpu-benchmark'+case+'/homfuel.tally')
+tallybins  = numpy.loadtxt('gpu-benchmark'+case+'/homfuel.tallybins')
+serpdata   = get_serpent_det('serpent-benchmark'+case+'/homfuel_det0.m')
+mcnpdata   = get_mcnp_mctal('mcnp-benchmark'+case+'/homfuel.tally')
 mcnp_vol = 2000*2000*2000
 #title = 'WARP 6e6 histories (2e6 discarded)\n Flux in homogenized block of UO2 and water'	
 
@@ -106,7 +119,7 @@ fig = pl.figure(figsize=(10,6))
 gs = gridspec.GridSpec(2, 1, height_ratios=[6, 1]) 
 ax0 = plt.subplot(gs[0])
 ax1 = plt.subplot(gs[1])
-ax0.semilogx(serpE,serpF,'b',linestyle='steps-mid',label='Serpent 2.1.15')
+ax0.semilogx(serpE,serpF,'b',linestyle='steps-mid',label='Serpent 2.1.18')
 ax0.semilogx(mcnp_avg,mcnp_newflux,'k',linestyle='steps-mid',label='MCNP 6.1')
 ax0.semilogx(avg,newflux,'r',linestyle='steps-mid',label='WARP')
 #ax0.set_xlabel('Energy (MeV)')
@@ -126,8 +139,8 @@ ax1.grid(True)
 if plot:
 	pl.show()
 else:
-	print 'homfuel_spec.eps'
-	fig.savefig('homfuel_spec.eps')
+	print 'homfuel_spec'+case+'.eps'
+	fig.savefig('homfuel_spec'+case+'.eps')
 
 fig = pl.figure(figsize=(18,6))
 gs = gridspec.GridSpec(1, 2, width_ratios=[1, 1]) 
@@ -136,9 +149,9 @@ ax1 = plt.subplot(gs[1])
 
 xmin = ymin = -1000
 xmax = ymax =  1000
-data=np.array(open("gpu-benchmark/homfuel.fission_points").read().split(),dtype=float)
+data=np.array(open("gpu-benchmark"+case+"/homfuel.fission_points").read().split(),dtype=float)
 data=np.reshape(data,(-1,4))
-ax0.hist2d(data[:,0], data[:,1], range=[[xmin, xmax], [ymin, ymax]], bins=256 , normed=True)#norm=LogNorm())
+ax0.hist2d(data[:,0], data[:,1], range=[[xmin, xmax], [ymin, ymax]], bins=reso , normed=True)#norm=LogNorm())
 ax0.set_xlabel('x (cm)')
 ax0.set_ylabel('y (cm)')
 ax0.grid('on',color='k')
@@ -147,9 +160,7 @@ xmin = -1000
 xmax =  1000
 ymin = -1000
 ymax =  1000
-data=np.array(open("gpu-benchmark/homfuel.fission_points").read().split(),dtype=float)
-data=np.reshape(data,(-1,4))
-ax1.hist2d(data[:,0], data[:,2], range=[[xmin, xmax], [ymin, ymax]], bins=256 , normed=True)#norm=LogNorm())
+ax1.hist2d(data[:,0], data[:,2], range=[[xmin, xmax], [ymin, ymax]], bins=reso , normed=True)#norm=LogNorm())
 ax1.set_xlabel('x (cm)')
 ax1.set_ylabel('z (cm)')
 ax1.grid('on',color='k')
@@ -159,8 +170,8 @@ fig.colorbar(ax1.get_images()[0], cax=cbar_ax[0])
 if plot:
 	pl.show()
 else:
-	print 'homfuel_fiss.eps'
-	fig.savefig('homfuel_fiss.eps')
+	print 'homfuel_fiss'+case+'.eps'
+	fig.savefig('homfuel_fiss'+case+'.eps')
 
 
 
@@ -170,10 +181,10 @@ else:
 #
 #  pincell
 #
-tally      = numpy.loadtxt('gpu-benchmark/pincell.tally')
-tallybins  = numpy.loadtxt('gpu-benchmark/pincell.tallybins')
-serpdata   = get_serpent_det('serpent-benchmark/pincell_det0.m')
-mcnpdata   = get_mcnp_mctal('mcnp-benchmark/pincell.tally')
+tally      = numpy.loadtxt('gpu-benchmark'+case+'/pincell.tally')
+tallybins  = numpy.loadtxt('gpu-benchmark'+case+'/pincell.tallybins')
+serpdata   = get_serpent_det('serpent-benchmark'+case+'/pincell_det0.m')
+mcnpdata   = get_mcnp_mctal('mcnp-benchmark'+case+'/pincell.tally')
 mcnp_vol = 125.663706144
 title='Serpent2 (Serial) vs. WARP 6e6 histories (2e6 discarded)\n Flux in the water of surrpunding a single UO2 pin'
 
@@ -205,7 +216,7 @@ fig = pl.figure(figsize=(10,6))
 gs = gridspec.GridSpec(2, 1, height_ratios=[6, 1]) 
 ax0 = plt.subplot(gs[0])
 ax1 = plt.subplot(gs[1])
-ax0.semilogx(serpE,serpF,'b',linestyle='steps-mid',label='Serpent 2.1.15')
+ax0.semilogx(serpE,serpF,'b',linestyle='steps-mid',label='Serpent 2.1.18')
 ax0.semilogx(mcnp_avg,mcnp_newflux,'k',linestyle='steps-mid',label='MCNP 6.1')
 ax0.semilogx(avg,newflux,'r',linestyle='steps-mid',label='WARP')
 #ax0.set_xlabel('Energy (MeV)')
@@ -225,8 +236,8 @@ ax1.grid(True)
 if plot:
 	pl.show()
 else:
-	print 'pincell_spec.eps'
-	fig.savefig('pincell_spec.eps')
+	print 'pincell_spec'+case+'.eps'
+	fig.savefig('pincell_spec'+case+'.eps')
 
 
 fig = pl.figure(figsize=(10,6))
@@ -236,9 +247,9 @@ ax1 = plt.subplot(gs[1])
 
 xmin = ymin = -2
 xmax = ymax =  2
-data=np.array(open("gpu-benchmark/pincell.fission_points").read().split(),dtype=float)
+data=np.array(open("gpu-benchmark"+case+"/pincell.fission_points").read().split(),dtype=float)
 data=np.reshape(data,(-1,4))
-ax0.hist2d(data[:,0], data[:,1], range=[[xmin, xmax], [ymin, ymax]], bins=256)# , normed=True)#norm=LogNorm())
+ax0.hist2d(data[:,0], data[:,1], range=[[xmin, xmax], [ymin, ymax]], bins=reso)# , normed=True)#norm=LogNorm())
 ax0.set_xlabel('x (cm)')
 ax0.set_ylabel('y (cm)')
 ax0.grid('on',color='k')
@@ -247,9 +258,7 @@ xmin = -4
 xmax =  4	
 ymin = -21
 ymax =  21
-data=np.array(open("gpu-benchmark/pincell.fission_points").read().split(),dtype=float)
-data=np.reshape(data,(-1,4))
-ax1.hist2d(data[:,0], data[:,2], range=[[xmin, xmax], [ymin, ymax]], bins=256 )#, normed=True)#, norm=LogNorm())
+ax1.hist2d(data[:,0], data[:,2], range=[[xmin, xmax], [ymin, ymax]], bins=reso )#, normed=True)#, norm=LogNorm())
 ax1.set_xlabel('x (cm)')
 ax1.set_ylabel('z (cm)')
 ax1.grid('on',color='k')
@@ -260,17 +269,17 @@ fig.colorbar(ax1.get_images()[0], cax=cbar_ax[0])
 if plot:
 	pl.show()
 else:
-	print 'pincell_fiss.eps'
-	fig.savefig('pincell_fiss.eps')
+	print 'pincell_fiss'+case+'.eps'
+	fig.savefig('pincell_fiss'+case+'.eps')
 
 
 #
 #  godiva
 #
-tally      = numpy.loadtxt('gpu-benchmark/godiva.tally')
-tallybins  = numpy.loadtxt('gpu-benchmark/godiva.tallybins')
-serpdata   = get_serpent_det('serpent-benchmark/godiva_det0.m')
-mcnpdata   = get_mcnp_mctal('mcnp-benchmark/godiva.tally')
+tally      = numpy.loadtxt('gpu-benchmark'+case+'/godiva.tally')
+tallybins  = numpy.loadtxt('gpu-benchmark'+case+'/godiva.tallybins')
+serpdata   = get_serpent_det('serpent-benchmark'+case+'/godiva_det0.m')
+mcnpdata   = get_mcnp_mctal('mcnp-benchmark'+case+'/godiva.tally')
 mcnp_vol = 555.647209455
 title = 'Serpent2 (Serial) vs. WARP 6e6 histories (2e6 discarded)\n Flux in a bare Pu-239 sphere (Godiva)'
 
@@ -302,7 +311,7 @@ fig = pl.figure(figsize=(10,6))
 gs = gridspec.GridSpec(2, 1, height_ratios=[6, 1]) 
 ax0 = plt.subplot(gs[0])
 ax1 = plt.subplot(gs[1])
-ax0.semilogx(serpE,serpF,'b',linestyle='steps-mid',label='Serpent 2.1.15')
+ax0.semilogx(serpE,serpF,'b',linestyle='steps-mid',label='Serpent 2.1.18')
 ax0.semilogx(mcnp_avg,mcnp_newflux,'k',linestyle='steps-mid',label='MCNP 6.1')
 ax0.semilogx(avg,newflux,'r',linestyle='steps-mid',label='WARP')
 #ax0.set_xlabel('Energy (MeV)')
@@ -322,8 +331,8 @@ ax1.grid(True)
 if plot:
 	pl.show()
 else:
-	print 'godiva_spec.eps'
-	fig.savefig('godiva_spec.eps')
+	print 'godiva_spec'+case+'.eps'
+	fig.savefig('godiva_spec'+case+'.eps')
 
 
 fig = pl.figure(figsize=(18,6))
@@ -333,9 +342,9 @@ ax1 = plt.subplot(gs[1])
 
 xmin = ymin = -7
 xmax = ymax =  7
-data=np.array(open("gpu-benchmark/godiva.fission_points").read().split(),dtype=float)
+data=np.array(open("gpu-benchmark"+case+"/godiva.fission_points").read().split(),dtype=float)
 data=np.reshape(data,(-1,4))
-ax0.hist2d(data[:,0], data[:,1], range=[[xmin, xmax], [ymin, ymax]], bins=256 , normed=True)#norm=LogNorm())
+ax0.hist2d(data[:,0], data[:,1], range=[[xmin, xmax], [ymin, ymax]], bins=reso , normed=True)#norm=LogNorm())
 ax0.set_xlabel('x (cm)')
 ax0.set_ylabel('y (cm)')
 ax0.grid('on',color='k')
@@ -344,9 +353,7 @@ xmin = -7
 xmax =  7
 ymin = -7
 ymax =  7
-data=np.array(open("gpu-benchmark/godiva.fission_points").read().split(),dtype=float)
-data=np.reshape(data,(-1,4))
-ax1.hist2d(data[:,0], data[:,2], range=[[xmin, xmax], [ymin, ymax]], bins=256 , normed=True)#norm=LogNorm())
+ax1.hist2d(data[:,0], data[:,2], range=[[xmin, xmax], [ymin, ymax]], bins=reso , normed=True)#norm=LogNorm())
 ax1.set_xlabel('x (cm)')
 ax1.set_ylabel('z (cm)')
 ax1.grid('on',color='k')
@@ -356,18 +363,18 @@ fig.colorbar(ax1.get_images()[0], cax=cbar_ax[0])
 if plot:
 	pl.show()
 else:
-	print 'godiva_fiss.eps'
-	fig.savefig('godiva_fiss.eps')
+	print 'godiva_fiss'+case+'.eps'
+	fig.savefig('godiva_fiss'+case+'.eps')
 
 
 
 #
 #  assembly
 #
-tally      = numpy.loadtxt('gpu-benchmark/assembly.tally')
-tallybins  = numpy.loadtxt('gpu-benchmark/assembly.tallybins')
-serpdata   = get_serpent_det('serpent-benchmark/assembly_det0.m')
-mcnpdata   = get_mcnp_mctal('mcnp-benchmark/assembly.tally')
+tally      = numpy.loadtxt('gpu-benchmark'+case+'/assembly.tally')
+tallybins  = numpy.loadtxt('gpu-benchmark'+case+'/assembly.tallybins')
+serpdata   = get_serpent_det('serpent-benchmark'+case+'/assembly_det0.m')
+mcnpdata   = get_mcnp_mctal('mcnp-benchmark'+case+'/assembly.tally')
 mcnp_vol = 125.663706144
 title = 'Serpent2 (Serial) vs. WARP 6e6 histories (2e6 discarded)\n Flux in the water of a hexagonal array of UO2 pins'
 
@@ -399,7 +406,7 @@ fig = pl.figure(figsize=(10,6))
 gs = gridspec.GridSpec(2, 1, height_ratios=[6, 1]) 
 ax0 = plt.subplot(gs[0])
 ax1 = plt.subplot(gs[1])
-ax0.semilogx(serpE,serpF,'b',linestyle='steps-mid',label='Serpent 2.1.15')
+ax0.semilogx(serpE,serpF,'b',linestyle='steps-mid',label='Serpent 2.1.18')
 ax0.semilogx(mcnp_avg,mcnp_newflux,'k',linestyle='steps-mid',label='MCNP 6.1')
 ax0.semilogx(avg,newflux,'r',linestyle='steps-mid',label='WARP')
 #ax0.set_xlabel('Energy (MeV)')
@@ -419,8 +426,8 @@ ax1.grid(True)
 if plot:
 	pl.show()
 else:
-	print 'assembly_spec.eps'
-	fig.savefig('assembly_spec.eps')
+	print 'assembly_spec'+case+'.eps'
+	fig.savefig('assembly_spec'+case+'.eps')
 
 
 fig = pl.figure(figsize=(18,6))
@@ -432,9 +439,9 @@ xmin = -40
 xmax =  40
 ymin = -40
 ymax =  40
-data=np.array(open("gpu-benchmark/assembly.fission_points").read().split(),dtype=float)
+data=np.array(open("gpu-benchmark"+case+"/assembly.fission_points").read().split(),dtype=float)
 data=np.reshape(data,(-1,4))
-ax0.hist2d(data[:,0], data[:,1], range=[[xmin, xmax], [ymin, ymax]], bins=256 , normed=True)#norm=LogNorm())
+ax0.hist2d(data[:,0], data[:,1], range=[[xmin, xmax], [ymin, ymax]], bins=reso , normed=True)#norm=LogNorm())
 ax0.set_xlabel('x (cm)')
 ax0.set_ylabel('y (cm)')
 ax0.grid('on',color='k')
@@ -443,9 +450,7 @@ xmin = -40
 xmax =  40
 ymin = -40
 ymax =  40
-data=np.array(open("gpu-benchmark/assembly.fission_points").read().split(),dtype=float)
-data=np.reshape(data,(-1,4))
-ax1.hist2d(data[:,0], data[:,2], range=[[xmin, xmax], [ymin, ymax]], bins=256 , normed=True)#norm=LogNorm())
+ax1.hist2d(data[:,0], data[:,2], range=[[xmin, xmax], [ymin, ymax]], bins=reso , normed=True)#norm=LogNorm())
 ax1.set_xlabel('x (cm)')
 ax1.set_ylabel('z (cm)')
 ax1.grid('on',color='k')
@@ -456,8 +461,8 @@ fig.colorbar(ax1.get_images()[0], cax=cbar_ax[0])
 if plot:
 	pl.show()
 else:
-	print 'assembly_fiss.eps'
-	fig.savefig('assembly_fiss.eps')
+	print 'assembly_fiss'+case+'.eps'
+	fig.savefig('assembly_fiss'+case+'.eps')
 
 
 
