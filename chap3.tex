@@ -340,7 +340,7 @@ The material's total macroscopic cross section is also written to an array so th
 
 \subsection{Flux Tally Kernel}
 
-The flux tally kernel simply scores the predefined tally bins via \eqref{flux_tally}.  Currently, WARP only allows evenly spaced logarithmic bins since their indices can be calculated analytically (as opposed to an arbitrary input grid).  The tally index $j$ out of $N_\mathrm{tally}$ bins for a neutron with energy $E$ is calculated via \eqref{tally_index}.  Since multiple threads could be adding to the element located at $j$, atomic operations are used to perform to sum, specifically the atomicAdd() function.  Atomic functions perform the load-compute-store operations in a single, uninterruptible transaction.  This eliminates the risk of data races occurring.
+The flux tally kernel simply scores a collision in a predefined cell into a bin via \eqref{flux_tally}.  Currently, WARP only allows evenly spaced logarithmic bins since their indices can be calculated analytically (as opposed to an arbitrary input grid).  The tally index $j$ out of $N_\mathrm{tally}$ bins for a neutron with energy $E$ is calculated via \eqref{tally_index}.  Since multiple threads could be adding to the element located at $j$, atomic operations are used to perform to sum, specifically the atomicAdd() function.  Atomic functions perform the load-compute-store operations in a single, uninterruptible transaction.  This eliminates the risk of data races occurring.
 
 \begin{equation}
 j = \mathrm{floor} \left( \frac{ \log \left( \frac{E}{E_\mathrm{min}} \right)} { \log \left( \frac{E_\mathrm{max}}{E_\mathrm{min}} \right)} (N_\mathrm{tally}-1) \right)

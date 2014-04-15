@@ -309,10 +309,9 @@ Of the reactions that produce secondary neutrons, the (n,2n) reaction is most si
 Thus, far there has only been mention of the target nuclide's by how it manifests itself in the 1/$v$ behavior of cross sections at low energy.  Most of the time, it is a good assumption that the thermal motion of the target nuclide is negligible.  Thermal energy is on the order of .01 eV, and this is a good assumption when neutrons are at MeV range energies, but when they scatter and lose energy, they can come near the thermal energy of the material.  When this happens, the target nuclide no longer appears stationary, and assuming that it has zero velocity in scattering calculations is inaccurate.  MCNP sets the threshold at 400kT, which corresponds to about 10 eV for materials at room temperature, above which the target nuclide can be assumed stationary.  Below this threshold, it is important to model thermal effects.  If this wasn't done, a neutron could keep scattering off of zero-energy targets and it's energy could approach zero, which is not physical.  Neutrons can only scatter down to a state where they are in thermal equilibrium with the material they are traveling through.  This creates a ``thermal peak'' at low energies where neutrons collect, especially in materials where the scattering cross section is large and neutrons scatter many times before they are absorbed.
 
 \begin{figure}[h!]
-  \label{MB_dist}
   \centering
     \includegraphics[width=0.8\textwidth]{graphics/MB_dist.eps}
-     \caption{Maxwell-Boltzmann distribution for the speed of heavy and light nuclides at different temperatures.}
+     \caption{Maxwell-Boltzmann distribution for the speed of heavy and light nuclides at different temperatures.   \label{MB_dist}}
 \end{figure}
 
 
@@ -994,10 +993,10 @@ Reactions that happen within a volume can be scored, or tallied.  This is just l
 \phi(\boldsymbol{\vec{r}},E) = \frac{ R_t(\boldsymbol{\vec{r}},E) }{  \Sigma_t(\boldsymbol{\vec{r}},E) }
 \end{equation}
 
-For a representation on a computer, a discrete set of energy bins $E_1 \rightarrow E_g$ must be specified in order to calculate the flux.  The flux in group $g$ such that $E_g < E < E_{g+1}$, and in volume $j$ is shown in \eqref{flux_discrete}.  The reaction rate in the same volume and energy group is shown in \eqref{RR_discrete}.
+For a representation on a computer, a discrete set of energy bins $E_1 \rightarrow E_g$ must be specified in order to calculate the flux.  The flux in group $g$, such that $E_g < E < E_{g+1}$, and in volume $j$ is shown in \eqref{flux_discrete}.
 
 \begin{equation}
-\label{RR_discrete}
+\label{flux_discrete}
 \bar{\phi}_{g,j} = \frac{1}{V_j} \int_{v_j} dV \int_{E_g}^{E_{g+1}} dE \: \phi(\boldsymbol{\vec{r}},E) = \frac{1}{V_j} \int_{v_j} dV \int_{E_g}^{E_{g+1}} dE \:\frac{ R_t(\boldsymbol{\vec{r}},E) }{  \Sigma_t(\boldsymbol{\vec{r}},E) } \\
 \end{equation}
 
@@ -1006,7 +1005,7 @@ Since the reaction rate $R_{g,j}$ is simply the number of collisions $N_{g,j}$ w
 \begin{equation}
 \label{RR_coll}
 \begin{gathered}
-R_{g,j} = \int_{v_j} dV \int_{E_g}^{E_{g+1}} dE \: R_t(\boldsymbol{\vec{r}},E) = \sum_{i=1}^{N_j} 1
+R_{g,j} = \int_{v_j} dV \int_{E_g}^{E_{g+1}} dE \: R_t(\boldsymbol{\vec{r}},E) = \sum_{i=1}^{N_{g,j}} 1
 \end{gathered}
 \end{equation}
 
@@ -1016,7 +1015,7 @@ The expression shown in \eqref{flux_tally} is \emph{analog estimator} of the flu
 \label{flux_tally}
 \begin{gathered}
 E_g < E_i < E_{g+1} \\
-\bar{\phi}_{g,j} =  \frac{1}{V_j} \sum_{i=1}^{N_j} \frac{1}{\Sigma_t(E_i)}
+\bar{\phi}_{g,j} =  \frac{1}{V_j} \sum_{i=1}^{N_j} \frac{1}{\Sigma_t(E_i)} =  \frac{1}{V_j} \int_{V_j} dV \int_{E_g}^{E_{g+1}} dE \: \phi(\boldsymbol{\vec{r}},E) 
 \end{gathered}
 \end{equation}
 
