@@ -1,18 +1,18 @@
 \chapter{Results}
 \label{chap:results}
 
+The results of four simple benchmarks of WARP against Serpent 2.1.18 and MCNP 6.1 are presented in this section.  All of the benchmarks make use nuclear data loaded from the ACE libraries that Serpent uses.  MCNP 6.1 uses the nuclear data distributed with it, which is also from ENDFB/VII, but since the library files are identical between Serpent and WARP, the error comparisons in this section are made against Serpent, not MCNP.  WARP only uses collision estimators for flux tallies and $k_\mathrm{eff}$ estimations, so the collision estimates from Serpent and MCNP are also used.  Serpent and MCNP have more sophisticated estimators as well, but a comparing WARP against their collision estimators specifically will provide the fairest comparison.  Serpent and MCNP are also run serially, which gives them the best theoretical performance when is comes to scaling, i.e. they are assumed to scale perfectly linearly.  In this way, the card that WARP runs on can be equivocated to a certain number of CPU cores, and a conservative performance per cost comparison can be made.
 
-criticality - godiva, homogenized cube, single pin,  small array, large array
-fixed source - water slab, accelerator driven subcritical?
-compare w serpent and mcnp
+All of the benchmark cases were run on a server containing two AMD Opteron 6128 Magny-Cours processors.  These processors contain eight cores each, which are clocked at 2.0Ghz and have a 512kB L2 cache.  The server has 32 GB of DDR3 clocked at 1.333GHz between the two processors.
 
-collision estimator values are shown for serpent and mcnp (since this is what warp uses as well)
-
-computer stats
 
 define pcm
 
+show how flux is normalized, lethargy
+
 \section{Multiplication Factors and Runtimes}
+
+criticality - godiva, homogenized cube, single pin,  small array, large array, table for material and description of geometry for each
 
 \begin{table}[h]
 \centering
@@ -27,28 +27,28 @@ define pcm
 \hline
  $k_\mathrm{eff}$ & 1.027509$\pm$0.0005 & 1.02748$\pm$0.00052 & 1.02789 & -38.1 pcm & -41 pcm  \\
  \hline
- Runtime               & 2.32 m & 9.50868 m & 0.2752 m & 8.4  & 34.6  \\
+ Runtime               & 2.32 m & 9.50868 m & 0.2752 m & 8.4x  & 34.6x  \\
  \hline
  \hline
 \multicolumn{6}{|l|}{Homogenized Block }\\
 \hline
  $k_\mathrm{eff}$ & 0.943049$\pm$0.0003 & 0.940306$\pm$0.00046 & 0.941916 & 113 pcm & -161 pcm   \\
  \hline
- Runtime               &  25.58 m & 18.7190 m & 0.761 m & 33.6  & 24.6  \\
+ Runtime               &  25.58 m & 18.7190 m & 0.761 m & 33.6x  & 24.6x  \\
  \hline
   \hline
 \multicolumn{6}{|l|}{Pin Cell}\\
 \hline
  $k_\mathrm{eff}$ & 0.381435$\pm$0.0008 &  0.380511$\pm$0.00128 & 0.380586 & 84.9 pcm &  -7.5 pcm    \\
  \hline
- Runtime               & 55.85 m & 40.0035 m &  2.81583 m &  19.8 & 14.2  \\
+ Runtime               & 55.85 m & 40.0035 m &  2.81583 m &  19.8x & 14.2x  \\
  \hline
   \hline
 \multicolumn{6}{|l|}{15-sided Hex Assembly}\\
 \hline
  $k_\mathrm{eff}$ & 1.437465$\pm$0.0004 & 1.44704$\pm$0.00046 & 1.4442 & -673 pcm & 284 pcm  \\
  \hline
- Runtime               & 25.34 m &  26.3349 m &  3.2395 m  & 7.8 & 8.1  \\
+ Runtime               & 25.34 m &  26.3349 m &  3.2395 m  & 7.8x & 8.x1  \\
  \hline
 \end{tabular}
 \end{table}
@@ -65,35 +65,37 @@ define pcm
 \hline
 \multicolumn{6}{|l|}{Jezebel}  \\
 \hline
- $k_\mathrm{eff}$ & 1.027957$\pm$0.0001 & $\pm$ &  &  &   \\
+ $k_\mathrm{eff}$ & 1.027957$\pm$0.0001 & 1.02806$\pm$0.00017 & 1.0279 & -5.7 pcm & -16 pcm   \\
  \hline
- Runtime               & 22.79 m &  m &  m &   &   \\
+ Runtime               & 22.79 m & 94.4311 m &  2.0147 m & 11.3x  & 46.9x  \\
  \hline
  \hline
 \multicolumn{6}{|l|}{Homogenized Block }\\
 \hline
- $k_\mathrm{eff}$ & &  &  & &    \\
+ $k_\mathrm{eff}$ & 0.942670$\pm$0.0001 & 0.939868$\pm$0.00021 & 0.94261 & -6 pcm &  274.4 pcm  \\
  \hline
- Runtime               & m &  m &  m & &  \\
+ Runtime               & 255.57 m & 185.966 m & 3.934 m & 64.96x & 47.28x  \\
  \hline
   \hline
 \multicolumn{6}{|l|}{Pin Cell}\\
 \hline
- $k_\mathrm{eff}$ & &  &  & &    \\
+ $k_\mathrm{eff}$ & 0.381405$\pm$0.0003 & 0.380615$\pm$0.00035 & 0.38043 & -97.5 pcm &  -18.5 pcm  \\
  \hline
- Runtime               & m &  m &  m & &  \\
+ Runtime               & 578.62 m & 391.995 m & 7.0682 m & 81.85x & 55.46x \\
  \hline
   \hline
 \multicolumn{6}{|l|}{15-sided Hex Assembly}\\
 \hline
- $k_\mathrm{eff}$ & &  &  & &    \\
+ $k_\mathrm{eff}$ & 1.437711$\pm$0.0001 & 1.44706$\pm$0.00013 & 1.4454 & 769 pcm &  -166 pcm  \\
  \hline
- Runtime               & m &  m &  m & &  \\
+ Runtime               & 252.77 m & 260.508 m & 7.9703 m & 31.71x & 32.68x \\
  \hline
 \end{tabular}
 \end{table}
 
 \subsection{Spectra and Fission Distributions}
+
+These are all for the 10$^6$ case.
 
 \begin{figure}[h!] 
 \centering
@@ -145,10 +147,23 @@ define pcm
 
 simple geometry serpent is slow since woodcock makes it sample the geom much more before leaking?, mcnp and warp can instantly leak it?  shouldn't be seen in the homogenized case... yep!
 
+low number not not saturate the gpu, not enough payload for the overhead , pipelining
+
 \section{Fixed Source}
 
+fixed source - water slab, accelerator driven subcritical?
+
+include?
 
 
 
 \section{Run Profiles}
+
+profiler stuff, time in each routine
+
+stats, the way the active particles die off for assembly and homfuel.  include the non-remapped version in the time/cycle plot.  runtimes...
+
+
+
+
 
