@@ -467,6 +467,72 @@ else:
 
 #
 #
+#  fixed source, u235 w 1ev point source 20cm cube
+#
+#
+tally      = numpy.loadtxt(  'fixed-benchmark/fixed_1ev_u235.nonremap')
+tallybins  = numpy.loadtxt(  'fixed-benchmark/fixed_1ev_u235.nonremapbins')
+serpdata   = get_serpent_det('fixed-benchmark/u235_mono1ev_serp_det0.m')
+mcnpdata   = get_mcnp_mctal( 'fixed-benchmark/u235_mono1ev_mcnp.mctal')
+mcnp_vol = 8000
+title = 'Serpent2 (Serial) vs. WARP 4e7 histories, 1eV point source \n Flux in a cube of u235'
+
+widths=numpy.diff(tallybins);
+avg=(tallybins[:-1]+tallybins[1:])/2;
+newflux=numpy.array(tally[:,0])
+warp_err = numpy.array(tally[:,1])
+newflux=numpy.divide(newflux,widths)
+newflux=numpy.multiply(newflux,avg)
+newflux=numpy.divide(newflux,4.0e7)  # source division not fixed in non-remapping
+
+mcnp_bins = mcnpdata[0]
+mcnp_widths=numpy.diff(mcnp_bins);
+mcnp_avg=(mcnp_bins[:-1]+mcnp_bins[1:])/2;
+#first is under, last value is TOTAL, clip
+mcnp_newflux= mcnpdata[1][1:-1]
+mcnp_err = mcnpdata[2][1:-1]
+mcnp_newflux=numpy.divide(mcnp_newflux,mcnp_widths)
+mcnp_newflux=numpy.multiply(mcnp_newflux,mcnp_avg)
+mcnp_newflux = mcnp_newflux * mcnp_vol  # mcnp divides by volume
+
+serpE=numpy.array(serpdata['DETfluxlogE'][:,2])
+serpErr=numpy.array(serpdata['DETfluxlog'][:,11])
+serpF=numpy.array(serpdata['DETfluxlog'][:,10])
+serpE = numpy.squeeze(numpy.asarray(serpE))
+serpErr = numpy.squeeze(numpy.asarray(serpErr))
+serpF = numpy.squeeze(numpy.asarray(serpF))
+serpF = numpy.multiply(serpF,numpy.max(mcnp_newflux)/numpy.max(serpF))
+
+fig = pl.figure(figsize=(10,6))
+gs = gridspec.GridSpec(2, 1, height_ratios=[6, 1]) 
+ax0 = plt.subplot(gs[0])
+ax1 = plt.subplot(gs[1])
+ax0.semilogx(serpE,serpF,'b',linestyle='steps-mid',label='Serpent 2.1.18')
+ax0.semilogx(mcnp_avg,mcnp_newflux,'k',linestyle='steps-mid',label='MCNP 6.1')
+ax0.semilogx(avg,newflux,'r',linestyle='steps-mid',label='WARP')
+#ax0.set_xlabel('Energy (MeV)')
+ax0.set_ylabel(r'Flux/Lethargy per Source Neutron (n/cm$^2$-s)')
+#ax0.set_title(title)
+handles, labels = ax0.get_legend_handles_labels()
+ax0.legend(handles,labels,loc=2)
+ax0.set_xlim([1e-11,20])
+ax0.grid(True)
+ax1.semilogx(serpE,numpy.divide(serpF-newflux,serpF),'b',linestyle='steps-mid',label='Flux Relative Error vs. Serpent')
+ax1.set_xlabel('Energy (MeV)')
+ax1.set_ylabel('Relative Error \n vs. Serpent')
+ax1.set_xlim([1e-11,20])
+ax1.set_ylim([-1e-1,1e-1])
+ax1.grid(True)
+
+if plot:
+	pl.show()
+else:
+	print 'fixed_spec'+case+'.eps'
+	fig.savefig('fixed_spec'+case+'.eps')
+
+
+#
+#
 #  process rates
 #
 #

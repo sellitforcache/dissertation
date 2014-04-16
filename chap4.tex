@@ -154,7 +154,32 @@ simple geometry serpent is slow since woodcock makes it sample the geom much mor
 
 low number not not saturate the gpu, not enough payload for the overhead , pipelining
 
-\section{Fixed Source}
+\section{Fixed Source}'
+
+\begin{table}[h]
+\centering
+\caption{Summary of $k_\mathrm{eff}$ single-run results of the WARP benchmarks with 20/40 discarded/active criticality cycles and $10^6$ histories per cycle.}
+\label{fixed_summary}
+\begin{tabular}{| l | r | r | r | r | r |}
+ \hline
+ Benchmark & MCNP 6.1 & Serpent 2.1.18 & WARP & $\Delta$ M & $\Delta$ S  \\
+\hline
+\hline
+\multicolumn{6}{|l|}{Jezebel}  \\
+\hline
+ $k_\mathrm{eff}$ & 1.027957$\pm$0.0001 & 1.02806$\pm$0.00017 & 1.0279 & -5.7 pcm & -16 pcm   \\
+ \hline
+ Runtime               & 22.79 m & 94.4311 m &  2.0147 m & 11.3x  & 46.9x  \\
+ \hline
+ \hline
+\end{tabular}
+\end{table}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\textwidth,trim= 2cm 0cm 2cm 0cm]{graphics/finalresults/fixed_spec.eps}
+\caption{Flux spectra of fixed source calculations of a 1eV points source in a block of uranium-235 . \label{fixed_spec} }
+\end{figure}
 
 fixed source - water slab, accelerator driven subcritical?
 
