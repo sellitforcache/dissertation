@@ -7,10 +7,12 @@
 % you don't get any numbering.  You probably won't be using any of
 % these commands in the abstract anyway.
 
-PLACEHOLDER, TAKEN FROM PAPER
+GPUs have gradually increased in computational power from the small, job-specific boards of the early 90s to the programmable powerhouses of today. Compared to CPUs, they have a higher aggregate memory bandwidth, much higher floating-point operations per second (FLOPS), and lower energy consumption per FLOP. Because one of the main obstacles in exascale computing is power consumption, many new supercomputing platforms are gaining much of their computational capacity by incorporating GPUs into their compute nodes. Since CPU optimized parallel algorithms are not directly portable to GPU architectures (or at least without losing substantial performance gain), transport codes need to be rewritten in order to execute efficiently on GPUs. Unless this is done, we cannot take full advantage of these new supercomputers for reactor simulations. 
 
-General purpose Graphical Processing Units (GPUs) are an emerging computational tool, sporting very high memory bandwidth and computational throughput compared to standard CPUs.  There are some drawbacks, however, including limited memory (currently 6 GB) and requiring data parallelism for full utilization.  Since all threads in a GPU thread block must execute the same instructions, having conditional statements based on random numbers can cause threads to be serialized. This can cause resource under-utilization.  For example, in particle transport where a particle history is assigned to each thread, thread divergence mainly arises through particles undergoing different reactions based on the results of cross section sampling.
+WARP is a 3D continuous energy Monte Carlo neutron transport code that has been developed at UC Berkeley as a first attempt to efficiently map the Monte Carlo transport algorithm on the GPU while preserving it's benefits, namely, very few physical and geometrical simplifications.  Using NVIDIA's OptiX ray tracing framework for geometry representation, adopting a unionized energy grid structure for cross sections, regularizing memory access through linked arrays, and introducing parallel-efficient search and sorting algorithms are the main factors in completing the task.
 
-Conventional CPU Monte Carlo algorithms typically use the approach of one particle history per CPU thread.  Data is accessed when needed and threads execute completely independently of each other.  This is a task parallel approach.  To fully utilize the computational power of GPUs, this approach must be modified.  Threads need to execute identical instructions and therefore must be in the same stage of the transport algorithm. 
+results
+
+conclusions
 
 \end{abstract}
