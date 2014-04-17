@@ -1,6 +1,5 @@
 #! /usr/bin/python
 import sys
-import numpy
 import os
 import re
 from matplotlib.colors import LogNorm
@@ -11,9 +10,29 @@ import matplotlib.pyplot as plt
 from termcolor import colored
 from pyne import ace
 import numpy as np
+import numpy
 import pylab as pl
-import os
-import sys
+
+
+#
+#  smoothing function form scipy cookbook
+#
+def smooth(x,window_len=11,window='hanning'):
+	if x.ndim != 1:
+		raise ValueError, "smooth only accepts 1 dimension arrays."
+	if x.size < window_len:
+		raise ValueError, "Input vector needs to be bigger than window size."
+	if window_len<3:
+		return x
+	if not window in ['flat', 'hanning', 'hamming', 'bartlett', 'blackman']:
+		raise ValueError, "Window is on of 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'"
+	s=np.r_[x[window_len-1:0:-1],x,x[-1:-window_len:-1]]
+	if window == 'flat': #moving average
+		w=np.ones(window_len,'d')
+	else:
+		w=eval('numpy.'+window+'(window_len)')
+	y=np.convolve(w/w.sum(),s,mode='valid')
+	return y
 
 #
 #  loading routines
@@ -164,6 +183,7 @@ ax1.hist2d(data[:,0], data[:,2], range=[[xmin, xmax], [ymin, ymax]], bins=reso ,
 ax1.set_xlabel('x (cm)')
 ax1.set_ylabel('z (cm)')
 ax1.grid('on',color='k')
+ax1.yaxis.tick_right()
 cbar_ax = cbar.make_axes(fig.get_axes())
 fig.colorbar(ax1.get_images()[0], cax=cbar_ax[0])
 
@@ -263,6 +283,7 @@ ax1.set_xlabel('x (cm)')
 ax1.set_ylabel('z (cm)')
 ax1.grid('on',color='k')
 ax1.set_xticks([xmin,0,xmax])
+ax1.yaxis.tick_right()
 cbar_ax = cbar.make_axes(fig.get_axes())
 fig.colorbar(ax1.get_images()[0], cax=cbar_ax[0])
 
@@ -357,6 +378,7 @@ ax1.hist2d(data[:,0], data[:,2], range=[[xmin, xmax], [ymin, ymax]], bins=reso ,
 ax1.set_xlabel('x (cm)')
 ax1.set_ylabel('z (cm)')
 ax1.grid('on',color='k')
+ax1.yaxis.tick_right()
 cbar_ax = cbar.make_axes(fig.get_axes())
 fig.colorbar(ax1.get_images()[0], cax=cbar_ax[0])
 
@@ -454,7 +476,7 @@ ax1.hist2d(data[:,0], data[:,2], range=[[xmin, xmax], [ymin, ymax]], bins=reso ,
 ax1.set_xlabel('x (cm)')
 ax1.set_ylabel('z (cm)')
 ax1.grid('on',color='k')
-
+ax1.yaxis.tick_right()
 cbar_ax = cbar.make_axes(fig.get_axes())
 fig.colorbar(ax1.get_images()[0], cax=cbar_ax[0])
 
@@ -467,10 +489,112 @@ else:
 
 #
 #
+#  fixed source, u235 w 1ev point source 20cm cube
+#
+#
+tally      = numpy.loadtxt(  'fixed-benchmark/fixed_1ev_u235.nonremap')
+tallybins  = numpy.loadtxt(  'fixed-benchmark/fixed_1ev_u235.nonremapbins')
+serpdata   = get_serpent_det('fixed-benchmark/u235_mono1ev_serp_det0.m')
+mcnpdata   = get_mcnp_mctal( 'fixed-benchmark/u235_mono1ev_mcnp.mctal')
+mcnp_vol = 8000
+title = 'Serpent2 (Serial) vs. WARP 4e7 histories, 1eV point source \n Flux in a cube of u235'
+
+widths=numpy.diff(tallybins);
+avg=(tallybins[:-1]+tallybins[1:])/2;
+newflux=numpy.array(tally[:,0])
+warp_err = numpy.array(tally[:,1])
+newflux=numpy.divide(newflux,widths)
+newflux=numpy.multiply(newflux,avg)
+newflux=numpy.divide(newflux,4.0e7)  # source division not fixed in non-remapping
+
+mcnp_bins = mcnpdata[0]
+mcnp_widths=numpy.diff(mcnp_bins);
+mcnp_avg=(mcnp_bins[:-1]+mcnp_bins[1:])/2;
+#first is under, last value is TOTAL, clip
+mcnp_newflux= mcnpdata[1][1:-1]
+mcnp_err = mcnpdata[2][1:-1]
+mcnp_newflux=numpy.divide(mcnp_newflux,mcnp_widths)
+mcnp_newflux=numpy.multiply(mcnp_newflux,mcnp_avg)
+mcnp_newflux = mcnp_newflux * mcnp_vol  # mcnp divides by volume
+
+serpE=numpy.array(serpdata['DETfluxlogE'][:,2])
+serpErr=numpy.array(serpdata['DETfluxlog'][:,11])
+serpF=numpy.array(serpdata['DETfluxlog'][:,10])
+serpE = numpy.squeeze(numpy.asarray(serpE))
+serpErr = numpy.squeeze(numpy.asarray(serpErr))
+serpF = numpy.squeeze(numpy.asarray(serpF))
+serpF = numpy.multiply(serpF,numpy.max(mcnp_newflux)/numpy.max(serpF))
+
+fig = pl.figure(figsize=(10,6))
+gs = gridspec.GridSpec(2, 1, height_ratios=[6, 1]) 
+ax0 = plt.subplot(gs[0])
+ax1 = plt.subplot(gs[1])
+ax0.semilogx(serpE,serpF,'b',linestyle='steps-mid',label='Serpent 2.1.18')
+ax0.semilogx(mcnp_avg,mcnp_newflux,'k',linestyle='steps-mid',label='MCNP 6.1')
+ax0.semilogx(avg,newflux,'r',linestyle='steps-mid',label='WARP')
+#ax0.set_xlabel('Energy (MeV)')
+ax0.set_ylabel(r'Flux/Lethargy per Source Neutron (n/cm$^2$-s)')
+#ax0.set_title(title)
+handles, labels = ax0.get_legend_handles_labels()
+ax0.legend(handles,labels,loc=2)
+ax0.set_xlim([1e-11,20])
+ax0.grid(True)
+ax1.semilogx(serpE,numpy.divide(serpF-newflux,serpF),'b',linestyle='steps-mid',label='Flux Relative Error vs. Serpent')
+ax1.set_xlabel('Energy (MeV)')
+ax1.set_ylabel('Relative Error \n vs. Serpent')
+ax1.set_xlim([1e-11,20])
+ax1.set_ylim([-1e-1,1e-1])
+ax1.grid(True)
+
+if plot:
+	pl.show()
+else:
+	print 'fixed_spec.eps'
+	fig.savefig('fixed_spec.eps')
+
+
+#
+#
 #  process rates
 #
 #
+assembly_remap  = np.array(open("gpu-benchmark-6/assembly.active").read().split(),dtype=float)
+homfuel_remap   = np.array(open("gpu-benchmark-6/homfuel.active").read().split(),dtype=float)
+assembly_nonremap  = np.array(open("gpu-nonremap-6/assembly.nonremap.active").read().split(),dtype=float)
+homfuel_nonremap   = np.array(open("gpu-nonremap-6/homfuel.nonremap.active").read().split(),dtype=float)
 
+assembly_remap_time   = assembly_remap[1::2]
+assembly_remap_time   = assembly_remap_time - assembly_remap_time[0]
+assembly_remap_active = assembly_remap[0::2]
+homfuel_remap_time    = homfuel_remap[1::2]
+homfuel_remap_time    = homfuel_remap_time - homfuel_remap_time[0]
+homfuel_remap_active  = homfuel_remap[0::2]
+assembly_nonremap_time   = assembly_nonremap[1::2]
+assembly_nonremap_time   = assembly_nonremap_time - assembly_nonremap_time[0]
+assembly_nonremap_active = assembly_nonremap[0::2]
+homfuel_nonremap_time    = homfuel_nonremap[1::2]
+homfuel_nonremap_time    = homfuel_nonremap_time - homfuel_nonremap_time[0]
+homfuel_nonremap_active  = homfuel_nonremap[0::2]
+
+fig = pl.figure(figsize=(10,6))
+ax=fig.add_subplot(1,1,1)
+ax.plot(assembly_remap_time[1:],smooth(    numpy.divide(assembly_remap_active[1:],numpy.diff(assembly_remap_time)),window_len=8)[:assembly_remap_time[1:].__len__()],'r',label='Assembly,    Remapping')
+ax.plot(assembly_nonremap_time[1:],smooth( numpy.divide(assembly_nonremap_active[1:],numpy.diff(assembly_nonremap_time)),window_len=8)[:assembly_nonremap_time[1:].__len__()],'b',label='Assembly, Non-Remapping')
+ax.plot(homfuel_remap_time[1:], smooth(    numpy.divide(homfuel_remap_active[1:],numpy.diff(homfuel_remap_time))  ,window_len=8)[:homfuel_remap_time[1:].__len__()],'r--',   label='Homogenized, Remapping')
+ax.plot(homfuel_nonremap_time[1:], smooth( numpy.divide(homfuel_nonremap_active[1:],numpy.diff(homfuel_nonremap_time))  ,window_len=8)[:homfuel_nonremap_time[1:].__len__()],'b--',   label='Homogenized, Non-Remapping')
+handles, labels = ax.get_legend_handles_labels()
+ax.legend(handles,labels,loc=1)
+ax.set_xlabel('Time (s)')
+ax.set_ylabel('Neutron processing rate (n/s)')
+ax.set_xlim([0,5])
+#ax.set_ylim([-5e-1,5e-1])
+ax.grid(True)
+
+if plot:
+	pl.show()
+else:
+	print 'process_rate.eps'
+	fig.savefig('process_rate.eps')
 
 
 
