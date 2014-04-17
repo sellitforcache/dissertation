@@ -1,6 +1,5 @@
 #! /usr/bin/python
 import sys
-import numpy
 import os
 import re
 from matplotlib.colors import LogNorm
@@ -11,9 +10,29 @@ import matplotlib.pyplot as plt
 from termcolor import colored
 from pyne import ace
 import numpy as np
+import numpy
 import pylab as pl
-import os
-import sys
+
+
+#
+#  smoothing function form scipy cookbook
+#
+def smooth(x,window_len=11,window='hanning'):
+	if x.ndim != 1:
+		raise ValueError, "smooth only accepts 1 dimension arrays."
+	if x.size < window_len:
+		raise ValueError, "Input vector needs to be bigger than window size."
+	if window_len<3:
+		return x
+	if not window in ['flat', 'hanning', 'hamming', 'bartlett', 'blackman']:
+		raise ValueError, "Window is on of 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'"
+	s=np.r_[x[window_len-1:0:-1],x,x[-1:-window_len:-1]]
+	if window == 'flat': #moving average
+		w=np.ones(window_len,'d')
+	else:
+		w=eval('numpy.'+window+'(window_len)')
+	y=np.convolve(w/w.sum(),s,mode='valid')
+	return y
 
 #
 #  loading routines
@@ -164,6 +183,7 @@ ax1.hist2d(data[:,0], data[:,2], range=[[xmin, xmax], [ymin, ymax]], bins=reso ,
 ax1.set_xlabel('x (cm)')
 ax1.set_ylabel('z (cm)')
 ax1.grid('on',color='k')
+ax1.yaxis.tick_right()
 cbar_ax = cbar.make_axes(fig.get_axes())
 fig.colorbar(ax1.get_images()[0], cax=cbar_ax[0])
 
@@ -263,6 +283,7 @@ ax1.set_xlabel('x (cm)')
 ax1.set_ylabel('z (cm)')
 ax1.grid('on',color='k')
 ax1.set_xticks([xmin,0,xmax])
+ax1.yaxis.tick_right()
 cbar_ax = cbar.make_axes(fig.get_axes())
 fig.colorbar(ax1.get_images()[0], cax=cbar_ax[0])
 
@@ -357,6 +378,7 @@ ax1.hist2d(data[:,0], data[:,2], range=[[xmin, xmax], [ymin, ymax]], bins=reso ,
 ax1.set_xlabel('x (cm)')
 ax1.set_ylabel('z (cm)')
 ax1.grid('on',color='k')
+ax1.yaxis.tick_right()
 cbar_ax = cbar.make_axes(fig.get_axes())
 fig.colorbar(ax1.get_images()[0], cax=cbar_ax[0])
 
@@ -454,7 +476,7 @@ ax1.hist2d(data[:,0], data[:,2], range=[[xmin, xmax], [ymin, ymax]], bins=reso ,
 ax1.set_xlabel('x (cm)')
 ax1.set_ylabel('z (cm)')
 ax1.grid('on',color='k')
-
+ax1.yaxis.tick_right()
 cbar_ax = cbar.make_axes(fig.get_axes())
 fig.colorbar(ax1.get_images()[0], cax=cbar_ax[0])
 
@@ -527,8 +549,8 @@ ax1.grid(True)
 if plot:
 	pl.show()
 else:
-	print 'fixed_spec'+case+'.eps'
-	fig.savefig('fixed_spec'+case+'.eps')
+	print 'fixed_spec.eps'
+	fig.savefig('fixed_spec.eps')
 
 
 #
@@ -536,7 +558,43 @@ else:
 #  process rates
 #
 #
+assembly_remap  = np.array(open("gpu-benchmark-6/assembly.active").read().split(),dtype=float)
+homfuel_remap   = np.array(open("gpu-benchmark-6/homfuel.active").read().split(),dtype=float)
+assembly_nonremap  = np.array(open("gpu-nonremap-6/assembly.nonremap.active").read().split(),dtype=float)
+homfuel_nonremap   = np.array(open("gpu-nonremap-6/homfuel.nonremap.active").read().split(),dtype=float)
 
+assembly_remap_time   = assembly_remap[1::2]
+assembly_remap_time   = assembly_remap_time - assembly_remap_time[0]
+assembly_remap_active = assembly_remap[0::2]
+homfuel_remap_time    = homfuel_remap[1::2]
+homfuel_remap_time    = homfuel_remap_time - homfuel_remap_time[0]
+homfuel_remap_active  = homfuel_remap[0::2]
+assembly_nonremap_time   = assembly_nonremap[1::2]
+assembly_nonremap_time   = assembly_nonremap_time - assembly_nonremap_time[0]
+assembly_nonremap_active = assembly_nonremap[0::2]
+homfuel_nonremap_time    = homfuel_nonremap[1::2]
+homfuel_nonremap_time    = homfuel_nonremap_time - homfuel_nonremap_time[0]
+homfuel_nonremap_active  = homfuel_nonremap[0::2]
+
+fig = pl.figure(figsize=(10,6))
+ax=fig.add_subplot(1,1,1)
+ax.plot(assembly_remap_time[1:],smooth(    numpy.divide(assembly_remap_active[1:],numpy.diff(assembly_remap_time)),window_len=8)[:assembly_remap_time[1:].__len__()],'r',label='Assembly,    Remapping')
+ax.plot(assembly_nonremap_time[1:],smooth( numpy.divide(assembly_nonremap_active[1:],numpy.diff(assembly_nonremap_time)),window_len=8)[:assembly_nonremap_time[1:].__len__()],'b',label='Assembly, Non-Remapping')
+ax.plot(homfuel_remap_time[1:], smooth(    numpy.divide(homfuel_remap_active[1:],numpy.diff(homfuel_remap_time))  ,window_len=8)[:homfuel_remap_time[1:].__len__()],'r--',   label='Homogenized, Remapping')
+ax.plot(homfuel_nonremap_time[1:], smooth( numpy.divide(homfuel_nonremap_active[1:],numpy.diff(homfuel_nonremap_time))  ,window_len=8)[:homfuel_nonremap_time[1:].__len__()],'b--',   label='Homogenized, Non-Remapping')
+handles, labels = ax.get_legend_handles_labels()
+ax.legend(handles,labels,loc=1)
+ax.set_xlabel('Time (s)')
+ax.set_ylabel('Neutron processing rate (n/s)')
+ax.set_xlim([0,5])
+#ax.set_ylim([-5e-1,5e-1])
+ax.grid(True)
+
+if plot:
+	pl.show()
+else:
+	print 'process_rate.eps'
+	fig.savefig('process_rate.eps')
 
 
 

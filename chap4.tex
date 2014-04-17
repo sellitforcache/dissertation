@@ -7,6 +7,8 @@ All of the benchmark cases were run on a server containing two AMD Opteron 6128 
 
 The multiplication factor differences are reported in ``per cent mille,'' which is a thousandth of a percent, or $10^{-5}$.  This is a standard way of reporting differences in the multiplication factor, as any small deviation from unity can cause a reactor to change its power level.  The flux spectra are normalized per source neutron and per lethargy.  Normalizing per source neutron serves to reproduce the same results for different numbers of histories run.  The uncertainty will be lower in results with more histories, of course, but the magnitudes should have the same mean values.   ``Lethargy'' simply means the logarithm of the neutron energy, $\ln(E_0/E)$, and is convenient since neutrons lose a fraction of energy per collision \cite{duderstadt}.  Normalizing the flux per lethargy accentuates the the high energy region of the flux, and is convenient in plotting spectra since otherwise overshadowed structure in the high-energy regions can be seen.  To plot the raw tally values, shown in \eqref{flux_tally}, the values must be divided by the total number of source neutrons run, divided by the energy bin width to , and multiplied by the average bin energy to normalized by lethargy \cite{lethargyplot}.  The expression for normalizing the raw tally scores is shown in \eqref{fluxtallynorm}, where $\bar{\phi}_{g,j}$ is the raw tally value in cell volume $j$ and energy group $g$.
 
+Physics not included...
+
 \begin{equation}
 \label{fluxtallynorm}
 \begin{gathered}
@@ -162,22 +164,19 @@ low number not not saturate the gpu, not enough payload for the overhead , pipel
 \label{fixed_summary}
 \begin{tabular}{| l | r | r | r | r | r |}
  \hline
- Benchmark & MCNP 6.1 & Serpent 2.1.18 & WARP & $\Delta$ M & $\Delta$ S  \\
+  U235, 1eV PS & MCNP 6.1 & Serpent 2.1.18 & WARP & $\Delta$ M & $\Delta$ S  \\
 \hline
 \hline
-\multicolumn{6}{|l|}{Jezebel}  \\
-\hline
- $k_\mathrm{eff}$ & 1.027957$\pm$0.0001 & 1.02806$\pm$0.00017 & 1.0279 & -5.7 pcm & -16 pcm   \\
+ $k_\mathrm{eff}$ & 0.6442 (inferred) & 0.749278$\pm$0.000019 & 0.752093 & -10.8\%  & -281.5 pcm   \\
  \hline
- Runtime               & 22.79 m & 94.4311 m &  2.0147 m & 11.3x  & 46.9x  \\
- \hline
+ Runtime               & 35.22 m & 4.317 m &  2.0925 m & 16.8x  & 2.1x  \\
  \hline
 \end{tabular}
 \end{table}
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width=\textwidth,trim= 2cm 0cm 2cm 0cm]{graphics/finalresults/fixed_spec.eps}
+\includegraphics[width=\textwidth]{graphics/finalresults/fixed_spec.eps}
 \caption{Flux spectra of fixed source calculations of a 1eV points source in a block of uranium-235 . \label{fixed_spec} }
 \end{figure}
 
@@ -188,6 +187,45 @@ include?
 
 
 \section{Run Profiles}
+
+\begin{table}[h]
+\centering
+\caption{Comparison of the non-remapping and remapping versions of WARP for the four benchmark cases.  20/40 discarded/active criticality cycles and $10^6$ histories per cycle.}
+\label{benchmark_nonremapping_summary}
+\begin{tabular}{| l | r | r | r |}
+ \hline
+ Benchmark & Remapping WARP & Non-Remapping WARP & $\Delta k$ or Ratio  \\
+\hline
+\hline
+\multicolumn{4}{|l|}{Jezebel}  \\
+\hline
+ $k_\mathrm{eff}$ & 1.0279 & 1.0279  & 0 pcm\\
+ \hline
+ Runtime               &   2.0147 m & 1.84 m & 0.91 \\
+ \hline
+ \hline
+\multicolumn{4}{|l|}{Homogenized Block }\\
+\hline
+ $k_\mathrm{eff}$ & 0.9426 & 0.941857 & 74.3 pcm  \\
+ \hline
+ Runtime               &  3.934 m & 4.05 m & 1.03 \\
+ \hline
+  \hline
+\multicolumn{4}{|l|}{Pin Cell}\\
+\hline
+ $k_\mathrm{eff}$ &  0.3804 & 0.38063  & -23 pcm \\
+ \hline
+ Runtime               & 7.0682 m & 10.52 m & 1.49 \\
+ \hline
+  \hline
+\multicolumn{4}{|l|}{15-sided Hex Assembly}\\
+\hline
+ $k_\mathrm{eff}$  & 1.4454  & 1.4457 & -30 pcm \\
+ \hline
+ Runtime               & 7.9703 m & 95.85 m & 12.03 \\
+ \hline
+\end{tabular}
+\end{table}
 
 \begin{table}[h]
 \centering
@@ -207,6 +245,12 @@ include?
 \hline
 \end{tabular}
 \end{table}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\textwidth]{graphics/finalresults/process_rate.eps}
+\caption{Neutron processing rate of WARP in the homogenized block and assembly benchmark cases. \label{process_rate} }
+\end{figure}
 
 profiler stuff, time in each routine.  compare assembly and homfuel.  compare w non-remapped
 
