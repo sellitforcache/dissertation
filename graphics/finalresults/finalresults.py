@@ -558,8 +558,14 @@ else:
 #  process rates
 #
 #
-assembly_remap  = np.array(open("gpu-benchmark-6/assembly.active").read().split(),dtype=float)
-homfuel_remap   = np.array(open("gpu-benchmark-6/homfuel.active").read().split(),dtype=float)
+def replace_invalid(argin):
+	mask = np.isnan(argin) + np.isinf(argin)
+	argin[mask] = np.interp(np.flatnonzero(mask), np.flatnonzero(~mask), argin[~mask], right=0)
+	return argin
+
+
+assembly_remap     = np.array(open("gpu-benchmark-6/assembly.active").read().split(),dtype=float)
+homfuel_remap      = np.array(open("gpu-benchmark-6/homfuel.active").read().split(),dtype=float)
 assembly_nonremap  = np.array(open("gpu-nonremap-6/assembly.nonremap.active").read().split(),dtype=float)
 homfuel_nonremap   = np.array(open("gpu-nonremap-6/homfuel.nonremap.active").read().split(),dtype=float)
 
@@ -578,15 +584,36 @@ homfuel_nonremap_active  = homfuel_nonremap[0::2]
 
 fig = pl.figure(figsize=(10,6))
 ax=fig.add_subplot(1,1,1)
-ax.plot(assembly_remap_time[1:],smooth(    numpy.divide(assembly_remap_active[1:],numpy.diff(assembly_remap_time)),window_len=8)[:assembly_remap_time[1:].__len__()],'r',label='Assembly,    Remapping')
-ax.plot(assembly_nonremap_time[1:],smooth( numpy.divide(assembly_nonremap_active[1:],numpy.diff(assembly_nonremap_time)),window_len=8)[:assembly_nonremap_time[1:].__len__()],'b',label='Assembly, Non-Remapping')
-ax.plot(homfuel_remap_time[1:], smooth(    numpy.divide(homfuel_remap_active[1:],numpy.diff(homfuel_remap_time))  ,window_len=8)[:homfuel_remap_time[1:].__len__()],'r--',   label='Homogenized, Remapping')
-ax.plot(homfuel_nonremap_time[1:], smooth( numpy.divide(homfuel_nonremap_active[1:],numpy.diff(homfuel_nonremap_time))  ,window_len=8)[:homfuel_nonremap_time[1:].__len__()],'b--',   label='Homogenized, Non-Remapping')
+w_len=12
+ar_x =    assembly_remap_active[:-1]
+an_x = assembly_nonremap_active[:-1]
+hr_x =     homfuel_remap_active[:-1]
+hn_x =  homfuel_nonremap_active[:-1]
+ar_y = smooth(  numpy.divide( ar_x , numpy.diff(assembly_remap_time   )  ), window_len=w_len)
+an_y = smooth(  numpy.divide( an_x , numpy.diff(assembly_nonremap_time)  ), window_len=w_len)
+hr_y = smooth(  numpy.divide( hr_x , numpy.diff(homfuel_remap_time    )  ), window_len=w_len)
+hn_y = smooth(  numpy.divide( hn_x , numpy.diff(homfuel_nonremap_time )  ), window_len=w_len)
+ar_y = np.append(ar_y,0.0)
+an_y = np.append(an_y,0.0)
+hr_y = np.append(hr_y,0.0)
+hn_y = np.append(hn_y,0.0)
+ar_y = replace_invalid( ar_y )
+an_y = replace_invalid( an_y )
+hr_y = replace_invalid( hr_y )
+hn_y = replace_invalid( hn_y )
+ar_diff = ar_y.__len__() - ar_x.__len__()
+an_diff = an_y.__len__() - an_x.__len__()
+hr_diff = hr_y.__len__() - hr_x.__len__()
+hn_diff = hn_y.__len__() - hn_x.__len__()
+ax.plot( ar_x, ar_y[:-ar_diff] , 'r',   label='Assembly,    Remapping')
+ax.plot( an_x, an_y[:-an_diff] , 'b',   label='Assembly,    Non-Remapping')
+ax.plot( hr_x, hr_y[:-hr_diff] , 'r--', label='Homogenized, Remapping')
+ax.plot( hn_x, hn_y[:-hn_diff] , 'b--', label='Homogenized, Non-Remapping')
 handles, labels = ax.get_legend_handles_labels()
-ax.legend(handles,labels,loc=1)
-ax.set_xlabel('Time (s)')
+ax.legend(handles,labels,loc=2)
+ax.set_xlabel('Active Neutrons')
 ax.set_ylabel('Neutron processing rate (n/s)')
-ax.set_xlim([0,5])
+#ax.set_xlim([0,5])
 #ax.set_ylim([-5e-1,5e-1])
 ax.grid(True)
 
