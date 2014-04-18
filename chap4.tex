@@ -21,9 +21,11 @@ The ``Jezebel'' benchmark is a bare plutonium sphere, and is a standard critical
 
 The ``homogenized block'' benchmark consists of a single cell and a single material as well, but that material has multiple isotopes in it.  This particular material is a one-to-one mixture of 1\% U-235 enriched UO$_2$ and water.  The cell dimensions are quite large as well to emphasize material processing instead of leakage.
 
-The ``homogenized block'' benchmark consists of a single cell and a single material as well, but that material has multiple isotopes in it.  This particular material is a one-to-one mixture of 1\% U-235 enriched UO$_2$ and water.  The cell dimensions are quite large as well to emphasize material processing instead of leakage.
+The ``pin cell'' benchmark consists of bare UO$_2$ cylinder surrounded by a block of water.  This benchmark now has two materials, each with multiple isotopes, and two cells.  The water block dimensions are not very large, so leakage should play a part.  This benchmark serves to highlight all the processing routines work simultaneously, and the effect of introducing more than one cell, which should have a significant effect on the ray tracing rate as pointed out in the preliminary OptiX study.
 
-The ``homogenized block'' benchmark consists of a single cell and a single material as well, but that material has multiple isotopes in it.  This particular material is a one-to-one mixture of 1\% U-235 enriched UO$_2$ and water.  The cell dimensions are quite large as well to emphasize material processing instead of leakage.
+The ``15-sided Hex Assembly'' benchmark consists of 631 bare UO$_2$ cylinders laid out in a hexagonal lattice surrounded by water.  The material compositions, densities, and the cylinder dimensions are identical to the pin cell benchmark case, but since this benchmark has two orders of magnitude more objects, it serves to highlight the effect of introducing many geometric objects into the problem and will further validate that the geometry processing routines work correctly if consistent results are obtained.
+
+The ``Fixed-source Block'' benchmark is identical to the homogenized block benchmark in terms of geometry and materials, but the the source mode is changed from criticality to a fixed, predefined source.  A 1eV isotropic point source was chosen as to highlight the effectiveness of popping any secondary neutrons back into the active transport cycle.  Since the source is at 1eV, it will induce fissions in U-235 which will produce neutrons in a fission spectrum that does not overlap with the source.  
 
 \begin{table}[h]
 \centering
@@ -34,7 +36,7 @@ The ``homogenized block'' benchmark consists of a single cell and a single mater
  Benchmark & No. Cells & Materials & Isotopes & Densities \\
  \hline
   \hline
- Jezebel                           & 1 sphere, r=5.1cm & Fuel & Pu-239 & 19.816 g/cm$^3$\\
+ Jezebel                           & 1 sphere, r=5.1cm & Fuel & (1.00) Pu-239 & 19.816 g/cm$^3$\\
   \hline
  \multirow{4}{*}{Homogenized Block}  & \multirow{4}{*}{1 cube, 2m$^3$ } & \multirow{4}{*}{Hom. Fuel.} & (0.99) U-238  & \multirow{4}{*}{10  g/cm$^3$} \\
  & & & (0.01) U-235 & \\
@@ -48,9 +50,9 @@ The ``homogenized block'' benchmark consists of a single cell and a single mater
  & & \multirow{2}{*}{Water} & (1.00) O-16 &  \multirow{2}{*}{3  g/cm$^3$} \\
  & & & (2.00) H-1 & \\
   \hline
- \multirow{5}{*}{15-sided Hex Assembly}      & \multirow{4}{*}{1 cube, 84cm$^3$} & \multirow{3}{*}{Fuel} & (0.90) U-238 & \multirow{3}{*}{15  g/cm$^3$} \\
- & \multirow{4}{*}{631 cylinders, r=1cm z=40cm} & & (0.10) U-235 & \\
-  & & & (2.00) O-16 & \\
+  \multirow{4}{*}{15-sided}  & \multirow{4}{*}{1 cube, 84cm$^3$} & \multirow{3}{*}{Fuel} & (0.90) U-238 & \multirow{3}{*}{15  g/cm$^3$} \\
+ \multirow{4}{*}{Hex Assembly}   & \multirow{4}{*}{631 cylinders, r=1cm z=40cm} & & (0.10) U-235 & \\
+     & & & (2.00) O-16 & \\
  \cline{3-5}
  & & \multirow{2}{*}{Water} & (1.00) O-16 &  \multirow{2}{*}{3  g/cm$^3$} \\
  & & & (2.00) H-1 & \\
@@ -65,6 +67,21 @@ The ``homogenized block'' benchmark consists of a single cell and a single mater
 
 \section{Multiplication Factors and Runtimes}
 
+blah
+
+blah
+
+blah
+
+blah
+
+blah
+
+blah
+
+blah
+
+blah
 
 \begin{table}[h]
 \centering
@@ -145,9 +162,27 @@ The ``homogenized block'' benchmark consists of a single cell and a single mater
 \end{tabular}
 \end{table}
 
+
+
 \subsection{Spectra and Fission Distributions}
 
 These are all for the 10$^6$ case.
+
+blah
+
+blah
+
+blah
+
+blah
+
+blah
+
+blah
+
+blah
+
+blah
 
 \begin{figure}[h!] 
 \centering
@@ -308,6 +343,8 @@ profiler stuff, time in each routine.  compare assembly and homfuel.  compare w 
 stats, the way the active particles die off for assembly and homfuel.  include the non-remapped version in the time/cycle plot.  runtimes...
 
 remapping has a huge impact on OptiX runtime?  or just in cases where neutrons don't die off quickly and the tail becomes much more important where a lot of time is wasted on processing blocks full of neutrons that just return.
+
+point out the number of iterations to get to 0 active, means that the non remapping routine spends quite a bit of time in the slow section of the processing curve.
 
 state smoothing and interpolation parameters, problem with cycle time becoming small and NaNs appearing
 
