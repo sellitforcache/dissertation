@@ -64,29 +64,16 @@ The ``Fixed-source Block'' benchmark is identical to the homogenized block bench
  \end{tabular}
 \end{table}
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Multiplication Factors and Runtimes}
 
-blah
-
-blah
-
-blah
-
-blah
-
-blah
-
-blah
-
-blah
-
-blah
+The goal of WARP is to be the first step in creating a full-featured continuous energy Monte Carlo neutron transport code that is \emph{accelerated} by running on GPUs.  The crux of the effort is to make Monte Carlo calculations faster but still produce accurate results.  Table \ref{benchmark_summary_5} shows the multiplication factor deviations and the speedup factors for the four criticality benchmarks compared to MCNP 6.1 and Serpent 2.1.18 when $10^5$ neutrons per batch are used.  Table  \ref{benchmark_summary_6} shows the same information, but for cases where $10^6$ neutrons per batch are used.
 
 \begin{table}[h]
 \centering
 \caption{Summary of $k_\mathrm{eff}$ single-run results of the WARP criticality benchmarks with 20/40 discarded/active criticality cycles and $10^5$ histories per cycle.}
-\label{benchmark_summary}
+\label{benchmark_summary_5}
 \begin{tabular}{| l | r | r | r | r | r |}
  \hline
  Benchmark & MCNP 6.1 & Serpent 2.1.18 & WARP & $\Delta$ M & $\Delta$ S  \\
@@ -94,30 +81,30 @@ blah
 \hline
 \multicolumn{6}{|l|}{Jezebel}  \\
 \hline
- $k_\mathrm{eff}$ & 1.027509$\pm$0.0005 & 1.02748$\pm$0.00052 & 1.02789 & -38.1 pcm & -41 pcm  \\
+ $k_\mathrm{eff}$ & 1.027509$\pm$0.0005 & 1.02748$\pm$0.00052 & 1.02789 & -38.1 pcm (y) & -41 pcm (y) \\
  \hline
  Runtime               & 2.32 m & 9.50868 m & 0.2752 m & 8.4x  & 34.6x  \\
  \hline
  \hline
 \multicolumn{6}{|l|}{Homogenized Block }\\
 \hline
- $k_\mathrm{eff}$ & 0.943049$\pm$0.0003 & 0.940306$\pm$0.00046 & 0.941916 & 113 pcm & -161 pcm   \\
+ $k_\mathrm{eff}$ & 0.943049$\pm$0.0003 & 0.940306$\pm$0.00046 & 0.941916 & 113 pcm (n)  & -161 pcm  (n) \\
  \hline
  Runtime               &  25.58 m & 18.7190 m & 0.761 m & 33.6x  & 24.6x  \\
  \hline
   \hline
 \multicolumn{6}{|l|}{Pin Cell}\\
 \hline
- $k_\mathrm{eff}$ & 0.381435$\pm$0.0008 &  0.380511$\pm$0.00128 & 0.380586 & 84.9 pcm &  -7.5 pcm    \\
+ $k_\mathrm{eff}$ & 0.381435$\pm$0.0008 &  0.380511$\pm$0.00128 & 0.380586 & 84.9 pcm (n)&  -7.5 pcm (y)    \\
  \hline
  Runtime               & 55.85 m & 40.0035 m &  2.81583 m &  19.8x & 14.2x  \\
  \hline
   \hline
 \multicolumn{6}{|l|}{15-sided Hex Assembly}\\
 \hline
- $k_\mathrm{eff}$ & 1.437465$\pm$0.0004 & 1.44704$\pm$0.00046 & 1.4442 & -673 pcm & 284 pcm  \\
+ $k_\mathrm{eff}$ & 1.437465$\pm$0.0004 & 1.44704$\pm$0.00046 & 1.4442 & -673 pcm (n) & 284 pcm (n) \\
  \hline
- Runtime               & 25.34 m &  26.3349 m &  3.2395 m  & 7.8x & 8.x1  \\
+ Runtime               & 25.34 m &  26.3349 m &  3.2395 m  & 7.8x & 8.1x  \\
  \hline
 \end{tabular}
 \end{table}
@@ -126,7 +113,7 @@ blah
 \begin{table}[h]
 \centering
 \caption{Summary of $k_\mathrm{eff}$ single-run results of the WARP criticality benchmarks with 20/40 discarded/active criticality cycles and $10^6$ histories per cycle.}
-\label{benchmark_summary}
+\label{benchmark_summary_6}
 \begin{tabular}{| l | r | r | r | r | r |}
  \hline
  Benchmark & MCNP 6.1 & Serpent 2.1.18 & WARP & $\Delta$ M & $\Delta$ S  \\
@@ -134,36 +121,40 @@ blah
 \hline
 \multicolumn{6}{|l|}{Jezebel}  \\
 \hline
- $k_\mathrm{eff}$ & 1.027957$\pm$0.0001 & 1.02806$\pm$0.00017 & 1.0279 & -5.7 pcm & -16 pcm   \\
+ $k_\mathrm{eff}$ & 1.027957$\pm$0.0001 & 1.02806$\pm$0.00017 & 1.0279 & 5.7 pcm (y)& 16 pcm  (y) \\
  \hline
  Runtime               & 22.79 m & 94.4311 m &  2.0147 m & 11.3x  & 46.9x  \\
  \hline
  \hline
 \multicolumn{6}{|l|}{Homogenized Block }\\
 \hline
- $k_\mathrm{eff}$ & 0.942670$\pm$0.0001 & 0.939868$\pm$0.00021 & 0.94261 & -6 pcm &  274.4 pcm  \\
+ $k_\mathrm{eff}$ & 0.942670$\pm$0.0001 & 0.939868$\pm$0.00021 & 0.94261 & 6 pcm (y) &  -274.4 pcm (n)  \\
  \hline
  Runtime               & 255.57 m & 185.966 m & 3.934 m & 64.96x & 47.28x  \\
  \hline
   \hline
 \multicolumn{6}{|l|}{Pin Cell}\\
 \hline
- $k_\mathrm{eff}$ & 0.381405$\pm$0.0003 & 0.380615$\pm$0.00035 & 0.38043 & -97.5 pcm &  -18.5 pcm  \\
+ $k_\mathrm{eff}$ & 0.381405$\pm$0.0003 & 0.380615$\pm$0.00035 & 0.38043 & 97.5 pcm (n) &  18.5 pcm (n)  \\
  \hline
  Runtime               & 578.62 m & 391.995 m & 7.0682 m & 81.85x & 55.46x \\
  \hline
   \hline
 \multicolumn{6}{|l|}{15-sided Hex Assembly}\\
 \hline
- $k_\mathrm{eff}$ & 1.437711$\pm$0.0001 & 1.44706$\pm$0.00013 & 1.4454 & 769 pcm &  -166 pcm  \\
+ $k_\mathrm{eff}$ & 1.437711$\pm$0.0001 & 1.44706$\pm$0.00013 & 1.4454 & -769 pcm (n) &  166 pcm (n) \\
  \hline
  Runtime               & 252.77 m & 260.508 m & 7.9703 m & 31.71x & 32.68x \\
  \hline
 \end{tabular}
 \end{table}
 
+It can be seen that in the $10^5$ neutrons per batch case, WARP performs 8 to 35 times faster than the production codes, and the multiplication factor differences are slightly different.  Most multiplication factors are most notably different in the assembly benchmark, where WARP's answer falls between MCNP and Serpent, but is still very far from either.  Similar trends are shown in the multiplication factor for the $10^6$ runs in Table \ref{benchmark_summary_6}, but the speedup factors are much higher, with WARP being 11 to 82 times faster than the production codes.  The (y) in the $\Delta$ columns signify if the WARP value is inside (y) or outside (n) one standard deviation of the production code's value.  In the Jezebel benchmark, all codes agree, but as things get more complicated, deviations start to occur.  WARP is often outside of a single standard deviation for either code.  It is important to point out that Serpent and MCNP are also often more than a standard deviation away from each other, with WARP falling somewhere in between, or if not in between, near one of the two codes.
 
+It is also interesting that in the Jezebel benchmark, MCNP is actually much faster than Serpent.  Presumably, this is do to the different methods they use for neutron tracking.  Serpent uses Woodcock tracking, and moves the neutron in small steps across the geometry, but does not have to calculate any surface intersection points.  MCNP uses ray tracing and does calculate intersection points (as does WARP).  Since the Jezebel sphere is a very leaky system, many neutrons stream out of the sphere without interacting many times or at all.  Since  MCNP and WARP both use ray tracing, they can terminate this particles in a small number of geometry queries.  Serpent, however, needs to query the geometry many times in order to propagate the neutrons to the edge of the sphere where they are then leaked.  This difference is not seen in the homogenized block benchmark, where leakage plays very little role in neutron loss.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Spectra and Fission Distributions}
 
 These are all for the 10$^6$ case.
@@ -232,11 +223,10 @@ blah
 \caption{Fission source distribution of an array of UO$_2$ pins in water. \label{assembly_fiss} }
 \end{figure}
 
-simple geometry serpent is slow since woodcock makes it sample the geom much more before leaking?, mcnp and warp can instantly leak it?  shouldn't be seen in the homogenized case... yep!
 
-low number not not saturate the gpu, not enough payload for the overhead , pipelining
-
-\section{Fixed Source}'
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Fixed Source}
 
 \begin{table}[h]
 \centering
@@ -271,7 +261,8 @@ fixed source - water slab, accelerator driven subcritical?
 include?
 
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Run Profiles}
 
 \begin{table}[h]
