@@ -15,7 +15,7 @@ E_g < E_i < E_{g+1} \\
 \end{gathered}
 \end{equation}
 
-Five benchmark cases were considered, four that are criticality-source type, and one that is a fixed-source type.  WARP can represent spheres, cuboids, cylinders, and hexagonal prisms, and all but the hexagonal prism are represented in the benchmarks.  Most of the cases have very simple geometries with few cells, but the assembly case has 632 total cells to accentuate the geometry processing routines and the impact of the material resampling as the neutrons move into different regions without interacting.  Every material in every benchmark case uses some combination of Pu-239, U-238, U-235, O-16, and H-1.  This is a relatively small set of isotopes to have in a reactor simulation, but loading and processing of isotopes was only tested with B-10, Al-27, Pb-208, C-12, Li-6 in addition to these isotopes.   The summary of the benchmark geometries and materials is shown in Table \ref{benchmark_setup}.  
+Five benchmark cases were considered, four that are criticality-source type, and one that is a fixed-source type.  WARP can represent spheres, cuboids, cylinders, and hexagonal prisms, and all but the hexagonal prism are represented in the benchmarks.  Most of the cases have very simple geometries with few cells, but the assembly case has 632 total cells to accentuate the geometry processing routines and the impact of the material resampling as the neutrons move into different regions without interacting.  Every material in every benchmark case uses some combination of Pu-239, U-238, U-235, O-16, and H-1.  This is a relatively small set of isotopes to have in a reactor simulation, but loading and processing of isotopes was only tested with B-10, Al-27, Pb-208, C-12, Li-6 in addition to these isotopes.  Currently a temperature of 300K is hardcoded into WARP, so cross sections used in these benchmarks are all processed at this temperature.   The summary of the benchmark geometries and materials is shown in Table \ref{benchmark_setup}.  
 
 The ``Jezebel'' benchmark is a bare plutonium sphere, and is a standard criticality test.   The fission neutrons rate from Pu-239 is balanced by the leakage rate from the 5.1cm radius to give a $k_\mathrm{eff}$ of approximately 1.  Since this system is so leaky, producing results consistent with MCNP and Serpent ensure that the boundary conditions are correctly being enforced.  
 
@@ -149,79 +149,76 @@ The goal of WARP is to be the first step in creating a full-featured continuous 
 \end{tabular}
 \end{table}
 
-It can be seen that in the $10^5$ neutrons per batch case, WARP performs 8 to 35 times faster than the production codes, and the multiplication factor differences are slightly different.  Most multiplication factors are most notably different in the assembly benchmark, where WARP's answer falls between MCNP and Serpent, but is still very far from either.  Similar trends are shown in the multiplication factor for the $10^6$ runs in Table \ref{benchmark_summary_6}, but the speedup factors are much higher, with WARP being 11 to 82 times faster than the production codes.  The (y) in the $\Delta$ columns signify if the WARP value is inside (y) or outside (n) one standard deviation of the production code's value.  In the Jezebel benchmark, all codes agree, but as things get more complicated, deviations start to occur.  WARP is often outside of a single standard deviation for either code.  It is important to point out that Serpent and MCNP are also often more than a standard deviation away from each other, with WARP falling somewhere in between, or if not in between, near one of the two codes.
+It can be seen that in the $10^5$ neutrons per batch case, WARP performs 8 to 35 times faster than the production codes, and the multiplication factor differences are slightly different.  Most multiplication factors are most notably different in the assembly benchmark, where WARP's answer falls between MCNP and Serpent, but is still very far from either.  Similar trends are shown in the multiplication factor for the $10^6$ runs in Table \ref{benchmark_summary_6}, but the speedup factors are much higher, with WARP being 11 to 82 times faster than the production codes.   The greatest speedup is seen in the pin cell benchmark, followed by the homogenized block, assembly, then finally the bare sphere.  The speedup factors compared to Serpent in the $10^6$ neutrons per batch runs are relatively constant, ranging from 33 to 56, whereas the speedup factors compared to MCNP range from 11 to 82.
+
+The (y) in the $\Delta$ columns signify if the WARP value is inside (y) or outside (n) one standard deviation of the production code's value.  In the Jezebel benchmark, all codes agree, but as things get more complicated, deviations start to occur.  WARP is often outside of a single standard deviation for either code.  It is important to point out that Serpent and MCNP are also often more than a standard deviation away from each other, with WARP falling somewhere in between, or if not in between, near one of the two codes.
 
 It is also interesting that in the Jezebel benchmark, MCNP is actually much faster than Serpent.  Presumably, this is do to the different methods they use for neutron tracking.  Serpent uses Woodcock tracking, and moves the neutron in small steps across the geometry, but does not have to calculate any surface intersection points.  MCNP uses ray tracing and does calculate intersection points (as does WARP).  Since the Jezebel sphere is a very leaky system, many neutrons stream out of the sphere without interacting many times or at all.  Since  MCNP and WARP both use ray tracing, they can terminate this particles in a small number of geometry queries.  Serpent, however, needs to query the geometry many times in order to propagate the neutrons to the edge of the sphere where they are then leaked.  This difference is not seen in the homogenized block benchmark, where leakage plays very little role in neutron loss.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Spectra and Fission Distributions}
-
-These are all for the 10$^6$ case.
-
-blah
-
-blah
-
-blah
-
-blah
-
-blah
-
-blah
-
-blah
-
-blah
+\section{Flux Spectra and Fission Distributions}
 
 \begin{figure}[h!] 
 \centering
-\includegraphics[width=\textwidth]{graphics/finalresults/godiva_spec-6.eps}
-\caption{Spectrum comparison in a ``jezebel'' bare pu-239 sphere.. \label{godiva_spec} }
+\includegraphics[width=\textwidth,trim= 1cm 0cm 1cm 0cm]{graphics/finalresults/godiva_spec-6.eps}
+\caption{Spectrum comparison in a ``Jezebel'' bare Pu-239 sphere. \label{godiva_spec} }
 \end{figure}
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width=\textwidth,trim= 2cm 0cm 2cm 0cm]{graphics/finalresults/godiva_fiss-6.eps}
-\caption{Fission source distribution of a ``jezebel'' bare pu-239 sphere. \label{godiva_fiss} }
+\includegraphics[width=\textwidth,trim= 5cm 0cm 7cm 0cm]{graphics/finalresults/godiva_fiss-6.eps}
+\caption{Fission source distribution of a ``Jezebel'' bare Pu-239 sphere. \label{godiva_fiss} }
 \end{figure}
 
 \begin{figure}[h!] 
 \centering
-\includegraphics[width=\textwidth]{graphics/finalresults/homfuel_spec-6.eps}
+\includegraphics[width=\textwidth,trim= 1cm 0cm 1cm 0cm]{graphics/finalresults/homfuel_spec-6.eps}
 \caption{Spectrum comparison in a homogenized block of UO$_2$ and water. \label{homfuel_spec} }
 \end{figure}
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width=\textwidth,trim= 2cm 0cm 2cm 0cm]{graphics/finalresults/homfuel_fiss-6.eps}
+\includegraphics[width=\textwidth,trim= 5cm 0cm 7cm 0cm]{graphics/finalresults/homfuel_fiss-6.eps}
 \caption{Fission source distribution of a homogenized block of UO$_2$ and water. \label{homfuel_fiss} }
 \end{figure}
 
+The flux and fission source distributions for the criticality benchmarks are shown in the following figures.  To show the most accurate and highest resolution results, the data in these figures are from runs using $10^6$ neutrons per batch.  Figures \ref{godiva_spec} and \ref{godiva_fiss}, show the volume-averaged flux spectrum and fission source distribution, respectively, in the Jezebel sphere.  The relative error compared to the Serpent spectrum is show in the subplot below the main spectrum plot.  The relative error is very low compared to Serpent, with the normalized tally bins being less than 2\% from each other in regions where the flux is large.  Of course, when the flux is small, the statistical uncertainty becomes much higher, and the relative error becomes noisy.  The spectra produced by the three codes lie very close together and are almost indistinguishable from each other in the plot.  The fission distribution appears very uniform with neutrons being preferentially born near the center.  The distribution is visually identical in an $z$-integrated slice compared to the $y$-integrated slice, as it should be.
+
+Figures \ref{homfuel_spec} and \ref{homfuel_fiss}, show the volume-averaged flux spectrum and fission source distribution, respectively, in the block of homogenized fuel.  Since this system is not leaky and contains light nuclides, neutrons should be able to easily scatter down to thermal energies and produce a thermal peak around 0.026 eV.  This feature is seen in the WARP spectrum, indicating that the target velocity sampling scheme is working correctly, as well as the vector transformation and rotation schemes.  Again, the relative error compared the the Serpent spectrum is very low, at 3\% or lower for energies $10^{-9}$-$10$ MeV where the flux has good statistics.  There are some strange sawtooth-like structures in the relative error plot in the thermal peak and the unresolved resonance regions, which could indicate that a minor sampling problem is occurring, and should be investigated as WARP continues to develop.  The fission source distribution shows very interesting nebulous structure, which might indicate that the fission source has not been fully sampled.  This may be to the fact that the block is so large, but the results should be almost same as a fully converged source since most neutrons never encounter geometry anyway.  The edges falloff to zero as they should, and the overall appearance of the distribution is quite uniform.
+
+Figures \ref{pincell_spec} and \ref{pincell_fiss}, show the volume-averaged flux spectrum and fission source distribution, respectively, in the UO$_2$ pin of the pin cell benchmark.  This system is slightly leaky, and again contains light nuclides (water), but now they are spatially separated from the fissile material.  The relative error compared to Serpent is again very low, around 3\% or lower for energies $5\times10^{-9}$-$10$ MeV where the flux has good statistics.  There is a small thermal peak in the spectrum compared to that of the homogenized fuel material.  This is expected behavior as the fuel has a much higher cross section at these energies than the homogenized fuel material.  This effect can also be seen in the fission source distribution as a ring of high probability around the edge of the pin.  This is cause by thermalized neutrons re-entering the fuel pin and immediately fissioning a U-235 nucleus.  This phenomenon is also called ``self-shielding'' since the uranium at the surface shields the interior uranium from thermal neutrons and has implications in depletion and power distributions.  Since the flux spectrum is volume averaged over the pin, the small thermal peak is most likely from the inclusion of this thin edge region where thermal neutrons still exist.  The axial fission source distribution follows an expected behavior of a finite cylinder as well, roughly following a cosine with the peak at $z=0$ \cite{duderstadt}.
+
+ 
 \begin{figure}[h!] 
 \centering
-\includegraphics[width=\textwidth]{graphics/finalresults/pincell_spec-6.eps}
+\includegraphics[width=\textwidth,trim= 1cm 0cm 1cm 0cm]{graphics/finalresults/pincell_spec-6.eps}
 \caption{Spectrum comparison in a single UO$_2$ pin surrounded by a block of water. \label{pincell_spec} }
 \end{figure}
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width=.8\textwidth]{graphics/finalresults/pincell_fiss-6.eps}
+\includegraphics[width=.75\textwidth]{graphics/finalresults/pincell_fiss-6.eps}
 \caption{Fission source distribution of a single UO$_2$ pin surrounded by a block of water. \label{pincell_fiss} }
 \end{figure}
 
 \begin{figure}[h!] 
 \centering
-\includegraphics[width=\textwidth]{graphics/finalresults/assembly_spec-6.eps}
-\caption{Spectrum comparison in the center UO$_2$ pin of a 15-sided hex pin array in water. \label{assembly_spec} }
+\includegraphics[width=\textwidth,trim= 1cm 0cm 1cm 0cm]{graphics/finalresults/assembly_spec-6.eps}
+\caption{Spectrum comparison in the center UO$_2$ pin of a 15-sided hexagonal pin array in water. \label{assembly_spec} }
 \end{figure}
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width=\textwidth,trim= 2cm 0cm 2cm 0cm]{graphics/finalresults/assembly_fiss-6.eps}
-\caption{Fission source distribution of an array of UO$_2$ pins in water. \label{assembly_fiss} }
+\includegraphics[width=\textwidth,trim= 4cm 0cm 6cm 0cm]{graphics/finalresults/assembly_fiss-6.eps}
+\caption{Fission source distribution of a 15-sided hexagonal array of UO$_2$ pins in water. \label{assembly_fiss} }
 \end{figure}
+
+
+Figures \ref{assembly_spec} and \ref{assembly_fiss}, show the volume-averaged flux spectrum and fission source distribution, respectively, in the center pin of the 15-sided hexagonal assembly benchmark.  This problem is much more hetregenous than any of the previous, with 300 times more objects in the domain than the pin cell benchmark.
+
+
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -246,17 +243,11 @@ blah
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width=\textwidth]{graphics/finalresults/fixed_spec.eps}
+\includegraphics[width=\textwidth,trim= 1cm 0cm 1cm 0cm]{graphics/finalresults/fixed_spec.eps}
 \caption{Flux spectra of fixed source calculations of a 1eV points source in a block of uranium-235 . \label{fixed_spec} }
 \end{figure}
 
 fixed source - water slab, accelerator driven subcritical?
-
-\begin{figure}[h!]
-\centering
-\includegraphics[width=\textwidth,trim= 2cm 0cm 2cm 0cm]{graphics/finalresults/assembly_fiss-6.eps}
-\caption{Fission source distribution of an array of UO$_2$ pins in water. \label{assembly_fiss} }
-\end{figure}
 
 include?
 
@@ -264,6 +255,41 @@ include?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Run Profiles}
+
+profiler stuff, time in each routine.  compare assembly and homfuel.  compare w non-remapped
+
+stats, the way the active particles die off for assembly and homfuel.  include the non-remapped version in the time/cycle plot.  runtimes...
+
+remapping has a huge impact on OptiX runtime?  or just in cases where neutrons don't die off quickly and the tail becomes much more important where a lot of time is wasted on processing blocks full of neutrons that just return.
+
+point out the number of iterations to get to 0 active, means that the non remapping routine spends quite a bit of time in the slow section of the processing curve.
+
+state smoothing and interpolation parameters, problem with cycle time becoming small and NaNs appearing
+
+\begin{table}[h]
+\centering
+\caption{Summary table of the time spent in each WARP subroutine in criticality mode for each benchmark case.}
+\label{profile_summary}
+\begin{tabular}{| l | r  | r | r | r |}
+\multicolumn{5}{l}{Remapping} \\
+ \hline
+ Subroutine & Jezebel & Homogenized Block & Pincell & 15-sided Hex Assembly  \\
+\hline
+\hline
+\multicolumn{5}{l}{} \\
+\multicolumn{5}{l}{Non-Remapping} \\
+ \hline
+ Subroutine & Jezebel & Homogenized Block & Pincell & 15-sided Hex Assembly  \\
+\hline
+\hline
+\end{tabular}
+\end{table}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\textwidth]{graphics/finalresults/process_rate.eps}
+\caption{Neutron processing rate of WARP in the homogenized block and assembly benchmark cases. \label{process_rate} }
+\end{figure}
 
 \begin{table}[h]
 \centering
@@ -304,40 +330,7 @@ include?
 \end{tabular}
 \end{table}
 
-\begin{table}[h]
-\centering
-\caption{Summary table of the time spent in each WARP subroutine in criticality mode for each benchmark case.}
-\label{profile_summary}
-\begin{tabular}{| l | r  | r | r | r |}
-\multicolumn{5}{l}{Remapping} \\
- \hline
- Subroutine & Jezebel & Homogenized Block & Pincell & 15-sided Hex Assembly  \\
-\hline
-\hline
-\multicolumn{5}{l}{} \\
-\multicolumn{5}{l}{Non-Remapping} \\
- \hline
- Subroutine & Jezebel & Homogenized Block & Pincell & 15-sided Hex Assembly  \\
-\hline
-\hline
-\end{tabular}
-\end{table}
 
-\begin{figure}[h!]
-\centering
-\includegraphics[width=\textwidth]{graphics/finalresults/process_rate.eps}
-\caption{Neutron processing rate of WARP in the homogenized block and assembly benchmark cases. \label{process_rate} }
-\end{figure}
-
-profiler stuff, time in each routine.  compare assembly and homfuel.  compare w non-remapped
-
-stats, the way the active particles die off for assembly and homfuel.  include the non-remapped version in the time/cycle plot.  runtimes...
-
-remapping has a huge impact on OptiX runtime?  or just in cases where neutrons don't die off quickly and the tail becomes much more important where a lot of time is wasted on processing blocks full of neutrons that just return.
-
-point out the number of iterations to get to 0 active, means that the non remapping routine spends quite a bit of time in the slow section of the processing curve.
-
-state smoothing and interpolation parameters, problem with cycle time becoming small and NaNs appearing
 
 
 

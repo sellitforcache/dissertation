@@ -152,7 +152,7 @@ ax1.semilogx(serpE,numpy.divide(serpF-newflux,serpF),'b',linestyle='steps-mid',l
 ax1.set_xlabel('Energy (MeV)')
 ax1.set_ylabel('Relative Error \n vs. Serpent')
 ax1.set_xlim([1e-11,20])
-ax1.set_ylim([-1e-1,1e-1])
+ax1.set_ylim([-5e-2,5e-2])
 ax1.grid(True)
 
 if plot:
@@ -250,7 +250,7 @@ ax1.semilogx(serpE,numpy.divide(serpF-newflux,serpF),'b',linestyle='steps-mid',l
 ax1.set_xlabel('Energy (MeV)')
 ax1.set_ylabel('Relative Error \n vs. Serpent')
 ax1.set_xlim([1e-11,20])
-ax1.set_ylim([-1.5e-1,1.5e-1])
+ax1.set_ylim([-5e-2,5e-2])
 ax1.grid(True)
 
 if plot:
@@ -346,7 +346,7 @@ ax1.semilogx(serpE,numpy.divide(serpF-newflux,serpF),'b',linestyle='steps-mid',l
 ax1.set_xlabel('Energy (MeV)')
 ax1.set_ylabel('Relative Error \n vs. Serpent')
 ax1.set_xlim([1e-11,20])
-ax1.set_ylim([-1e-1,1e-1])
+ax1.set_ylim([-5e-2,5e-2])
 ax1.grid(True)
 
 if plot:
@@ -442,7 +442,7 @@ ax1.semilogx(serpE,numpy.divide(serpF-newflux,serpF),'b',linestyle='steps-mid',l
 ax1.set_xlabel('Energy (MeV)')
 ax1.set_ylabel('Relative Error \n vs. Serpent')
 ax1.set_xlim([1e-11,20])
-ax1.set_ylim([-5e-1,5e-1])
+ax1.set_ylim([-3e-1,3e-1])
 ax1.grid(True)
 
 if plot:
