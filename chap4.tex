@@ -5,9 +5,7 @@ The results of four simple benchmarks of WARP against Serpent 2.1.18 and MCNP 6.
 
 All of the benchmark cases were run on a server containing two AMD Opteron 6128 Magny-Cours processors.  These processors each contain eight cores which are clocked at 2.0Ghz and have a 512kB L2 cache.  The server has 32 GB of DDR3 clocked at 1.333GHz between the two processors.  The GPU used in the benchmarks is a NVIDIA Tesla k20.  It has 2496 ``CUDA cores,'' a multiprocessor clock of 706MHz, and 5GB of 2.6GHz GDDR5 global memory.  The Opteron 6128 was released in Q2 of 2010, whereas the k20 was released in Q4 2012 \cite{opterondate,k20date}.  This is a comparison of one of the newest Tesla cards with a older CPU, but it is a standard CPU for many supercomputer systems currently running and is sufficient if given every advantage in the comparison (i.e. perfect scaling linearity).
 
-The multiplication factor differences are reported in ``per cent mille,'' which is a thousandth of a percent, or $10^{-5}$.  This is a standard way of reporting differences in the multiplication factor, as any small deviation from unity can cause a reactor to change its power level.  The flux spectra are normalized per source neutron and per lethargy.  Normalizing per source neutron serves to reproduce the same results for different numbers of histories run.  The uncertainty will be lower in results with more histories, of course, but the magnitudes should have the same mean values.   ``Lethargy'' simply means the logarithm of the neutron energy, $\ln(E_0/E)$, and is convenient since neutrons lose a fraction of energy per collision \cite{duderstadt}.  Normalizing the flux per lethargy accentuates the the high energy region of the flux, and is convenient in plotting spectra since otherwise overshadowed structure in the high-energy regions can be seen.  To plot the raw tally values, shown in \eqref{flux_tally}, the values must be divided by the total number of source neutrons run, divided by the energy bin width to , and multiplied by the average bin energy to normalized by lethargy \cite{lethargyplot}.  The expression for normalizing the raw tally scores is shown in \eqref{fluxtallynorm}, where $\bar{\phi}_{g,j}$ is the raw tally value in cell volume $j$ and energy group $g$.
-
-Physics not included...
+The multiplication factor differences are reported in ``per cent mille,'' which is a thousandth of a percent, or $10^{-5}$.  This is a standard way of reporting differences in the multiplication factor, as any small deviation from unity can cause a reactor to change its power level.  The flux spectra are normalized per source neutron and per lethargy.  Normalizing per source neutron serves to reproduce the same results for different numbers of histories run.  The uncertainty will be lower in results with more histories, of course, but the magnitudes should have the same mean values.   ``Lethargy'' simply means the logarithm of the neutron energy, $\ln(E_0/E)$, and is convenient since neutrons lose a fraction of energy per collision \cite{duderstadt}.  Normalizing the flux per lethargy accentuates the the high energy region of the flux, and is convenient in plotting spectra since otherwise overshadowed structure in the high-energy regions can be seen.  To plot the raw tally values, shown in \eqref{flux_tally}, the values must be divided by the total number of source neutrons run, divided by the energy bin width to , and multiplied by the average bin energy to normalized by lethargy \cite{lethargyplot}.  The expression for normalizing the raw tally scores is shown in \eqref{fluxtallynorm}, where $\bar{\phi}_{g,j}$ is the raw tally value in cell volume $j$ and energy group $g$.  Since WARP does not include S($\alpha$,$\beta$) or unresolved resonance tables (yet), these features were not activated in MCNP or Serpent in the benchmark runs.  WARP is currently only able to handle black, or vacuum, boundary conditions, so all the benchmark runs use black boundary condition as well.
 
 \begin{equation}
 \label{fluxtallynorm}
@@ -17,13 +15,52 @@ E_g < E_i < E_{g+1} \\
 \end{gathered}
 \end{equation}
 
-\section{Multiplication Factors and Runtimes}
-
-criticality - godiva, homogenized cube, single pin,  small array, large array, table for material and description of geometry for each
+Five benchmark cases were considered, four that are criticality-source type, and one that is a fixed-source type.    The summary of the benchmark geometries and materials is shown in Table \ref{benchmark_setup}.
 
 \begin{table}[h]
 \centering
-\caption{Summary of $k_\mathrm{eff}$ single-run results of the WARP benchmarks with 20/40 discarded/active criticality cycles and $10^5$ histories per cycle.}
+\caption{The five benchmark cases.}
+\label{benchmark_setup}
+\begin{tabular}{| l | c | c | c | c |}
+ \hline
+ Benchmark & No. Cells & Materials & Isotopes & Densities \\
+ \hline
+  \hline
+ Jezebel                           & 1 sphere, r=5.1cm & Fuel & Pu-239 & 19.816 g/cm$^3$\\
+  \hline
+ \multirow{4}{*}{Homogenized Block}  & \multirow{4}{*}{1 cube, 2m$^3$ } & \multirow{4}{*}{Hom. Fuel.} & (0.99) U-238  & \multirow{4}{*}{10  g/cm$^3$} \\
+ & & & (0.01) U-235 & \\
+ & & & (3.00) O-16   & \\
+ & & & (2.00) H-1     & \\
+  \hline
+ \multirow{5}{*}{Pin Cell}                        & \multirow{4}{*}{1 cuboid, 10x10x50cm} & \multirow{3}{*}{Fuel} & (0.90) U-238 & \multirow{3}{*}{15  g/cm$^3$} \\
+ &  \multirow{4}{*}{1 cylinder, r=1cm z=40cm} & & (0.10) U-235 & \\
+  & & & (2.00) O-16 & \\
+ \cline{3-5}
+ & & \multirow{2}{*}{Water} & (1.00) O-16 &  \multirow{2}{*}{3  g/cm$^3$} \\
+ & & & (2.00) H-1 & \\
+  \hline
+ \multirow{5}{*}{15-sided Hex Assembly}      & \multirow{4}{*}{1 cube, 84cm$^3$} & \multirow{3}{*}{Fuel} & (0.90) U-238 & \multirow{3}{*}{15  g/cm$^3$} \\
+ & \multirow{4}{*}{631 cylinders, r=1cm z=40cm} & & (0.10) U-235 & \\
+  & & & (2.00) O-16 & \\
+ \cline{3-5}
+ & & \multirow{2}{*}{Water} & (1.00) O-16 &  \multirow{2}{*}{3  g/cm$^3$} \\
+ & & & (2.00) H-1 & \\
+  \hline
+ \multirow{4}{*}{Fixed-source Block}  & \multirow{4}{*}{1 cube, 2m$^3$ } & \multirow{4}{*}{Hom. Fuel.} & (0.99) U-238  & \multirow{4}{*}{10  g/cm$^3$} \\
+ & & & (0.01) U-235 & \\
+ & & & (3.00) O-16   & \\
+ & & & (2.00) H-1     & \\  \hline
+ \end{tabular}
+\end{table}
+
+
+\section{Multiplication Factors and Runtimes}
+
+
+\begin{table}[h]
+\centering
+\caption{Summary of $k_\mathrm{eff}$ single-run results of the WARP criticality benchmarks with 20/40 discarded/active criticality cycles and $10^5$ histories per cycle.}
 \label{benchmark_summary}
 \begin{tabular}{| l | r | r | r | r | r |}
  \hline
@@ -63,7 +100,7 @@ criticality - godiva, homogenized cube, single pin,  small array, large array, t
 
 \begin{table}[h]
 \centering
-\caption{Summary of $k_\mathrm{eff}$ single-run results of the WARP benchmarks with 20/40 discarded/active criticality cycles and $10^6$ histories per cycle.}
+\caption{Summary of $k_\mathrm{eff}$ single-run results of the WARP criticality benchmarks with 20/40 discarded/active criticality cycles and $10^6$ histories per cycle.}
 \label{benchmark_summary}
 \begin{tabular}{| l | r | r | r | r | r |}
  \hline
@@ -160,7 +197,7 @@ low number not not saturate the gpu, not enough payload for the overhead , pipel
 
 \begin{table}[h]
 \centering
-\caption{Summary of $k_\mathrm{eff}$ single-run results of the WARP benchmarks with 20/40 discarded/active criticality cycles and $10^6$ histories per cycle.}
+\caption{Summary of $k_\mathrm{eff}$ single-run results of the WARP fixed-source benchmark with $40^7$ total histories.}
 \label{fixed_summary}
 \begin{tabular}{| l | r | r | r | r | r |}
  \hline
@@ -196,7 +233,7 @@ include?
 
 \begin{table}[h]
 \centering
-\caption{Comparison of the non-remapping and remapping versions of WARP for the four benchmark cases.  20/40 discarded/active criticality cycles and $10^6$ histories per cycle.}
+\caption{Comparison of the non-remapping and remapping versions of WARP for the four criticality benchmark cases.  20/40 discarded/active criticality cycles and $10^6$ histories per cycle.}
 \label{benchmark_nonremapping_summary}
 \begin{tabular}{| l | r | r | r |}
  \hline
