@@ -12,4 +12,5 @@ replace geom, parallel routines with handwritten, specific ones, if geom could f
 - better geom performance with woodcock maybe
 - material processing schemes
 - dynamic parallelism can be implemented and kernel launch overhead minimized.  
+- change fixed source pop to be more like criticaility, pop into next generation instead of this generation?
 -----  might be the same as using a stack-pop and task based with syncthreads?  The only routines used in the transport loop are the geometry and the sort.   pop would replace the sort?  and pass off reactions if total coherence is wanted.  still need to communicate the fissions?  this could be eliminated by a query-able analytic representation of a converged fission source.  FFT, something else.  Might not be fast as simply using the previous cycle points but would scale well?  Previous points could be used for refinement...  might be a neat consideration?
