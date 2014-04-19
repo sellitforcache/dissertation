@@ -15,7 +15,7 @@ E_g < E_i < E_{g+1} \\
 \end{gathered}
 \end{equation}
 
-Five benchmark cases were considered, four that are criticality-source type, and one that is a fixed-source type.  WARP can represent spheres, cuboids, cylinders, and hexagonal prisms, and all but the hexagonal prism are represented in the benchmarks.  Most of the cases have very simple geometries with few cells, but the assembly case has 632 total cells to accentuate the geometry processing routines and the impact of the material resampling as the neutrons move into different regions without interacting.  Every material in every benchmark case uses some combination of Pu-239, U-238, U-235, O-16, and H-1.  This is a relatively small set of isotopes to have in a reactor simulation, but loading and processing of isotopes was only tested with B-10, Al-27, Pb-208, C-12, Li-6 in addition to these isotopes.  Currently a temperature of 300K is hardcoded into WARP, so cross sections used in these benchmarks are all processed at this temperature.   The summary of the benchmark geometries and materials is shown in Table \ref{benchmark_setup}.  
+Five benchmark cases were considered, four that are criticality-source type, and one that is a fixed-source type.  WARP can represent spheres, cuboids, cylinders, and hexagonal prisms, and all but the hexagonal prism are represented in the benchmarks.  Most of the cases have very simple geometries with few cells, but the assembly case has 632 total cells to accentuate the geometry processing routines and the impact of the material resampling as the neutrons move into different regions without interacting.  Every material in every benchmark case uses some combination of Pu-239, U-238, U-235, O-16, B-10, and H-1.  This is a relatively small set of isotopes to have in a reactor simulation, but loading and processing of isotopes was only tested with Al-27, Pb-208, C-12, Li-6 in addition to these isotopes.  Currently a temperature of 300K is hardcoded into WARP, so cross sections used in these benchmarks are all processed at this temperature.   The summary of the benchmark geometries and materials is shown in Table \ref{benchmark_setup}.  
 
 The ``Jezebel'' benchmark is a bare plutonium sphere, and is a standard criticality test.   The fission neutrons rate from Pu-239 is balanced by the leakage rate from the 5.1cm radius to give a $k_\mathrm{eff}$ of approximately 1.  Since this system is so leaky, producing results consistent with MCNP and Serpent ensure that the boundary conditions are correctly being enforced.  
 
@@ -25,7 +25,7 @@ The ``pin cell'' benchmark consists of bare UO$_2$ cylinder surrounded by a bloc
 
 The ``15-sided Hex Assembly'' benchmark consists of 631 bare UO$_2$ cylinders laid out in a hexagonal lattice surrounded by water.  The material compositions, densities, and the cylinder dimensions are identical to the pin cell benchmark case, but since this benchmark has two orders of magnitude more objects, it serves to highlight the effect of introducing many geometric objects into the problem and will further validate that the geometry processing routines work correctly if consistent results are obtained.
 
-The ``Fixed-source Block'' benchmark is identical to the homogenized block benchmark in terms of geometry and materials, but the the source mode is changed from criticality to a fixed, predefined source.  A 1eV isotropic point source was chosen as to highlight the effectiveness of popping any secondary neutrons back into the active transport cycle.  Since the source is at 1eV, it will induce fissions in U-235 which will produce neutrons in a fission spectrum that does not overlap with the source.  
+The ``Fixed-source Block'' benchmark is identical to the homogenized block benchmark in terms of geometry and materials, except for the addition of a small amount B-10 to supress the multiplication factor as to not make runtimes extremely long (the multiplication for $k_\mathrm{eff}$=0.94 is about 17).   A 1eV isotropic point source at the origin was chosen as to highlight the effectiveness of popping any secondary neutrons back into the active transport cycle.  Since the source is at 1eV, it will induce fissions in U-235 which will produce neutrons in a fission spectrum that does not overlap with the source.  
 
 \begin{table}[h]
 \centering
@@ -57,10 +57,12 @@ The ``Fixed-source Block'' benchmark is identical to the homogenized block bench
  & & \multirow{2}{*}{Water} & (1.00) O-16 &  \multirow{2}{*}{3  g/cm$^3$} \\
  & & & (2.00) H-1 & \\
   \hline
- \multirow{4}{*}{Fixed-source Block}  & \multirow{4}{*}{1 cube, 2m$^3$ } & \multirow{4}{*}{Hom. Fuel.} & (0.99) U-238  & \multirow{4}{*}{10  g/cm$^3$} \\
- & & & (0.01) U-235 & \\
+ \multirow{5}{*}{Fixed-source Block}  & \multirow{4}{*}{1 cube, 2m$^3$ } & \multirow{4}{*}{Hom. Fuel.} & (0.99) U-238  & \multirow{4}{*}{10  g/cm$^3$} \\
+ & &  \multirow{4}{*}{with B-10} & (0.01) U-235 & \\
  & & & (3.00) O-16   & \\
- & & & (2.00) H-1     & \\  \hline
+ & & & (0.02) B-10   & \\
+ & & & (2.00) H-1     & \\  
+ \hline
  \end{tabular}
 \end{table}
 
@@ -246,10 +248,9 @@ Figures \ref{assembly_spec} and \ref{assembly_fiss}, show the volume-averaged fl
 \caption{Flux spectra of fixed source calculations of a 1eV points source in a block of uranium-235 . \label{fixed_spec} }
 \end{figure}
 
-fixed source - water slab, accelerator driven subcritical?
+WARP is also able to run simulations in fixed-source mode, where the initial neutron energies, directions, and locations are predefined and do not incorporate any feedback from the flux like the criticality source.  This mode adds any induced secondary neutrons back into the active particle dataset to be transported in conjunction with the source neutrons, which is also why these problems must be subcritical.  The materials and geometry are the same as the homogenized block since this case was 
 
-include?
-
+Figure \ref{fixed_spec} shows a comparison of the spectra produced by WARP compared to Serpent 2.1.18 and MCNP 6.1.  
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
