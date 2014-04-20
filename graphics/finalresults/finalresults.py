@@ -269,7 +269,7 @@ xmin = ymin = -2
 xmax = ymax =  2
 data=np.array(open("gpu-benchmark"+case+"/pincell.fission_points").read().split(),dtype=float)
 data=np.reshape(data,(-1,4))
-ax0.hist2d(data[:,0], data[:,1], range=[[xmin, xmax], [ymin, ymax]], bins=reso)# , normed=True)#norm=LogNorm())
+ax0.hist2d(data[:,0], data[:,1], range=[[xmin, xmax], [ymin, ymax]], bins=reso, normed=True)#norm=LogNorm())
 ax0.set_xlabel('x (cm)')
 ax0.set_ylabel('y (cm)')
 ax0.grid('on',color='k')
@@ -278,7 +278,7 @@ xmin = -4
 xmax =  4	
 ymin = -21
 ymax =  21
-ax1.hist2d(data[:,0], data[:,2], range=[[xmin, xmax], [ymin, ymax]], bins=reso )#, normed=True)#, norm=LogNorm())
+ax1.hist2d(data[:,0], data[:,2], range=[[xmin, xmax], [ymin, ymax]], bins=reso , normed=True)#, norm=LogNorm())
 ax1.set_xlabel('x (cm)')
 ax1.set_ylabel('z (cm)')
 ax1.grid('on',color='k')
