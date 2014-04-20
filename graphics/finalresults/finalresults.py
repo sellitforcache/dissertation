@@ -495,8 +495,8 @@ else:
 tally      = numpy.loadtxt(  'fixed-benchmark/fixed_1ev_u235.nonremap')
 tallybins  = numpy.loadtxt(  'fixed-benchmark/fixed_1ev_u235.nonremapbins')
 serpdata   = get_serpent_det('fixed-benchmark/u235_mono1ev_serp_det0.m')
-mcnpdata   = get_mcnp_mctal( 'fixed-benchmark/u235_mono1ev_mcnp.mctal')
-mcnp_vol = 8000
+mcnpdata   = get_mcnp_mctal( 'fixed-benchmark/u235_mono1ev_mcnp.tally')
+mcnp_vol = 2000*2000*2000
 title = 'Serpent2 (Serial) vs. WARP 4e7 histories, 1eV point source \n Flux in a cube of u235'
 
 widths=numpy.diff(tallybins);
@@ -543,7 +543,7 @@ ax1.semilogx(serpE,numpy.divide(serpF-newflux,serpF),'b',linestyle='steps-mid',l
 ax1.set_xlabel('Energy (MeV)')
 ax1.set_ylabel('Relative Error \n vs. Serpent')
 ax1.set_xlim([1e-11,20])
-ax1.set_ylim([-1e-1,1e-1])
+ax1.set_ylim([-5e-2,5e-2])
 ax1.grid(True)
 
 if plot:
