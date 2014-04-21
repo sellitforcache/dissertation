@@ -256,9 +256,9 @@ Figure \ref{fixed_spec} shows a comparison of the spectra produced by WARP compa
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Comparison and Run Profiles}
+\section{Comparison to Non-Remapping}
 
-To measure the benefit of sorting and remapping references in WARP, a comparison to a non-remapping version of WARP must be made.  Table \ref{benchmark_nonremapping_summary} shows the runtimes and multiplications factors of the criticality benchmarks for remapping and non-remapping versions of WARP.  The remapping version performs much better than the non-remapping version when more complexity is added to the problem.  For very simple problems, like the Jezebel benchmark, remapping only adds overhead since the neutrons are constrained be the problem materials on geometry to generally do undergo the same three reactions: fission and scattering in Pu-239 or leaking out.  The leaky
+To measure the benefit of sorting and remapping references in WARP, a comparison to a non-remapping version of WARP must be made.  Table \ref{benchmark_nonremapping_summary} shows the runtimes and multiplications factors of the criticality benchmarks for remapping and non-remapping versions of WARP.  The remapping version performs much better than the non-remapping version when more complexity is added to the problem.  For very simple problems, like the Jezebel benchmark, remapping only adds overhead since the neutrons are constrained be the problem materials on geometry to generally do undergo the same three reactions: fission and scattering in Pu-239 or leaking out.  The leaky nature of the problem also means neutrons only undergo a few interactions on average before being terminated.  In the non-remapping case, this is advantageous since the implementation is less efficient at processing neutrons when the active number is small.
 
 \begin{table}[h]
 \centering
@@ -299,33 +299,19 @@ To measure the benefit of sorting and remapping references in WARP, a comparison
 \end{tabular}
 \end{table}
 
-These effects are more clearly seen in the trends of Figure \ref{process_rate}.
-
 \begin{figure}[h!]
 \centering
 \includegraphics[width=\textwidth]{graphics/finalresults/process_rate.eps}
 \caption{Neutron processing rate of WARP in the homogenized block and assembly benchmark cases. \label{process_rate} }
 \end{figure}
 
-stats, the way the active particles die off for assembly and homfuel.  include the non-remapped version in the time/cycle plot.  runtimes...
 
-remapping has a huge impact on OptiX runtime?  or just in cases where neutrons don't die off quickly and the tail becomes much more important where a lot of time is wasted on processing blocks full of neutrons that just return.
+These effects are more clearly seen in the trends of Figure \ref{process_rate}.  This figure shows the rate at which each implementation is able to process neutrons vs the number of active neutrons left in the batch.  The figure has been smoothed with a window 11 data points wide, and linearly interpolated where the timings were too close together and gave Inf or NaN results for processing rates.  The remapping implementation is slower at large numbers of active neutrons since accessing the entire dataset generally yields active data anyway.  Conversely, the remapping implementation is faster when there few active neutrons left in the batch and accessing the entire grid generally yields terminated data.  The tradeoff in the remapping implementation is that the sort adds overhead when there are many active particles, but eliminating completed data and thus reducing the grid size makes it much more efficient when there are few active neutrons left.  Since the radix sort is a very efficient operation, the addition cost is small in the (about 30\% slower), but the benefit at small neutron numbers pays for this (about 3x faster).  
 
-point out the number of iterations to get to 0 active, means that the non remapping routine spends quite a bit of time in the slow section of the processing curve.
+It therefore makes sense that the remapping implementation performs much better when the simulation spends significant time in the sub-400k active neutrons region on the processing rate curve (where the lines cross).  In a high leakage problem, like Jezebel, or a highly absorbing problem, like the homogenized block, the neutrons die off quickly and the relative number of transport iterations spent with fewer than 400k active neutrons is small.  In these two simulations, only XXX\% of the iterations are spent here.  In the pin cell benchmark, XXX\% of the iterations occur here, and XXX\% of the iterations occur here.  Adding many surfaces also keeps neutrons alive longer, since they often have to resample the materials as they cross boundaries.  Slows the rate at which neutrons are terminated and increases the time spent in the lower processing rate region.
 
-state smoothing and interpolation parameters, problem with cycle time becoming small and NaNs appearing
 
-pop is rather expensive, which is why the fixed source problems are much slower!  pop needs to be done at every inner loop iteration, whereas in crit, it is done once at the end of the inner loop
-
-average values for entire run.  will not add to 100 since there are other operations going on, but are usually negligible.  these included functions are the compute kernels in the inner and outer transport loops.  other routines are only executed a small number of times comparatively.
-
-occupancy of iscatter and cscatrer are still really low, like 2\%, since there just aren't that many neutrons doing them ever.  mist are elastic, getting ~45/50\% occupancy (I don't know why maximum theoretical is 50\%), same for macro/micro.  pop is around 85\% of 100 early on, drops to a few percent at the end.   occupancy is always limited by grid size.
-
-compaction in nonremapping also include the cost of flipping the done flags to make an ``is valid'' vector
-
-not only to the specific reaction kernels benefit, but the main time svanings is in the global functions being able to reduce the size of their launches ( trace,  rng seeds (might be unecesary), scans, reductions, sorts) 
-
-\begin{table}[h]
+\begin{table}[h!]
 \centering
 \caption{Summary table of the time spent in each WARP subroutine in criticality mode for each benchmark case.}
 \label{profile_summary}
@@ -376,7 +362,17 @@ Compaction         &  3.8      &        7.3                  &   11.2   &  20.1 
 
 
 
+remapping has a huge impact on OptiX runtime?  or just in cases where neutrons don't die off quickly and the tail becomes much more important where a lot of time is wasted on processing blocks full of neutrons that just return.
 
+pop is rather expensive, which is why the fixed source problems are much slower!  pop needs to be done at every inner loop iteration, whereas in crit, it is done once at the end of the inner loop
+
+average values for entire run.  will not add to 100 since there are other operations going on, but are usually negligible.  these included functions are the compute kernels in the inner and outer transport loops.  other routines are only executed a small number of times comparatively.
+
+occupancy of iscatter and cscatrer are still really low, like 2\%, since there just aren't that many neutrons doing them ever.  mist are elastic, getting ~45/50\% occupancy (I don't know why maximum theoretical is 50\%), same for macro/micro.  pop is around 85\% of 100 early on, drops to a few percent at the end.   occupancy is always limited by grid size.
+
+compaction in nonremapping also include the cost of flipping the done flags to make an ``is valid'' vector
+
+not only to the specific reaction kernels benefit, but the main time savings is in the global functions being able to reduce the size of their launches ( trace,  rng seeds (might be unecesary), scans, reductions, sorts) 
 
 
 
