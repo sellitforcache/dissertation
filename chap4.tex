@@ -268,7 +268,11 @@ point out the number of iterations to get to 0 active, means that the non remapp
 
 state smoothing and interpolation parameters, problem with cycle time becoming small and NaNs appearing
 
-pop is rather expensive, which is why the fixed source problems are much slower!  pop needs to be done at every innter loop iteration, whereas in crit, it is done once at the end of the inner loop
+pop is rather expensive, which is why the fixed source problems are much slower!  pop needs to be done at every inner loop iteration, whereas in crit, it is done once at the end of the inner loop
+
+average values for entire run.  will not add to 100 since there are other operations going on, but are usually negligible.  these included functions are the compute kernels in the inner and outer transport loops.  other routines are only executed a small number of times comparatively.
+
+occupancy of iscatter and cscatrer are still really low, like 2\%, since there just aren't that many neutrons doing them ever.  mist are elastic, getting ~45/50\% occupancy (I don't know why maximum theoretical is 50\%), same for macro/micro.  pop is around 85\% of 100 early on, drops to a few percent at the end.   occupancy is always limited by grid size.
 
 \begin{table}[h]
 \centering
@@ -277,14 +281,41 @@ pop is rather expensive, which is why the fixed source problems are much slower!
 \begin{tabular}{| l | r  | r | r | r |}
 \multicolumn{5}{l}{Remapping} \\
  \hline
- Subroutine & Jezebel & Homogenized Block & Pincell & 15-sided Hex Assembly  \\
-\hline
+ Subroutine        & Jezebel & Homogenized Block & Pincell & 15-sided Hex Assembly  \\
+ \hline \hline
+ OptiX Trace       & 3.8       &    18.5                        &   26.5    &      41.1    \\ \hline
+ Grid Search       & 0.5       &    6.5                         &   5.1       &      4.7       \\ \hline
+ Tally                   & 0.2       &    1.3                         &   0.5       &      0.4       \\ \hline
+ Macroscopic      & 1.7       &   22.3                        &   19.2      &     19.0     \\ \hline
+ Microscopic       & 1.3       &    11.3                        &  8.6        &      8.4       \\ \hline
+ Radix Sort         & 1.7       &     5.3                         &   8.5       &      10.3     \\ \hline
+ Elastic Scatter   & 1.0       &     15.1                       &   14.6    &      11.1    \\ \hline
+ Inelastic Scatter & 0.4       &     0.4                         &   0.0      &       0.1   \\ \hline
+ Continuum Scatter & 0.3   &     0.2                         &   0.0      &       0.1   \\ \hline
+ Fission               & 0.2       &      0.2                        &   0.2      &       0.2     \\ \hline
+ Yield Reduction  & 0.0       &      0.0                        &   0.0     &       0.0    \\ \hline
+ Yield Rebase     & 0.0        &     0.0                         &   0.0     &       0.0   \\ \hline
+ Yield Prefix Sum &  0.0       &    0.0                         &   0.0     &       0.0   \\ \hline
+ Pop Source         &  87.3     &    18.3                       &   14.5   &      5.2    \\ 
 \hline
 \multicolumn{5}{l}{} \\
 \multicolumn{5}{l}{Non-Remapping} \\
  \hline
- Subroutine & Jezebel & Homogenized Block & Pincell & 15-sided Hex Assembly  \\
-\hline
+Subroutine         & Jezebel & Homogenized Block & Pincell & 15-sided Hex Assembly  \\
+\hline \hline
+ OptiX Trace       & 3.8       &    18.5                        &   26.5    &      41.1    \\ \hline
+ Grid Search       & 0.5       &    6.5                         &   5.1       &      4.7       \\ \hline
+ Tally                   & 0.2       &    1.3                         &   0.5       &      0.4       \\ \hline
+ Macroscopic      & 1.7       &   22.3                        &   19.2      &     19.0     \\ \hline
+ Microscopic       & 1.3       &    11.3                        &  8.6        &      8.4       \\ \hline
+ Elastic Scatter   & 1.0       &     15.1                       &   14.6    &      11.1    \\ \hline
+ Inelastic Scatter & 0.4       &     0.4                         &   0.0      &       0.1   \\ \hline
+ Continuum Scatter & 0.3   &     0.2                         &   0.0      &       0.1   \\ \hline
+ Fission               & 0.2       &      0.2                        &   0.2      &       0.2     \\ \hline
+ Yield Reduction  & 0.0       &      0.0                        &   0.0     &       0.0    \\ \hline
+ Yield Rebase     & 0.0        &     0.0                         &   0.0     &       0.0   \\ \hline
+ Yield Prefix Sum &  0.0       &    0.0                         &   0.0     &       0.0   \\ \hline
+ Pop Source         &  87.3     &    18.3                       &   14.5   &      5.2    \\ 
 \hline
 \end{tabular}
 \end{table}
