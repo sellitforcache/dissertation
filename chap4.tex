@@ -256,75 +256,9 @@ Figure \ref{fixed_spec} shows a comparison of the spectra produced by WARP compa
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Run Profiles}
+\section{Comparison and Run Profiles}
 
-profiler stuff, time in each routine.  compare assembly and homfuel.  compare w non-remapped
-
-stats, the way the active particles die off for assembly and homfuel.  include the non-remapped version in the time/cycle plot.  runtimes...
-
-remapping has a huge impact on OptiX runtime?  or just in cases where neutrons don't die off quickly and the tail becomes much more important where a lot of time is wasted on processing blocks full of neutrons that just return.
-
-point out the number of iterations to get to 0 active, means that the non remapping routine spends quite a bit of time in the slow section of the processing curve.
-
-state smoothing and interpolation parameters, problem with cycle time becoming small and NaNs appearing
-
-pop is rather expensive, which is why the fixed source problems are much slower!  pop needs to be done at every inner loop iteration, whereas in crit, it is done once at the end of the inner loop
-
-average values for entire run.  will not add to 100 since there are other operations going on, but are usually negligible.  these included functions are the compute kernels in the inner and outer transport loops.  other routines are only executed a small number of times comparatively.
-
-occupancy of iscatter and cscatrer are still really low, like 2\%, since there just aren't that many neutrons doing them ever.  mist are elastic, getting ~45/50\% occupancy (I don't know why maximum theoretical is 50\%), same for macro/micro.  pop is around 85\% of 100 early on, drops to a few percent at the end.   occupancy is always limited by grid size.
-
-\begin{table}[h]
-\centering
-\caption{Summary table of the time spent in each WARP subroutine in criticality mode for each benchmark case.}
-\label{profile_summary}
-\begin{tabular}{| l | r  | r | r | r |}
-\multicolumn{5}{l}{Remapping} \\
- \hline
- Subroutine        & Jezebel & Homogenized Block & Pincell & 15-sided Hex Assembly  \\
- \hline \hline
- OptiX Trace       & 3.8       &    18.5                        &   26.5    &      41.1    \\ \hline
- Grid Search       & 0.5       &    6.5                         &   5.1       &      4.7       \\ \hline
- Tally                   & 0.2       &    1.3                         &   0.5       &      0.4       \\ \hline
- Macroscopic      & 1.7       &   22.3                        &   19.2      &     19.0     \\ \hline
- Microscopic       & 1.3       &    11.3                        &  8.6        &      8.4       \\ \hline
- Radix Sort         & 1.7       &     5.3                         &   8.5       &      10.3     \\ \hline
- Elastic Scatter   & 1.0       &     15.1                       &   14.6    &      11.1    \\ \hline
- Inelastic Scatter & 0.4       &     0.4                         &   0.0      &       0.1   \\ \hline
- Continuum Scatter & 0.3   &     0.2                         &   0.0      &       0.1   \\ \hline
- Fission               & 0.2       &      0.2                        &   0.2      &       0.2     \\ \hline
- Yield Reduction  & 0.0       &      0.0                        &   0.0     &       0.0    \\ \hline
- Yield Rebase     & 0.0        &     0.0                         &   0.0     &       0.0   \\ \hline
- Yield Prefix Sum &  0.0       &    0.0                         &   0.0     &       0.0   \\ \hline
- Pop Source         &  87.3     &    18.3                       &   14.5   &      5.2    \\ 
-\hline
-\multicolumn{5}{l}{} \\
-\multicolumn{5}{l}{Non-Remapping} \\
- \hline
-Subroutine         & Jezebel & Homogenized Block & Pincell & 15-sided Hex Assembly  \\
-\hline \hline
- OptiX Trace       & 3.8       &    18.5                        &   26.5    &      41.1    \\ \hline
- Grid Search       & 0.5       &    6.5                         &   5.1       &      4.7       \\ \hline
- Tally                   & 0.2       &    1.3                         &   0.5       &      0.4       \\ \hline
- Macroscopic      & 1.7       &   22.3                        &   19.2      &     19.0     \\ \hline
- Microscopic       & 1.3       &    11.3                        &  8.6        &      8.4       \\ \hline
- Elastic Scatter   & 1.0       &     15.1                       &   14.6    &      11.1    \\ \hline
- Inelastic Scatter & 0.4       &     0.4                         &   0.0      &       0.1   \\ \hline
- Continuum Scatter & 0.3   &     0.2                         &   0.0      &       0.1   \\ \hline
- Fission               & 0.2       &      0.2                        &   0.2      &       0.2     \\ \hline
- Yield Reduction  & 0.0       &      0.0                        &   0.0     &       0.0    \\ \hline
- Yield Rebase     & 0.0        &     0.0                         &   0.0     &       0.0   \\ \hline
- Yield Prefix Sum &  0.0       &    0.0                         &   0.0     &       0.0   \\ \hline
- Pop Source         &  87.3     &    18.3                       &   14.5   &      5.2    \\ 
-\hline
-\end{tabular}
-\end{table}
-
-\begin{figure}[h!]
-\centering
-\includegraphics[width=\textwidth]{graphics/finalresults/process_rate.eps}
-\caption{Neutron processing rate of WARP in the homogenized block and assembly benchmark cases. \label{process_rate} }
-\end{figure}
+To measure the benefit of sorting and remapping references in WARP, a comparison to a non-remapping version of WARP must be made.  Table \ref{benchmark_nonremapping_summary} shows the runtimes and multiplications factors of the criticality benchmarks for remapping and non-remapping versions of WARP.  The remapping version performs much better than the non-remapping version when more complexity is added to the problem.  For very simple problems, like the Jezebel benchmark, remapping only adds overhead since the neutrons are constrained be the problem materials on geometry to generally do undergo the same three reactions: fission and scattering in Pu-239 or leaking out.  The leaky
 
 \begin{table}[h]
 \centering
@@ -364,6 +298,83 @@ Subroutine         & Jezebel & Homogenized Block & Pincell & 15-sided Hex Assemb
  \hline
 \end{tabular}
 \end{table}
+
+These effects are more clearly seen in the trends of Figure \ref{process_rate}.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\textwidth]{graphics/finalresults/process_rate.eps}
+\caption{Neutron processing rate of WARP in the homogenized block and assembly benchmark cases. \label{process_rate} }
+\end{figure}
+
+stats, the way the active particles die off for assembly and homfuel.  include the non-remapped version in the time/cycle plot.  runtimes...
+
+remapping has a huge impact on OptiX runtime?  or just in cases where neutrons don't die off quickly and the tail becomes much more important where a lot of time is wasted on processing blocks full of neutrons that just return.
+
+point out the number of iterations to get to 0 active, means that the non remapping routine spends quite a bit of time in the slow section of the processing curve.
+
+state smoothing and interpolation parameters, problem with cycle time becoming small and NaNs appearing
+
+pop is rather expensive, which is why the fixed source problems are much slower!  pop needs to be done at every inner loop iteration, whereas in crit, it is done once at the end of the inner loop
+
+average values for entire run.  will not add to 100 since there are other operations going on, but are usually negligible.  these included functions are the compute kernels in the inner and outer transport loops.  other routines are only executed a small number of times comparatively.
+
+occupancy of iscatter and cscatrer are still really low, like 2\%, since there just aren't that many neutrons doing them ever.  mist are elastic, getting ~45/50\% occupancy (I don't know why maximum theoretical is 50\%), same for macro/micro.  pop is around 85\% of 100 early on, drops to a few percent at the end.   occupancy is always limited by grid size.
+
+compaction in nonremapping also include the cost of flipping the done flags to make an ``is valid'' vector
+
+not only to the specific reaction kernels benefit, but the main time svanings is in the global functions being able to reduce the size of their launches ( trace,  rng seeds (might be unecesary), scans, reductions, sorts) 
+
+\begin{table}[h]
+\centering
+\caption{Summary table of the time spent in each WARP subroutine in criticality mode for each benchmark case.}
+\label{profile_summary}
+\begin{tabular}{| l | r  | r | r | r |}
+\multicolumn{5}{l}{Remapping} \\
+ \hline
+ Subroutine        & Jezebel & Homogenized Block & Pincell & 15-sided Hex Assembly  \\
+ \hline \hline
+ OptiX Trace       & 3.8       &    18.5                        &   26.5    &      41.1    \\ \hline
+ Grid Search       & 0.5       &    6.5                         &   5.1       &      4.7       \\ \hline
+ Tally                   & 0.2       &    1.3                         &   0.5       &      0.4       \\ \hline
+ Macroscopic      & 1.7       &   22.3                        &   19.2      &     19.0     \\ \hline
+ Microscopic       & 1.3       &    11.3                        &  8.6        &      8.4       \\ \hline
+ Radix Sort         & 1.7       &     5.3                         &   8.5       &      10.3     \\ \hline
+ Elastic Scatter   & 1.0       &     15.1                       &   14.6    &      11.1    \\ \hline
+ Inelastic Scatter & 0.4       &     0.4                         &   0.0      &       0.1   \\ \hline
+ Continuum Scatter & 0.3   &     0.2                         &   0.0      &       0.1   \\ \hline
+ Fission               & 0.2       &      0.2                        &   0.2      &       0.2     \\ \hline
+ Yield Reduction  & 0.1       &      0.0                        &   0.0     &       0.0    \\ \hline
+ Yield Rebase     & 0.0        &     0.0                         &   0.0     &       0.0   \\ \hline
+ Yield Prefix Sum &  0.0       &    0.0                         &   0.0     &       0.0   \\ \hline
+ Pop Source         &  87.3     &    18.3                       &   14.5   &      5.2    \\ 
+\hline
+\multicolumn{5}{l}{} \\
+\multicolumn{5}{l}{Non-Remapping} \\
+ \hline
+Subroutine         & Jezebel & Homogenized Block & Pincell & 15-sided Hex Assembly  \\
+\hline \hline
+ OptiX Trace       & 14.2       &      38.0            &   46.7    &    45.2     \\ \hline
+ Grid Search       &  1.3      &        6.3                 &  4.7     &     2.1      \\ \hline
+ Tally                   &  0.2      &         0.7               &   0.4    &    1.2       \\ \hline
+ Macroscopic      &  1.3     &          8.8               &  6.6      &    2.8     \\ \hline
+ Microscopic       &  1.5      &          5.6               &  2.6     &    1.9       \\ \hline
+ Elastic Scatter   &  2.5      &        10.5                 &   8.3    &   3.6      \\ \hline
+ Inelastic Scatter & 1.2       &        1.6                  &  1.5    &    2.4    \\ \hline
+ Continuum Scatter & 1.1  &         1.5                 &   1.6   &    2.4   \\ \hline
+ Fission               &  0.4      &         0.7                 &   0.9   &    1.3      \\ \hline
+ Absorption          & 0.3       &         0.6                 &   0.8   &    1.3      \\ \hline
+Compaction         &  3.8      &        7.3                  &   11.2   &  20.1        \\ \hline
+ Yield Reduction  &   1.5     &        2.6                 &  4.0    &    7.3     \\ \hline
+ Yield Rebase     &    0.0     &       0.0                   &   0.0  &    0.0    \\ \hline
+ Yield Prefix Sum &   1.4    &       2.5                    &  4.0   &    7.2    \\ \hline
+ Pop Source         &  67.9     &     12.8                    & 5.7    &    0.5    \\ 
+\hline
+\end{tabular}
+\end{table}
+
+
+
 
 
 
