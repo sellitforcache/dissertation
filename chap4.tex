@@ -173,6 +173,12 @@ It is also interesting that in the Jezebel benchmark, MCNP is actually much fast
 \caption{Fission source distribution of a ``Jezebel'' bare Pu-239 sphere. \label{godiva_fiss} }
 \end{figure}
 
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\textwidth,trim= 5cm 0cm 7cm 0cm]{graphics/finalresults/godiva_fiss_diff-6.eps}
+\caption{Relative error of WARP's fission source distribution compared to Serpent's for the Jezebel bare Pu-239 sphere. \label{godiva_fiss_diff} }
+\end{figure}
+
 \begin{figure}[h!] 
 \centering
 \includegraphics[width=\textwidth,trim= 1cm 0cm 1cm 0cm]{graphics/finalresults/homfuel_spec-6.pdf}
@@ -183,6 +189,12 @@ It is also interesting that in the Jezebel benchmark, MCNP is actually much fast
 \centering
 \includegraphics[width=\textwidth,trim= 5cm 0cm 7cm 0cm]{graphics/finalresults/homfuel_fiss-6.eps}
 \caption{Fission source distribution of a homogenized block of UO$_2$ and water. \label{homfuel_fiss} }
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\textwidth,trim= 5cm 0cm 7cm 0cm]{graphics/finalresults/homfuel_fiss_diff-6.eps}
+\caption{Relative error of WARP's fission source distribution compared to Serpent's for the homogenized block of UO$_2$ and water. \label{homfuel_fiss_diff} }
 \end{figure}
 
 The flux and fission source distributions for the criticality benchmarks are shown in the following figures.  The relative error subplots for the spectra also have the 2$\sigma$ error shown in transparent green.  Since the relative error is calculated against Serpent, the error levels are from Serpent as well.  The colors in the fission source distribution plots represent the probability density of a fission neutron being born at that point.  To show the most accurate and highest resolution results, the data in these figures are from runs using $10^6$ neutrons per batch.  The corresponding Serpent fission source and thermal flux mesh plots are included in Figures \ref{serp_godiva_mesh}-\ref{serp_assembly_mesh} in Appendix \ref{app:A} so the fission source distributions shown here can be visually validated against them.  
@@ -206,6 +218,12 @@ Figures \ref{pincell_spec} and \ref{pincell_fiss}, show the volume-averaged flux
 \caption{Fission source distribution of a single UO$_2$ pin surrounded by a block of water. \label{pincell_fiss} }
 \end{figure}
 
+\begin{figure}[h!]
+\centering
+\includegraphics[width=.75\textwidth]{graphics/finalresults/pincell_fiss_diff-6.eps}
+\caption{Relative error of WARP's fission source distribution compared to Serpent's for the single UO$_2$ pin surrounded by water. \label{pincell_fiss_diff} }
+\end{figure}
+
 \begin{figure}[h!] 
 \centering
 \includegraphics[width=\textwidth,trim= 1cm 0cm 1cm 0cm]{graphics/finalresults/assembly_spec-6.pdf}
@@ -216,6 +234,12 @@ Figures \ref{pincell_spec} and \ref{pincell_fiss}, show the volume-averaged flux
 \centering
 \includegraphics[width=\textwidth,trim= 4cm 0cm 6cm 0cm]{graphics/finalresults/assembly_fiss-6.eps}
 \caption{Fission source distribution of a 15-sided hexagonal array of UO$_2$ pins in water. \label{assembly_fiss} }
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\textwidth,trim= 4cm 0cm 6cm 0cm]{graphics/finalresults/assembly_fiss_diff-6.eps}
+\caption{Relative error of WARP's fission source distribution compared to Serpent's for the 15-sided hexagonal array of UO$_2$ pins in water. \label{assembly_fiss_diff} }
 \end{figure}
 	
 
