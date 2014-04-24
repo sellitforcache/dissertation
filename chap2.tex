@@ -1298,7 +1298,7 @@ BVH is object-centric in the sense that it places boundaries around groups of ob
 \begin{figure}[h!] 
 \centering
 \includegraphics[width=0.8\textwidth, trim= 8cm 0cm 0cm 0cm ]{graphics/bvh_kd.eps}
-\caption{Partitioning schemes (top) with the resulting trees (bottom). A BVH tree is on the left and a k-d tree is on the right. (courtesy WikiMedia commons)  \label{bvh_kd}}
+\caption{Partitioning schemes (top) with the resulting trees (bottom). A BVH tree \cite{wikimedia_bvh} is on the left and a k-d tree is on the right \cite{wikimedia_kd}.   \label{bvh_kd}}
 \end{figure}
 
 The benefit of these structures is that they can be queried in $\log(N)$ time rather than in linear time since major portions of the geometry are \cite{something}.  OptiX automatically builds theses trees over the geometry without any user input other than to specify the type.  The different types have tradeoffs with size, build speed, and performance, but since WARP's geometry is static and relatively simple compared to photorealistic rendering jobs, the build speed and size have negligible impact, so the highest performance structure is used is WARP.  Which structure prevodes the best performance is the goal of one of the preliminary studies in Section \ref{sec:prelim}.  
