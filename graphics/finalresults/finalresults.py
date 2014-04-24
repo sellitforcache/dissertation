@@ -109,7 +109,7 @@ tally      = numpy.loadtxt('gpu-benchmark'+case+'/homfuel.tally')
 tallybins  = numpy.loadtxt('gpu-benchmark'+case+'/homfuel.tallybins')
 serpdata   = get_serpent_det('serpent-benchmark'+case+'/homfuel_det0.m')
 mcnpdata   = get_mcnp_mctal('mcnp-benchmark'+case+'/homfuel.tally')
-mcnp_vol = 2000*2000*2000
+mcnp_vol = 200*200*200
 #title = 'WARP 6e6 histories (2e6 discarded)\n Flux in homogenized block of UO2 and water'	
 
 widths=numpy.diff(tallybins);
@@ -144,7 +144,7 @@ ax0.semilogx(serpE,serpF,'b',linestyle='steps-mid',label='Serpent 2.1.18')
 ax0.semilogx(mcnp_avg,mcnp_newflux,'k',linestyle='steps-mid',label='MCNP 6.1')
 ax0.semilogx(avg,newflux,'r',linestyle='steps-mid',label='WARP')
 #ax0.set_xlabel('Energy (MeV)')
-ax0.set_ylabel(r'Flux/Lethargy per Fission Neutron (n/cm$^2$-s)')
+ax0.set_ylabel(r'Flux/Lethargy per Fission Neutron')
 #ax0.set_title(title)
 handles, labels = ax0.get_legend_handles_labels()
 ax0.legend(handles,labels,loc=2)
@@ -196,6 +196,26 @@ ax1.grid('on',color='k')
 ax1.yaxis.tick_right()
 cbar_ax = cbar.make_axes(fig.get_axes())
 fig.colorbar(ax1.get_images()[0], cax=cbar_ax[0])
+fig.close()
+
+fig = pl.figure(figsize=(18,6))
+gs = gridspec.GridSpec(1, 2, width_ratios=[1, 1]) 
+ax0 = plt.subplot(gs[0])
+ax1 = plt.subplot(gs[1])
+xmin = ymin = -100
+xmax = ymax =  100
+ax0.imshow(warp_xy,extent=[xmin, xmax, ymin, ymax])
+ax0.set_xlabel('x (cm)')
+ax0.set_ylabel('y (cm)')
+ax0.grid('on',color='k')
+ax1.imshow(warp_xz,extent=[xmin, xmax, ymin, ymax])
+ax1.set_xlabel('x (cm)')
+ax1.set_ylabel('z (cm)')
+ax1.grid('on',color='k')
+ax1.yaxis.tick_right()
+cbar_ax = cbar.make_axes(fig.get_axes())
+fig.colorbar(ax1.get_images()[0], cax=cbar_ax[0])
+
 
 if plot:
 	pl.show()
@@ -213,7 +233,7 @@ xmax = ymax =  100
 data=np.array(open("serpent-benchmark"+case+"/homfuel_mesh1.dist1").read().split(),dtype=float)
 serp_xy=data.reshape(500,500)
 serp_xy=serp_xy/np.max(serp_xy)
-ax0.imshow(serp_xy )#, normed=True)#norm=LogNorm())
+ax0.imshow(serp_xy,extent=[xmin, xmax, ymin, ymax] )#, normed=True)#norm=LogNorm())
 ax0.set_xlabel('x (cm)')
 ax0.set_ylabel('y (cm)')
 ax0.grid('on',color='k')
@@ -225,7 +245,7 @@ ymax =  100
 data=np.array(open("serpent-benchmark"+case+"/homfuel_mesh2.dist1").read().split(),dtype=float)
 serp_xz=data.reshape(500,500)
 serp_xz=serp_xz/np.max(serp_xz)
-ax1.imshow(serp_xz)
+ax1.imshow(serp_xz,extent=[xmin, xmax, ymin, ymax])
 ax1.set_xlabel('x (cm)')
 ax1.set_ylabel('z (cm)')
 ax1.grid('on',color='k')
@@ -244,12 +264,12 @@ fig = pl.figure(figsize=(18,6))
 gs = gridspec.GridSpec(1, 2, width_ratios=[1, 1]) 
 ax0 = plt.subplot(gs[0])
 ax1 = plt.subplot(gs[1])
-ax0.imshow( np.divide(serp_xy - warp_xy , serp_xy), vmin=-1 , vmax=1 )#, normed=True)#norm=LogNorm())
+ax0.imshow( np.divide(serp_xy - warp_xy , serp_xy), vmin=-1 , vmax=1 ,extent=[xmin, xmax, ymin, ymax])#, normed=True)#norm=LogNorm())
 ax0.set_xlabel('x (cm)')
 ax0.set_ylabel('y (cm)')
 ax0.grid('on',color='k')
 
-ax1.imshow( np.divide( serp_xz - warp_xz , serp_xz ), vmin=-1 , vmax=1 )
+ax1.imshow( np.divide( serp_xz - warp_xz , serp_xz ), vmin=-1 , vmax=1 ,extent=[xmin, xmax, ymin, ymax])
 ax1.set_xlabel('x (cm)')
 ax1.set_ylabel('z (cm)')
 ax1.grid('on',color='k')
@@ -307,7 +327,7 @@ ax0.semilogx(serpE,serpF,'b',linestyle='steps-mid',label='Serpent 2.1.18')
 ax0.semilogx(mcnp_avg,mcnp_newflux,'k',linestyle='steps-mid',label='MCNP 6.1')
 ax0.semilogx(avg,newflux,'r',linestyle='steps-mid',label='WARP')
 #ax0.set_xlabel('Energy (MeV)')
-ax0.set_ylabel(r'Flux/Lethargy per Fission Neutron (n/cm$^2$-s)')
+ax0.set_ylabel(r'Flux/Lethargy per Fission Neutron')
 #ax0.set_title(title)
 handles, labels = ax0.get_legend_handles_labels()
 ax0.legend(handles,labels,loc=2)
@@ -335,8 +355,8 @@ gs = gridspec.GridSpec(1, 2, width_ratios=[8, 1])
 ax0 = plt.subplot(gs[0])
 ax1 = plt.subplot(gs[1])
 
-xmin = ymin = -2
-xmax = ymax =  2
+xmin = ymin = -5
+xmax = ymax =  5
 data=np.array(open("gpu-benchmark"+case+"/pincell.fission_points").read().split(),dtype=float)
 data=np.reshape(data,(-1,4))
 ax0.hist2d(data[:,0], data[:,1], range=[[xmin, xmax], [ymin, ymax]], bins=reso, normed=True)#norm=LogNorm())
@@ -344,8 +364,8 @@ ax0.set_xlabel('x (cm)')
 ax0.set_ylabel('y (cm)')
 ax0.grid('on',color='k')
 
-xmin = -4	
-xmax =  4	
+xmin = -5	
+xmax =  5	
 ymin = -21
 ymax =  21
 ax1.hist2d(data[:,0], data[:,2], range=[[xmin, xmax], [ymin, ymax]], bins=reso , normed=True)#, norm=LogNorm())
@@ -356,12 +376,105 @@ ax1.set_xticks([xmin,0,xmax])
 ax1.yaxis.tick_right()
 cbar_ax = cbar.make_axes(fig.get_axes())
 fig.colorbar(ax1.get_images()[0], cax=cbar_ax[0])
+fig.close()
+
+fig = pl.figure(figsize=(18,6))
+gs = gridspec.GridSpec(1, 2, width_ratios=[8, 1]) 
+ax0 = plt.subplot(gs[0])
+ax1 = plt.subplot(gs[1])
+xmin = ymin = -5
+xmax = ymax =  5
+ax0.imshow(warp_xy,extent=[xmin, xmax, ymin, ymax])
+ax0.set_xlabel('x (cm)')
+ax0.set_ylabel('y (cm)')
+ax0.grid('on',color='k')
+xmin = -5	
+xmax =  5	
+ymin = -21
+ymax =  21
+ax1.imshow(warp_xz,extent=[xmin, xmax, ymin, ymax])
+ax1.set_xlabel('x (cm)')
+ax1.set_ylabel('z (cm)')
+ax1.grid('on',color='k')
+ax1.yaxis.tick_right()
+cbar_ax = cbar.make_axes(fig.get_axes())
+fig.colorbar(ax1.get_images()[0], cax=cbar_ax[0])
+
 
 if plot:
 	pl.show()
 else:
-	print 'pincell_fiss'+case+'.eps'
+	print       'pincell_fiss'+case+'.eps'
 	fig.savefig('pincell_fiss'+case+'.eps')
+
+
+
+fig = pl.figure(figsize=(18,6))
+gs = gridspec.GridSpec(1, 2, width_ratios=[8, 1]) 
+ax0 = plt.subplot(gs[0])
+ax1 = plt.subplot(gs[1])
+xmin = ymin = -5
+xmax = ymax =  5
+data=np.array(open("serpent-benchmark"+case+"/pincell_mesh1.dist1").read().split(),dtype=float)
+serp_xy=data.reshape(500,500)
+serp_xy=serp_xy/np.max(serp_xy)
+ax0.imshow(serp_xy ,extent=[xmin, xmax, ymin, ymax])#, normed=True)#norm=LogNorm())
+ax0.set_xlabel('x (cm)')
+ax0.set_ylabel('y (cm)')
+ax0.grid('on',color='k')
+
+xmin = -5	
+xmax =  5	
+ymin = -21
+ymax =  21
+data=np.array(open("serpent-benchmark"+case+"/pincell_mesh2.dist1").read().split(),dtype=float)
+serp_xz=data.reshape(500,500)
+serp_xz=serp_xz/np.max(serp_xz)
+ax1.imshow(serp_xz,extent=[xmin, xmax, ymin, ymax])
+ax1.set_xlabel('x (cm)')
+ax1.set_ylabel('z (cm)')
+ax1.grid('on',color='k')
+ax1.yaxis.tick_right()
+cbar_ax = cbar.make_axes(fig.get_axes())
+fig.colorbar(ax1.get_images()[0], cax=cbar_ax[0])
+
+if plot:
+	pl.show()
+else:
+	print       'pincell_fiss_serp'+case+'.eps'
+	fig.savefig('pincell_fiss_serp'+case+'.eps')
+
+xmin = -5	
+xmax =  5	
+ymin = -5
+ymax =  5
+fig = pl.figure(figsize=(18,6))
+gs = gridspec.GridSpec(1, 2, width_ratios=[8, 1]) 
+ax0 = plt.subplot(gs[0])
+ax1 = plt.subplot(gs[1])
+ax0.imshow( np.divide(serp_xy - warp_xy , serp_xy), vmin=-1 , vmax=1 ,extent=[xmin, xmax, ymin, ymax])#, normed=True)#norm=LogNorm())
+ax0.set_xlabel('x (cm)')
+ax0.set_ylabel('y (cm)')
+ax0.grid('on',color='k')
+
+xmin = -5	
+xmax =  5	
+ymin = -21
+ymax =  21
+
+ax1.imshow( np.divide( serp_xz - warp_xz , serp_xz ), vmin=-1 , vmax=1 ,extent=[xmin, xmax, ymin, ymax])
+ax1.set_xlabel('x (cm)')
+ax1.set_ylabel('z (cm)')
+ax1.grid('on',color='k')
+ax1.yaxis.tick_right()
+cbar_ax = cbar.make_axes(fig.get_axes())
+fig.colorbar(ax1.get_images()[0], cax=cbar_ax[0])
+
+if plot:
+	pl.show()
+else:
+	print       'pincell_fiss_diff'+case+'.eps'
+	fig.savefig('pincell_fiss_diff'+case+'.eps')
 
 
 #
@@ -406,7 +519,7 @@ ax0.semilogx(serpE,serpF,'b',linestyle='steps-mid',label='Serpent 2.1.18')
 ax0.semilogx(mcnp_avg,mcnp_newflux,'k',linestyle='steps-mid',label='MCNP 6.1')
 ax0.semilogx(avg,newflux,'r',linestyle='steps-mid',label='WARP')
 #ax0.set_xlabel('Energy (MeV)')
-ax0.set_ylabel(r'Flux/Lethargy per Fission Neutron (n/cm$^2$-s)')
+ax0.set_ylabel(r'Flux/Lethargy per Fission Neutron')
 #ax0.set_title(title)
 handles, labels = ax0.get_legend_handles_labels()
 ax0.legend(handles,labels,loc=2)
@@ -434,20 +547,81 @@ gs = gridspec.GridSpec(1, 2, width_ratios=[1, 1])
 ax0 = plt.subplot(gs[0])
 ax1 = plt.subplot(gs[1])
 
-xmin = ymin = -7
-xmax = ymax =  7
+xmin = ymin = -5.1
+xmax = ymax =  5.1
 data=np.array(open("gpu-benchmark"+case+"/godiva.fission_points").read().split(),dtype=float)
 data=np.reshape(data,(-1,4))
-ax0.hist2d(data[:,0], data[:,1], range=[[xmin, xmax], [ymin, ymax]], bins=reso , normed=True)#norm=LogNorm())
+warp_xy=ax0.hist2d(data[:,0], data[:,1], range=[[xmin, xmax], [ymin, ymax]], bins=reso )#, normed=True)#norm=LogNorm())
+warp_xy=warp_xy[3].get_array().data
+warp_xy=warp_xy/np.max(warp_xy)
 ax0.set_xlabel('x (cm)')
 ax0.set_ylabel('y (cm)')
 ax0.grid('on',color='k')
 
-xmin = -7
-xmax =  7
-ymin = -7
-ymax =  7
-ax1.hist2d(data[:,0], data[:,2], range=[[xmin, xmax], [ymin, ymax]], bins=reso , normed=True)#norm=LogNorm())
+xmin = -5.1
+xmax =  5.1
+ymin = -5.1
+ymax =  5.1
+warp_xz=ax1.hist2d(data[:,0], data[:,2], range=[[xmin, xmax], [ymin, ymax]], bins=reso )#, normed=True)#norm=LogNorm())
+warp_xz=warp_xz[3].get_array().data
+warp_xz=warp_xz/np.max(warp_xz)
+ax1.set_xlabel('x (cm)')
+ax1.set_ylabel('z (cm)')
+ax1.grid('on',color='k')
+ax1.yaxis.tick_right()
+cbar_ax = cbar.make_axes(fig.get_axes())
+fig.colorbar(ax1.get_images()[0], cax=cbar_ax[0])
+fig.close()
+
+fig = pl.figure(figsize=(18,6))
+gs = gridspec.GridSpec(1, 2, width_ratios=[1, 1]) 
+ax0 = plt.subplot(gs[0])
+ax1 = plt.subplot(gs[1])
+xmin = ymin = -5.1
+xmax = ymax =  5.1
+ax0.imshow(warp_xy,extent=[xmin, xmax, ymin, ymax])
+ax0.set_xlabel('x (cm)')
+ax0.set_ylabel('y (cm)')
+ax0.grid('on',color='k')
+ax1.imshow(warp_xz,extent=[xmin, xmax, ymin, ymax])
+ax1.set_xlabel('x (cm)')
+ax1.set_ylabel('z (cm)')
+ax1.grid('on',color='k')
+ax1.yaxis.tick_right()
+cbar_ax = cbar.make_axes(fig.get_axes())
+fig.colorbar(ax1.get_images()[0], cax=cbar_ax[0])
+
+
+if plot:
+	pl.show()
+else:
+	print 'godiva_fiss'+case+'.eps'
+	fig.savefig('godiva_fiss'+case+'.eps')
+
+
+
+fig = pl.figure(figsize=(18,6))
+gs = gridspec.GridSpec(1, 2, width_ratios=[1, 1]) 
+ax0 = plt.subplot(gs[0])
+ax1 = plt.subplot(gs[1])
+xmin = ymin = -5.1
+xmax = ymax =  5.1
+data=np.array(open("serpent-benchmark"+case+"/godiva_mesh1.dist1").read().split(),dtype=float)
+serp_xy=data.reshape(500,500)
+serp_xy=serp_xy/np.max(serp_xy)
+ax0.imshow(serp_xy ,extent=[xmin, xmax, ymin, ymax])#, normed=True)#norm=LogNorm())
+ax0.set_xlabel('x (cm)')
+ax0.set_ylabel('y (cm)')
+ax0.grid('on',color='k')
+
+xmin = -5.1
+xmax =  5.1
+ymin = -5.1
+ymax =  5.1
+data=np.array(open("serpent-benchmark"+case+"/godiva_mesh2.dist1").read().split(),dtype=float)
+serp_xz=data.reshape(500,500)
+serp_xz=serp_xz/np.max(serp_xz)
+ax1.imshow(serp_xz,extent=[xmin, xmax, ymin, ymax])
 ax1.set_xlabel('x (cm)')
 ax1.set_ylabel('z (cm)')
 ax1.grid('on',color='k')
@@ -458,9 +632,32 @@ fig.colorbar(ax1.get_images()[0], cax=cbar_ax[0])
 if plot:
 	pl.show()
 else:
-	print 'godiva_fiss'+case+'.eps'
-	fig.savefig('godiva_fiss'+case+'.eps')
+	print 'godiva_fiss_serp'+case+'.eps'
+	fig.savefig('godiva_fiss_serp'+case+'.eps')
 
+
+fig = pl.figure(figsize=(18,6))
+gs = gridspec.GridSpec(1, 2, width_ratios=[1, 1]) 
+ax0 = plt.subplot(gs[0])
+ax1 = plt.subplot(gs[1])
+ax0.imshow( np.divide(serp_xy - warp_xy , serp_xy), vmin=-1 , vmax=1 ,extent=[xmin, xmax, ymin, ymax])#, normed=True)#norm=LogNorm())
+ax0.set_xlabel('x (cm)')
+ax0.set_ylabel('y (cm)')
+ax0.grid('on',color='k')
+
+ax1.imshow( np.divide( serp_xz - warp_xz , serp_xz ), vmin=-1 , vmax=1 ,extent=[xmin, xmax, ymin, ymax])
+ax1.set_xlabel('x (cm)')
+ax1.set_ylabel('z (cm)')
+ax1.grid('on',color='k')
+ax1.yaxis.tick_right()
+cbar_ax = cbar.make_axes(fig.get_axes())
+fig.colorbar(ax1.get_images()[0], cax=cbar_ax[0])
+
+if plot:
+	pl.show()
+else:
+	print 'godiva_fiss_diff'+case+'.eps'
+	fig.savefig('godiva_fiss_diff'+case+'.eps')
 
 
 #
@@ -505,7 +702,7 @@ ax0.semilogx(serpE,serpF,'b',linestyle='steps-mid',label='Serpent 2.1.18')
 ax0.semilogx(mcnp_avg,mcnp_newflux,'k',linestyle='steps-mid',label='MCNP 6.1')
 ax0.semilogx(avg,newflux,'r',linestyle='steps-mid',label='WARP')
 #ax0.set_xlabel('Energy (MeV)')
-ax0.set_ylabel(r'Flux/Lethargy per Fission Neutron (n/cm$^2$-s)')
+ax0.set_ylabel(r'Flux/Lethargy per Fission Neutron')
 #ax0.set_title(title)
 handles, labels = ax0.get_legend_handles_labels()
 ax0.legend(handles,labels,loc=2)
@@ -555,12 +752,93 @@ ax1.grid('on',color='k')
 ax1.yaxis.tick_right()
 cbar_ax = cbar.make_axes(fig.get_axes())
 fig.colorbar(ax1.get_images()[0], cax=cbar_ax[0])
+fig.close()
+
+fig = pl.figure(figsize=(18,6))
+gs = gridspec.GridSpec(1, 2, width_ratios=[1, 1]) 
+ax0 = plt.subplot(gs[0])
+ax1 = plt.subplot(gs[1])
+xmin = ymin = -40
+xmax = ymax =  40
+ax0.imshow(warp_xy,extent=[xmin, xmax, ymin, ymax])
+ax0.set_xlabel('x (cm)')
+ax0.set_ylabel('y (cm)')
+ax0.grid('on',color='k')
+ax1.imshow(warp_xz,extent=[xmin, xmax, ymin, ymax])
+ax1.set_xlabel('x (cm)')
+ax1.set_ylabel('z (cm)')
+ax1.grid('on',color='k')
+ax1.yaxis.tick_right()
+cbar_ax = cbar.make_axes(fig.get_axes())
+fig.colorbar(ax1.get_images()[0], cax=cbar_ax[0])
+
 
 if plot:
 	pl.show()
 else:
-	print 'assembly_fiss'+case+'.eps'
+	print       'assembly_fiss'+case+'.eps'
 	fig.savefig('assembly_fiss'+case+'.eps')
+
+
+
+fig = pl.figure(figsize=(18,6))
+gs = gridspec.GridSpec(1, 2, width_ratios=[1, 1]) 
+ax0 = plt.subplot(gs[0])
+ax1 = plt.subplot(gs[1])
+xmin = ymin = -40
+xmax = ymax =  40
+data=np.array(open("serpent-benchmark"+case+"/assembly_mesh1.dist1").read().split(),dtype=float)
+serp_xy=data.reshape(500,500)
+serp_xy=serp_xy/np.max(serp_xy)
+ax0.imshow(serp_xy ,extent=[xmin, xmax, ymin, ymax])#, normed=True)#norm=LogNorm())
+ax0.set_xlabel('x (cm)')
+ax0.set_ylabel('y (cm)')
+ax0.grid('on',color='k')
+
+xmin = -40
+xmax =  40
+ymin = -40
+ymax =  40
+data=np.array(open("serpent-benchmark"+case+"/assembly_mesh2.dist1").read().split(),dtype=float)
+serp_xz=data.reshape(500,500)
+serp_xz=serp_xz/np.max(serp_xz)
+ax1.imshow(serp_xz,extent=[xmin, xmax, ymin, ymax])
+ax1.set_xlabel('x (cm)')
+ax1.set_ylabel('z (cm)')
+ax1.grid('on',color='k')
+ax1.yaxis.tick_right()
+cbar_ax = cbar.make_axes(fig.get_axes())
+fig.colorbar(ax1.get_images()[0], cax=cbar_ax[0])
+
+if plot:
+	pl.show()
+else:
+	print       'assembly_fiss_serp'+case+'.eps'
+	fig.savefig('assembly_fiss_serp'+case+'.eps')
+
+
+fig = pl.figure(figsize=(18,6))
+gs = gridspec.GridSpec(1, 2, width_ratios=[1, 1]) 
+ax0 = plt.subplot(gs[0])
+ax1 = plt.subplot(gs[1])
+ax0.imshow( np.divide(serp_xy - warp_xy , serp_xy), vmin=-1 , vmax=1 ,extent=[xmin, xmax, ymin, ymax])#, normed=True)#norm=LogNorm())
+ax0.set_xlabel('x (cm)')
+ax0.set_ylabel('y (cm)')
+ax0.grid('on',color='k')
+
+ax1.imshow( np.divide( serp_xz - warp_xz , serp_xz ), vmin=-1 , vmax=1 ,extent=[xmin, xmax, ymin, ymax])
+ax1.set_xlabel('x (cm)')
+ax1.set_ylabel('z (cm)')
+ax1.grid('on',color='k')
+ax1.yaxis.tick_right()
+cbar_ax = cbar.make_axes(fig.get_axes())
+fig.colorbar(ax1.get_images()[0], cax=cbar_ax[0])
+
+if plot:
+	pl.show()
+else:
+	print       'assembly_fiss_diff'+case+'.eps'
+	fig.savefig('assembly_fiss_diff'+case+'.eps')
 
 
 #
@@ -572,7 +850,7 @@ tally      = numpy.loadtxt(  'fixed-benchmark/fixed_1ev_u235.nonremap')
 tallybins  = numpy.loadtxt(  'fixed-benchmark/fixed_1ev_u235.nonremapbins')
 serpdata   = get_serpent_det('fixed-benchmark/u235_mono1ev_serp_det0.m')
 mcnpdata   = get_mcnp_mctal( 'fixed-benchmark/u235_mono1ev_mcnp.tally')
-mcnp_vol = 2000*2000*2000
+mcnp_vol = 200*200*200
 title = 'Serpent2 (Serial) vs. WARP 4e7 histories, 1eV point source \n Flux in a cube of u235'
 
 widths=numpy.diff(tallybins);
@@ -609,7 +887,7 @@ ax0.semilogx(serpE,serpF,'b',linestyle='steps-mid',label='Serpent 2.1.18')
 ax0.semilogx(mcnp_avg,mcnp_newflux,'k',linestyle='steps-mid',label='MCNP 6.1')
 ax0.semilogx(avg,newflux,'r',linestyle='steps-mid',label='WARP')
 #ax0.set_xlabel('Energy (MeV)')
-ax0.set_ylabel(r'Flux/Lethargy per Source Neutron (n/cm$^2$-s)')
+ax0.set_ylabel(r'Flux/Lethargy per Source Neutron')
 #ax0.set_title(title)
 handles, labels = ax0.get_legend_handles_labels()
 ax0.legend(handles,labels,loc=2)
