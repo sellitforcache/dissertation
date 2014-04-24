@@ -23,6 +23,7 @@ Using the NVIDIA OptiX ray tracing framework was also shown to be an effectively
 this section could go on forever
 
 - replace geom, parallel routines with handwritten, specific ones, if geom could fit in shared memory, there would be great performance increase
+- on the fly temperature treatments
 - reduce the memory needed per history so a maximum number can be launched, this was no optimized at all in the initial development
 - use a SM-based algorithm instead of global.  history info could be stored in shared, but would need to rendezvous like CPU codes.
 - newer libraries, CUB, optix prime, rayforce?
