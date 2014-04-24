@@ -6,6 +6,7 @@ from matplotlib.colors import LogNorm
 import matplotlib.gridspec as gridspec
 import matplotlib.colorbar as cbar
 import matplotlib.pyplot as plt 
+from matplotlib.ticker import MaxNLocator
 
 from termcolor import colored
 from pyne import ace
@@ -94,7 +95,7 @@ else:
 if plot:
 	print colored(' --- Plotting without LaTeX, NO FILES WRITTEN','red')
 else:
-	print colored(' --- Rendering .eps files with LaTeX enabled','green')
+	print colored(' --- Rendering .eps/.pdf files with LaTeX enabled','green')
 	pl.rc('text', usetex=True)
 	pl.rc('font', family='serif')
 
@@ -149,17 +150,20 @@ ax0.legend(handles,labels,loc=2)
 ax0.set_xlim([1e-11,20])
 ax0.grid(True)
 ax1.semilogx(serpE,numpy.divide(serpF-newflux,serpF),'b',linestyle='steps-mid',label='Flux Relative Error vs. Serpent')
+ax1.fill_between(serpE,-2.0*serpErr,2.0*serpErr,color='black',facecolor='green', alpha=0.5)
+ax1.set_xscale('log')
+ax1.yaxis.set_major_locator(MaxNLocator(4))
 ax1.set_xlabel('Energy (MeV)')
 ax1.set_ylabel('Relative Error \n vs. Serpent')
 ax1.set_xlim([1e-11,20])
-ax1.set_ylim([-5e-2,5e-2])
+ax1.set_ylim([-5e-3,5e-3])
 ax1.grid(True)
 
 if plot:
 	pl.show()
 else:
-	print 'homfuel_spec'+case+'.eps'
-	fig.savefig('homfuel_spec'+case+'.eps')
+	print 'homfuel_spec'+case+'.pdf'
+	fig.savefig('homfuel_spec'+case+'.pdf')
 
 fig = pl.figure(figsize=(18,6))
 gs = gridspec.GridSpec(1, 2, width_ratios=[1, 1]) 
@@ -247,6 +251,9 @@ ax0.legend(handles,labels,loc=2)
 ax0.set_xlim([1e-11,20])
 ax0.grid(True)
 ax1.semilogx(serpE,numpy.divide(serpF-newflux,serpF),'b',linestyle='steps-mid',label='Flux Relative Error vs. Serpent')
+ax1.fill_between(serpE,-2.0*serpErr,2.0*serpErr,color='black',facecolor='green', alpha=0.5)
+ax1.set_xscale('log')
+ax1.yaxis.set_major_locator(MaxNLocator(4))
 ax1.set_xlabel('Energy (MeV)')
 ax1.set_ylabel('Relative Error \n vs. Serpent')
 ax1.set_xlim([1e-11,20])
@@ -256,8 +263,8 @@ ax1.grid(True)
 if plot:
 	pl.show()
 else:
-	print 'pincell_spec'+case+'.eps'
-	fig.savefig('pincell_spec'+case+'.eps')
+	print 'pincell_spec'+case+'.pdf'
+	fig.savefig('pincell_spec'+case+'.pdf')
 
 
 fig = pl.figure(figsize=(10,6))
@@ -343,17 +350,20 @@ ax0.legend(handles,labels,loc=2)
 ax0.set_xlim([1e-11,20])
 ax0.grid(True)
 ax1.semilogx(serpE,numpy.divide(serpF-newflux,serpF),'b',linestyle='steps-mid',label='Flux Relative Error vs. Serpent')
+ax1.fill_between(serpE,-2.0*serpErr,2.0*serpErr,color='black',facecolor='green', alpha=0.5)
+ax1.set_xscale('log')
+ax1.yaxis.set_major_locator(MaxNLocator(4))
 ax1.set_xlabel('Energy (MeV)')
 ax1.set_ylabel('Relative Error \n vs. Serpent')
 ax1.set_xlim([1e-11,20])
-ax1.set_ylim([-5e-2,5e-2])
+ax1.set_ylim([-2e-2,2e-2])
 ax1.grid(True)
 
 if plot:
 	pl.show()
 else:
-	print 'godiva_spec'+case+'.eps'
-	fig.savefig('godiva_spec'+case+'.eps')
+	print 'godiva_spec'+case+'.pdf'
+	fig.savefig('godiva_spec'+case+'.pdf')
 
 
 fig = pl.figure(figsize=(18,6))
@@ -439,17 +449,20 @@ ax0.legend(handles,labels,loc=2)
 ax0.set_xlim([1e-11,20])
 ax0.grid(True)
 ax1.semilogx(serpE,numpy.divide(serpF-newflux,serpF),'b',linestyle='steps-mid',label='Flux Relative Error vs. Serpent')
+ax1.fill_between(serpE,-2.0*serpErr,2.0*serpErr,color='black',facecolor='green', alpha=0.5)
+ax1.set_xscale('log')
+ax1.yaxis.set_major_locator(MaxNLocator(4))
 ax1.set_xlabel('Energy (MeV)')
 ax1.set_ylabel('Relative Error \n vs. Serpent')
 ax1.set_xlim([1e-11,20])
-ax1.set_ylim([-3e-1,3e-1])
+ax1.set_ylim([-2e-1,2e-1])
 ax1.grid(True)
 
 if plot:
 	pl.show()
 else:
-	print 'assembly_spec'+case+'.eps'
-	fig.savefig('assembly_spec'+case+'.eps')
+	print 'assembly_spec'+case+'.pdf'
+	fig.savefig('assembly_spec'+case+'.pdf')
 
 
 fig = pl.figure(figsize=(18,6))
@@ -540,6 +553,9 @@ ax0.legend(handles,labels,loc=2)
 ax0.set_xlim([1e-11,20])
 ax0.grid(True)
 ax1.semilogx(serpE,numpy.divide(serpF-newflux,serpF),'b',linestyle='steps-mid',label='Flux Relative Error vs. Serpent')
+ax1.fill_between(serpE,-2.0*serpErr,2.0*serpErr,color='black',facecolor='green', alpha=0.5)
+ax1.set_xscale('log')
+ax1.yaxis.set_major_locator(MaxNLocator(4))
 ax1.set_xlabel('Energy (MeV)')
 ax1.set_ylabel('Relative Error \n vs. Serpent')
 ax1.set_xlim([1e-11,20])
