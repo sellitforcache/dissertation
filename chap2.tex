@@ -62,11 +62,6 @@ k_\mathrm{eff}  = \eta f p  \epsilon P_\mathrm{FNL} P_\mathrm{TNL}
 The six factor formula relates to the Monte Carlo method since it is basically dimensionally-average Monte Carlo.  In other words, it describes what happens to the average neutron, and an individual neutron's lifetime, or ``history,'' could be simulated by sampling the constant probabilities that the factors represent as shown in Figure \ref{six_ff_chain}.  After a large group, or ensemble, of these histories is assembled, they can be averaged to determine the multiplication factor.  This is the basic idea of Monte Carlo neutron transport.  The results are trivial in this case, since there is no dimensionally in the problem and the probabilities are constant and the multiplication can be found analytically, but the six factor formula is way to think about the process without complicating it with dimensionality.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{History}
-
-The Monte Carlo method is not a new way to simulate nuclear reactors (or any particle transport problem for that matter) and in it's modern form dates back to 1940 when XXX invented the approach while working on the Manhattan Project \cite{}. Uncle in Monaco...  During this time, Henry Metropolis and John Von Neumann...\cite{}  Although this may be disputed by some people since is was rumored that Enrico Fermi was basically doing small scale simulations of this kind in his head trying to get the Chicago Pile critical \cite{}.  This approach is very intuitive, however, if one knows the underlying physics as the Monte Carlo method strives to recreate an ``experiment' on the computer by directly simulating every interaction neutrons make as they do their random walk through matter.  More here if necessary...
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Nuclear Interactions}
 \label{subsec:interactions}
 
@@ -252,8 +247,8 @@ Fission means ``the splitting splitting of something into two parts'' in the lit
   
 \begin{figure}[h!]
   \centering
-    \includegraphics[width=0.8\textwidth]{graphics/binding_e_per_nuc.eps}
-     \caption{Average binding energy per nucleon.  REPLACE ME WITH ONE YOU MAKE YOURSELF FROM DATA. \cite{}.\label{binding_e_per_nuc}}
+    \includegraphics[width=0.8\textwidth]{graphics/binding_energy.pdf}
+     \caption{Average binding energy per nucleon \cite{wikimedia_binding}.\label{binding_e_per_nuc}}
 \end{figure}
 
 \begin{table}[h]
@@ -283,7 +278,7 @@ Fission is technically considered a disappearance reaction as well since the fis
 \begin{figure}[h!]
   \centering
     \includegraphics[width=0.8\textwidth]{graphics/nu_compare.eps}
-     \caption{Total fission yield, $\nu_\mathrm{T}$, for uranium-235, uranium-238, and plutonium-239. \label{nu_compare}}
+     \caption{Total fission yield for uranium-235, uranium-238, and plutonium-239. \label{nu_compare}}
 \end{figure}
 
 \begin{figure}[h!]
@@ -325,7 +320,7 @@ The widening of resonances effects reactors in significant ways, most notably in
 \begin{figure}[h!]
   \centering
     \includegraphics[width=0.8\textwidth]{graphics/xs_eu_broaden.eps}
-     \caption{Doppler broadening of the 1eV fission resonance in Eu-155.  \label{xs_eu_broaden}}
+     \caption{Doppler broadening of the 1 eV fission resonance in Eu-155.  \label{xs_eu_broaden}}
 \end{figure}
 
 At 0K, resonances are very sharp and can be treated as delta functions.  The reaction rates actually depend on the relative velocity of the neutron and the target nuclide, and since the target nuclides have a spectrum of energies, the relative velocity does as well.  Assuming the target is at rest requires summing all the contributions to the reaction rate from the different relative velocities given a single neutron energy.  From the reaction rate, a \emph{thermally averaged} cross section can be calculated be used in simulations assuming a target at rest.  This is especially significant at resonances since slight movements in velocity can produce very large differences in cross section.  The overall effect is that sharp resonances are \emph{effectively} broadened since they start to contribute to reaction rates once the thermal distribution of relative velocities starts overlap them.   The expression for thermally averaged cross section is shown in \eqref{broaden}, where $v_n$ and $\boldsymbol{v_n}$ are the velocity and speed of the neutron, respectively, $\boldsymbol{v_t}$ is the velocity of the target, $v_\mathrm{rel} = || \boldsymbol{v_n} -\boldsymbol{v_t}||$ is the relative velocity of the neutron to the target, and $M(v_t)$ is the thermal distribution of target speeds.
@@ -1100,6 +1095,35 @@ When all the cycles are complete, the individual estimates of $k_\mathrm{eff}$ a
 \end{split}
 \end{equation}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Standard Monte Carlo Neutron Transport Codes}
+
+The main purpose in developing WARP is to accelerate Monte Carlo nuclear reactor simulations by using the computational power of GPUs.  To know if WARP is successful in doing this, it will compared against Serpent and MCNP, two Monte Carlo neutron transport codes that are used in the nuclear engineering community.  Each code has different features, and will 
+
+\subsection{MCNP}
+
+developed when and for what
+
+fortran
+
+gold standard
+
+lots of physics
+
+ray traced
+
+
+\subsection{Serpent}
+
+jaakko, vtt, c
+
+only for reactor analysis
+
+woodcock tracking
+
+unionized grid
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -1135,7 +1159,7 @@ transistor space
      \caption{Relative transistor space use in GPUs and CPUs \cite{cuda}. \label{cuda_transistors}}
 \end{figure}
 
-Part of the reason GPUs are able to perform efficiently is do to their reliance on single instruction, multiple data (SIMD) execution.  This execution method uses the same instructions simultaneously carried out over multiple pieces of data.  This reduces the amount of power used in control and therefore more math can be done per watt, which is the main why they are being used in supercomputers \cite{citation_definitely_needed}.  The GPU programming model abstracts SIMD execution by using threads, which can be thought of in the traditional sense. There are some tradeoffs for this power efficiency, however, such as requiring relatively simple tasks due to limited cache and control space and requiring data parallelism for full utilization.  Single-instruction multiple-thread (SIMT) and SIMD are similar in the sense that identical instructions are carried out across different pieces of data, but SIMT allows threads to act independently, albeit with a performance penalty.   When a thread in a multiprocessor executes different instruction than the other resident threads, the multiprocessor masks it from execution, executes the identically-executing threads, then masks the identically-executing threads and executes the \emph{divergent} thread.  This effectively serializes operations if they require different instructions.  This masking and serializing makes many empty spaces in the SIMD lanes of the multiprocessor, and thus can incur severe performance penalties.  The magnitude of the penalty depends on the rate at which data is being delivered to the multiprocessor, of course, since work can only be done if data is present.  If the multiprocessor can completes all jobs, even if they need some serialization, before the next set of data arrives, then the penalty will be invisible \cite{cuda}.
+Part of the reason GPUs are able to perform efficiently is do to their reliance on single instruction, multiple data (SIMD) execution.  This execution method uses the same instructions simultaneously carried out over multiple pieces of data.  This reduces the amount of power used in control and therefore more math can be done per watt, which is the main why they are being used in supercomputers \cite{exascale}.  The GPU programming model abstracts SIMD execution by using threads, which can be thought of in the traditional sense. There are some tradeoffs for this power efficiency, however, such as requiring relatively simple tasks due to limited cache and control space and requiring data parallelism for full utilization.  Single-instruction multiple-thread (SIMT) and SIMD are similar in the sense that identical instructions are carried out across different pieces of data, but SIMT allows threads to act independently, albeit with a performance penalty.   When a thread in a multiprocessor executes different instruction than the other resident threads, the multiprocessor masks it from execution, executes the identically-executing threads, then masks the identically-executing threads and executes the \emph{divergent} thread.  This effectively serializes operations if they require different instructions.  This masking and serializing makes many empty spaces in the SIMD lanes of the multiprocessor, and thus can incur severe performance penalties.  The magnitude of the penalty depends on the rate at which data is being delivered to the multiprocessor, of course, since work can only be done if data is present.  If the multiprocessor can completes all jobs, even if they need some serialization, before the next set of data arrives, then the penalty will be invisible \cite{cuda}.
 
 \subsection{CUDA}
 
@@ -1274,7 +1298,7 @@ BVH is object-centric in the sense that it places boundaries around groups of ob
 \begin{figure}[h!] 
 \centering
 \includegraphics[width=0.8\textwidth, trim= 8cm 0cm 0cm 0cm ]{graphics/bvh_kd.eps}
-\caption{Partitioning schemes (top) with the resulting trees (bottom). A BVH tree is on the left and a k-d tree is on the right. (courtesy WikiMedia commons)  \label{bvh_kd}}
+\caption{Partitioning schemes (top) with the resulting trees (bottom). A BVH tree \cite{wikimedia_bvh} is on the left and a k-d tree is on the right \cite{wikimedia_kd}.   \label{bvh_kd}}
 \end{figure}
 
 The benefit of these structures is that they can be queried in $\log(N)$ time rather than in linear time since major portions of the geometry are \cite{something}.  OptiX automatically builds theses trees over the geometry without any user input other than to specify the type.  The different types have tradeoffs with size, build speed, and performance, but since WARP's geometry is static and relatively simple compared to photorealistic rendering jobs, the build speed and size have negligible impact, so the highest performance structure is used is WARP.  Which structure prevodes the best performance is the goal of one of the preliminary studies in Section \ref{sec:prelim}.  

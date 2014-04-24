@@ -163,7 +163,7 @@ It is also interesting that in the Jezebel benchmark, MCNP is actually much fast
 
 \begin{figure}[h!] 
 \centering
-\includegraphics[width=\textwidth,trim= 1cm 0cm 1cm 0cm]{graphics/finalresults/godiva_spec-6.eps}
+\includegraphics[width=\textwidth,trim= 1cm 0cm 1cm 0cm]{graphics/finalresults/godiva_spec-6.pdf}
 \caption{Spectrum comparison in a ``Jezebel'' bare Pu-239 sphere. \label{godiva_spec} }
 \end{figure}
 
@@ -175,7 +175,7 @@ It is also interesting that in the Jezebel benchmark, MCNP is actually much fast
 
 \begin{figure}[h!] 
 \centering
-\includegraphics[width=\textwidth,trim= 1cm 0cm 1cm 0cm]{graphics/finalresults/homfuel_spec-6.eps}
+\includegraphics[width=\textwidth,trim= 1cm 0cm 1cm 0cm]{graphics/finalresults/homfuel_spec-6.pdf}
 \caption{Spectrum comparison in a homogenized block of UO$_2$ and water. \label{homfuel_spec} }
 \end{figure}
 
@@ -185,7 +185,7 @@ It is also interesting that in the Jezebel benchmark, MCNP is actually much fast
 \caption{Fission source distribution of a homogenized block of UO$_2$ and water. \label{homfuel_fiss} }
 \end{figure}
 
-The flux and fission source distributions for the criticality benchmarks are shown in the following figures.  The colors in the fission source distribution plots represent the probability density of a fission neutron being born at that point.  To show the most accurate and highest resolution results, the data in these figures are from runs using $10^6$ neutrons per batch.  The corresponding Serpent fission source and thermal flux mesh plots are included in Figures \ref{serp_godiva_mesh}-\ref{serp_assembly_mesh} in Appendix \ref{app:A} so the fission source distributions shown here can be visually validated against them.  
+The flux and fission source distributions for the criticality benchmarks are shown in the following figures.  The relative error subplots for the spectra also have the 2$\sigma$ error shown in transparent green.  Since the relative error is calculated against Serpent, the error levels are from Serpent as well.  The colors in the fission source distribution plots represent the probability density of a fission neutron being born at that point.  To show the most accurate and highest resolution results, the data in these figures are from runs using $10^6$ neutrons per batch.  The corresponding Serpent fission source and thermal flux mesh plots are included in Figures \ref{serp_godiva_mesh}-\ref{serp_assembly_mesh} in Appendix \ref{app:A} so the fission source distributions shown here can be visually validated against them.  
 
 Figures \ref{godiva_spec} and \ref{godiva_fiss}, show the volume-averaged flux spectrum and fission source distribution, respectively, in the Jezebel sphere.  The relative error compared to the Serpent spectrum is show in the subplot below the main spectrum plot.  The relative error is very low compared to Serpent, with the normalized tally bins being less than 2\% from each other in regions where the flux is large.  Of course, when the flux is small, the statistical uncertainty becomes much higher, and the relative error becomes noisy.  The spectra produced by the three codes lie very close together and are almost indistinguishable from each other in the plot.  The fission distribution appears very uniform with neutrons being preferentially born near the center.  The distribution is visually identical in an $z$-integrated slice compared to the $y$-integrated slice, as it should be.
 
@@ -196,7 +196,7 @@ Figures \ref{pincell_spec} and \ref{pincell_fiss}, show the volume-averaged flux
  
 \begin{figure}[h!] 
 \centering
-\includegraphics[width=\textwidth,trim= 1cm 0cm 1cm 0cm]{graphics/finalresults/pincell_spec-6.eps}
+\includegraphics[width=\textwidth,trim= 1cm 0cm 1cm 0cm]{graphics/finalresults/pincell_spec-6.pdf}
 \caption{Spectrum comparison in a single UO$_2$ pin surrounded by a block of water. \label{pincell_spec} }
 \end{figure}
 
@@ -208,7 +208,7 @@ Figures \ref{pincell_spec} and \ref{pincell_fiss}, show the volume-averaged flux
 
 \begin{figure}[h!] 
 \centering
-\includegraphics[width=\textwidth,trim= 1cm 0cm 1cm 0cm]{graphics/finalresults/assembly_spec-6.eps}
+\includegraphics[width=\textwidth,trim= 1cm 0cm 1cm 0cm]{graphics/finalresults/assembly_spec-6.pdf}
 \caption{Spectrum comparison in the center UO$_2$ pin of a 15-sided hexagonal pin array in water. \label{assembly_spec} }
 \end{figure}
 
@@ -246,7 +246,7 @@ WARP is also able to run simulations in fixed-source mode, where the initial neu
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width=\textwidth,trim= 1cm 0cm 1cm 0cm]{graphics/finalresults/fixed_spec.eps}
+\includegraphics[width=\textwidth,trim= 1cm 0cm 1cm 0cm]{graphics/finalresults/fixed_spec.pdf}
 \caption{Flux spectra of fixed source calculations of a 1eV points source in a block of uranium-235 . \label{fixed_spec} }
 \end{figure}
 
