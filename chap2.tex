@@ -1112,30 +1112,135 @@ lots of physics
 
 ray traced
 
-The Monte Carlo method is generally attributed to scientists working on the development ofnuclear weapons in Los Alamos during the 1940s. However, its roots go back much farther.Perhaps the earliest documented use of random sampling to solve a mathematical problem was thatof Compte de Buffon in 1772.4 A century later people performed experiments in which they threwa needle in a haphazard manner onto a board ruled with parallel straight lines and inferred the valueof ? from observations of the number of intersections between needle and lines.5,6 Laplacesuggested in 1786 that ? could be evaluated by random sampling.7 Lord Kelvin appears to haveused random sampling to aid in evaluating some time integrals of the kinetic energy that appear inthe kinetic theory of gasses8 and acknowledged his secretary for performing calculations for morethan 5000 collisions.9
-According to Emilio Segrè, Enrico Fermi's student and collaborator, Fermi invented a form of theMonte Carlo method when he was studying the moderation of neutrons in Rome.9,10 Though Fermidid not publish anything, he amazed his colleagues with his predictions of experimental results.After indulging himself, he would reveal that his ?guesses? were really derived from the statisticalsampling techniques that he performed in his head when he couldn't fall asleep.During World War II at Los Alamos, Fermi joined many other eminent scientists to develop thefirst atomic bomb. It was here that Stan Ulam became impressed with electromechanical computersused for implosion studies. Ulam realized that statistical sampling techniques were consideredimpractical because they were long and tedious, but with the development of computers they couldbecome practical. Ulam discussed his ideas with others like John von Neumann and NicholasMetropolis. Statistical sampling techniques reminded everyone of games of chance, whererandomness would statistically become resolved in predictable probabilities. It was NicholasMetropolis who noted that Stan had an uncle who would borrow money from relatives because he?just had to go to Monte Carlo? and thus named the mathematical method ?Monte Carlo.?10Meanwhile, a team of wartime scientists headed by John Mauchly was working to develop the firstelectronic computer at the University of Pennsylvania in Philadelphia. Mauchly realized that ifGeiger counters in physics laboratories could count, then they could also do arithmetic and solvemathematical problems. When he saw a seemingly limitless array of women cranking out firingtables with desk calculators at the Ballistic Research Laboratory at Aberdeen, he proposed10 thatan electronic computer be built to deal with these calculations. The result was ENIAC (ElectronicNumerical Integrator and Computer), the world?s first computer, built for Aberdeen at theUniversity of Pennsylvania. It had 18,000 double triode vacuum tubes in a system with 500,000solder joints.
-John von Neumann was a consultant to both Aberdeen and Los Alamos. When he heard aboutENIAC, he convinced the authorities at Aberdeen that he could provide a more exhaustive test ofthe computer than mere firing-table computations. In 1945 John von Neumann, Stan Frankel, andNicholas Metropolis visited the Moore School of Electrical Engineering at the University ofPennsylvania to explore using ENIAC for thermonuclear weapon calculations with Edward Tellerat Los Alamos.10 After the successful testing and dropping of the first atomic bombs a few monthslater, work began in earnest to calculate a thermonuclear weapon. On March 11, 1947, John vonNeumann sent a letter to Robert Richtmyer, leader of the Theoretical Division at Los Alamos,proposing use of the statistical method to solve neutron diffusion and multiplication problems infission devices.10 His letter was the first formulation of a Monte Carlo computation for anelectronic computing machine. In 1947, while in Los Alamos, Fermi invented a mechanical devicecalled FERMIAC11 to trace neutron movements through fissionable materials by the Monte CarloMethod.
+The Monte Carlo method is generally attributed to scientists working on the development of
+nuclear weapons in Los Alamos during the 1940s. However, its roots go back much farther.
+Perhaps the earliest documented use of random sampling to solve a mathematical problem was that
+of Compte de Buffon in 1772. A century later people performed experiments in which they threw
+a needle in a haphazard manner onto a board ruled with parallel straight lines and inferred the value
+of ? from observations of the number of intersections between needle and lines.5,6 Laplace
+suggested in 1786 that ? could be evaluated by random sampling.7 Lord Kelvin appears to have
+used random sampling to aid in evaluating some time integrals of the kinetic energy that appear in
+the kinetic theory of gasses8 and acknowledged his secretary for performing calculations for more
+than 5000 collisions.9
 
-By 1948 Stan Ulam was able to report to the Atomic Energy Commission that not only was theMonte Carlo method being successfully used on problems pertaining to thermonuclear as well asfission devices, but also it was being applied to cosmic ray showers and the study of partialdifferential equations.10 In the late 1940s and early 1950s, there was a surge of papers describingthe Monte Carlo method and how it could solve problems in radiation or particle transport andother areas.12,13,14 Many of the methods described in these papers are still used in Monte Carlotoday, including the method of generating random numbers15 used in MCNP. Much of the interestwas based on continued development of computers such as the Los Alamos MANIAC (MechanicalAnalyzer, Numerical Integrator, and Computer) in March, 1952.
+According to Emilio Segrè, Enrico Fermi's student and collaborator, Fermi invented a form of the
+Monte Carlo method when he was studying the moderation of neutrons in Rome.9,10 Though Fermi
+did not publish anything, he amazed his colleagues with his predictions of experimental results.
+After indulging himself, he would reveal that his ?guesses? were really derived from the statistical
+sampling techniques that he performed in his head when he couldn't fall asleep.
+During World War II at Los Alamos, Fermi joined many other eminent scientists to develop the
+first atomic bomb. It was here that Stan Ulam became impressed with electromechanical computers
+used for implosion studies. Ulam realized that statistical sampling techniques were considered
+impractical because they were long and tedious, but with the development of computers they could
+become practical. Ulam discussed his ideas with others like John von Neumann and Nicholas
+Metropolis. Statistical sampling techniques reminded everyone of games of chance, where
+randomness would statistically become resolved in predictable probabilities. It was Nicholas
+Metropolis who noted that Stan had an uncle who would borrow money from relatives because he
+?just had to go to Monte Carlo? and thus named the mathematical method ?Monte Carlo.?10
+Meanwhile, a team of wartime scientists headed by John Mauchly was working to develop the first
+electronic computer at the University of Pennsylvania in Philadelphia. Mauchly realized that if
+Geiger counters in physics laboratories could count, then they could also do arithmetic and solve
+mathematical problems. When he saw a seemingly limitless array of women cranking out firing
+tables with desk calculators at the Ballistic Research Laboratory at Aberdeen, he proposed10 that
+an electronic computer be built to deal with these calculations. The result was ENIAC (Electronic
+Numerical Integrator and Computer), the world?s first computer, built for Aberdeen at the
+University of Pennsylvania. It had 18,000 double triode vacuum tubes in a system with 500,000
+solder joints.
 
-The Atomic Energy Act of 1946 created the Atomic Energy Commission to succeed the ManhattanProject. In 1953 the United States embarked upon the ?Atoms for Peace? program with the intentof developing nuclear energy for peaceful applications such as nuclear power generation.Meanwhile, computers were advancing rapidly. These factors led to greater interest in the MonteCarlo method. In 1954 the first comprehensive review of the Monte Carlo method was publishedby Herman Kahn16 and the first book was published by Cashwell and Everett17 in 1959.At Los Alamos, Monte Carlo computer codes developed along with computers. The first MonteCarlo code was the simple 19-step computing sheet in John von Neumann's letter to Richtmyer.But as computers became more sophisticated, so did the codes. At first the codes were written inmachine language and each code would solve a specific problem. In the early 1960s, bettercomputers and the standardization of programming languages such as Fortran made possible moregeneral codes. The first Los Alamos general-purpose particle transport Monte Carlo code wasMCS,18 written in 1963. Scientists who were not necessarily experts in computers and Monte Carlomathematical techniques now could take advantage of the Monte Carlo method for radiationtransport. They could run the MCS code to solve modest problems without having to do either theprogramming or the mathematical analysis themselves. MCS was followed by MCN19 in 1965.MCNcould solve the problem of neutrons interacting with matter in a three?dimensional geometryand used physics data stored in separate, highly?developed libraries.
+John von Neumann was a consultant to both Aberdeen and Los Alamos. When he heard about
+ENIAC, he convinced the authorities at Aberdeen that he could provide a more exhaustive test of
+the computer than mere firing-table computations. In 1945 John von Neumann, Stan Frankel, and
+Nicholas Metropolis visited the Moore School of Electrical Engineering at the University of
+Pennsylvania to explore using ENIAC for thermonuclear weapon calculations with Edward Teller
+at Los Alamos.10 After the successful testing and dropping of the first atomic bombs a few months
+later, work began in earnest to calculate a thermonuclear weapon. On March 11, 1947, John von
+Neumann sent a letter to Robert Richtmyer, leader of the Theoretical Division at Los Alamos,
+proposing use of the statistical method to solve neutron diffusion and multiplication problems in
+fission devices.10 His letter was the first formulation of a Monte Carlo computation for an
+electronic computing machine. In 1947, while in Los Alamos, Fermi invented a mechanical device
+called FERMIAC11 to trace neutron movements through fissionable materials by the Monte Carlo
+Method.
 
-In 1973 MCN was merged with MCG,20 a Monte Carlo gamma code that treated higher energyphotons, to form MCNG, a coupled neutron?gamma code. In 1977 MCNG was merged withMCP,20 a Monte Carlo Photon code with detailed physics treatment down to 1 keV, to accuratelymodel neutron-photon interactions. The code has been known as MCNP ever since. Though at firstMCNP stood for Monte Carlo Neutron Photon, now it stands for Monte Carlo N?Particle. Othermajor advances in the 70s included the present generalized tally structure, automatic calculation ofvolumes, and a Monte Carlo eigenvalue algorithm to determine keff for nuclear criticality(KCODE).
+By 1948 Stan Ulam was able to report to the Atomic Energy Commission that not only was the
+Monte Carlo method being successfully used on problems pertaining to thermonuclear as well as
+fission devices, but also it was being applied to cosmic ray showers and the study of partial
+differential equations.10 In the late 1940s and early 1950s, there was a surge of papers describing
+the Monte Carlo method and how it could solve problems in radiation or particle transport and
+other areas.12,13,14 Many of the methods described in these papers are still used in Monte Carlo
+today, including the method of generating random numbers15 used in MCNP. Much of the interest
+was based on continued development of computers such as the Los Alamos MANIAC (Mechanical
+Analyzer, Numerical Integrator, and Computer) in March, 1952.
 
-In 1983 MCNP3 was released, entirely rewritten in ANSI standard Fortran 77. MCNP3 was thefirst MCNP version internationally distributed through the Radiation Shielding and InformationCenter at Oak Ridge, Tennessee. Other 1980s versions of MCNP were MCNP3A (1986) and
+The Atomic Energy Act of 1946 created the Atomic Energy Commission to succeed the Manhattan
+Project. In 1953 the United States embarked upon the ?Atoms for Peace? program with the intent
+of developing nuclear energy for peaceful applications such as nuclear power generation.
+Meanwhile, computers were advancing rapidly. These factors led to greater interest in the Monte
+Carlo method. In 1954 the first comprehensive review of the Monte Carlo method was published
+by Herman Kahn16 and the first book was published by Cashwell and Everett17 in 1959.
+At Los Alamos, Monte Carlo computer codes developed along with computers. The first Monte
+Carlo code was the simple 19-step computing sheet in John von Neumann's letter to Richtmyer.
+But as computers became more sophisticated, so did the codes. At first the codes were written in
+machine language and each code would solve a specific problem. In the early 1960s, better
+computers and the standardization of programming languages such as Fortran made possible more
+general codes. The first Los Alamos general-purpose particle transport Monte Carlo code was
+MCS,18 written in 1963. Scientists who were not necessarily experts in computers and Monte Carlo
+mathematical techniques now could take advantage of the Monte Carlo method for radiation
+transport. They could run the MCS code to solve modest problems without having to do either the
+programming or the mathematical analysis themselves. MCS was followed by MCN19 in 1965.
+MCNcould solve the problem of neutrons interacting with matter in a three?dimensional geometry
+and used physics data stored in separate, highly?developed libraries.
 
-MCNP3B (1988), that included tally plotting graphics (MCPLOT), the present generalized source,surface sources, repeated structures/lattice geometries, and multigroup/adjoint transport.
+In 1973 MCN was merged with MCG,20 a Monte Carlo gamma code that treated higher energy
+photons, to form MCNG, a coupled neutron?gamma code. In 1977 MCNG was merged with
+MCP,20 a Monte Carlo Photon code with detailed physics treatment down to 1 keV, to accurately
+model neutron-photon interactions. The code has been known as MCNP ever since. Though at first
+MCNP stood for Monte Carlo Neutron Photon, now it stands for Monte Carlo N?Particle. Other
+major advances in the 70s included the present generalized tally structure, automatic calculation of
+volumes, and a Monte Carlo eigenvalue algorithm to determine keff for nuclear criticality
+(KCODE).
 
-MCNP4 was released in 1990 and was the first UNIX version of the code. It accommodatedN?particle transport and multitasking on parallel computer architectures. MCNP4 added electrontransport (patterned after the Integrated TIGER Series (ITS) electron physics),21 the pulse heighttally (F8), a thick?target bremsstrahlung approximation for photon transport, enabled detectors andDXTRAN with the S(?,?) thermal treatment, provided greater random number control, andallowed plotting of tally results while the code was running.
+In 1983 MCNP3 was released, entirely rewritten in ANSI standard Fortran 77. MCNP3 was the
+first MCNP version internationally distributed through the Radiation Shielding and Information
+Center at Oak Ridge, Tennessee. Other 1980s versions of MCNP were MCNP3A (1986) and
 
-MCNP4A, released in 1993, featured enhanced statistical analysis, distributed processormultitasking for running in parallel on a cluster of scientific workstations, new photon libraries, ENDF?6 capabilities, color X?Windows graphics, dynamic memory allocation, expandedcriticality output, periodic boundaries, plotting of particle tracks via SABRINA, improved talliesin repeated structures, and many smaller improvements.
+MCNP3B (1988), that included tally plotting graphics (MCPLOT), the present generalized source,
+surface sources, repeated structures/lattice geometries, and multigroup/adjoint transport.
 
-MCNP4B, released in 1997, featured differential operator perturbations, enhanced photon physicsequivalent to ITS3.0, PVM load balance and fault tolerance, cross-section plotting, postscript fileplotting, 64?bit workstation upgrades, PC X?windows, inclusion of LAHET HMCNP, latticeuniverse mapping, enhanced neutron lifetimes, coincident?surface lattice capability, and manysmaller features and improvements.
+MCNP4 was released in 1990 and was the first UNIX version of the code. It accommodated
+N?particle transport and multitasking on parallel computer architectures. MCNP4 added electron
+transport (patterned after the Integrated TIGER Series (ITS) electron physics),21 the pulse height
+tally (F8), a thick?target bremsstrahlung approximation for photon transport, enabled detectors and
+DXTRAN with the S(?,?) thermal treatment, provided greater random number control, and
+allowed plotting of tally results while the code was running.
 
-MCNP4C, released in 2000, featured an unresolved resonance treatment, macrobodies,superimposed importance mesh, perturbation enhancements, electron physics enhancements,plotter upgrades, cumulative tallies, parallel enhancements and other small features andimprovements.
+MCNP4A, released in 1993, featured enhanced statistical analysis, distributed processor
+multitasking for running in parallel on a cluster of scientific workstations, new photon libraries, ENDF?6 capabilities, color X?Windows graphics, dynamic memory allocation, expanded
+criticality output, periodic boundaries, plotting of particle tracks via SABRINA, improved tallies
+in repeated structures, and many smaller improvements.
 
-MCNP5, released in 2003, is rewritten in ANSI standard Fortran 90. It includes the addition ofphotonuclear collision physics, superimposed mesh tallies, time splitting, and plotter upgrades.MCNP5 also includes parallel computing enhancements with the addition of support for OpenMPand MPI.
-Large production codes such as MCNP have revolutionized science ?? not only in the way it isdone, but also by becoming the repositories for physics knowledge. MCNP represents over 500person-years of sustained effort. The knowledge and expertise contained in MCNP is formidable.Current MCNP development is characterized by a strong emphasis on quality control,documentation, and research. New features continue to be added to the code to reflect newadvances in computer architecture, improvements in Monte Carlo methodology, and better physicsmodels. MCNP has a proud history and a promising future.
+MCNP4B, released in 1997, featured differential operator perturbations, enhanced photon physics
+equivalent to ITS3.0, PVM load balance and fault tolerance, cross-section plotting, postscript file
+plotting, 64?bit workstation upgrades, PC X?windows, inclusion of LAHET HMCNP, lattice
+universe mapping, enhanced neutron lifetimes, coincident?surface lattice capability, and many
+smaller features and improvements.
+
+MCNP4C, released in 2000, featured an unresolved resonance treatment, macrobodies,
+superimposed importance mesh, perturbation enhancements, electron physics enhancements,
+plotter upgrades, cumulative tallies, parallel enhancements and other small features and
+improvements.
+
+MCNP5, released in 2003, is rewritten in ANSI standard Fortran 90. It includes the addition of
+photonuclear collision physics, superimposed mesh tallies, time splitting, and plotter upgrades.
+MCNP5 also includes parallel computing enhancements with the addition of support for OpenMP
+and MPI.
+
+Large production codes such as MCNP have revolutionized science ?? not only in the way it is
+done, but also by becoming the repositories for physics knowledge. MCNP represents over 500
+person-years of sustained effort. The knowledge and expertise contained in MCNP is formidable.
+Current MCNP development is characterized by a strong emphasis on quality control,
+documentation, and research. New features continue to be added to the code to reflect new
+advances in computer architecture, improvements in Monte Carlo methodology, and better physics
+models. MCNP has a proud history and a promising future.
 
 \cite{mcnp}
 
