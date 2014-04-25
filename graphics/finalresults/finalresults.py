@@ -730,10 +730,10 @@ gs = gridspec.GridSpec(1, 2, width_ratios=[1, 1])
 ax0 = plt.subplot(gs[0])
 ax1 = plt.subplot(gs[1])
 
-xmin = -40
-xmax =  40
-ymin = -40
-ymax =  40
+xmin = -48
+xmax =  48
+ymin = -48
+ymax =  48
 data=np.array(open("gpu-benchmark"+case+"/assembly.fission_points").read().split(),dtype=float)
 data=np.reshape(data,(-1,4))
 ax0.hist2d(data[:,0], data[:,1], range=[[xmin, xmax], [ymin, ymax]], bins=reso , normed=True)#norm=LogNorm())
@@ -741,10 +741,10 @@ ax0.set_xlabel('x (cm)')
 ax0.set_ylabel('y (cm)')
 ax0.grid('on',color='k')
 
-xmin = -40
-xmax =  40
-ymin = -40
-ymax =  40
+xmin = -48
+xmax =  48
+ymin = -48
+ymax =  48
 ax1.hist2d(data[:,0], data[:,2], range=[[xmin, xmax], [ymin, ymax]], bins=reso , normed=True)#norm=LogNorm())
 ax1.set_xlabel('x (cm)')
 ax1.set_ylabel('z (cm)')
@@ -758,8 +758,8 @@ fig = pl.figure(figsize=(18,6))
 gs = gridspec.GridSpec(1, 2, width_ratios=[1, 1]) 
 ax0 = plt.subplot(gs[0])
 ax1 = plt.subplot(gs[1])
-xmin = ymin = -40
-xmax = ymax =  40
+xmin = ymin = -48
+xmax = ymax =  48
 ax0.imshow(warp_xy,extent=[xmin, xmax, ymin, ymax])
 ax0.set_xlabel('x (cm)')
 ax0.set_ylabel('y (cm)')
@@ -785,8 +785,8 @@ fig = pl.figure(figsize=(18,6))
 gs = gridspec.GridSpec(1, 2, width_ratios=[1, 1]) 
 ax0 = plt.subplot(gs[0])
 ax1 = plt.subplot(gs[1])
-xmin = ymin = -40
-xmax = ymax =  40
+xmin = ymin = -48
+xmax = ymax =  48
 data=np.array(open("serpent-benchmark"+case+"/assembly_mesh1.dist1").read().split(),dtype=float)
 serp_xy=data.reshape(500,500)
 serp_xy=serp_xy/np.max(serp_xy)
@@ -795,10 +795,10 @@ ax0.set_xlabel('x (cm)')
 ax0.set_ylabel('y (cm)')
 ax0.grid('on',color='k')
 
-xmin = -40
-xmax =  40
-ymin = -40
-ymax =  40
+xmin = -48
+xmax =  48
+ymin = -48
+ymax =  48
 data=np.array(open("serpent-benchmark"+case+"/assembly_mesh2.dist1").read().split(),dtype=float)
 serp_xz=data.reshape(500,500)
 serp_xz=serp_xz/np.max(serp_xz)
