@@ -1,6 +1,10 @@
 \chapter{Supplementary Results}
 \label{app:A}
 
+Additional results go here
+
+\section{2D Scattering on Fermi}
+
 Something about the previous scattering results...  most likely due to L1 cache being removed in Kepler (L1 is local, not cached, Fermi had a L1)
 
 \begin{figure}[h!] 
@@ -10,6 +14,8 @@ Something about the previous scattering results...  most likely due to L1 cache 
 \end{figure}
 
 Figure \ref{prelim_speedup_old} shows the speedup factors, $F_s=t_\mathrm{CPU}/t_\mathrm{GPU}$, of the GPU implementations discussed in Section \ref{sec:prelim}.  This benchmark was run on the same server with a 8-core AMD Opteron 6128 CPU clocked at 2.0GHz, but on a Tesla C2075 card.  The task-parallel implementation performs best, with a maximum speedup of around 29x.  The remapping implementation has the next best performance, with about a 20x speedup over the CPU. The batched implementation's performance departs from the remapping implementation at $10^5$ particles and even starts to deteriorate between $10^6$ and $10^7$ particles.  This is due to the transport having to be done in batches at this point due to the maximum block number of 65,536.
+
+\section{Serpent Fission Source Distributions}
 
 \begin{figure}[h!] 
   \centering
@@ -25,7 +31,7 @@ Figure \ref{prelim_speedup_old} shows the speedup factors, $F_s=t_\mathrm{CPU}/t
 
 \begin{figure}[h!] 
   \centering
-    \includegraphics[width=\textwidth,trim= 4cm 0cm 6cm 0cm]{graphics/finalresults/pincell_fiss_serp-6.eps}
+    \includegraphics[width=\textwidth,trim= 10cm 0cm 6cm 0cm]{graphics/finalresults/pincell_fiss_serp-6.eps}
      \caption{Fission source distribution from Serpent 2.1.18 of a single UO$_2$ pin surrounded by a block of water  \label{serp_pincell_mesh} }
 \end{figure}
 

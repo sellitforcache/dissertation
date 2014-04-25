@@ -123,30 +123,30 @@ The goal of WARP is to be the first step in creating a full-featured continuous 
 \hline
 \multicolumn{6}{|l|}{Jezebel}  \\
 \hline
- $k_\mathrm{eff}$ & 1.027957$\pm$0.0001 & 1.02806$\pm$0.00017 & 1.0279 & 5.7 pcm (y)& 16 pcm  (y) \\
+ $k_\mathrm{eff}$ & 1.027942$\pm$0.0002 & 1.02837$\pm$0.00017 & 1.0279 & 4.2 pcm (y)& 47 pcm  (n) \\
  \hline
- Runtime               & 22.79 m & 94.4311 m &  2.0147 m & 11.3x  & 46.9x  \\
+ Runtime               & 22.75 m & 95.8 m &  2.0147 m & 11.3x  & 47.6x  \\
  \hline
  \hline
 \multicolumn{6}{|l|}{Homogenized Block }\\
 \hline
- $k_\mathrm{eff}$ & 0.942670$\pm$0.0001 & 0.939868$\pm$0.00021 & 0.94261 & 6 pcm (y) &  -274.4 pcm (n)  \\
+ $k_\mathrm{eff}$ & 0.938223$\pm$0.0001 & 0.9252628$\pm$0.00032 & 0.92755 & 1067 pcm (n) &  -228.7 pcm (n)  \\
  \hline
- Runtime               & 255.57 m & 185.966 m & 3.934 m & 64.96x & 47.28x  \\
+ Runtime               & 236.9 m & 193.0 m & 3.73 m & 63.5x & 51.7x  \\
  \hline
   \hline
 \multicolumn{6}{|l|}{Pin Cell}\\
 \hline
- $k_\mathrm{eff}$ & 0.381405$\pm$0.0003 & 0.380615$\pm$0.00035 & 0.38043 & 97.5 pcm (n) &  18.5 pcm (n)  \\
+ $k_\mathrm{eff}$ & 0.381405$\pm$0.0003 & 0.380624$\pm$0.00037 & 0.38043 & 97.5 pcm (n) &  19.4 pcm (y)  \\
  \hline
- Runtime               & 578.62 m & 391.995 m & 7.0682 m & 81.85x & 55.46x \\
+ Runtime               & 578.62 m & 404.2 m & 7.0682 m & 81.85x & 57.2x \\
  \hline
   \hline
 \multicolumn{6}{|l|}{15-sided Hex Assembly}\\
 \hline
- $k_\mathrm{eff}$ & 1.437711$\pm$0.0001 & 1.44706$\pm$0.00013 & 1.4454 & -769 pcm (n) &  166 pcm (n) \\
+ $k_\mathrm{eff}$ & 1.437245$\pm$0.0002 & 1.44722$\pm$0.00014 & 1.4454 & -812.5 pcm (n) &  182 pcm (n) \\
  \hline
- Runtime               & 252.77 m & 260.508 m & 7.9703 m & 31.71x & 32.68x \\
+ Runtime               & 252.77 m & 267.7 m & 7.9703 m & 31.71x & 33.6x \\
  \hline
 \end{tabular}
 \end{table}
@@ -161,51 +161,42 @@ It is also interesting that in the Jezebel benchmark, MCNP is actually much fast
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Flux Spectra and Fission Distributions}
 
-\begin{figure}[h] 
+\begin{figure}[h!] 
 \centering
 \includegraphics[width=\textwidth,trim= 1cm 0cm 1cm 0cm]{graphics/finalresults/godiva_spec-6.pdf}
 \caption{Spectrum comparison in a ``Jezebel'' bare Pu-239 sphere. \label{godiva_spec} }
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[h!]
 \centering
 \includegraphics[width=\textwidth,trim= 5cm 0cm 7cm 0cm]{graphics/finalresults/godiva_fiss-6.eps}
 \caption{Fission source distribution of a ``Jezebel'' bare Pu-239 sphere. \label{godiva_fiss} }
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[h!]
 \centering
 \includegraphics[width=\textwidth,trim= 5cm 0cm 7cm 0cm]{graphics/finalresults/godiva_fiss_diff-6.eps}
 \caption{Relative error of WARP's fission source distribution compared to Serpent's for the Jezebel bare Pu-239 sphere. \label{godiva_fiss_diff} }
 \end{figure}
 
-\begin{figure}[h] 
+\begin{figure}[h!] 
 \centering
 \includegraphics[width=\textwidth,trim= 1cm 0cm 1cm 0cm]{graphics/finalresults/homfuel_spec-6.pdf}
 \caption{Spectrum comparison in a homogenized block of UO$_2$ and water. \label{homfuel_spec} }
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[h!]
 \centering
 \includegraphics[width=\textwidth,trim= 5cm 0cm 7cm 0cm]{graphics/finalresults/homfuel_fiss-6.eps}
 \caption{Fission source distribution of a homogenized block of UO$_2$ and water. \label{homfuel_fiss} }
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[h!]
 \centering
 \includegraphics[width=\textwidth,trim= 5cm 0cm 7cm 0cm]{graphics/finalresults/homfuel_fiss_diff-6.eps}
 \caption{Relative error of WARP's fission source distribution compared to Serpent's for the homogenized block of UO$_2$ and water. \label{homfuel_fiss_diff} }
 \end{figure}
 
-The flux and fission source distributions for the criticality benchmarks are shown in the following figures.  The relative error subplots for the spectra also have the 2$\sigma$ error shown in transparent green.  Since the relative error is calculated against Serpent, the error levels are from Serpent as well.  The colors in the fission source distribution plots represent the probability density of a fission neutron being born at that point.  To show the most accurate and highest resolution results, the data in these figures are from runs using $10^6$ neutrons per batch.  The corresponding Serpent fission source and thermal flux mesh plots are included in Figures \ref{serp_godiva_mesh}-\ref{serp_assembly_mesh} in Appendix \ref{app:A} so the fission source distributions shown here can be visually validated against them.  
-
-Figures \ref{godiva_spec} and \ref{godiva_fiss}, show the volume-averaged flux spectrum and fission source distribution, respectively, in the Jezebel sphere.  The relative error compared to the Serpent spectrum is show in the subplot below the main spectrum plot.  The relative error is very low compared to Serpent, with the normalized tally bins being less than 2\% from each other in regions where the flux is large.  Of course, when the flux is small, the statistical uncertainty becomes much higher, and the relative error becomes noisy.  The spectra produced by the three codes lie very close together and are almost indistinguishable from each other in the plot.  The fission distribution appears very uniform with neutrons being preferentially born near the center.  The distribution is visually identical in an $z$-integrated slice compared to the $y$-integrated slice, as it should be.
-
-Figures \ref{homfuel_spec} and \ref{homfuel_fiss}, show the volume-averaged flux spectrum and fission source distribution, respectively, in the block of homogenized fuel.  Since this system is not leaky and contains light nuclides, neutrons should be able to easily scatter down to thermal energies and produce a thermal peak around 0.026 eV.  This feature is seen in the WARP spectrum, indicating that the target velocity sampling scheme is working correctly, as well as the vector transformation and rotation schemes.  Again, the relative error compared the the Serpent spectrum is very low, at 3\% or lower for energies $10^{-9}$-$10$ MeV where the flux has good statistics.  There are some strange sawtooth-like structures in the relative error plot in the thermal peak and the unresolved resonance regions, which could indicate that a minor sampling problem is occurring, and should be investigated as WARP continues to develop.  The fission source distribution shows very interesting nebulous structure, which might indicate that the fission source has not been fully sampled.  This may be to the fact that the block is so large, but the results should be almost same as a fully converged source since most neutrons never encounter geometry anyway.  The edges falloff to zero as they should, and the overall appearance of the distribution is quite uniform.
-
-Figures \ref{pincell_spec} and \ref{pincell_fiss}, show the volume-averaged flux spectrum and fission source distribution, respectively, in the UO$_2$ pin of the pin cell benchmark.  This system is slightly leaky, and again contains light nuclides (water), but now they are spatially separated from the fissile material.  The relative error compared to Serpent is again low, around 3\% or lower for energies $5\times10^{-9}$-$10$ MeV where the flux has good statistics.  There is a small thermal peak in the spectrum compared to that of the homogenized fuel material.  This is expected behavior as the fuel has a much higher cross section at these energies than the homogenized fuel material.  This effect can also be seen in the fission source distribution as a ring of high probability around the edge of the pin.  This is cause by thermalized neutrons re-entering the fuel pin and immediately fissioning a U-235 nucleus.  This phenomenon is also called ``self-shielding'' since the uranium at the surface shields the interior uranium from thermal neutrons and has implications in depletion and power distributions.  Since the flux spectrum is volume averaged over the pin, the small thermal peak is most likely from the inclusion of this thin edge region where thermal neutrons still exist.  The axial fission source distribution follows an expected behavior of a finite cylinder as well, roughly following a cosine with the peak at $z=0$ \cite{duderstadt}.
-
- 
 \begin{figure}[h!] 
 \centering
 \includegraphics[width=\textwidth,trim= 1cm 0cm 1cm 0cm]{graphics/finalresults/pincell_spec-6.pdf}
@@ -214,13 +205,13 @@ Figures \ref{pincell_spec} and \ref{pincell_fiss}, show the volume-averaged flux
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width=.75\textwidth]{graphics/finalresults/pincell_fiss-6.eps}
+\includegraphics[width=\textwidth,trim= 11cm 0cm 6cm 0cm]{graphics/finalresults/pincell_fiss-6.eps}
 \caption{Fission source distribution of a single UO$_2$ pin surrounded by a block of water. \label{pincell_fiss} }
 \end{figure}
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width=.75\textwidth]{graphics/finalresults/pincell_fiss_diff-6.eps}
+\includegraphics[width=\textwidth,trim= 11cm 0cm 6cm 0cm]{graphics/finalresults/pincell_fiss_diff-6.eps}
 \caption{Relative error of WARP's fission source distribution compared to Serpent's for the single UO$_2$ pin surrounded by water. \label{pincell_fiss_diff} }
 \end{figure}
 
@@ -242,6 +233,13 @@ Figures \ref{pincell_spec} and \ref{pincell_fiss}, show the volume-averaged flux
 \caption{Relative error of WARP's fission source distribution compared to Serpent's for the 15-sided hexagonal array of UO$_2$ pins in water. \label{assembly_fiss_diff} }
 \end{figure}
 	
+The flux and fission source distributions for the criticality benchmarks are shown in the following figures.  The relative error subplots for the spectra also have the 2$\sigma$ error shown in transparent green.  Since the relative error is calculated against Serpent, the error levels are from Serpent as well.  The colors in the fission source distribution plots represent the probability density of a fission neutron being born at that point.  To show the most accurate and highest resolution results, the data in these figures are from runs using $10^6$ neutrons per batch.  The corresponding Serpent fission source and thermal flux mesh plots are included in Figures \ref{serp_godiva_mesh}-\ref{serp_assembly_mesh} in Appendix \ref{app:A} so the fission source distributions shown here can be visually validated against them.  
+
+Figures \ref{godiva_spec} and \ref{godiva_fiss}, show the volume-averaged flux spectrum and fission source distribution, respectively, in the Jezebel sphere.  The relative error compared to the Serpent spectrum is show in the subplot below the main spectrum plot.  The relative error is very low compared to Serpent, with the normalized tally bins being less than 2\% from each other in regions where the flux is large.  Of course, when the flux is small, the statistical uncertainty becomes much higher, and the relative error becomes noisy.  The spectra produced by the three codes lie very close together and are almost indistinguishable from each other in the plot.  The fission distribution appears very uniform with neutrons being preferentially born near the center.  The distribution is visually identical in an $z$-integrated slice compared to the $y$-integrated slice, as it should be.
+
+Figures \ref{homfuel_spec} and \ref{homfuel_fiss}, show the volume-averaged flux spectrum and fission source distribution, respectively, in the block of homogenized fuel.  Since this system is not leaky and contains light nuclides, neutrons should be able to easily scatter down to thermal energies and produce a thermal peak around 0.026 eV.  This feature is seen in the WARP spectrum, indicating that the target velocity sampling scheme is working correctly, as well as the vector transformation and rotation schemes.  Again, the relative error compared the the Serpent spectrum is very low, at 3\% or lower for energies $10^{-9}$-$10$ MeV where the flux has good statistics.  There are some strange sawtooth-like structures in the relative error plot in the thermal peak and the unresolved resonance regions, which could indicate that a minor sampling problem is occurring, and should be investigated as WARP continues to develop.  The fission source distribution shows very interesting nebulous structure, which might indicate that the fission source has not been fully sampled.  This may be to the fact that the block is so large, but the results should be almost same as a fully converged source since most neutrons never encounter geometry anyway.  The edges falloff to zero as they should, and the overall appearance of the distribution is quite uniform.
+
+Figures \ref{pincell_spec} and \ref{pincell_fiss}, show the volume-averaged flux spectrum and fission source distribution, respectively, in the UO$_2$ pin of the pin cell benchmark.  This system is slightly leaky, and again contains light nuclides (water), but now they are spatially separated from the fissile material.  The relative error compared to Serpent is again low, around 3\% or lower for energies $5\times10^{-9}$-$10$ MeV where the flux has good statistics.  There is a small thermal peak in the spectrum compared to that of the homogenized fuel material.  This is expected behavior as the fuel has a much higher cross section at these energies than the homogenized fuel material.  This effect can also be seen in the fission source distribution as a ring of high probability around the edge of the pin.  This is cause by thermalized neutrons re-entering the fuel pin and immediately fissioning a U-235 nucleus.  This phenomenon is also called ``self-shielding'' since the uranium at the surface shields the interior uranium from thermal neutrons and has implications in depletion and power distributions.  Since the flux spectrum is volume averaged over the pin, the small thermal peak is most likely from the inclusion of this thin edge region where thermal neutrons still exist.  The axial fission source distribution follows an expected behavior of a finite cylinder as well, roughly following a cosine with the peak at $z=0$ \cite{duderstadt}.
 
 Figures \ref{assembly_spec} and \ref{assembly_fiss}, show the volume-averaged flux spectrum and fission source distribution, respectively, in the center pin of the 15-sided hexagonal assembly benchmark.  This problem is much more heterogeneous than any of the previous, with 300 times more objects in the domain compared to the pin cell benchmark.  The WARP's spectrum matches very well with Serpent's, and the relative error is with 15\% of Serpent  for energies $10^{-8}$-$9$ MeV where the flux has good statistics.  The spectrum is much noisier than any of the other benchmarks since the volume of the center pin is relatively small compared to the volume of the fission source, even though this pin has the highest flux of any of the pins.  The mean of the error appears to be close to zero, however, and the high error is most likely due to statistics.  The MCNP spectrum is slightly higher than both the WARP and Serpent spectra, which might be a small normalization error or a real difference.  The fission source distribution appears as expected, with the highest average probability in the center of the array both axially and radially.  Self-shielding is shown again, as every pin has a ring of higher probability on near its surface.  The assembly also shows some reflection effects from the thick layers of water surrounding it.  The pins at the edges have a higher fission source probability at the surfaces facing the water rather than the interior of the assembly.  This is due to neutrons being abel to scatter many times in the large volume of water and eventually scattering into an edge pin where there are immediately absorbed.  This phenomenon is apparent in both the axial and radial directions.
 

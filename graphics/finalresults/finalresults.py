@@ -231,7 +231,7 @@ ax1 = plt.subplot(gs[1])
 xmin = ymin = -100
 xmax = ymax =  100
 data=np.array(open("serpent-benchmark"+case+"/homfuel_mesh1.dist1").read().split(),dtype=float)
-serp_xy=data.reshape(500,500)
+serp_xy=data.reshape(500,500,order='F')
 serp_xy=serp_xy/np.max(serp_xy)
 ax0.imshow(serp_xy,extent=[xmin, xmax, ymin, ymax] )#, normed=True)#norm=LogNorm())
 ax0.set_xlabel('x (cm)')
@@ -243,7 +243,7 @@ xmax =  100
 ymin = -100
 ymax =  100
 data=np.array(open("serpent-benchmark"+case+"/homfuel_mesh2.dist1").read().split(),dtype=float)
-serp_xz=data.reshape(500,500)
+serp_xz=data.reshape(500,500,order='F')
 serp_xz=serp_xz/np.max(serp_xz)
 ax1.imshow(serp_xz,extent=[xmin, xmax, ymin, ymax])
 ax1.set_xlabel('x (cm)')
@@ -346,12 +346,12 @@ ax1.grid(True)
 if plot:
 	pl.show()
 else:
-	print 'pincell_spec'+case+'.pdf'
+	print       'pincell_spec'+case+'.pdf'
 	fig.savefig('pincell_spec'+case+'.pdf')
 
 
-fig = pl.figure(figsize=(10,6))
-gs = gridspec.GridSpec(1, 2, width_ratios=[8, 1]) 
+fig = pl.figure(figsize=(18,6))
+gs = gridspec.GridSpec(1, 2, width_ratios=[6, 1]) 
 ax0 = plt.subplot(gs[0])
 ax1 = plt.subplot(gs[1])
 
@@ -359,27 +359,30 @@ xmin = ymin = -5
 xmax = ymax =  5
 data=np.array(open("gpu-benchmark"+case+"/pincell.fission_points").read().split(),dtype=float)
 data=np.reshape(data,(-1,4))
-ax0.hist2d(data[:,0], data[:,1], range=[[xmin, xmax], [ymin, ymax]], bins=reso, normed=True)#norm=LogNorm())
+warp_xy=ax0.hist2d(data[:,0], data[:,1], range=[[xmin, xmax], [ymin, ymax]], bins=reso )#, normed=True)#norm=LogNorm())
+warp_xy=warp_xy[3].get_array().data
+warp_xy=warp_xy/np.max(warp_xy)
 ax0.set_xlabel('x (cm)')
 ax0.set_ylabel('y (cm)')
 ax0.grid('on',color='k')
 
-xmin = -5	
-xmax =  5	
-ymin = -21
-ymax =  21
-ax1.hist2d(data[:,0], data[:,2], range=[[xmin, xmax], [ymin, ymax]], bins=reso , normed=True)#, norm=LogNorm())
+xmin = -5
+xmax =  5
+ymin = -25
+ymax =  25
+warp_xz=ax1.hist2d(data[:,0], data[:,2], range=[[xmin, xmax], [ymin, ymax]], bins=reso )#, normed=True)#norm=LogNorm())
+warp_xz=warp_xz[3].get_array().data
+warp_xz=warp_xz/np.max(warp_xz)
 ax1.set_xlabel('x (cm)')
 ax1.set_ylabel('z (cm)')
 ax1.grid('on',color='k')
-ax1.set_xticks([xmin,0,xmax])
 ax1.yaxis.tick_right()
 cbar_ax = cbar.make_axes(fig.get_axes())
 fig.colorbar(ax1.get_images()[0], cax=cbar_ax[0])
 fig.close()
 
 fig = pl.figure(figsize=(18,6))
-gs = gridspec.GridSpec(1, 2, width_ratios=[8, 1]) 
+gs = gridspec.GridSpec(1, 2, width_ratios=[6, 1]) 
 ax0 = plt.subplot(gs[0])
 ax1 = plt.subplot(gs[1])
 xmin = ymin = -5
@@ -388,10 +391,10 @@ ax0.imshow(warp_xy,extent=[xmin, xmax, ymin, ymax])
 ax0.set_xlabel('x (cm)')
 ax0.set_ylabel('y (cm)')
 ax0.grid('on',color='k')
-xmin = -5	
-xmax =  5	
-ymin = -21
-ymax =  21
+xmin = -5
+xmax =  5
+ymin = -25
+ymax =  25
 ax1.imshow(warp_xz,extent=[xmin, xmax, ymin, ymax])
 ax1.set_xlabel('x (cm)')
 ax1.set_ylabel('z (cm)')
@@ -410,25 +413,25 @@ else:
 
 
 fig = pl.figure(figsize=(18,6))
-gs = gridspec.GridSpec(1, 2, width_ratios=[8, 1]) 
+gs = gridspec.GridSpec(1, 2, width_ratios=[6, 1]) 
 ax0 = plt.subplot(gs[0])
 ax1 = plt.subplot(gs[1])
 xmin = ymin = -5
 xmax = ymax =  5
 data=np.array(open("serpent-benchmark"+case+"/pincell_mesh1.dist1").read().split(),dtype=float)
-serp_xy=data.reshape(500,500)
+serp_xy=data.reshape(500,500,order='F')
 serp_xy=serp_xy/np.max(serp_xy)
 ax0.imshow(serp_xy ,extent=[xmin, xmax, ymin, ymax])#, normed=True)#norm=LogNorm())
 ax0.set_xlabel('x (cm)')
 ax0.set_ylabel('y (cm)')
 ax0.grid('on',color='k')
 
-xmin = -5	
-xmax =  5	
-ymin = -21
-ymax =  21
+xmin = -5
+xmax =  5
+ymin = -25
+ymax =  25
 data=np.array(open("serpent-benchmark"+case+"/pincell_mesh2.dist1").read().split(),dtype=float)
-serp_xz=data.reshape(500,500)
+serp_xz=data.reshape(500,500,order='F')
 serp_xz=serp_xz/np.max(serp_xz)
 ax1.imshow(serp_xz,extent=[xmin, xmax, ymin, ymax])
 ax1.set_xlabel('x (cm)')
@@ -444,12 +447,13 @@ else:
 	print       'pincell_fiss_serp'+case+'.eps'
 	fig.savefig('pincell_fiss_serp'+case+'.eps')
 
-xmin = -5	
-xmax =  5	
+
+xmin = -5
+xmax =  5
 ymin = -5
 ymax =  5
 fig = pl.figure(figsize=(18,6))
-gs = gridspec.GridSpec(1, 2, width_ratios=[8, 1]) 
+gs = gridspec.GridSpec(1, 2, width_ratios=[6, 1]) 
 ax0 = plt.subplot(gs[0])
 ax1 = plt.subplot(gs[1])
 ax0.imshow( np.divide(serp_xy - warp_xy , serp_xy), vmin=-1 , vmax=1 ,extent=[xmin, xmax, ymin, ymax])#, normed=True)#norm=LogNorm())
@@ -457,11 +461,10 @@ ax0.set_xlabel('x (cm)')
 ax0.set_ylabel('y (cm)')
 ax0.grid('on',color='k')
 
-xmin = -5	
-xmax =  5	
-ymin = -21
-ymax =  21
-
+xmin = -5
+xmax =  5
+ymin = -25
+ymax =  25
 ax1.imshow( np.divide( serp_xz - warp_xz , serp_xz ), vmin=-1 , vmax=1 ,extent=[xmin, xmax, ymin, ymax])
 ax1.set_xlabel('x (cm)')
 ax1.set_ylabel('z (cm)')
@@ -475,6 +478,7 @@ if plot:
 else:
 	print       'pincell_fiss_diff'+case+'.eps'
 	fig.savefig('pincell_fiss_diff'+case+'.eps')
+
 
 
 #
@@ -607,7 +611,7 @@ ax1 = plt.subplot(gs[1])
 xmin = ymin = -5.1
 xmax = ymax =  5.1
 data=np.array(open("serpent-benchmark"+case+"/godiva_mesh1.dist1").read().split(),dtype=float)
-serp_xy=data.reshape(500,500)
+serp_xy=data.reshape(500,500,order='F')
 serp_xy=serp_xy/np.max(serp_xy)
 ax0.imshow(serp_xy ,extent=[xmin, xmax, ymin, ymax])#, normed=True)#norm=LogNorm())
 ax0.set_xlabel('x (cm)')
@@ -619,7 +623,7 @@ xmax =  5.1
 ymin = -5.1
 ymax =  5.1
 data=np.array(open("serpent-benchmark"+case+"/godiva_mesh2.dist1").read().split(),dtype=float)
-serp_xz=data.reshape(500,500)
+serp_xz=data.reshape(500,500,order='F')
 serp_xz=serp_xz/np.max(serp_xz)
 ax1.imshow(serp_xz,extent=[xmin, xmax, ymin, ymax])
 ax1.set_xlabel('x (cm)')
@@ -730,13 +734,13 @@ gs = gridspec.GridSpec(1, 2, width_ratios=[1, 1])
 ax0 = plt.subplot(gs[0])
 ax1 = plt.subplot(gs[1])
 
-xmin = -48
-xmax =  48
-ymin = -48
-ymax =  48
+xmin = ymin = -48
+xmax = ymax =  48
 data=np.array(open("gpu-benchmark"+case+"/assembly.fission_points").read().split(),dtype=float)
 data=np.reshape(data,(-1,4))
-ax0.hist2d(data[:,0], data[:,1], range=[[xmin, xmax], [ymin, ymax]], bins=reso , normed=True)#norm=LogNorm())
+warp_xy=ax0.hist2d(data[:,0], data[:,1], range=[[xmin, xmax], [ymin, ymax]], bins=reso )#, normed=True)#norm=LogNorm())
+warp_xy=warp_xy[3].get_array().data
+warp_xy=warp_xy/np.max(warp_xy)
 ax0.set_xlabel('x (cm)')
 ax0.set_ylabel('y (cm)')
 ax0.grid('on',color='k')
@@ -745,7 +749,9 @@ xmin = -48
 xmax =  48
 ymin = -48
 ymax =  48
-ax1.hist2d(data[:,0], data[:,2], range=[[xmin, xmax], [ymin, ymax]], bins=reso , normed=True)#norm=LogNorm())
+warp_xz=ax1.hist2d(data[:,0], data[:,2], range=[[xmin, xmax], [ymin, ymax]], bins=reso )#, normed=True)#norm=LogNorm())
+warp_xz=warp_xz[3].get_array().data
+warp_xz=warp_xz/np.max(warp_xz)
 ax1.set_xlabel('x (cm)')
 ax1.set_ylabel('z (cm)')
 ax1.grid('on',color='k')
@@ -764,6 +770,10 @@ ax0.imshow(warp_xy,extent=[xmin, xmax, ymin, ymax])
 ax0.set_xlabel('x (cm)')
 ax0.set_ylabel('y (cm)')
 ax0.grid('on',color='k')
+xmin = -48
+xmax =  48
+ymin = -48
+ymax =  48
 ax1.imshow(warp_xz,extent=[xmin, xmax, ymin, ymax])
 ax1.set_xlabel('x (cm)')
 ax1.set_ylabel('z (cm)')
@@ -788,7 +798,7 @@ ax1 = plt.subplot(gs[1])
 xmin = ymin = -48
 xmax = ymax =  48
 data=np.array(open("serpent-benchmark"+case+"/assembly_mesh1.dist1").read().split(),dtype=float)
-serp_xy=data.reshape(500,500)
+serp_xy=data.reshape(500,500,order='F')
 serp_xy=serp_xy/np.max(serp_xy)
 ax0.imshow(serp_xy ,extent=[xmin, xmax, ymin, ymax])#, normed=True)#norm=LogNorm())
 ax0.set_xlabel('x (cm)')
@@ -800,7 +810,7 @@ xmax =  48
 ymin = -48
 ymax =  48
 data=np.array(open("serpent-benchmark"+case+"/assembly_mesh2.dist1").read().split(),dtype=float)
-serp_xz=data.reshape(500,500)
+serp_xz=data.reshape(500,500,order='F')
 serp_xz=serp_xz/np.max(serp_xz)
 ax1.imshow(serp_xz,extent=[xmin, xmax, ymin, ymax])
 ax1.set_xlabel('x (cm)')
@@ -817,6 +827,10 @@ else:
 	fig.savefig('assembly_fiss_serp'+case+'.eps')
 
 
+xmin = -48
+xmax =  48
+ymin = -48
+ymax =  48
 fig = pl.figure(figsize=(18,6))
 gs = gridspec.GridSpec(1, 2, width_ratios=[1, 1]) 
 ax0 = plt.subplot(gs[0])
@@ -826,6 +840,10 @@ ax0.set_xlabel('x (cm)')
 ax0.set_ylabel('y (cm)')
 ax0.grid('on',color='k')
 
+xmin = -48
+xmax =  48
+ymin = -48
+ymax =  48
 ax1.imshow( np.divide( serp_xz - warp_xz , serp_xz ), vmin=-1 , vmax=1 ,extent=[xmin, xmax, ymin, ymax])
 ax1.set_xlabel('x (cm)')
 ax1.set_ylabel('z (cm)')
