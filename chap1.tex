@@ -88,10 +88,14 @@ per TeraFLOP (\$.05 / kWh)   & & \\
 \end{tabular}
 \end{table}
 
+\section{Added Value}
+
+Producing this program, which has been named WARP, will be the first step in hopefully creating a full featured reactor simulation program that runs on GPU accelerator cards.  The added value in doing this comes from the fact that many supercomputers are gaining power from GPUs and in order for nuclear engineers to take advantage of this new computing power, which they always need more of, a new code must be written to run on them.  Even though GPU computing is still in its very early stages, developing WARP hedges risk for the simulation community against their computational tools becoming under powered or even obsolete.  Conversely, it also exposes a substantial amount of  computing power that couldn't otherwise be used on personal computers, workstations, and laptops.  Targeting GPUs could enable smaller computers to take on substantial reactor simulation tasks, and potentially reduce design iterations for people without access to supercomputers.  Other than being a nod to NVIDIA's terminology, if WARP were an acronym, it would stand for ``weaving all the random particles,'' with the words ``weaving all'' referring to the lockstep way in which ``all the random particles'', i.e. the neutrons, are sorted into coherent bundles and transported.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Standard Monte Carlo Neutron Transport Codes}
 
-The main purpose in developing WARP is to accelerate Monte Carlo nuclear reactor simulations by using the computational power of GPUs, but much of the inspiration for it has come from the performance, modernity, and ease of use of Serpent.  To know if WARP is successful in doing this, it will compared against Serpent and MCNP, two Monte Carlo neutron transport codes that are used in the nuclear engineering community.  Each code has different features and strengths and weaknesses in different areas.  Comparing against these two codes will certify the accuracy of WARP's results and determine if WARP's GPU implementations are effective in accelerating the calculations.
+The main purpose in developing WARP is to accelerate Monte Carlo nuclear reactor simulations by using the computational power of GPUs.  To know if WARP is successful in doing this, it will compared against Serpent and MCNP, two Monte Carlo neutron transport codes that are used in the nuclear engineering community.  Each code has different features and strengths and weaknesses in different areas.  much of the inspiration for it has come from the performance, modernity, and ease of use of Serpent, and comparing against it and MCNP will certify that WARP is doing the correct calculations and determine if WARP's GPU implementations are effective in accelerating them.  
 
 \subsection{MCNP}
 
@@ -109,18 +113,7 @@ Like many Monte Carlo neutron transport codes (MCNP and Keno-VI included), Serpe
 
 Serpent also pioneered the use of a unionized energy grid format for the cross section and reaction data.  This reformatting of the nuclear data regularized the access of the data and increases performance, but comes at the cost of a larger memory footprint.  It can also perform cross section preprocessing to arbitrary temperatures for more accurate calculations with a minimal computational cost, or on-the-fly cross section broadening from 0K data so only one set of nuclear data needs to be stored in memory (but with some additional computational cost) \cite{serpent}.
 
-
-Validation
-
-Each Serpent update is validated by comparison to MCNP by running a standard set of assembly calculation problems. Effective multiplication factors and homogenized few-group reaction cross sections are within the statistical accuracy from the reference results, when the same ACE libraries are used in the calculations. Validation against MCNP has also been carried out with equally good results for calculations involving individual nuclides, by comparing the flux spectra produced by the two codes. Differences to other Monte Carlo codes (Keno-VI) are small, but statistically significant discrepancies can be observed in some cases. Differences to deterministic lattice codes are generally larger, mainly due to the fundamental differences between the calculation methods.
-
-Validation of burnup calculation routines is considerably more difficult, due to the lack of a perfect reference code. In addition to discrepancies in the transport simulation, there are additional factors related to decay and fission yield data, methods used for solving the Bateman equations, number of nuclide concentrations tracked for each burnable material, depletion algorithms, and so on. The results are generally good compared to other burnup calculation codes, but there are some significant discrepancies as well. Comparisons to CASMO-4E (Leppänen, 2009a), for example, show a consistent few-percent over-prediction in the build-up of Pu-239 and noticeable differences in the concentrations of the main fission product poisons, Xe-135 and Sm-149. The differences most like originate from several factors related to the data and methods used by the two codes, but the root cause is yet to be discovered.
-
-Systematic validation for criticality safety analyses using experimental configurations and data from the International Handbook of Evaluated Criticality Safety Benchmark Experiments is currently under way. Another validation project, in which Serpent-generated group constants are used for fuel cycle and transient simulator calculations by nodal diffusion ARES, HEXBU-3D, TRAB-3D and HEXTRAN, developed at VTT and the Finnish Radiation and Nuclear Safety Authority (STUK), was recently started. The first study involved the Serpent-ARES code sequence for the calculation of a hot zero-power initial core configuration of a commercial PWR (MIT BEAVRS Benchmark). The results showed good agreement compared to experimental measurements and reference 3D Monte Carlo calculations (Leppänen, 2014b).
-
-\section{Added Value}
-
-Producing this program, which has been named WARP, will be the first step in hopefully creating a full featured reactor simulation program that runs on GPU accelerator cards.  The added value in doing this comes from the fact that many supercomputers are gaining power from GPUs and in order for nuclear engineers to take advantage of this new computing power, which they always need more of, a new code must be written to run on them.  Even though GPU computing is still in its very early stages, developing WARP hedges risk for the simulation community against their computational tools becoming under powered or even obsolete.  Conversely, it also exposes a substantial amount of  computing power that couldn't otherwise be used on personal computers, workstations, and laptops.  Targeting GPUs could enable smaller computers to take on substantial reactor simulation tasks, and potentially reduce design iterations for people without access to supercomputers.  Other than being a nod to NVIDIA's terminology, if WARP were an acronym, it would stand for ``weaving all the random particles,'' with the words ``weaving all'' referring to the lockstep way in which ``all the random particles'', i.e. the neutrons, are sorted into coherent bundles and transported.
+Serpent has also been extensively validated against benchmark problems as well as against other Monte Carlo codes like MCNP and Keno-VI.  It shows good agreement  with the reference cases, but can sometimes have statistically significant differences from the other codes, depending on the problem.  Despite this, Serpent is very accurate for most problems \cite{serpent}.
 
 \section{Objective}
 
@@ -129,3 +122,11 @@ The first goal of this work is first to produce a program (WARP) that runs accur
 \section{Outline}
 
 1 paragraph summaries of each chapter.  Will do once they are written!
+
+Background 
+
+GPU Implementations
+
+Results
+
+Conclusions
