@@ -1,7 +1,7 @@
 \chapter{GPU Implementations}
 \label{chap:imp}
 
-In this chapter, all GPU implementations will be explained in detail, both the preliminary studies done to motivate the algorithmic choices made in WARP and of those in WARP itself.
+In this chapter, all GPU implementations will be explained in detail, both the preliminary studies done to motivate the algorithmic choices made in WARP and of those in WARP itself.  First, the exploratory studies done in preparation for developing WARP will be discussed.  These studies show the algorithmic benefits of a very important feature of WARP - remapping the data references.  It also goes over how OptiX execution is optimized for best performance in reactor-like geometries.  After the preliminary studies, the data layout for cross sections is explained and its similarities and differences from Serpent pointed out.  The last topic discussed is the handwritten CUDA kernels written for WARP.  These routines process the neutrons as they travel through the problem geometry and provide the ``glue'' to connect all the important tasks that WARP requires to processing the neutron data.
 
 \section{Preliminary Studies}
 \label{sec:prelim}
@@ -88,7 +88,7 @@ Actively remapping the data also reduces control flow divergence, as shown by Fi
 \begin{figure}[h!] 
   \centering
     \includegraphics[width=0.8\textwidth]{graphics/prelim_divergence.eps}
-     \caption{The percent of control flow divergence in blocks of the task- and event-based GPU implementations (UPDATE). \label{prelim_divergence} }
+     \caption{The percent of control flow divergence in blocks of the task- and event-based GPU implementations. \label{prelim_divergence} }
 \end{figure}
 
 The studies done by Yu, Henderson, and Xu all employ a particle-popping algorithm at some point, which is not considered in this study.  This algorithm is task-based, but each thread holds a bank of particle data, so when its initial data terminates, it can immediately start transporting a new particle \cite{tianyu, henderson, qixu}.  This is a clever way of doing things, and \emph{might} be the faster overall, but another consideration pointed out by this study is that library use and the task-based algorithms are incompatible.  Libraries currently available for the GPU carry out a single task on a dataset, they are not coded for single-thread operation and must be launched as their own kernels.  Having threads in different states wouldn't allow the library routines to be dropped in and carried out consistently across all the active particle data.  Also, much of the performance from optimized algorithms comes from thread blocks cooperating, and using a task-based algorithm would be like treating each SM as a separate CPU (using a stack-popping method) and would minimize the benefits of divide-and-conquer algorithms.

@@ -249,7 +249,7 @@ WARP is also able to run simulations in fixed-source mode, where the initial neu
 
 \begin{table}[h]
 \centering
-\caption{Summary of $k_\mathrm{eff}$ single-run results of the WARP fixed-source benchmark with $4^7$ total histories.}
+\caption{Summary of $k_\mathrm{eff}$ single-run results of the WARP fixed-source benchmark with $4\times10^7$ total histories.}
 \label{fixed_summary}
 \begin{tabular}{| l | r | r | r | r | r |}
  \hline
@@ -371,7 +371,6 @@ Active Reduction  &  3.8      &        7.3                  &   11.2   &  20.1  
 \end{table}
 
 
-
 These effects are more clearly seen in the trends of Figure \ref{process_rate}.  This figure shows the rate at which each version is able to process neutrons vs the number of active neutrons left in the batch.  The figure has been smoothed with a window 11 data points wide, and linearly interpolated where the timings were too close together and gave Inf or NaN results for processing rates.  The remapping version is slower at large numbers of active neutrons since accessing the entire dataset generally yields active data anyway.  Conversely, the remapping version is faster when there few active neutrons left in the batch and accessing the entire grid generally yields terminated data.  The tradeoff in the remapping version is that the sort adds overhead when there are many active particles, but eliminating completed data and thus reducing the grid size makes it much more efficient when there are few active neutrons left.  Since the radix sort is a very efficient operation, the addition cost is small in the (about 30\% slower), but the benefit at small neutron numbers pays for this (about 3x faster).   In the non-remapping version, the addition cost at low numbers of active neutrons is due to launching a large grid where most of the blocks access terminated data and simply return without doing work.  Compute cycles and, more importantly, loads from global memory are wasted simply to check if a neutron is terminated already or not.
 
 It therefore makes sense that the remapping version performs much better when the simulation spends significant time in the sub-300k active neutrons region on the processing rate curve (about where the lines cross).  In the Jezebel, homogenized block, pin cell, and assembly benchmarks, 90\%, 77\%, 91\%, and 96\% of the transport iterations occur in this region, respectively.  It also makes sense that the relative number of iterations  spent in the regions is vaguely constant.  The particles die out exponentially, and it takes roughly the same number of transport iterations to go from $10^7$ to $10^6$ active neutrons as it does to go from $10^2$ to $10^1$ active neutrons.  This is why Figure \ref{process_rate} is plotted logarithmically in $x$, to emphasize that equal spaces under the curves  typically take the same amount of iterations to complete.  This shouldn't be confused for the amount of time the iterations take to complete, however.  Iterations with more active neutrons typically take more time to complete, but have overall higher processing rates since the large neutron payload pays for overheads and latencies.
@@ -382,7 +381,7 @@ Table \ref{profile_summary} shows a breakdown of the amount of time spent in eac
 
 In the non-remapping version, WARP spends most of its time in global routines like OptiX, macroscopic, scan, and source pop kernels, whereas the remapping version spends most of its time in OptiX and the reaction kernels (except in the Jezebel benchmark, where almost all time is spent in the source pop).  This is due to the fact that the non-remapping version never knows where the active data is and must launch kernels over the entire grid at every iteration.  This makes the global operations expensive since they are always going through $10^6$ elements.  In the remapping version, the global functions access the remapping vector and only sort or scan the active data, making them much cheaper as neutrons are terminated.  Remapping is almost always worth the effort, especially since radix is done in-place rather than having to be done and copied, but its main benefit is by eliminating stale access, and therefore grid size, not reducing divergence in the reaction kernels.
 
-In its current state, the source pop operation is rather expensive, usually in the top five most costly routines.  This may explain why the fixed source mode is much slower that the criticality mode.  In fixed source mode, the source pop needs to be done at every inner loop iteration to add active particles to the list of  active neutrons, whereas in criticality mode it is only done once at the end of the inner loop.
+%In its current state, the source pop operation is rather expensive, usually in the top five most costly routines.  This may explain why the fixed source mode is much slower that the criticality mode.  In fixed source mode, the source pop needs to be done at every inner loop iteration to add active particles to the list of  active neutrons, whereas in criticality mode it is only done once at the end of the inner loop.
 
 
 
