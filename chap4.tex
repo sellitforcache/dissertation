@@ -38,8 +38,8 @@ The ``Fixed-source Block'' benchmark is identical to the homogenized block bench
   \hline
  Jezebel                           & 1 sphere, r=5.1cm & Fuel & (1.00) Pu-239 & 19.816 g/cm$^3$\\
   \hline
- \multirow{4}{*}{Homogenized Block}  & \multirow{4}{*}{1 cube, 200cm } & \multirow{4}{*}{Hom. Fuel.} & (0.99) U-238  & \multirow{4}{*}{10  g/cm$^3$} \\
- & & & (0.01) U-235 & \\
+ \multirow{4}{*}{Homogenized Block}  & \multirow{4}{*}{1 cube, r=10cm } & \multirow{4}{*}{Hom. Fuel.} & (0.90) U-238  & \multirow{4}{*}{10  g/cm$^3$} \\
+ & & & (0.10) U-235 & \\
  & & & (3.00) O-16   & \\
  & & & (2.00) H-1     & \\
   \hline
@@ -130,21 +130,21 @@ The goal of WARP is to be the first step in creating a full-featured continuous 
  \hline
 \multicolumn{6}{|l|}{Homogenized Block }\\
 \hline
- $k_\mathrm{eff}$ & 0.938223$\pm$0.0001 & 0.9252628$\pm$0.00032 & 0.92755 & 1067 pcm (n) &  -228.7 pcm (n)  \\
+ $k_\mathrm{eff}$ & 0.938223$\pm$0.0001 & 0.9252628$\pm$0.00032 & 1.21346 & 1067 pcm (n) &  -228.7 pcm (n)  \\
  \hline
- Runtime               & 236.9 m & 193.0 m & 3.73 m & 63.5x & 51.7x  \\
+ Runtime               & 236.9 m & 193.0 m & 2.8175 m & 63.5x & 51.7x  \\
  \hline
   \hline
 \multicolumn{6}{|l|}{Pin Cell}\\
 \hline
- $k_\mathrm{eff}$ & 0.381405$\pm$0.0003 & 0.380624$\pm$0.00037 & 0.38043 & 97.5 pcm (n) &  19.4 pcm (y)  \\
+ $k_\mathrm{eff}$ & 0.381564$\pm$0.0003 & 0.380624$\pm$0.00037 & 0.38043 & 113.4 pcm (n) &  19.4 pcm (y)  \\
  \hline
  Runtime               & 578.62 m & 404.2 m & 7.0682 m & 81.85x & 57.2x \\
  \hline
   \hline
 \multicolumn{6}{|l|}{15-sided Hex Assembly}\\
 \hline
- $k_\mathrm{eff}$ & 1.437245$\pm$0.0002 & 1.44722$\pm$0.00014 & 1.4454 & -812.5 pcm (n) &  182 pcm (n) \\
+ $k_\mathrm{eff}$ & 1.437326$\pm$0.0002 & 1.44722$\pm$0.00014 & 1.4454 & -807.4 pcm (n) &  182 pcm (n) \\
  \hline
  Runtime               & 252.77 m & 267.7 m & 7.9703 m & 31.71x & 33.6x \\
  \hline
