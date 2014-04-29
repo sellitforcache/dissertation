@@ -109,7 +109,7 @@ tally      = numpy.loadtxt('gpu-benchmark'+case+'/homfuel.tally')
 tallybins  = numpy.loadtxt('gpu-benchmark'+case+'/homfuel.tallybins')
 serpdata   = get_serpent_det('serpent-benchmark'+case+'/homfuel_det0.m')
 mcnpdata   = get_mcnp_mctal('mcnp-benchmark'+case+'/homfuel.tally')
-mcnp_vol = 200*200*200
+mcnp_vol = 60*60*60
 #title = 'WARP 6e6 histories (2e6 discarded)\n Flux in homogenized block of UO2 and water'	
 
 widths=numpy.diff(tallybins);
@@ -172,8 +172,8 @@ fig = pl.figure(figsize=(18,6))
 gs = gridspec.GridSpec(1, 2, width_ratios=[1, 1]) 
 ax0 = plt.subplot(gs[0])
 ax1 = plt.subplot(gs[1])
-xmin = ymin = -100
-xmax = ymax =  100
+xmin = ymin = -30
+xmax = ymax =  30
 data=np.array(open("gpu-benchmark"+case+"/homfuel.fission_points").read().split(),dtype=float)
 data=np.reshape(data,(-1,4))
 warp_xy=ax0.hist2d(data[:,0], data[:,1], range=[[xmin, xmax], [ymin, ymax]], bins=reso )#, normed=True)#norm=LogNorm())
@@ -183,10 +183,6 @@ ax0.set_xlabel('x (cm)')
 ax0.set_ylabel('y (cm)')
 ax0.grid('on',color='k')
 
-xmin = -100
-xmax =  100
-ymin = -100
-ymax =  100
 warp_xz=ax1.hist2d(data[:,0], data[:,2], range=[[xmin, xmax], [ymin, ymax]], bins=reso )#, normed=True)#norm=LogNorm())
 warp_xz=warp_xz[3].get_array().data	
 warp_xz=warp_xz/np.max(warp_xz)
@@ -202,8 +198,6 @@ fig = pl.figure(figsize=(18,6))
 gs = gridspec.GridSpec(1, 2, width_ratios=[1, 1]) 
 ax0 = plt.subplot(gs[0])
 ax1 = plt.subplot(gs[1])
-xmin = ymin = -100
-xmax = ymax =  100
 ax0.imshow(warp_xy,extent=[xmin, xmax, ymin, ymax])
 ax0.set_xlabel('x (cm)')
 ax0.set_ylabel('y (cm)')
@@ -228,8 +222,6 @@ fig = pl.figure(figsize=(18,6))
 gs = gridspec.GridSpec(1, 2, width_ratios=[1, 1]) 
 ax0 = plt.subplot(gs[0])
 ax1 = plt.subplot(gs[1])
-xmin = ymin = -100
-xmax = ymax =  100
 data=np.array(open("serpent-benchmark"+case+"/homfuel_mesh1.dist1").read().split(),dtype=float)
 serp_xy=data.reshape(500,500,order='F')
 serp_xy=serp_xy/np.max(serp_xy)
@@ -238,10 +230,6 @@ ax0.set_xlabel('x (cm)')
 ax0.set_ylabel('y (cm)')
 ax0.grid('on',color='k')
 
-xmin = -100
-xmax =  100
-ymin = -100
-ymax =  100
 data=np.array(open("serpent-benchmark"+case+"/homfuel_mesh2.dist1").read().split(),dtype=float)
 serp_xz=data.reshape(500,500,order='F')
 serp_xz=serp_xz/np.max(serp_xz)

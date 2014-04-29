@@ -57,11 +57,8 @@ The ``Fixed-source Block'' benchmark is identical to the homogenized block bench
  & & \multirow{2}{*}{Water} & (1.00) O-16 &  \multirow{2}{*}{3  g/cm$^3$} \\
  & & & (2.00) H-1 & \\
   \hline
- \multirow{5}{*}{Fixed-source Block}  & \multirow{4}{*}{1 cube, 200cm } & \multirow{4}{*}{Hom. Fuel.} & (0.99) U-238  & \multirow{4}{*}{10  g/cm$^3$} \\
- & &  \multirow{4}{*}{with B-10} & (0.01) U-235 & \\
- & & & (3.00) O-16   & \\
- & & & (0.01) B-10   & \\
- & & & (2.00) H-1     & \\  
+ \multirow{2}{*}{Fixed-source Block}  & \multirow{2}{*}{1 cube, 2x2x2m}  & \multirow{2}{*}{Water} & (1.00) O-16  & \multirow{2}{*}{1  g/cm$^3$} \\
+ & &  & (2.00) H-1 & \\
  \hline
  \end{tabular}
 \end{table}
@@ -90,9 +87,9 @@ The goal of WARP is to be the first step in creating a full-featured continuous 
  \hline
 \multicolumn{6}{|l|}{Homogenized Block }\\
 \hline
- $k_\mathrm{eff}$ & 0.943049$\pm$0.0003 & 0.940306$\pm$0.00046 & 0.941916 & 113 pcm (n)  & -161 pcm  (n) \\
+ $k_\mathrm{eff}$ & 1.216842$\pm$0.0005 & 1.21494$\pm$0.00047 & 1.21463 & 221 pcm (n)  & -31 pcm  (y) \\
  \hline
- Runtime               &  25.58 m & 18.7190 m & 0.761 m & 33.6x  & 24.6x  \\
+ Runtime               &  17.28 m & 13.6 m & 0.48 m & 36.0x  & 28.3x  \\
  \hline
   \hline
 \multicolumn{6}{|l|}{Pin Cell}\\
@@ -123,30 +120,30 @@ The goal of WARP is to be the first step in creating a full-featured continuous 
 \hline
 \multicolumn{6}{|l|}{Jezebel}  \\
 \hline
- $k_\mathrm{eff}$ & 1.027942$\pm$0.0002 & 1.02837$\pm$0.00017 & 1.0279 & 4.2 pcm (y)& 47 pcm  (n) \\
+ $k_\mathrm{eff}$ & 1.027942$\pm$0.0002 & 1.02837$\pm$0.00017 & 1.0279 & 4.2 pcm (y) & 47 pcm  (n) \\
  \hline
- Runtime               & 22.75 m & 95.8 m &  2.0147 m & 11.3x  & 47.6x  \\
+ Runtime               & 22.75 m & 95.8 m &  2.0 m & 11.3x  & 47.6x  \\
  \hline
  \hline
 \multicolumn{6}{|l|}{Homogenized Block }\\
 \hline
- $k_\mathrm{eff}$ & 0.938223$\pm$0.0001 & 0.9252628$\pm$0.00032 & 1.21346 & 1067 pcm (n) &  -228.7 pcm (n)  \\
+ $k_\mathrm{eff}$ & 0.938223$\pm$0.0001 & 1.21414$\pm$0.0002 & 1.21346 & 1067 pcm (n) &  68 pcm (n)  \\
  \hline
- Runtime               & 236.9 m & 193.0 m & 2.8175 m & 63.5x & 51.7x  \\
+ Runtime               & 236.9 m & 137.0 m & 2.8 m & 63.5x & 48.6x  \\
  \hline
   \hline
 \multicolumn{6}{|l|}{Pin Cell}\\
 \hline
  $k_\mathrm{eff}$ & 0.381564$\pm$0.0003 & 0.380624$\pm$0.00037 & 0.38043 & 113.4 pcm (n) &  19.4 pcm (y)  \\
  \hline
- Runtime               & 578.62 m & 404.2 m & 7.0682 m & 81.85x & 57.2x \\
+ Runtime               & 578.62 m & 404.2 m & 7.1 m & 81.9x & 57.2x \\
  \hline
   \hline
 \multicolumn{6}{|l|}{15-sided Hex Assembly}\\
 \hline
  $k_\mathrm{eff}$ & 1.437326$\pm$0.0002 & 1.44722$\pm$0.00014 & 1.4454 & -807.4 pcm (n) &  182 pcm (n) \\
  \hline
- Runtime               & 252.77 m & 267.7 m & 7.9703 m & 31.71x & 33.6x \\
+ Runtime               & 252.77 m & 267.7 m & 8.0 m & 31.7x & 33.6x \\
  \hline
 \end{tabular}
 \end{table}
@@ -259,9 +256,7 @@ WARP is also able to run simulations in fixed-source mode, where the initial neu
  & MCNP 6.1 & Serpent 2.1.18 & WARP & $\Delta$ M & $\Delta$ S  \\
 \hline
 \hline
- $k_\mathrm{eff}$ & 0.18314 (inferred) & 0.270545$\pm$0.00015 & 0.273947 & -9080.7 pcm & -340.2 pcm   \\
- \hline
- Runtime               & 82.32 m & 7.11 m &  3.52 m & 23.4x  & 2.0x  \\
+  Runtime               &  m &  m &  15.8 m & x  &  x \\
  \hline
 \end{tabular}
 \end{table}
@@ -302,7 +297,7 @@ To measure the benefit of sorting and remapping references in WARP, a comparison
 \hline
  $k_\mathrm{eff}$ & 0.9426 & 0.941857 & 74.3 pcm  \\
  \hline
- Runtime               &  3.934 m & 4.05 m & 1.03x \\
+ Runtime               &  2.8 m & 2.9 m & 1.04x \\
  \hline
   \hline
 \multicolumn{4}{|l|}{Pin Cell}\\
@@ -329,7 +324,7 @@ To measure the benefit of sorting and remapping references in WARP, a comparison
 
 \begin{table}[h!]
 \centering
-\caption{Summary table of the time spent in each WARP subroutine in criticality mode for each benchmark case.}
+\caption{Summary table of the fraction of total kernel time spent in each WARP subroutine in criticality mode for each benchmark case.}
 \label{profile_summary}
 \begin{tabular}{| l | r  | r | r | r |}
 \multicolumn{5}{l}{Remapping} \\

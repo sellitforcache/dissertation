@@ -22,7 +22,7 @@ Table \ref{gpu_cpu_comp} shows a breakdown of features of both an AMD Opteron Ma
 
 \begin{table}[h]
 \centering
-\caption{A comparison of a NVIDIA GPU and an Opteron CPU \cite{cent}.}
+\caption{A comparison of a NVIDIA GPU and an Intel CPU \cite{cent, cpu_latency}.}
 \label{gpu_cpu_comp}
 \begin{tabular}{| l | r | r |}
 \hline
@@ -91,7 +91,7 @@ per TeraFLOP (\$.05 / kWh)   & & \\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Standard Monte Carlo Neutron Transport Codes}
 
-The main purpose in developing WARP is to accelerate Monte Carlo nuclear reactor simulations by using the computational power of GPUs.  To know if WARP is successful in doing this, it will compared against Serpent and MCNP, two Monte Carlo neutron transport codes that are used in the nuclear engineering community.  Each code has different features and strengths and weaknesses in different areas.  Comparing against these two codes will certify the accuracy of WARP's results and determine if WARP's GPU implementations are effective in accelerating the calculations.
+The main purpose in developing WARP is to accelerate Monte Carlo nuclear reactor simulations by using the computational power of GPUs, but much of the inspiration for it has come from the performance, modernity, and ease of use of Serpent.  To know if WARP is successful in doing this, it will compared against Serpent and MCNP, two Monte Carlo neutron transport codes that are used in the nuclear engineering community.  Each code has different features and strengths and weaknesses in different areas.  Comparing against these two codes will certify the accuracy of WARP's results and determine if WARP's GPU implementations are effective in accelerating the calculations.
 
 \subsection{MCNP}
 
@@ -101,65 +101,14 @@ Despite the age of the project, MCNP tries to include all relevant advancements 
 
 \subsection{Serpent}
 
-``Serpent is a three-dimensional continuous-energy Monte Carlo reactor physics burnup calculation code, developed at VTT Technical Research Centre of Finland since 2004. The publicly available Serpent 1 has been distributed by the OECD/NEA Data Bank and RSICC since 2009, and next version of the code, Serpent 2, is currently in a beta-testing phase and available to registered users by request \cite{serpent}.''
+``Serpent is a three-dimensional continuous-energy Monte Carlo reactor physics burnup calculation code, developed at VTT Technical Research Centre of Finland since 2004. The publicly available Serpent 1 has been distributed by the OECD/NEA Data Bank and RSICC since 2009, and next version of the code, Serpent 2, is currently in a beta-testing phase and available to registered users by request \cite{serpent}.''  It is written in ANSI C and makes use of MPI and OpenMP for parallelization \cite{jaakko}.
 
- According to the Serpent website, Serpent is suggested for use in ``spatial homogenization and group constant generation for deterministic reactor simulator calculations, fuel cycle studies involving detailed assembly-level burnup calculations, validation of deterministic lattice transport codes, full-core modeling of research reactors, SMR's, and other closely coupled systems, coupled multi-physics applications (Serpent 2),  and educational purposes and demonstration of reactor physics phenomena \cite{serpent}.''  Serpent 1 has been extensively validated against standard nuclear reactor criticality benchmarks as well as normally comparing very well with results given by MCNP and Keno-IV \cite{serpent}.
+ According to the Serpent website, Serpent is suggested for use in ``spatial homogenization and group constant generation for deterministic reactor simulator calculations, fuel cycle studies involving detailed assembly-level burnup calculations, validation of deterministic lattice transport codes, full-core modeling of research reactors, SMR's, and other closely coupled systems, coupled multi-physics applications (Serpent 2),  and educational purposes and demonstration of reactor physics phenomena \cite{serpent}.''  Serpent 1 has been extensively validated against standard nuclear reactor criticality benchmarks as well as normally comparing very well with results given by MCNP and Keno-VI \cite{serpent}.
 
-Like many Monte Carlo neutron transport codes (MCNP and Keno-IV included), Serpent uses a universe-based combinatorial solid geometry (CSG) model which determines which volume a neutron is in by using binary logic on second-order surfaces \ref{mcnp, serpent}.  Serpent uses a combination of ray tracing and the Woodcock delta-tracking method to track neutron movements, however \cite{serpent}.  The Woodcock method and  ``has proven efficient and well suited for geometries where the neutron mean-free-path is long compared to the dimensions, which is typically the case in fuel assemblies, and especially in HTGR particle fuels \cite{serpent}.'' 
+Like many Monte Carlo neutron transport codes (MCNP and Keno-VI included), Serpent uses a universe-based combinatorial solid geometry (CSG) model which determines which volume a neutron is in by using binary logic on second-order surfaces \cite{mcnp, serpent}.  Serpent uses a combination of ray tracing and the Woodcock delta-tracking method to track neutron movements, however \cite{serpent}.  The Woodcock method and ``has proven efficient and well suited for geometries where the neutron mean-free-path is long compared to the dimensions, which is typically the case in fuel assemblies, and especially in HTGR particle fuels'' while overcoming excess geometry sampling that can occur when strong absorbers are present \cite{serpent}.
 
-The combination of two tracking methods overcomes the efficiency problems normally encountered with delta-tracking in the presence of localized heavy absorbers (Leppänen, 2010b).
+Serpent also pioneered the use of a unionized energy grid format for the cross section and reaction data.  This reformatting of the nuclear data regularized the access of the data and increases performance, but comes at the cost of a larger memory footprint.  It can also perform cross section preprocessing to arbitrary temperatures for more accurate calculations with a minimal computational cost, or on-the-fly cross section broadening from 0K data so only one set of nuclear data needs to be stored in memory (but with some additional computational cost) \cite{serpent}.
 
-The main drawback of delta-tracking is that the track-length estimate of neutron flux is not available and reaction rates have to be calculated using the potentially less-efficient collision estimator. This is usually not a problem in reactor calculations when reaction rates are scored in regions of high collision density. However, the efficiency of the collision estimator becomes poor in small or optically thin volumes located far or isolated from the active source. Methods for obtaining better statistics for detector calculations are being developed for Serpent 2, but in general the code is not the best choice for shielding applications.
-
-Unionized energy grid format
-
-Continuous-energy cross sections in the library files are reconstructed on a unionized energy grid, used for all reaction modes (Leppänen, 2009b). The use of a single energy grid results in a major speed-up in calculation, as the number of CPU time consuming grid search iterations is reduced to minimum. Macroscopic cross sections for each material are pre-generated before the transport simulation. Instead of calculating the cross sections by summing over the constituent nuclides during tracking, the values are read from pre-generated tables, which is another effective way of improving the performance.
-
-The drawback of the unionized energy grid approach is that computer memory is wasted for storing redundant data points. The grid size may become prohibitively large in burnup calculations, often involving over 250 actinide and fission product nuclides. To overcome this issue, Serpent 2 provides different optimization modes for small and large burnup calculation problems, in which the the unionized energy grid approach is used selectively (Leppänen, 2012a).
-
-Doppler-broadening of cross sections
-
-A built-in Doppler-broadening preprocessor routine allows the conversion of ACE format cross sections into a higher temperature. This capability results in a more accurate description of the interaction physics in temperature-sensitive applications, as the data in the cross section libraries is available only in 300K intervals. The method has been validated with good results and the routine works efficiently without a major increase in the overall calculation time (Viitanen, 2009). In addition to the pre-processor routine, Serpent 2 has the option to adjust nuclide temperatures on-the-fly (see description of on-going work in Serpent 2) . Both methodologies are currently limited to continuous-energy cross sections, and do not cover unresolved resonance probability tables or S(?,?) scattering data.
-
-Burnup calculation
-
-The burnup capability in Serpent is entirely based on built-in calculation routines, without any external coupling. The number of depletion zones is not restricted, although memory usage becomes a limiting factor for Serpent 1 when the number of burnable materials is large.
-
-Fission products and actinide daughter nuclides are selected for the calculation without additional user effort and burnable materials can be sub-divided into depletion zones automatically. The irradiation history is defined in units of time or burnup. Reaction rates are normalized to total power, specific power density, flux or fission rate and the normalization can be changed by dividing the irradiation cycle into a number of separate depletion intervals. Volumes and masses needed for the normalization are calculated automatically for simple geometries, such as 2D fuel pin lattices. The values can also be obtained from a Monte Carlo based volume calculation routine or entered manually. Predictor-corrector calculation is optional and used by default for each burnup step. In addition to the conventional predictor-corrector method based on linear interpolation, Serpent 2 offers various higher-order methods and sub-step solutions for burnup calculation (Isotalo, 2011b; 2011c; 2013b).
-
-Radioactive decay and fission yield data used in the calculation is read from standard ENDF format data libraries. The decay libraries may contain data for almost 4000 nuclides and meta-stable states, all of which is available for the calculation. The total number of different nuclides produced from fission, transmutation and decay reactions is generally lower, in the order of 1500. The concentrations of all included nuclides with decay data are tracked in the burnup calculation, and the number of nuclides with cross sections typically ranges from 200 to 300. Energy-dependent fission yields are available for all main actinides (31 nuclides in ENDF/B-VII data).
-
-Integral one-group transmutation cross sections are calculated either within the transport cycle, or by collapsing the continuous-energy reaction cross sections after the cycle using a flux spectrum collected on the unionized energy grid. The spectrum collapse method speeds up the calculation by a factor of 3-4, and due to the high energy resolution of the flux spectrum, the errors in the results are practically negligible. Similar methodology has been successfully used with coupled Monte Carlo burnup calculation codes (Haeck, 2007; Fridman, 2008a; 2008b) before it was implemented in Serpent.
-
-Serpent has two fundamentally different options for solving the Bateman depletion equations. The first method is the Transmutation Trajectory Analysis (TTA) method (Cetnar, 2006), based on the analytical solution of linearized depletion chains. The second option is the Chebyshev Rational Approximation Method (CRAM), an advanced matrix exponential solution developed for Serpent at VTT (Pusa, 2010; 2011; 2012;. 2013a;. 2013b;. 2013c). The two methods have shown to yield consistent results, both when used with Serpent (Leppänen, 2009a) and in separate methodological studies (Isotalo, 2011a).
-
-Fission product poison Xe-135 can be handled separately from the other nuclides, and iterated to its equilibrium concentration during the transport simulation. The equilibrium calculation is independent of the depletion routine, and the iteration can also be performed in transport mode without burnup calculation.
-
-Parallelization
-
-Serpent 1 uses the Message Passing Interface (MPI) for parallel calculation. Parallelization of the transport routine is implemented by dividing the neutron histories between the parallel tasks and combining the results after the simulation has been completed. This approach is simple and efficient, but it lacks error tolerance and dynamic load sharing. The overall calculation time is dependent on the slowest task, which is why the method is best applied in a symmetric parallel environment.
-
-Parallelization in Serpent 2 is based on a hybrid OpenMP / MPI approach. The main advantage of thread-based OpenMP is that all CPU cores within the computational node are accessing the same memory space, which makes it possible to use all available cores in the calculation without running into problems with excessive memory usage.
-
-In addition to the neutronics simulation, parallelization in the burnup calculation mode divides also the preprocessing and depletion routines between several CPU's.
-
-Results and output
-
-Spatial homogenization was the main intended application for Serpent when the project was started in 2004. The work is still in progress, and the group constant generation capability in Serpent 2 currently covers:
-
-?	 Homogenized few-group reaction cross sections
-?	Scattering and scattering production cross sections and matrices up to Legendre order 7
-?	Diffusion coefficients
-?	Assembly discontinuity factors (ADF's), surface and corner fluxes and currents for square and hexagonal fuel lattices
-?	Group-wise peaking factors for pin-power reconstruction
-?	Poison cross sections for Xe-135 and Sm-149 and their precursors
-Homogenization can be performed in critical spectrum, or using a leakage correction based on the deterministic solution of B1 equations (Fridman, 2011; 2012). Work is currently under way for the calculation of adjoint-weighted time constants for transient simulator codes, and ADF's in reflector regions and colorset configurations, which requires the explicit solution of local homogeneous flux, as the net current over the homogenized region is not reduced to zero.
-
-User-defined tallies can be set up for calculating various integral reaction rates. The spatial integration domain can be defined by a combination of cells, universes, lattices and materials, or using a three-dimensional super-imposed mesh. The number and structure of detector energy bins is unrestricted. Various response functions are available for the calculation, including material-wise macroscopic and isotopic microscopic cross sections and ACE format dosimetry data. Serpent 2 calculates adjoint-weighted point kinetics parameters and effective delayed neutron fractions using the iterated fission probability (IFP) method (Leppänen, 2014b), relying on an implementation similar to that in MCNP5 (Kiedrowski, 2011).
-
-Output for burnup calculation consists of isotopic compositions, activities, spontaneous fission rates and decay heat data. The results are given both as material-wise and total values. Group constants and all the other output parameters are calculated and printed for each burnup step.
-
-All numerical output is written in Matlab m-format files to simplify the post-processing of the results. The code also has a geometry plotter feature and a reaction rate plotter, which is convenient for visualizing the neutronics and tally results (see the gallery for examples).
 
 Validation
 
@@ -168,15 +117,6 @@ Each Serpent update is validated by comparison to MCNP by running a standard set
 Validation of burnup calculation routines is considerably more difficult, due to the lack of a perfect reference code. In addition to discrepancies in the transport simulation, there are additional factors related to decay and fission yield data, methods used for solving the Bateman equations, number of nuclide concentrations tracked for each burnable material, depletion algorithms, and so on. The results are generally good compared to other burnup calculation codes, but there are some significant discrepancies as well. Comparisons to CASMO-4E (Leppänen, 2009a), for example, show a consistent few-percent over-prediction in the build-up of Pu-239 and noticeable differences in the concentrations of the main fission product poisons, Xe-135 and Sm-149. The differences most like originate from several factors related to the data and methods used by the two codes, but the root cause is yet to be discovered.
 
 Systematic validation for criticality safety analyses using experimental configurations and data from the International Handbook of Evaluated Criticality Safety Benchmark Experiments is currently under way. Another validation project, in which Serpent-generated group constants are used for fuel cycle and transient simulator calculations by nodal diffusion ARES, HEXBU-3D, TRAB-3D and HEXTRAN, developed at VTT and the Finnish Radiation and Nuclear Safety Authority (STUK), was recently started. The first study involved the Serpent-ARES code sequence for the calculation of a hot zero-power initial core configuration of a commercial PWR (MIT BEAVRS Benchmark). The results showed good agreement compared to experimental measurements and reference 3D Monte Carlo calculations (Leppänen, 2014b).
-
-Performance
-
-Serpent 1 is optimized for performance in infinite lattice calculations. The typical single-CPU running time on a 2.6 GHz AMD Opteron PC varies from 5 to 20 minutes when 3 million neutron histories are simulated, although it should be noted that the performance depends on several factors. Owing to the unionized energy grid approach, the running time is not strongly dependent on the complexity of the material compositions. Compared to fresh fuel calculations, the transport cycle usually slows down by less than a factor of 1.5 when modeling irradiated fuels consisting of 100-250 nuclides.
-
-The main factor limiting the performance of Serpent 1 is that the parallelization is based on distributed-memory MPI, which means that the memory demand is multiplied by the number of parallel tasks. Serpent 2 currently runs slower with a single CPU, but the capability to run parallel calculation with OpenMP without limitations in memory demand means that the code clearly outperforms Serpent 1 by making more efficient use of computational resources. Studies on the parallel scalability of Serpent 2 are currently under way.
-
-\cite{jaakko}
-
 
 \section{Added Value}
 
