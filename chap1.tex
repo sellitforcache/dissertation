@@ -97,7 +97,7 @@ The main purpose in developing WARP is to accelerate Monte Carlo nuclear reactor
 
 Monte Carlo simulations were one of the first applications of early computers.   This is reflected in the correspondance of John von Neumann and  Robert Richtmyer  in 1947.  In his letter, von Neumann outlined how to use statistical calculations to solve the neutron diffusion equation.  Shortly after, Enrico Fermi invented FERMIAC11 at Los Alamos National Laboratory to track neutrons as they travelled through fissile materials by the Monte Carlo Method \cite{mcnp}.  With the introduction of Fortran in 1957, it became possible to write more general neutron transport code systems than writing directly in machine code, and MCNP has been developed in (various incarnations) at Los Alamos National Laboratory since 1963 \cite{mcnp}.
  
-MCNP is the ``gold standard'' of Monte Carlo neutron transport codes, and includes lots of detailed and accurate physical models and data.  MCNP has become a ``repository for physics knowledge'' and ``represents over 500 person-years of sustained effort \cite{mcnp}.''
+Despite the age of the project, MCNP tries to include all relevant advancements in the Monte Carlo Method, includes detailed and accurate physical models and data, and is the ``gold standard'' of Monte Carlo neutron transport codes.  MCNP has become a ``repository for physics knowledge'' and ``represents over 500 person-years of sustained effort \cite{mcnp}.''   WARP is similar to MCNP in that MCNP reads ACE-formatted nuclear data and uses ray tracing to handle boundary crossings.  Serpent is capable of reproducing the results from MCNP very well, but MCNP will be included in the comparisons to further validate the results.
 
 \subsection{Serpent}
 
@@ -105,31 +105,11 @@ MCNP is the ``gold standard'' of Monte Carlo neutron transport codes, and includ
 
  According to the Serpent website, Serpent is suggested for use in ``spatial homogenization and group constant generation for deterministic reactor simulator calculations, fuel cycle studies involving detailed assembly-level burnup calculations, validation of deterministic lattice transport codes, full-core modeling of research reactors, SMR's, and other closely coupled systems, coupled multi-physics applications (Serpent 2),  and educational purposes and demonstration of reactor physics phenomena \cite{serpent}.''  Serpent 1 has been extensively validated against standard nuclear reactor criticality benchmarks as well as normally comparing very well with results given by MCNP and Keno-IV \cite{serpent}.
 
-Like many Monte Carlo neutron transport codes (MCNP and Keno-IV included), Serpent uses a universe-based combinatorial solid geometry (CSG) model
+Like many Monte Carlo neutron transport codes (MCNP and Keno-IV included), Serpent uses a universe-based combinatorial solid geometry (CSG) model which determines which volume a neutron is in by using binary logic on second-order surfaces \ref{mcnp, serpent}.  Serpent uses a combination of ray tracing and the Woodcock delta-tracking method to track neutron movements, however \cite{serpent}.  The Woodcock method and  ``has proven efficient and well suited for geometries where the neutron mean-free-path is long compared to the dimensions, which is typically the case in fuel assemblies, and especially in HTGR particle fuels \cite{serpent}.'' 
 
-Geometry and neutron tracking
-
-The code also provides some additional geometry features specifically for fuel design. These features include simplified definition of cylindrical fuel pins and spherical fuel particles, square and hexagonal lattices for LWR and fast reactor geometries, and circular cluster arrays for CANDU fuels. The random dispersion of microscopic fuel particles in high-temperature gas-cooled reactor fuels and pebble distributions in pebble-bed type HTGR cores can be modeled using geometry types specifically designed for the task (see below).
-
-Woodcock delta-tracking method
-
-The Monte Carlo simulation can be run in k-eigenvalue criticality source or external source mode. Neutron transport is based on a combination of conventional surface-to-surface ray-tracing and the Woodcock delta-tracking method (Woodcock, 1965). The tracking routine has proven efficient and well suited for geometries where the neutron mean-free-path is long compared to the dimensions, which is typically the case in fuel assemblies, and especially in HTGR particle fuels. The combination of two tracking methods overcomes the efficiency problems normally encountered with delta-tracking in the presence of localized heavy absorbers (Leppänen, 2010b).
+The combination of two tracking methods overcomes the efficiency problems normally encountered with delta-tracking in the presence of localized heavy absorbers (Leppänen, 2010b).
 
 The main drawback of delta-tracking is that the track-length estimate of neutron flux is not available and reaction rates have to be calculated using the potentially less-efficient collision estimator. This is usually not a problem in reactor calculations when reaction rates are scored in regions of high collision density. However, the efficiency of the collision estimator becomes poor in small or optically thin volumes located far or isolated from the active source. Methods for obtaining better statistics for detector calculations are being developed for Serpent 2, but in general the code is not the best choice for shielding applications.
-
-Explicit particle and pebble-bed fuel model for HTGR calculations
-
-High-temperature gas-cooled reactor geometries differ significantly from conventional light water reactors. The fissile material is encapsulated inside microscopic tristructural-isotropic (TRISO) fuel particles, randomly dispersed in fuel compacts or pebbles made of graphite. In pebble-bed type geometries the spherical fuel pebbles are piled inside the reactor core, which brings another level of random heterogeneity in the calculation.
-
-The explicit HTGR geometry model in Serpent reads the coordinates of fuel particles or pebbles from a separate input file, and generates the geometry as it is defined, without any approximations. The model works on several levels (particles inside a pebble and pebbles inside the core) and it has been tested in realistic double-heterogeneous reactor configurations consisting of over 60 million randomly positioned units (Suikkanen, 2010). The computational overhead from handling the unstructured configuration is typically 20-50% compared to a similar regular-lattice model. The routine also enables the calculation of pebble-wise power distributions over the reactor core without defining additional tallies.
-
-To simplify the construction of HTGR geometries, Serpent provides a separate command line routine that generates random particle distribution files for the explicit geometry model.
-
-Interaction physics
-
-Serpent reads continuous-energy cross sections from ACE format data libraries. The interaction physics is based on classical collision kinematics, ENDF reaction laws and probability table sampling in the unresolved resonance region. Improved treatment for the free-gas scattering kernel near resonances is also available, based on the DBRC Doppler-broadening rejection correction method (Becker, 2009).
-
-ACE format cross section libraries based on JEF-2.2, JEFF-3.1, JEFF-3.1.1, ENDF/B-VI.8 and ENDFB/B-VII evaluated data files are included in the installation package of Serpent 1. Ineraction data is available for 432 nuclides at 6 temperatures between 300 and 1800K. Thermal bound-atom scattering data is included for light and heavy water and graphite. Since the data format is shared with MCNP, any continuous-energy ACE format data library generated for MCNP can be used with Serpent as well.
 
 Unionized energy grid format
 
