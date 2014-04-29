@@ -88,9 +88,11 @@ per TeraFLOP (\$.05 / kWh)   & & \\
 \end{tabular}
 \end{table}
 
-\section{Added Value}
+\section{Added Value and Objective}
 
 Producing this program, which has been named WARP, will be the first step in hopefully creating a full featured reactor simulation program that runs on GPU accelerator cards.  The added value in doing this comes from the fact that many supercomputers are gaining power from GPUs and in order for nuclear engineers to take advantage of this new computing power, which they always need more of, a new code must be written to run on them.  Even though GPU computing is still in its very early stages, developing WARP hedges risk for the simulation community against their computational tools becoming under powered or even obsolete.  Conversely, it also exposes a substantial amount of  computing power that couldn't otherwise be used on personal computers, workstations, and laptops.  Targeting GPUs could enable smaller computers to take on substantial reactor simulation tasks, and potentially reduce design iterations for people without access to supercomputers.  Other than being a nod to NVIDIA's terminology, if WARP were an acronym, it would stand for ``weaving all the random particles,'' with the words ``weaving all'' referring to the lockstep way in which ``all the random particles'', i.e. the neutrons, are sorted into coherent bundles and transported.
+
+The first goal of this work is first to produce a program (WARP) that runs accurate continuous energy neutron transport simulations on the GPU in general 3D geometries using standard nuclear data files.  This program will be able to run in both fixed source and criticality source modes.  It will also be able to produce neutron spectra.  The second goal is to make these simulations as fast as possible.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Standard Monte Carlo Neutron Transport Codes}
@@ -114,10 +116,6 @@ Like many Monte Carlo neutron transport codes (MCNP and Keno-VI included), Serpe
 Serpent also pioneered the use of a unionized energy grid format for the cross section and reaction data.  This reformatting of the nuclear data regularized the access of the data and increases performance, but comes at the cost of a larger memory footprint.  It can also perform cross section preprocessing to arbitrary temperatures for more accurate calculations with a minimal computational cost, or on-the-fly cross section broadening from 0K data so only one set of nuclear data needs to be stored in memory (but with some additional computational cost) \cite{serpent}.
 
 Serpent has also been extensively validated against benchmark problems as well as against other Monte Carlo codes like MCNP and Keno-VI.  It shows good agreement  with the reference cases, but can sometimes have statistically significant differences from the other codes, depending on the problem.  Despite this, Serpent is very accurate for most problems \cite{serpent}.
-
-\section{Objective}
-
-The first goal of this work is first to produce a program (WARP) that runs accurate continuous energy neutron transport simulations on the GPU in general 3D geometries using standard nuclear data files.  This program will be able to run in both fixed source and criticality source modes.  It will also be able to produce neutron spectra.  The second goal is to make these simulations as fast as possible.
 
 \section{Outline}
 
