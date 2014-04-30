@@ -258,20 +258,26 @@ WARP is also able to run simulations in fixed-source mode, where the initial neu
 \hline
 \multicolumn{6}{|l|}{Water with 2 MeV point source }  \\
 \hline
- Runtime               & 2.32 m & 9.50868 m & 0.2752 m & 8.4x  & 34.6x  \\
+ Runtime               &  m &  m & 15.8 m & x  & x  \\
  \hline
  \hline
 \multicolumn{6}{|l|}{Homogenized fuel with 1 eV point source }\\
 \hline
- Runtime               &  17.28 m & 13.6 m & 0.48 m & 36.0x  & 28.3x  \\
+ Runtime               &  82.3 m &  71.1 m &  3.4 m & x  & x  \\
  \hline
 \end{tabular}
 \end{table}
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width=\textwidth,trim= 1cm 0cm 1cm 0cm]{graphics/finalresults/fixed_spec.pdf}
-\caption{Flux spectra of fixed source calculations of a 1eV points source in a block of uranium-235 . \label{fixed_spec} }
+\includegraphics[width=\textwidth,trim= 1cm 0cm 1cm 0cm]{graphics/finalresults/fixed_spec_water.pdf}
+\caption{Flux spectra of fixed source simulation with a 2 MeV points source in a block of water. \label{fixed_spec_water} }
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\textwidth,trim= 1cm 0cm 1cm 0cm]{graphics/finalresults/fixed_spec_homfuel.pdf}
+\caption{Flux spectra of fixed source simulation with a 1 eV points source in a block of fuel with boron. \label{fixed_spec_homfuel} }
 \end{figure}
 
 Table \ref{fixed_summary} shows the runtimes and multiplication factors calculated by WARPM compared to the production codes.  MCNP does not report a multiplication factor when run with a fixed source, so the value shown was inferred via \eqref{sub_crit_mult} using the ``total multiplication'' value that was reported in the MCNP output file.  The value calculated by WARP is near Serpent's, but it is outside one standard deviation.  The inferred value from MCNP is very far from either, and may not be an accurate result.  WARP is moderately faster than Serpent, but substantially faster than MCNP.  Compared to the homogenized block criticality benchmark, the speedup factor compared to Serpent is much lower.  This may be do to the fact that secondary particles are popped into active data after every iteration of the inner transport loop, whereas the source pop only happens at the end of the outer loop in criticality mode.
