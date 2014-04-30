@@ -249,14 +249,21 @@ WARP is also able to run simulations in fixed-source mode, where the initial neu
 
 \begin{table}[h]
 \centering
-\caption{Summary of $k_\mathrm{eff}$ single-run results of the WARP fixed-source benchmark with $4\times10^7$ total histories.}
+\caption{Summary of $k_\mathrm{eff}$ single-run results of the WARP fixed-source benchmarks with $4\times10^7$ total histories.}
 \label{fixed_summary}
 \begin{tabular}{| l | r | r | r | r | r |}
  \hline
- & MCNP 6.1 & Serpent 2.1.18 & WARP & $\Delta$ M & $\Delta$ S  \\
+ Benchmark & MCNP 6.1 & Serpent 2.1.18 & WARP & $\Delta$ M & $\Delta$ S  \\
 \hline
 \hline
-  Runtime               &  m &  m &  15.8 m & x  &  x \\
+\multicolumn{6}{|l|}{Water with 2 MeV point source }  \\
+\hline
+ Runtime               & 2.32 m & 9.50868 m & 0.2752 m & 8.4x  & 34.6x  \\
+ \hline
+ \hline
+\multicolumn{6}{|l|}{Homogenized fuel with 1 eV point source }\\
+\hline
+ Runtime               &  17.28 m & 13.6 m & 0.48 m & 36.0x  & 28.3x  \\
  \hline
 \end{tabular}
 \end{table}

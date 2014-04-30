@@ -23,16 +23,27 @@ Using the NVIDIA OptiX ray tracing framework was also shown to be an effectively
 As this is the very first 
 
 - replace geom, parallel routines with handwritten, specific ones, if geom could fit in shared memory, there would be great performance increase
+
 - on the fly temperature treatments
+
 - automatical scnece episonl placement for coinceident surfaces
+
 - reduce the memory needed per history so a maximum number can be launched, this was no optimized at all in the initial development
+
 - use a SM-based algorithm instead of global.  history info could be stored in shared, but would need to rendezvous like CPU codes.
+
 - newer libraries, CUB, optix prime, rayforce?
+
 - legendre instead of tabular angular?
+
 - better geom performance with woodcock maybe
+
 - material processing schemes , xsbench \cite{openmc}
+
 - dynamic parallelism can be implemented and kernel launch overhead minimized.  
+
 - change fixed source pop to be more like criticality, pop into next generation instead of this generation?
+
 -----  might be the same as using a stack-pop and task based with syncthreads?  The only routines used in the transport loop are the geometry and the sort.   pop would replace the sort?  and pass off reactions if total coherence is wanted.  still need to communicate the fissions?  this could be eliminated by a query-able analytic representation of a converged fission source.  FFT, something else.  Might not be fast as simply using the previous cycle points but would scale well?  Previous points could be used for refinement...  might be a neat consideration?
 
 Releasing it as open source software is in progress, and is pending University approval.  Releasing the source openly has benefits of providing potential users with a convenient and transparent way of obtaining the software, as well as allowing for valuable contributions from the community.
