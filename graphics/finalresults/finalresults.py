@@ -925,7 +925,7 @@ widths=numpy.diff(tallybins);
 avg=(tallybins[:-1]+tallybins[1:])/2;
 newflux=numpy.array(tally[:,0])
 warp_err = numpy.array(tally[:,1])
-newflux=numpy.divide(newflux,widths*mcnp_vol)
+newflux=numpy.divide(newflux,widths*mcnp_vol*10)
 newflux=numpy.multiply(newflux,avg)
 
 mcnp_bins = mcnpdata[0]
