@@ -349,6 +349,8 @@ j = \mathrm{floor} \left( \frac{ \log \left( \frac{E}{E_\mathrm{min}} \right)} {
 \label{tally_index}
 \end{equation}
 
+Since WARP uses single precision floats and integers, buffer overflow can be a problem when a tally is scored frequently (or at least more of one than if double precision was used).  Because of this, the tallies are copied from the device during each outer loop iteration.  The tally values are divided by the total number of source neutrons and are accumulated into double and long integer arrays on the host.  After copying, the device arrays are zeroed out.  Dividing and accumulating also serves to increase the accuracy of the arithmetic and roundoff error can occur when adding small floating point numbers to large ones, which probably happens when the float values are near to being overflown.  Copying during intermittently during transport increases the device-host communication, but since it is only done once in the outer loop that impact is minimal and can be overlapped with other routines.
+
 \subsection{Microscopic Kernel}
 
 Unlike the macroscopic kernel, the microscopic kernel only has one job - to determine which reaction the neutron undergoes in the isotope it has been sampled to interact with.  This is done by scanning the isotope's subrow in the unionized cross section matrix as show in \eqref{micro_vector}.  $N_{\mathrm{start},k}$ is the starting index of the row for isotope $k$, $N_{\mathrm{end},k}$ is the index of its last reaction cross section, and $\sigma_{t,k}(E)$ is isotope $k$'s total microscopic cross section.  The starting and ending indices for an isotope are precomputed and stored in a separate array.  For most runs, this array and the material isotope density array can be stored in fast shared memory.
