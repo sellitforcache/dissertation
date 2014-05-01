@@ -261,11 +261,11 @@ The fission source distribution, show in Figure \ref{assembly_fiss}, appears as 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Fixed Source}
 
-WARP is also able to run simulations in fixed-source mode, where the initial neutron energies, directions, and locations are predefined and do not incorporate any feedback from the flux like the criticality source.  This mode adds any induced secondary neutrons back into the active particle dataset to be transported in conjunction with the source neutrons, which is also why these problems must be subcritical.  The materials and geometry are the same as the homogenized block, but with a small amount of B-10 added to reduce the multiplication factor to ensure reasonable runtimes.
+WARP is also able to run simulations in fixed-source mode, where the initial neutron energies, directions, and locations are predefined and do not incorporate any feedback from the flux like the criticality source.  This mode adds any induced secondary neutrons back into the active particle dataset to be transported in conjunction with the source neutrons, which is also why these problems must be subcritical.   The first benchmark is a large block of homogenized fuel material with a low energy point source, so fissions will occur in uranium and secondary neutrons are produced and transported.   The second benchmark is a block of water with a high energy point source where no secondary neutrons are produced.
 
 \begin{table}[h]
 \centering
-\caption{Summary of $k_\mathrm{eff}$ single-run results of the WARP fixed-source benchmarks with $4\times10^7$ total histories.}
+\caption{Summary of runtimes of the fixed-source benchmarks with $4\times10^7$ total histories.}
 \label{fixed_summary}
 \begin{tabular}{| l | r | r | r | r | r |}
  \hline
@@ -284,23 +284,24 @@ WARP is also able to run simulations in fixed-source mode, where the initial neu
 \end{tabular}
 \end{table}
 
-\begin{figure}[h!]
-\centering
-\includegraphics[width=\textwidth,trim= 1cm 0cm 1cm 0cm]{graphics/finalresults/fixed_spec_water.pdf}
-\caption{Flux spectra of fixed source simulation with a 2 MeV points source in a block of water. \label{fixed_spec_water} }
-\end{figure}
+Table \ref{fixed_summary} shows the runtimes of WARP, Serpent, and MCNP for the two fixed source benchmarks.  WARP is able to perform the transport faster than either code on a single CPU, but the the water benchmark performs about twice as fast as the homogenized fuel benchmark.  The runtimes of the water benchmark is about five times longer than the homogenized fuel benchmark, indicating that neutrons survive much longer and undergo many more scattering reactions in water than the homogenized fuel before they are absorbed or leak out.  The homogenized block contains two very strong thermal neutron absorbers, and low energy neutrons are quickly absorbed.  Even though there are more neutrons transported in total in the homogenized block due to the secondary neutrons produced, the number of scatters in water still makes the runtime much longer.
 
 \begin{figure}[h!]
 \centering
 \includegraphics[width=\textwidth,trim= 1cm 0cm 1cm 0cm]{graphics/finalresults/fixed_spec_homfuel.pdf}
-\caption{Flux spectra of fixed source simulation with a 1 eV points source in a block of fuel with boron. \label{fixed_spec_homfuel} }
+\caption{Flux spectra of a fixed source simulation with a 1 eV points source in a block of fuel with boron. \label{fixed_spec_homfuel} }
 \end{figure}
 
-plots shown with the source spike truncated to show more structure at other energies, error at source can still be seen in the error plots.
+Figure \ref{fixed_spec_homfuel} shows the spectra produced by WARP, Serpent, and MCNP for the homogenized fuel fixed-source benchmark.  The source spike extends beyond the plot scale, but the plot is on this scale to show more structure at other energies.  Even though the height of the source flux is not shown, the error at source is still calculated with the actual value and can still be seen in the error plots.  The source spike at 1 eV is clearly visible, and despite the presence of very strong thermal absorbers, there is a slight thermal population due to the size of the source.  Even though the absorbers are strong, some neutrons will interaction with the $^{1}$H, $^{16}$O, or $^{238}$U and will not immediately be absorbed.  The difference in magnitude of the source spike and the knee immediately below it is about a factor of 30, attesting the the strength of the absorbers since leakage is low.  Subcritical multiplication is also evident, since there is significant flux at energies higher than the source.  The structure looks very similar to that of the criticality benchmark in Figure \ref{homfuel_spec}, as it should.  The relative error is below 1\% for most energies and within the statistical error of the Serpent results below the source spike, but has a constant negative offset above the source.  If this offset were not there, it appears that the error would also be within the Serpent bounds.  The error also exhibits a deviation 0.6 MeV, similar to that in the pin cell spectrum.  
 
-Table \ref{fixed_summary} shows the runtimes and multiplication factors calculated by WARPM compared to the production codes.  MCNP does not report a multiplication factor when run with a fixed source, so the value shown was inferred via \eqref{sub_crit_mult} using the ``total multiplication'' value that was reported in the MCNP output file.  The value calculated by WARP is near Serpent's, but it is outside one standard deviation.  The inferred value from MCNP is very far from either, and may not be an accurate result.  WARP is moderately faster than Serpent, but substantially faster than MCNP.  Compared to the homogenized block criticality benchmark, the speedup factor compared to Serpent is much lower.  This may be do to the fact that secondary particles are popped into active data after every iteration of the inner transport loop, whereas the source pop only happens at the end of the outer loop in criticality mode.
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\textwidth,trim= 1cm 0cm 1cm 0cm]{graphics/finalresults/fixed_spec_water.pdf}
+\caption{Flux spectra of a fixed source simulation with a 2 MeV points source in a block of water. \label{fixed_spec_water} }
+\end{figure}
 
-Figure \ref{fixed_spec} shows a comparison of the spectra produced by WARP compared to Serpent 2.1.18 and MCNP 6.1.  The relative error of the spectrum compared to Serpent is below 2\% for energies $10^{-9}$-$9$ MeV where the flux has good statistics.  The exception to this is at 1 eV, the neutron source energy.  The flux reported by MCNP and Serpent is about twice as high as that reported by WARP at this one point.  The are a few sawtooth structures in the relative error as well, especially in the thermal region below the source energy.  The magnitude of the flux is very small since the volume is large and most neutrons will not travel further than a few centimeters from the source point in this material.
+Figure \ref{fixed_spec_water} shows the spectra produced by WARP, Serpent, and MCNP for the water fixed-source benchmark.  Again, the source spike extends beyond the plot scale to show more details at other energies.  This spectrum is much simpler than those with heavy nuclides.  There are no resonances below about 0.6 MeV, and the reactions are almost entirely elastic scattering.  There is very little structure until the very large thermal peak where neutrons accumulate until they are most likely absorbed in $^1$H.  The relative error is below 0.5\% and within the uncertainty of Serpent's results for most of the energy domain except in the thermal peak and again at 0.6 MeV.  The thermal peak exhibits the same large swings as the higher energy region of the homogenized fuel criticality benchmark.  The large swings may indicate that there is a small error in how the tallies are accumulated and there is some roundoff error in regions where they tallies are scored frequently.   Since the 0.6 MeV deviation is present in almost all spectra and so is $^{16}$O, this may indicate that there is a small error in handling the 0.6 MeV scattering resonance in $^{16}$O.  
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
