@@ -19,13 +19,14 @@ Five benchmark cases were considered, four that are criticality-source type, and
 
 The ``Jezebel'' benchmark is a bare plutonium sphere, and is a standard criticality test.   The fission neutrons rate from Pu-239 is balanced by the leakage rate from the 5.1cm radius to give a $k_\mathrm{eff}$ of approximately 1.  Since this system is so leaky, producing results consistent with MCNP and Serpent ensure that the boundary conditions are correctly being enforced.  
 
-The ``homogenized block'' benchmark consists of a single cell and a single material as well, but that material has multiple isotopes in it.  This particular material is a one-to-one mixture of 1\% U-235 enriched UO$_2$ and water.  The cell dimensions are quite large as well to emphasize material processing instead of leakage.
+The ``homogenized block'' benchmark consists of a single cell and a single material as well, but that material has multiple isotopes in it.  This particular material is a one-to-one mixture of 1\% U-235 enriched UO$_2$ and water.  Since this single cell is entirely made up of material containing fissile isotopes, fissions can happen anywhere and the fission source is spread over a large volume compared to the other benchmarks.  The cell dimensions are small so the amount of time requires to converge the fission source is not extremely long.
 
 The ``pin cell'' benchmark consists of bare UO$_2$ cylinder surrounded by a block of water.  This benchmark now has two materials, each with multiple isotopes, and two cells.  The water block dimensions are not very large, so leakage should play a part.  This benchmark serves to highlight all the processing routines work simultaneously, and the effect of introducing more than one cell, which should have a significant effect on the ray tracing rate as pointed out in the preliminary OptiX study.
 
 The ``15-sided Hex Assembly'' benchmark consists of 631 bare UO$_2$ cylinders laid out in a hexagonal lattice surrounded by water.  The material compositions, densities, and the cylinder dimensions are identical to the pin cell benchmark case, but since this benchmark has two orders of magnitude more objects, it serves to highlight the effect of introducing many geometric objects into the problem and will further validate that the geometry processing routines work correctly if consistent results are obtained.
 
-The ``Fixed-source Block'' benchmark is identical to the homogenized block benchmark in terms of geometry and materials, except for the addition of a small amount B-10 to supress the multiplication factor as to not make runtimes extremely long (the multiplication for $k_\mathrm{eff}$=0.94 is about 17).   A 1eV isotropic point source at the origin was chosen as to highlight the effectiveness of popping any secondary neutrons back into the active transport cycle.  Since the source is at 1eV, it will induce fissions in U-235 which will produce neutrons in a fission spectrum that does not overlap with the source.  
+The ``Fixed-source Block'' refers to two separate benchmarks where WARP is run in fixed-source mode in stead of criticality source mode. The first benchmark illustrates WARP's capability to perform subcritical multiplication from secondary neutrons in fixed-source mode.  The geometry is a cube that is 2 meters on a side so leakage is minimized and a thermal peak should be produced.  The materials are identical to the homogenized block benchmark in terms of materials, except for the addition of a small amount B-10 to suppress the multiplication factor as to not make runtimes extremely long (the multiplication for $k_\mathrm{eff}$=0.94 is about 17).   A 1eV isotropic point source at the origin was chosen as to highlight the effectiveness of popping any secondary neutrons back into the active transport cycle.  Since the source is at 1eV, it will induce fissions in U-235 which will produce neutrons in a fission spectrum that does not overlap with the source.  The second fixed-source benchmark is a 2 meter cube of water that contains a 2 MeV point source at the center.  This benchmark does not contain any fissile materials, so there are no secondary particles transported. There are also no highly absorbing materials, so neutrons will scatter many times before they are absorbed or leak out of the cube.  This benchmark serves as a counterpoint to the first since it will be seen what effect eliminating the secondary pop routine from the inner transport loop will have on performance.
+
 
 \begin{table}[h]
 \centering
@@ -57,9 +58,15 @@ The ``Fixed-source Block'' benchmark is identical to the homogenized block bench
  & & \multirow{2}{*}{Water} & (1.00) O-16 &  \multirow{2}{*}{3  g/cm$^3$} \\
  & & & (2.00) H-1 & \\
   \hline
- \multirow{2}{*}{Fixed-source Block}  & \multirow{2}{*}{1 cube, 2x2x2m}  & \multirow{2}{*}{Water} & (1.00) O-16  & \multirow{2}{*}{1  g/cm$^3$} \\
+ \multirow{7}{*}{Fixed-source Block}  & \multirow{2}{*}{1 cube, 2x2x2m}  & \multirow{2}{*}{Water} & (1.00) O-16  & \multirow{2}{*}{1  g/cm$^3$} \\
  & &  & (2.00) H-1 & \\
- \hline
+ \cline{2-5}
+ & \multirow{5}{*}{1 cube, 2x2x2m}  & \multirow{4}{*}{Hom. Fuel}  & (0.90) U-238 & \multirow{5}{*}{10  g/cm$^3$} \\
+ & &  \multirow{4}{*}{w/ B-10}  & (0.10) U-235 & \\
+  & & & (0.10) B-10 & \\
+ & & & (3.00) O-16   & \\
+ & & & (2.00) H-1     & \\
+\hline
  \end{tabular}
 \end{table}
 
