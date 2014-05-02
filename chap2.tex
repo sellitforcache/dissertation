@@ -1155,7 +1155,7 @@ High bandwidth is necessary to feed the many hungry mouths of the arithmetic uni
 \begin{figure}[h!] 
   \centering
     \includegraphics[width=0.6\textwidth]{graphics/memory_bandwidth.pdf}
-     \caption{The memory spaces in CUDA and NVIDIA GPUs \cite{cuda}. \label{bandwidth}}
+     \caption{The total gloabl memory bandwidth of NVIDIA GPUs vs. flagship Intel processors \cite{cuda}. \label{bandwidth}}
 \end{figure}
 
 In order to maximize bandwidth and take advantage of spatial locality in memory, the memory subsystem on a GPU is also SIMD-like, as are most modern CPU subsystems.  When a thread requests a piece of data, not just the piece that is request is delivered by the subsystem, but rather a chunk of aligned data that contains the requested piece.  If the other values in load are not used, memory bandwidth is lost.  For best performance, CUDA requires adjacent threads to access adjacent pieces of data.  This way, memory transactions are ``coalesced.''   In coalesced transactions, every piece of data in the memory payload is used and bandwidth is maximized \cite{cuda}.  Figure \ref{coalesced} shows is graphically, and helps convey and important subtlety.  If a thread needs to load an entire array, it is better to interleave values in memory so that adjacent memory is accessed at the \emph{same time} by neighboring threads rather than adjacent data is loaded sequentially by a single thread.
@@ -1195,7 +1195,7 @@ As stated before, the developer must provide all the programs for OptiX.  These 
 \begin{figure}[h!] 
   \centering
     \includegraphics[width=0.5\textwidth]{graphics/optix_flow.eps}
-     \caption{The memory spaces in CUDA and NVIDIA GPUs \cite{optix_paper}. \label{optix_flow}}
+     \caption{The program flow in a launched OptiX context \cite{optix_paper}. \label{optix_flow}}
 \end{figure}
 
 The ``ray generation'' program is like a main function in the ray tracer. It initializes rays, their starting points and directions, as well as specifies the data that they report.  Once this is done, the trace is executed, which traverses the geometry and find intersection points.  If \emph{any} geometry primitive is intersected, the ``any hit'' program is executed.  This program is typically used for determining areas that are completely occluded from the light source in graphics rendering problems, therefore terminating the trace, but normally this program just returns and allows the trace to continue.  As OptiX queries the primitives along a ray, it tightens an interval on $t$, the path length of the parameterized ray.  The equation for a parameterized ray is shown in \eqref{parameterized_ray}, where $\vec{r}_P$ is the end point of the ray, $\vec{r}_O$ is the origin point of the ray, and $\vec{r}_D$ is the directional unit vector of the ray.  Figure \ref{ray_surface} shows an illustration of a ray-surface intersection.
