@@ -72,70 +72,76 @@ The six factor formula relates to the Monte Carlo method since it is basically d
 \section{Nuclear Interactions}
 \label{subsec:interactions}
 
-The core of a Monte Carlo simulation is explicitly modeling the individual interactions the neutron undergoes as it moves through matter.  At the highest level, these reactions can be broken down into two scattering and absorbtion.  
+The core of a Monte Carlo simulation is explicitly modeling the individual interactions the neutron undergoes as it moves through matter.  At the highest level, these reactions can be broken down into two broad categories - scattering and absorption.  Scattering reactions are when a neutron ``bounces off'' a nucleus.  They change a neutron's direction and energy, but do not terminate its progression through materials.  Absorption reactions are when the neutron becomes part of the nucleus.  This state of a nucleus plus the incoming free neutron is called a ``compound nucleus.''  The neutron does not continue in a free state, and its progress through the material is ended.
 
-Elastic reactions are those where both momentum and kinetic energy are conserved, i.e. ones where any energy the neutron loses is given to the target nucleus.  Inelastic reactions are those that conserve momentum but do not conserve kinetic energy, i.e. ones where the kinetic energy of the particles can be converted to a vibrational mode of the target nucleus, etc.  These reactions are further divided by the number and type of secondary particles they produce.  
+Scattering reactions can be further broken down into elastic and inelastic types.  Elastic reactions are those where both momentum and kinetic energy are conserved, i.e. ones where any energy the neutron loses is given to the target nucleus.  Inelastic reactions are those that conserve momentum but do not conserve kinetic energy, i.e. ones where the kinetic energy of the particles can be converted to a vibrational mode of the target nucleus, etc.  In some cases, the inelastic scattering reactions form a compound nucleus for a short time.  A single neutron is emitted from the compound nucleus, resulting in the same particles that entered the reaction, but the nucleus is left at an excited state, making the reaction inelastic.  Inelastic scattering reactions are further divided by the energy given to the nucleus \cite{duderstadt}.  
 
-Reactions that produce no secondary neutrons are called ``disappearance'' reactions since the neutron effectively disappears, reactions that produce a single neutron are typically called scattering reactions since they effectively change the incoming neutron's energy and direction, and reaction the produce more than one particle are simply called ``secondary-producing'' reactions. Table \ref{nuc_reaction_summary} show a summary of the reaction classifications, and it can be seen that elastic scattering is the only elastic reaction.   
+There are many types of different absorption reactions, which are categorized by how the compound nucleus behaves, i.e. the number and type of secondary products it produces as it relaxes from its excited state.  Some reactions do not produce any secondary particles, and the neutron is ``captured.''  Others produce secondary neutrons, like (n,2n) reactions where the neutron is absorbed, but the excited compound nucleus decays to a ground state by emitting two neutrons.  Fission is also classified as an absorption reaction since a compound nucleus is formed, but in this case the compound nucleus does not relax to another state, but splits instead \cite{duderstadt}. 
 
-The probabilities for individual reactions occurring are expressed in terms of cross sections.  In simple terms, nuclear cross sections are like a geometric cross sections -they represent the ``size'' of the target nucleus for a particular reaction.  The classical analogy is that if neutrons and nuclei are hard spheres, and neutrons are randomly shot through a material, more neutrons will hit the larger targets than the smaller ones.  Cross sections are also expressed in units of area, the ``barn,'' which is $10^{-24}$ cm$^2$.  This unit was coined by Baker and Holloway while performing scattering experiments with uranium since ``a cross section of $10^{-24}$ cm$^2$ for nuclear purposes was really as big as a barn''\cite{LAMS523}.  Of course, nuclear cross sections have no literal meaning in terms of the actual sizes of the nuclei, they only represent the likelihood of a particular reaction occurring.  Working from the macroscopic scale, which is where measurements are taken, a \emph{macroscopic cross section}, represented by greek capital sigma ($\Sigma$), is the probability of a reaction happening within an infinitesimal distance d$x$.  With this parameter, we can write down an equation that describes the survival probability of a group of particles.  Describing a group is necessary since the dimension x is \emph{continuous}.  Given a particle packet containing N particles and $\Sigma$, their interaction probability over $d$x, the change the population over $d$x is the product of the population N and the interaction probability, as show in \eqref{pop_diff}.
+The probabilities for individual reactions occurring are expressed in terms of cross sections.  Cross sections are referred to in two ways - microscopically and macroscopically.  Microscopic cross sections, represented by greek lowercase sigma ($\sigma$), describe the individual nucleus interaction probabilities.  Macroscopic cross sections, represented by greek capital sigma ($\Sigma$), take into account the density of a nucleus in space, and describe the interaction probability over a distance.  
+
+Microscopic cross sections are like a geometric cross sections - they represent the ``size'' of the target nucleus for a particular reaction.  The classical analogy is that if neutrons and nuclei are hard spheres, and neutrons are randomly shot through a material, more neutrons will hit the larger targets than the smaller ones.  Cross sections are also expressed in units of area, the ``barn,'' which is $10^{-24}$ cm$^2$.  This unit was coined by Baker and Holloway while performing scattering experiments with uranium since ``a cross section of $10^{-24}$ cm$^2$ for nuclear purposes was really as big as a barn''\cite{LAMS523}.  Of course, nuclear cross sections have no literal meaning in terms of the actual sizes of the nuclei, they only represent the likelihood of a particular reaction occurring.  
+
+Working from the macroscopic scale, which is where measurements are taken, a macroscopic cross section is the probability of a reaction happening per unit distance.  With this parameter, an equation can be written that describes the survival probability of a group of particles.  Describing a group is necessary since neutrons are discrete particles, but the dimension x is \emph{continuous}.  Given a particle packet containing N particles and $\Sigma$, their interaction probability per unit distance, the change the population over $d$x is the product of the population N and the interaction probability, as show in \eqref{pop_diff} \cite{duderstadt}.  $N$ is simply the number of neutrons and does not take any dimensionality into account.  When number densities are discussed later, they will be represented by a lowercase $n$.
 
 \begin{equation}
-\frac{d\mathrm{N}}{d\mathrm{x}} = - \Sigma \mathrm{N}
+\frac{d N}{d x} = - \Sigma N
 \label{pop_diff}
 \end{equation}
 
-Integrating \ref{pop_diff} over an interval yields an expression for the number of \emph{non-interacting} particles left in a packet after crossing that interval.  Dividing the surviving number by the initial gives a dimensionless expression for the non-interaction probability, P$_\mathrm{NI}$, over the interval x$_1$ as shown in \eqref{pop_NI}.
+Integrating \ref{pop_diff} over an interval yields an expression for the number of \emph{non-interacting} particles left in a packet after crossing that interval.  Dividing the surviving number by the initial gives a dimensionless expression for the non-interaction probability, $P_\mathrm{NI}$, over the interval $x_1$ as shown in \eqref{pop_NI} \cite{duderstadt}.  The expressions for non-interaction probability will be important later when it is necessary to sample the distance to the next interaction for individual neutrons in the Monte Carlo Method.
 
 \begin{equation}
-\mathrm{P}_\mathrm{NI} = \frac{\mathrm{N}}{\mathrm{N}_0} = \mathrm{e}^{- \Sigma \mathrm{x}_1}
+P_\mathrm{NI} = \frac{N}{N_0} = \exp \left(- \Sigma x_1 \right)
 \label{pop_NI}
 \end{equation}
 
 \begin{equation}
-\Sigma = \frac{ - \mathrm{ln}(    \mathrm{I} / \mathrm{I}_0  )  }  {\mathrm{x}_1}
+\Sigma = \frac{ - \ln \left(    \mathrm{N} / \mathrm{N}_0  \right )  }  {x_1}
 \label{pop_beam}
 \end{equation}
 
-Since these expressions also apply to beam intensity, they can be used to measure the cross sections for materials by rearranging the equations into the form shown in \eqref{pop_beam}.  If the source intensity, the exiting intensity, and the material thickness are all known, the macroscopic cross section for that material can be determined.  On a microscopic level, however, the neutron interaction probabilities only depend on the type of nucleus, not the aggregate material.  To correct for this, the measured macroscopic cross section can be divided by the number density of nuclei in the material to give the microscopic cross section, $\sigma$, which is material-independent and only depends on the isotope.  In \eqref{micro_exp}, N represents the number density in units of cm$^{-3}$, $\rho$ represents the material density in terms of g*cm$^{-3}$, and M represents the nuclear mass in g.  The microscopic cross section has units of barns, and is what is given in nuclear data files.  They are more general since they are not material-dependent and can be summed into a total material macroscopic cross section by weighting individual microscopic cross sections with the number density of an isotope in a material, as show in \eqref{material_sum_xs}.  In this expression, $f_\mathrm{i}$ is the atomic fraction of isotope i in the material.
-
-
-\begin{equation}
-\Sigma = N \sigma = \frac{\rho}{M} \sigma
-\label{micro_exp}
-\end{equation}
+Macroscopic cross sections are simply the microscopic cross section multiplied by the isotope's number density \cite{duderstadt}.  When a material is composed of multiple isotopes, the total macroscopic cross section for the material is the sum of the material's individual macroscopic cross sections.  Compositions are commonly given in terms of atomic fraction,$f_i$, of isotope $i$, and total material mass density, $\rho$.  It is then necessary to compute each isotope's number density from the average atomic mass of the isotopic combination, $M_\mathrm{avg}$.  The average atomic mass is computed from the individual isotopes' fractionally-weighted atomic masses, as shown in \eqref{mass_avg}.  Once this is computed, the average number density of the mixture can be calculated by \eqref{number_avg}.  Using this value, the material's macroscopic cross section can can be calculated with \eqref{material_sum_xs}.
 
 \begin{equation}
-\sum_{\mathrm{i}=1}^{\mathrm{N}_\mathrm{isotopes}} f_\mathrm{i} =1
+\sum_{i=1}^{N_\mathrm{isotopes}} f_i =1
 \label{fraction_norm}
 \end{equation}
 
 \begin{equation}
-\Sigma_{\mathrm{material}} = \mathrm{N}_1 \sigma_1 +  \mathrm{N}_2 \sigma_2 + \mathrm{N}_3 \sigma_3+ ... = \sum_{\mathrm{i}=1}^{\mathrm{N}_\mathrm{isotopes}} \mathrm{N}_\mathrm{i} \sigma_\mathrm{i} = \rho\frac{\sum_{\mathrm{i}=1}^{\mathrm{N}_\mathrm{isotopes}} f_\mathrm{i}\sigma_\mathrm{i} } { \sum_{\mathrm{i}=1}^{\mathrm{N}_\mathrm{isotopes}} f_\mathrm{i} \mathrm{M}_\mathrm{i}}
+M_\mathrm{avg} = \sum_{i=1}^{N_\mathrm{isotopes}} f_i M_i
+\label{mass_avg}
+\end{equation}
+
+\begin{equation}
+n_i = f_i n_\mathrm{avg} = f_i \frac{\rho}{M_\mathrm{avg}}
+\label{number_avg}
+\end{equation}
+
+\begin{equation}
+\Sigma_{\mathrm{material}} = \sum_{i=1}^{N_\mathrm{isotopes}} n_i \sigma_i = n_\mathrm{avg} \sum_{i=1}^{N_\mathrm{isotopes}} f_i \sigma_\mathrm{i} = \frac{\rho}{M_\mathrm{avg}} \sum_{i=1}^{n_\mathrm{isotopes}} f_i \sigma_i 
 \label{material_sum_xs}
 \end{equation}
 
-The above expressions do not take energy into account, so they are assumed to be at a single energy.  Using such simple expressions to determine the cross section of an isotope would only be valid with the use of a very, very precisely mono-energetic beam.  The quantum mechanical details that go into cross sections can cause them to depend strongly on the energy (or velocity) of the neutron and the target nucleus.  Many nuclides have resonances where the interactions probability spikes to very large values.  This typically happens when the incoming energy is exactly that of an energy level of the resultant compound nucleus \cite{duderstadt}.   Figure \ref{xs_e_dependence_li} shows the energy dependence of various reactions type in lithium-6 and Figure \ref{xs_e_dependence_u} shows the dependence of others in uranium-235.  
+The above expressions do not take energy into account, so they are assumed to be at a single energy.  Using such simple expressions to determine the cross section of an isotope would only be valid with the use of a very, very precisely mono-energetic neutron population.  The quantum mechanical details that go into cross sections can cause them to depend strongly on the energy (or velocity) of the neutron and the target nucleus.  Many nuclides have resonances where the interactions probability spikes to very large values.  This typically happens when the incoming energy is exactly that of an energy level of the resultant compound nucleus \cite{duderstadt}.   Figure \ref{xs_e_dependence_li} shows the energy dependence of various reactions type in $^6$Li and Figure \ref{xs_e_dependence_u} shows the dependence of others in $^{235}$U.  
 
 \begin{figure}[h!]
   \centering
     \includegraphics[width=0.8\textwidth]{graphics/xs_li6.eps}
-     \caption{The energy dependence of some reactions in lithium-6.\label{xs_e_dependence_li}}
+     \caption{The energy dependence of some reactions in $^6$Li.\label{xs_e_dependence_li}}
 \end{figure}
 
 \begin{figure}[h!]
   \centering
     \includegraphics[width=0.8\textwidth]{graphics/xs_u235.eps}
-    \caption{The energy dependence of some reactions in uranium-235.   \label{xs_e_dependence_u}}
+    \caption{The energy dependence of some reactions in $^{235}$U.   \label{xs_e_dependence_u}}
 \end{figure}
 
-It is important to note the complexity shown in uranium-235 in the 0.1eV to 40keV range.  This is referred to as the ``resonance region'' and adds much of the complexity in accurately modeling neutron transport.  There are no simple functional representations available for these types of cross sections, so they must be represented in a point-wise tabular format.  It is also important to note that at low energies, cross sections typically lose structure and exhibit the same ``1/$v$'' scaling.  This is due to the particle and the target having more time to interact with each other.  The energy levels where this phenomenon exists is similar the thermal energy of the target and the target no longer appears stationary from the neutrons perspective.  If the neutron is slow enough, the targets appear to be moving instead of the neutron, and more of them come into the neutrons sphere of interaction.  This is the qualitative reason for 1/$v$ scaling at low energies.  Due to to their identical scaling, the ratios between the reaction types stays constant as velocity is decreased but the overall interaction probability with respect to distance increases.
-
-In the next subsections, the characteristics and kinematics of the different reaction types are explained.
+It is important to note the complexity shown in $^{235}$U in the 0.1eV to 40keV range.  This is referred to as the ``resonance region'' and adds much of the complexity in accurately modeling neutron transport.  There are no simple functional representations available for these types of cross sections, so they must be represented in a point-wise tabular format.  It is also important to note that at low energies, cross sections typically lose structure and exhibit the same ``1/$v$'' scaling.  This is due to the particle and the target having more time to interact with each other.  The energy levels where this phenomenon exists is similar the thermal energy of the target and the target no longer appears stationary from the neutrons perspective.  If the neutron is slow enough, the targets appear to be moving instead of the neutron, and more of them come into the neutrons sphere of interaction.  This is the qualitative reason for 1/$v$ scaling at low energies.  Due to to their identical scaling, the ratios between the reaction types stays constant as velocity is decreased but the overall interaction probability with respect to distance increases.
 
 \subsection{Elastic Scattering}
 
-Elastic scattering conserves both the momentum and the kinetic energy of the reacting particles and occurs when the neutron does not enter the nucleus, only bounces off of it's potential field.  Since there is only a single exiting particle, elastic scattering is a two-body interaction and the exiting energies can be determined if the angle between the exiting particle is known.  This problem is greatly simplified if the interacting particles' velocities are transformed into the center-of-mass (CM) frame, where net momentum is zero. The velocity of the CM is defined in \eqref{vCM} where $m$ and $M$ are the neutron's and the target's respective masses, $v$ and $V$ are their respective velocity vectors, and $A$ is the ratio of the target's mass to the neutron's mass (also know as the ``atomic weight ratio'' or AWR).  The derivation from here follows closely with that in ref \cite{jaakko}.
+Elastic scattering conserves both the momentum and the kinetic energy of the reacting particles and occurs when the neutron does not enter the nucleus, only bounces off of it's potential field.  Since there is only a single exiting particle, elastic scattering is a two-body interaction and the exiting energies can be determined if the angle between the exiting particle is known.  This problem is greatly simplified if the velocities of the interacting neutron and nucleus are transformed into the center-of-mass (CM) frame, where net momentum is zero. The velocity of the CM is defined in \eqref{vCM} where $m$ and $M$ are the neutron's and the target's respective masses, $v$ and $V$ are their respective velocity vectors, and $A$ is the ratio of the target's mass to the neutron's mass (also know as the ``atomic mass ratio'' or AMR).  The derivation from here follows closely with that in \cite{jaakko}.
 
 \begin{equation}
 A = \frac{M}{m}
@@ -147,7 +153,7 @@ A = \frac{M}{m}
 \label{vCM}
 \end{equation}
 
-The CM velocities of the target and the neutron are then calculated by subtracting the CM velocity out of them, ash shown in \eqref{CM}.  The $_\mathrm{c}$ subscript will denote the CM-frame values from now on, whereas $v_{\mathrm{CM}}$ will denote the velocity of the CM frame relative to the lab frame.
+The CM velocities of the target and the neutron are then calculated by subtracting the CM velocity out of them, as shown in \eqref{CM}.  The ``$c$'' subscript will denote the CM-frame values from now on, whereas $v_{\mathrm{CM}}$ will denote the velocity of the CM frame relative to the Lab frame.
 
 \begin{equation}
 \begin{split}
@@ -175,7 +181,7 @@ m \boldsymbol{v_{_\mathrm{c}}} + M \boldsymbol{V_{_\mathrm{c}}} &= m \boldsymbol
 \label{rotationCM}
 \end{equation}
 
-The equation for conservation of energy is shown in \ref{consECM}.  Energy is a scalar quantity, and therefore these equations are as well.  There are no vectors, which are indicated with boldface type, since $v^2 =( \boldsymbol{v} \cdot \boldsymbol{v})$.  $Q$ is the amount of energy released by the reaction, and is zero here but is convenient to include in this derivation for use in inelastic collision kinematics where it is nonzero.
+The equation for conservation of energy is shown in \ref{consECM}.  $Q$ is the amount of energy released by the reaction and is zero for elastic scattering.  It is convenient to include in this derivation for use in inelastic collision kinematics where it is nonzero.
 
 \begin{equation}
 \begin{split}
@@ -195,14 +201,18 @@ V_{_\mathrm{c}}^{\prime} &= \sqrt{ V_{_\mathrm{c}}^{2} + \frac{2Q}{mA(A+1)}  }
 \label{finalvCM}
 \end{equation}
 
-At first glance, it seems like the interaction has been fully characterized, but \eqref{rotationCM} only relates the initial states of the neutron and the target to one another and the final states of neutron and the target to one another.  The initial state and final state of the neutron still need to be related.  It has been mentioned already that the interaction is only a rotation in the CM frame, so the initial and final state of the neutron's direction can be related by a three-dimensional rotation formula.  An efficient algorithm is given by the Rodrigues' rotation formula, shown in \eqref{RodriguesRot}.  In the formula, $\boldsymbol{k}$ is an auxilliary unit vector around which $\boldsymbol{v}$ is being rotated.  From this unit vector, $theta$ is the angle $\boldsymbol{v}$ is rotated away from $\boldsymbol{k}$ such that $(\boldsymbol{v} \cdot \boldsymbol{v_{\mathrm{rot}}}) = |v||v_{\mathrm{rot}}|\cos\theta$.  It is ``efficient'' in the sense that to rotate a vector, a full 3x3 matrix does not need to be constructed and multiplied by the vector. In other words, matrix-vector operations are not needed and it can be carried out with only vector operations \cite{}.
+At first glance, it seems like the interaction has been fully characterized, but \eqref{rotationCM} only relates the initial states of the neutron and the target to one another and the final states of neutron and the target to one another.  The initial state and final state of the neutron still need to be related.  It has been mentioned already that the interaction is only a rotation in the CM frame, so the initial and final state of the neutron's direction can be related by a three-dimensional rotation formula.  An efficient algorithm is given by \eqref{vector_rot} \cite{openmc}.  In the formula, $\mu=\cos \theta$, and $\hat{v}_x$, $\hat{v}_y$, and $\hat{v}_z$ are the axis projections of the velocity's unit vector.  It is ``efficient'' in the sense that to rotate a vector, a full 3x3 matrix does not need to be constructed and multiplied by the vector. In other words, matrix-vector operations are not needed and it can be carried out with only vector operations.
 
 \begin{equation}
- \boldsymbol{ v_{ \mathrm{rot}}} = \boldsymbol{v} \cos \theta + (\boldsymbol{k} \times \boldsymbol{v}) \sin \theta + \boldsymbol{k} (\boldsymbol{k} \cdot \boldsymbol{v})(1-\cos \theta)
-\label{RodriguesRot}
+\begin{split}
+\hat{v}_x^{\prime} &= \mu \hat{v}_x + \frac{\sqrt{1-\mu^2} (\hat{v}_x \hat{v}_z \cos \phi - \hat{v}_y \sin \phi)}{ \sqrt{1-\mu \hat{v}_z^2}} \\
+\hat{v}_y^{\prime} &= \mu \hat{v}_y + \frac{\sqrt{1-\mu^2} (\hat{v}_y \hat{v}_z \cos \phi + \hat{v}_x \sin \phi)}{ \sqrt{1-\mu \hat{v}_z^2}} \\
+\hat{v}_z^{\prime} &= \mu \hat{v}_z - \sqrt{ (1-\mu^2) (1-\mu \hat{v}_z^2) }  \cos \phi 
+\end{split}
+\label{vector_rot}
 \end{equation}
 
-If the polar and azimuthal rotation angles, $\theta$ and $\phi$, respectively, are determined, the initial neutron velocity vector can be rotated through these angles to its final value.  After the rotation is done, the final velocities are known in the CM frame and they can be transformed back to the lab frame to give the final velocities there, as shown in \eqref{xformbackCM}.
+If the polar and azimuthal rotation angles, $\theta$ and $\phi$, respectively, are determined, the initial neutron velocity vector can be rotated through these angles to its final value.  After the rotation is done, the final velocities are known in the CM frame and they can be transformed back to the Lab frame to give the final velocities there, as shown in \eqref{xformbackCM}.
 
 \begin{equation}
 \begin{split}
@@ -217,24 +227,17 @@ If the polar and azimuthal rotation angles, $\theta$ and $\phi$, respectively, a
 
 Inelastic scattering is the other type of scattering a neutron can undergo where kinetic energy is no longer conserved.  An amount of energy is either released from the reaction to the particles, or more commonly, taken from the particles and lost to the reaction.  In neutron-nucleus collisions, the target nucleus can be excited to a higher energy state than its ground state if the colliding neutron has a high enough energy to do so.  If it does and the collision excites the nucleus, a discrete amount of energy equal to the energy of the excited state is lost to the reaction.  These excited states typically do not have long half lives, and a gamma ray is emitted when the nucleus relaxes to its ground state.  This type of reaction is called inelastic level scattering due to a an excited energy \emph{level} becoming occupied by the target nucleus.  
 
-Since it is still a two-body interaction, the kinematics of the reaction are identical to elastic scattering except the $Q$ value is nonzero and negative.  These reactions have a threshold energy below which their cross sections are zero since the neutron would not have enough energy to excite the state.   Figure \ref{Elevels} shows the energy levels in hafnium-177, which is often used as a thermal neutron absorber, but also could be used as a fast neutron moderators due to its low-lying energy levels and its large inelastic scattering cross sections.
+Since it is still a two-body interaction, the kinematics of the reaction are identical to elastic scattering except the $Q$ value is nonzero and negative.  These reactions have a threshold energy below which their cross sections are zero since the neutron would not have enough energy to excite the state.   Figure \ref{Elevels} shows the energy levels in $^{177}$Hf, which is often used as a thermal neutron absorber, but also could be used as a fast neutron moderators due to its low-lying energy levels and its large inelastic scattering cross sections.
 
 \begin{figure}[h!]
   \centering
     \includegraphics[width=0.6\textwidth]{graphics/wiley_levels.pdf}
-     \caption{The energy levels of hafnium-177 \cite{krane}. \label{Elevels}}
+     \caption{The energy levels of $^{177}$Hf \cite{krane}. \label{Elevels}}
 \end{figure}
 
 \subsection{Inelastic Continuum Scattering}
 
 At energies above the distinct levels there lies a continuum in the nuclear energy states.  This isn't truly a ``continuum'' in the strictest sense, but the energy levels become so close together they they effectively form a domain where energy can take continuous values.  Unlike the discrete $Q$ values corresponding to a single excited state used in inelastic level scattering, the $Q$ value of the reaction now follows a distribution.  
-
-In bound nuclei, S(a,b),  compound nucleus?
-
-\subsection{Disappearance Reactions}
-
-Unlike scattering reactions, where the energy and direction of the neutron is changed but continues to transport, \emph{disappearance} reactions remove a free neutron.  Typically this \emph{capture} of a neutron leaves the daughter nucleus in an excited state, which them relaxes to ground state by emitting a gamma ray.
-
 
 \subsection{Fission}
 
@@ -282,15 +285,19 @@ Fission is technically considered a disappearance reaction as well since the fis
      \caption{Fission cross sections for uranium-235, uranium-238, and plutonium-239. \label{xs_fission_only}}
 \end{figure}
 
-Figure \ref{nu_compare} shows the energy dependence of the total fission neutron yield, $nu_\mathrm{T}$. It is shown at one temperature since it have very weak temperature dependence.   It can be seen that it is constant until energies in the MeV range, where it increases sharply due to the energy the incident neutron provides being sufficient to eject a bound neutron.  Figure \ref{xs_fission_only} shows the total fission cross sections for two \emph{fissile} isotopes, uranium-235 and plutonium-239, and one \emph{fertile} isotope, uranium-238.  Fissile isotopes are those which neutrons at any energy can induce fission.  The figure shows that uranium-238 has a fission cross section, but it isn't significant until above 1 MeV.  For uranium-238, fission is a threshold reaction.  Simply absorbing a neutron does not provide enough energy to split the nucleus.  Additional energy is required, which can be provided in the form of an incident neutron's kinetic energy.  Uranium-238 isn't fissile, but it can be a significant contributor of fission reactions in reactors where the neutron population is \emph{fast}, i.e. mainly high-energy.  As mentioned before, uranium-238 is considered fertile, which means that it produces a fissile isotope after it absorbs a neutron, and in this case decays to plutonium-239.  
+Figure \ref{nu_compare} shows the energy dependence of the total fission neutron yield, $nu_\mathrm{T}$. It is shown at one temperature since it have very weak temperature dependence.   It can be seen that it is constant until energies in the MeV range, where it increases sharply due to the energy the incident neutron provides being sufficient to eject a bound neutron.  Figure \ref{xs_fission_only} shows the total fission cross sections for two \emph{fissile} isotopes,  $^{235}$U and  $^{239}$Pu, and one \emph{fertile} isotope,  $^{238}$U.  Fissile isotopes are those which neutrons at any energy can induce fission.  The figure shows that  $^{238}$U has a fission cross section, but it isn't significant until above 1 MeV.  For  $^{238}$U, fission is a threshold reaction.  Simply absorbing a neutron does not provide enough energy to split the nucleus.  Additional energy is required, which can be provided in the form of an incident neutron's kinetic energy.  Uranium-238 isn't fissile, but it can be a significant contributor of fission reactions in reactors where the neutron population is \emph{fast}, i.e. mainly high-energy.  As mentioned before,  $^{238}$U is considered fertile, which means that it produces a fissile isotope after it absorbs a neutron, and in this case decays to  $^{239}$Pu.  
 
-Fission spectrum?
+\subsection{Capture Reactions}
 
-\subsection{Other Inelastic Secondary-Producing Reactions}
+Unlike scattering reactions, where the energy and direction of the neutron is changed but continues to transport, \emph{disappearance} reactions remove a free neutron.  Typically this \emph{capture} of a neutron leaves the daughter nucleus in an excited state, which them relaxes to ground state by emitting a gamma ray \cite{krane}.
+
+
+\subsection{Other Secondary-Producing Absorption Reactions}
 
 This category encompasses all the other reactions neutrons undergo.  There are two types, ones that produce secondary neutrons in some amount and those that do not.  Those that do not may still produce other particles, like alpha particles, tritons, protons, et cetera.  Since they do not produce secondary neutrons, however, they are basically equivalent to a disappearance reaction in the scope of neutron transport.  Even though they aren't capture reactions, they can contribute significantly to an isotope's absorption of neutrons.  Figure \ref{xs_e_dependence_li} shows that the (n,$^3$H) in lithium-6 is by far the main component of the total cross section and makes it a very strong absorber of low energy neutrons.  Boron-10 is another great example of this.  Its (n,$\alpha$) reaction has a very high cross section for low energy neutrons, and it is widely used in thermal spectrum reactors in safety and control systems.
 
 Of the reactions that produce secondary neutrons, the (n,2n) reaction is most significant, due to it having the lowest threshold energy.  At higher incident neutron energies, (n,3n) and even (n,4n) can become possible.  Other particle combinations are possible as well, such as (n,n$\alpha$), and these reactions act like an inelastic scatter interaction where the relationship between scattering angle and energy no longer applies due to there being three bodies to distribute energy to instead of only two.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Temperature Effects}
@@ -310,12 +317,12 @@ Thus, far there has only been mention of the target nuclide's by how it manifest
 
 The other effect that thermal motion has is the \emph{Doppler effect}.  This is where resonances are broadened as temperature increases due to the thermal distribution becoming wider.  The effect is also known as \emph{Doppler broadening} for this reason.  Figure \ref{MB_dist} shows the Maxwell-Boltzmann distributions at various temperatures for a heavy particle and for a light particle.  This is the distribution of speeds particles in a ``gas'' have if they only interact by scattering off of one another.  Most solids can be modeled as a dense gas when there are no strong anisotropies in their structure, which is why modeling the target velocities in this way is called the ``free gas model.''  Note that the broadening effect is much more pronounced for light nuclei.  
 
-The widening of resonances effects reactors in significant ways, most notably in that more neutrons are absorbed in the resonance region as the scatter down to thermal energies.  The number of neutrons lost to capture increases and reduces the overall multiplication factor.  It is important for reactor safety that this occurs since it produces a negative reactivity feedback for temperature and helps prevent power excursions and meltdowns.  If the multiplication factor is above unity, the power starts to rise, and therefore so does the temperature (if the coolant flow rate remains the same).  When the temperature goes up, the increased captures causes it to go back down, stopping the power from increasing.  Of course, there are many different types of reactivity feedback phenomena, but the temperature feedback is generally negative due to Doppler broadening.  Capture is increases most in fission products since they often have strong absorption resonances and are lighter than fuel nuclides.  Very light nuclides typically do not have absorption resonances, so Doppler broadening has littler effect on their absorption rates.  This is why temperature feedback is least effective in fresh fuel where there are few fission products.  Figure \ref{xs_eu_broaden} shows the effect in europium-155, a fission product with a high capture cross section.
+The widening of resonances effects reactors in significant ways, most notably in that more neutrons are absorbed in the resonance region as the scatter down to thermal energies.  The number of neutrons lost to capture increases and reduces the overall multiplication factor.  It is important for reactor safety that this occurs since it produces a negative reactivity feedback for temperature and helps prevent power excursions and meltdowns.  If the multiplication factor is above unity, the power starts to rise, and therefore so does the temperature (if the coolant flow rate remains the same).  When the temperature goes up, the increased captures causes it to go back down, stopping the power from increasing.  Of course, there are many different types of reactivity feedback phenomena, but the temperature feedback is generally negative due to Doppler broadening.  Capture is increases most in fission products since they often have strong absorption resonances and are lighter than fuel nuclides.  Very light nuclides typically do not have absorption resonances, so Doppler broadening has littler effect on their absorption rates.  This is why temperature feedback is least effective in fresh fuel where there are few fission products.  Figure \ref{xs_eu_broaden} shows the effect in  $^{155}$Eu, a fission product with a high capture cross section.
 
 \begin{figure}[h!]
   \centering
     \includegraphics[width=0.8\textwidth]{graphics/xs_eu_broaden.eps}
-     \caption{Doppler broadening of the 1 eV fission resonance in Eu-155.  \label{xs_eu_broaden}}
+     \caption{Doppler broadening of the 1 eV fission resonance in  $^{155}$Eu.  \label{xs_eu_broaden}}
 \end{figure}
 
 At 0K, resonances are very sharp and can be treated as delta functions.  The reaction rates actually depend on the relative velocity of the neutron and the target nuclide, and since the target nuclides have a spectrum of energies, the relative velocity does as well.  Assuming the target is at rest requires summing all the contributions to the reaction rate from the different relative velocities given a single neutron energy.  From the reaction rate, a \emph{thermally averaged} cross section can be calculated be used in simulations assuming a target at rest.  This is especially significant at resonances since slight movements in velocity can produce very large differences in cross section.  The overall effect is that sharp resonances are \emph{effectively} broadened since they start to contribute to reaction rates once the thermal distribution of relative velocities starts overlap them.   The expression for thermally averaged cross section is shown in \eqref{broaden}, where $v_n$ and $\boldsymbol{v_n}$ are the velocity and speed of the neutron, respectively, $\boldsymbol{v_t}$ is the velocity of the target, $v_\mathrm{rel} = || \boldsymbol{v_n} -\boldsymbol{v_t}||$ is the relative velocity of the neutron to the target, and $M(v_t)$ is the thermal distribution of target speeds.
@@ -501,7 +508,7 @@ The nuclear chain reaction is sustained by fission reactions producing neutrons,
 \begin{figure}[h!] 
   \centering
     \includegraphics[width=0.8\textwidth ]{graphics/fiss_spec.eps} 
-     \caption{The prompt fission spectrum for uranium-235 and plutonium-239. \label{fiss_spec}}
+     \caption{The prompt fission spectra for uranium-235 and plutonium-239. \label{fiss_spec}}
 \end{figure}
 
 To write an expression for the fission source, or the number of fission neutrons born in energy $E$, we must know the number of neutrons born from fission at all energies.  Once this is known, it is multiplied by the fission spectrum to select the fraction that will be in energy $E$.  The expression for the fission source is shown in \eqref{fiss_source}.
@@ -933,7 +940,7 @@ It is essential to model this phenomena accurately since the scattering angle fa
      \caption{Error in the energy spectrum caused by treating elastic scattering as isotropic for all energies.\label{scattering_error}}
 \end{figure}
 
-After the target and neutron are transformed to the CM frame, the scattering CDF histogram interpolated and sampled as described in previous subsections.  Once the scattering angle is known, the rotated angle is calculated via Rodrigues' rotation formula shown in \eqref{RodriguesRot}.  The CM-rotated neutron velocity vector is then transformed back to the lab frame and the reaction is complete.
+After the target and neutron are transformed to the CM frame, the scattering CDF histogram interpolated and sampled as described in previous subsections.  Once the scattering angle is known, the rotated angle is calculated via Rodrigues' rotation formula shown in \eqref{RodriguesRot}.  The CM-rotated neutron velocity vector is then transformed back to the Lab frame and the reaction is complete.
 
 \subsubsection{Inelastic Reactions}
 
@@ -1047,7 +1054,7 @@ This series only converges for $k<1$, which sets a restriction for fixed-source 
 
 \subsubsection{Fission Source, $k$-Eigenvalue Method}
 
-When a fission source is specified, the simulation will run in a manner different to an external source problem.  The neutron source now depends on the neutron population itself, and a method must be used which directly ties the source to the population.  This is done by using any points where neutrons any secondary-producing reactions as source points for subsequent neutron histories.  When neutrons are born from these induced points, they of course must follow the emissions laws specified by the data.  For fission reactions, there is usually a tabulated energy spectrum, which is sampled and interpolated in the data-specified ways, and then scaled to the incoming energy bins via \eqref{energy_scaling}.  The angle is isotropic in the lab frame, and this is easily sampled via \eqref{iso_samp}.
+When a fission source is specified, the simulation will run in a manner different to an external source problem.  The neutron source now depends on the neutron population itself, and a method must be used which directly ties the source to the population.  This is done by using any points where neutrons any secondary-producing reactions as source points for subsequent neutron histories.  When neutrons are born from these induced points, they of course must follow the emissions laws specified by the data.  For fission reactions, there is usually a tabulated energy spectrum, which is sampled and interpolated in the data-specified ways, and then scaled to the incoming energy bins via \eqref{energy_scaling}.  The angle is isotropic in the Lab frame, and this is easily sampled via \eqref{iso_samp}.
 
 \begin{equation}
 \label{iso_samp}
