@@ -2,18 +2,23 @@
 \chapter{Background}
 \label{chap:background}
 
-This chapter explains the fundamental theory and mathematics that went into the development of WARP.  It covers nuclear physics, nuclear reactor analysis, and the kinematics involved in neutron transport.  Then the mathematics behind the governing equations is discussed, the solution method explained, and how the required probability distributions are sampled.  After the physics and mathematics sections, the computer hardware is discussed as is the OptiX ray tracing framework, the major library used in WARP.  The chapter concludes with an overview of the previous works done regarding Monte Carlo neutron transport on GPUs and how WARP fits into their progression.
+This chapter explains the fundamental theory and mathematics that went into the development of WARP.  It covers nuclear physics, nuclear reactor analysis, and the kinematics involved in neutron transport.  Then the mathematics behind the governing equations is discussed, the Monte Carlo solution method explained, and how the required probability distributions are sampled.  After the physics and mathematics sections, the computer hardware is discussed as is the OptiX ray tracing framework, the major library used in WARP.  The chapter concludes with an overview of the previous works done regarding Monte Carlo neutron transport on GPUs and how WARP fits into their progression.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Reactor Analysis}
+\section{Nuclear Reactor Analysis}
 
-reactors in general, LWR, fast breeders, GenIV, waste streams, power conversion, coupling between TH, need for fast simulations in oder to do convergence iterations
+Nuclear reactors generate electricity from the heat produced by fissions induced in heavy nuclei.  Fissions are induced by a free neutron population present in the reactor, and this free neutron population is self-sustaining if the reactor environment is maintained within certain property ranges.  The neutron density in the reactor is much smaller than the nuclei density and it can change much more quickly.  The power is directly proportional to the neutron flux, which is derived from the neutron density, and thus can change as quickly as the flux.  Therefore, to know a reactor's most basic state, one must know the neutron distribution.  Knowing how reactor power will change given changes in the environment means knowing how the neutron distribution will respond to the changes.
 
-The fission chain reaction is sustained from the fact that when a uranium (or other fissile heavy metal) nucleus fissions, 2 or more neutrons are released.  If, on average, one of these neutrons goes on to induce another fission, the system in which the fissions are occurring is \emph{critical}, or able to maintain a constant neutron population and fission reaction rate (i.e. power) without any external neutron sources.
+The neutron distribution has strong feedback mechanism from the materials present in the reactor.  Each isotope in the materials may have many different reactions that the neutrons can undergo, and these reaction probabilities may have very strong dependence on the incoming neutron energy.
+
+track neutrons, especially fissions
+
 
 \subsection{Point Kinetics, Multiplication Factor}
 
-The most important parameter of a nuclear reactor is its effective multiplication factor, $k_\mathrm{eff}$, which is the ratio of subsequent neutron generations.  This number can partly describes the rate of change of the neutron population if the average neutron lifetime is know.  If a reactor is treated as a point, i.e. with no dimensional dependence, the rate of change of its neutron population can be described with the differential equation shown in \eqref{point_kin2} where $N(t)$ is the neutron population at time $t$ and $l_p$ is the average neutron lifetime \cite{duderstadt}. 
+When a uranium (or other fissile heavy metal) nucleus fissions, two or more neutrons are released.  If, on average, exactly one of these neutrons goes on to induce another fission, the system in which the fissions are occurring is \emph{critical}, or able to maintain a constant neutron population and fission reaction rate (power) without any external neutron sources.  This is a stable fission chain reaction.
+
+The most important parameter of a nuclear reactor is its effective multiplication factor, $k_\mathrm{eff}$, which is the ratio of the number of neutrons in subsequent neutron generations.  It describes the growth rate of the neutron population in terms of generations.  This number can also describes the time rate of change of the neutron population if the average neutron lifetime is known.  If a reactor is treated as a point (which means it has no spatial \emph{dependence}, not that it has no spatial \emph{extent}), the rate of change of its neutron population can be described with the differential equation shown in \eqref{point_kin2} where $N(t)$ is the neutron population at time $t$ and $l_p$ is the average neutron lifetime \cite{duderstadt}. 
 
 \begin{equation}
 \label{point_kin1}
@@ -59,7 +64,9 @@ k_\mathrm{eff}  = \eta f p  \epsilon P_\mathrm{FNL} P_\mathrm{TNL}
      \caption{The reaction chain represented by probabilities in the six factor formula. \label{six_ff_chain}}
 \end{figure}
 
-The six factor formula relates to the Monte Carlo method since it is basically dimensionally-average Monte Carlo.  In other words, it describes what happens to the average neutron, and an individual neutron's lifetime, or ``history,'' could be simulated by sampling the constant probabilities that the factors represent as shown in Figure \ref{six_ff_chain}.  After a large group, or ensemble, of these histories is assembled, they can be averaged to determine the multiplication factor.  This is the basic idea of Monte Carlo neutron transport.  The results are trivial in this case, since there is no dimensionally in the problem and the probabilities are constant and the multiplication can be found analytically, but the six factor formula is way to think about the process without complicating it with dimensionality.
+The six factor formula relates to the Monte Carlo method since it is basically dimensionally-average Monte Carlo.  In other words, it describes what happens to the average neutron, and an individual neutron history could be simulated by sampling the constant probabilities that the factors represent as shown in Figure \ref{six_ff_chain}.  After a large group, or ensemble, of these histories is assembled, they can be averaged to determine the multiplication factor.  This is the basic idea of Monte Carlo neutron transport.  The results are trivial in this case, since there is no dimensionally in the problem and the probabilities are constant and the multiplication can be found analytically, but the six factor formula is way to think about the process without complicating it with dimensionality.
+
+cross sections because interactions have energy dependence
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Nuclear Interactions}
