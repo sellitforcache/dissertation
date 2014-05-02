@@ -7,18 +7,17 @@ This chapter explains the fundamental theory and mathematics that went into the 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Nuclear Reactor Analysis}
 
-Nuclear reactors generate electricity from the heat produced by fissions induced in heavy nuclei.  Fissions are induced by a free neutron population present in the reactor, and this free neutron population is self-sustaining if the reactor environment is maintained within certain property ranges.  The neutron density in the reactor is much smaller than the nuclei density and it can change much more quickly.  The power is directly proportional to the neutron flux, which is derived from the neutron density, and thus can change as quickly as the flux.  Therefore, to know a reactor's most basic state, one must know the neutron distribution.  Knowing how reactor power will change given changes in the environment means knowing how the neutron distribution will respond to the changes.
+Nuclear reactors generate electricity from the heat produced by fissions induced in heavy nuclei.  Fissions are induced by a free neutron population present in the reactor, and this free neutron population is self-sustaining if the reactor environment is maintained within certain property ranges.  The neutron density in the reactor is much smaller than the nuclei density and it can change much more quickly.  The power is directly proportional to the neutron flux, which is derived from the neutron density, and thus can change as quickly as the flux.  Therefore, to know a reactor's most basic state, one must know the neutron distribution.  Knowing how reactor power will change given changes in the environment means knowing how the neutron distribution will respond to the changes.  This is why it is essential to accurately solve the neutron transport equations in order to characterized reactor behavior. 
 
-The neutron distribution has strong feedback mechanism from the materials present in the reactor.  Each isotope in the materials may have many different reactions that the neutrons can undergo, and these reaction probabilities may have very strong dependence on the incoming neutron energy.
-
-track neutrons, especially fissions
-
+Many things influence the neutron distribution, and therefore must be incorporated in the solution method.  The neutron distribution has strong feedback mechanism from the materials present in the reactor.  Each isotope in the materials may have many different reactions that the neutrons can undergo, and these reaction probabilities may have very strong dependence on the incoming neutron energy.  Using the Monte Carlo Method to approximate solutions to the neutron transport equation requires all of the neutron interactions to be explicitly modeled.  The reactor geometry also effects the neutron distribution, since it describes the spatial extent of the reactor materials.   The Monte Carlo Method tracks neutrons as they move through the reactor materials, sampling the reactions they can undergo along the way.  Of foremost importance is tracking fission reactions, since these are the reactions that sustain the fission chain reaction and maintain the reactor's effective multiplication factor.
 
 \subsection{Point Kinetics, Multiplication Factor}
 
 When a uranium (or other fissile heavy metal) nucleus fissions, two or more neutrons are released.  If, on average, exactly one of these neutrons goes on to induce another fission, the system in which the fissions are occurring is \emph{critical}, or able to maintain a constant neutron population and fission reaction rate (power) without any external neutron sources.  This is a stable fission chain reaction.
 
-The most important parameter of a nuclear reactor is its effective multiplication factor, $k_\mathrm{eff}$, which is the ratio of the number of neutrons in subsequent neutron generations.  It describes the growth rate of the neutron population in terms of generations.  This number can also describes the time rate of change of the neutron population if the average neutron lifetime is known.  If a reactor is treated as a point (which means it has no spatial \emph{dependence}, not that it has no spatial \emph{extent}), the rate of change of its neutron population can be described with the differential equation shown in \eqref{point_kin2} where $N(t)$ is the neutron population at time $t$ and $l_p$ is the average neutron lifetime \cite{duderstadt}. 
+The most important parameter of a nuclear reactor is its effective multiplication factor, $k_\mathrm{eff}$, which is the ratio of the number of neutrons in subsequent neutron generations.  All of the work put into reactor analysis and solving the neutron transport equations can usually be condensed into the effective multiplication factor.  It describes the growth rate of the neutron population in terms of generations.  If $k_\mathrm{eff}=1$, then subsequent neutron generations are exactly the same size and the reactor is critical.  If it is below 1, subsequent neutron generation are smaller and the reactor is subcritical.  If $k_\mathrm{eff}$ is greater than 1, subsequent generations are larger and the reactor is supercritical.  
+
+The effective multiplication factor can also describe the time rate of change of the neutron population if the average neutron lifetime is known.  If a reactor is treated as a point (which means it has no spatial \emph{dependence}, not that it has no spatial \emph{extent}), the rate of change of its neutron population can be described with the differential equation shown in \eqref{point_kin1} where $N(t)$ is the neutron population at time $t$ and $l_p$ is the average neutron lifetime \cite{duderstadt}.  The expression on the left side is the neutron population after a mean neutron lifetime, which is equal to the multiplication factor multiplied by the initial neutron population.  The expression on the left hand side can be Taylor expanded to first order by the middle expression.  Rearranging this equation yields the ODE shown in  \eqref{point_kin2} \cite{duderstadt}.
 
 \begin{equation}
 \label{point_kin1}
@@ -30,7 +29,9 @@ N(t+l_p) \simeq N(t)+l_p \frac{dN(t)}{dt} = k_\mathrm{eff} N(t)
 \frac{dN(t)}{dt} \simeq \frac{k_\mathrm{eff} -1}{l_p}N(t)
 \end{equation}
 
-The solution to this equation is show in in \eqref{reactor_period}.  The neutron lifetime is usually treated as constant since it mostly depends on the material present in the reactor (which change very slowly compared to the neutron population), so the only parameter that influences the reaction period $T$ is $k_\mathrm{eff}$.  When the multiplication factor is unity, the reactor period is infinity, implying that the neutron population is in a steady state.  When it is less than one, the period is negative, implying that the neutron population will decrease.  The converse it true when it is positive.  Then the period is positive and the neutron population increases with time.
+The solution to this equation is show in in \eqref{reactor_period} \cite{duderstadt}.  The neutron lifetime is usually treated as constant since it mostly depends on the material present in the reactor (which change very slowly compared to the neutron population), so the only parameter that influences the reaction period $T$ is $k_\mathrm{eff}$.  This does not mean that the mean neutron lifetime is not important, but rather that the only readily-changeable value in the reactor period expression is the multiplication factor.  The mean neutron lifetime affects how \emph{fast} changes occur in the neutron population, which is of huge consequence in reactor control \cite{duderstadt}.  
+
+When the multiplication factor is unity, the reactor period is infinity, implying that the neutron population is in a steady state.  When it is less than one, the period is negative, implying that the neutron population will decrease.  The converse it true when it is positive.  Then the period is positive and the neutron population increases with time.
 
 \begin{equation}
 \label{reactor_period}
@@ -42,11 +43,11 @@ T &= \frac{l_p}{k_\mathrm{eff} -1}
 
 \subsection{Six Factor Formula}
 
-The multiplication factor is the most important parameter in a nuclear reactor because it dictates the time rate of change of its power.  It is a global number, and a lot of physics gets integrated into it.  From a high level, there are six factors that can influence the multiplication factor: 
-the thermal fission factor, $\eta$, or the average number of neutrons produced per thermal fission;
+The multiplication factor is the most important parameter in a nuclear reactor because it dictates the time rate of change of its power.  It is a global number, and a lot of physics gets integrated into it.   The reaction cross sections, the naming of which is discussed in the next section, describe the probabilities of neutron reactions occurring as a function of energy.  There are many individual reactions, but from a high level and speaking in broad terms, there are six probabilities that can influence the multiplication factor: 
+the thermal reproduction factor, $\eta$, or the average number of neutrons produced per neutron absorbed in the fuel;
 the thermal utilization factor, $f$, or the probability that an absorbed thermal neutron was absorbed by a fissile nuclide;
-the resonance escape probability, $p$, or the probability that neutrons are not captures in large resonances as they scatter from high energy; 
-the fast fission factor, $\epsilon$, the ratio of all fission neutrons to those born from thermal fissions;
+the resonance escape probability, $p$, or the probability that neutrons are not captures in large resonances as they scatter down from high energy; 
+the fast fission factor, $\epsilon$, the ratio of total fission neutrons (including high-energy fissions) to those born from thermal fissions;
 the fast non-leakage probability, $P_\mathrm{FNL}$, the probability that high-energy neutrons will not leak out of the system;
 the thermal non-leakage probability, $P_\mathrm{TNL}$, the probability that low-energy neutrons will not leak out of the system.
 
@@ -66,29 +67,16 @@ k_\mathrm{eff}  = \eta f p  \epsilon P_\mathrm{FNL} P_\mathrm{TNL}
 
 The six factor formula relates to the Monte Carlo method since it is basically dimensionally-average Monte Carlo.  In other words, it describes what happens to the average neutron, and an individual neutron history could be simulated by sampling the constant probabilities that the factors represent as shown in Figure \ref{six_ff_chain}.  After a large group, or ensemble, of these histories is assembled, they can be averaged to determine the multiplication factor.  This is the basic idea of Monte Carlo neutron transport.  The results are trivial in this case, since there is no dimensionally in the problem and the probabilities are constant and the multiplication can be found analytically, but the six factor formula is way to think about the process without complicating it with dimensionality.
 
-cross sections because interactions have energy dependence
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Nuclear Interactions}
 \label{subsec:interactions}
 
-The core of a Monte Carlo simulation is explicitly modeling the individual interactions the neutron undergoes as it moves through matter.  At the highest level, these reactions can be broken down into two categories, elastic reactions and inelastic reactions.  Elastic reactions are those where both momentum and kinetic energy are conserved, i.e. ones where any energy the neutron loses is given to the target nucleus.  Inelastic reactions are those that conserve momentum but do not conserve kinetic energy, i.e. ones where the kinetic energy of the particles can be converted to a vibrational mode of the target nucleus, etc.  These reactions are further divided by the number and type of secondary particles they produce.  Reactions that produce no secondary neutrons are called ``disappearance'' reactions since the neutron effectively disappears, reactions that produce a single neutron are typically called scattering reactions since they effectively change the incoming neutron's energy and direction, and reaction the produce more than one particle are simply called ``secondary-producing'' reactions. Table \ref{nuc_reaction_summary} show a summary of the reaction classifications, and it can be seen that elastic scattering is the only elastic reaction.   
+The core of a Monte Carlo simulation is explicitly modeling the individual interactions the neutron undergoes as it moves through matter.  At the highest level, these reactions can be broken down into two scattering and absorbtion.  
 
-\begin{table}[h]
-\centering
-\caption{Summary matrix of how neutron reactions are classified.}
-\label{nuc_reaction_summary}
-\begin{tabular}{| l | c | c | c |}
-\multicolumn{4}{c}{Number of Secondaries} \\
-\hline
-  & 0 & 1 & $>$1 \\
- \hline
- Elastic & & Elastic Scatter & \\
- \hline
- Inelastic & Disappearance & Inelastic Scatter & Secondary-Producing \\
-\hline
-\end{tabular}
-\end{table}
+Elastic reactions are those where both momentum and kinetic energy are conserved, i.e. ones where any energy the neutron loses is given to the target nucleus.  Inelastic reactions are those that conserve momentum but do not conserve kinetic energy, i.e. ones where the kinetic energy of the particles can be converted to a vibrational mode of the target nucleus, etc.  These reactions are further divided by the number and type of secondary particles they produce.  
+
+Reactions that produce no secondary neutrons are called ``disappearance'' reactions since the neutron effectively disappears, reactions that produce a single neutron are typically called scattering reactions since they effectively change the incoming neutron's energy and direction, and reaction the produce more than one particle are simply called ``secondary-producing'' reactions. Table \ref{nuc_reaction_summary} show a summary of the reaction classifications, and it can be seen that elastic scattering is the only elastic reaction.   
 
 The probabilities for individual reactions occurring are expressed in terms of cross sections.  In simple terms, nuclear cross sections are like a geometric cross sections -they represent the ``size'' of the target nucleus for a particular reaction.  The classical analogy is that if neutrons and nuclei are hard spheres, and neutrons are randomly shot through a material, more neutrons will hit the larger targets than the smaller ones.  Cross sections are also expressed in units of area, the ``barn,'' which is $10^{-24}$ cm$^2$.  This unit was coined by Baker and Holloway while performing scattering experiments with uranium since ``a cross section of $10^{-24}$ cm$^2$ for nuclear purposes was really as big as a barn''\cite{LAMS523}.  Of course, nuclear cross sections have no literal meaning in terms of the actual sizes of the nuclei, they only represent the likelihood of a particular reaction occurring.  Working from the macroscopic scale, which is where measurements are taken, a \emph{macroscopic cross section}, represented by greek capital sigma ($\Sigma$), is the probability of a reaction happening within an infinitesimal distance d$x$.  With this parameter, we can write down an equation that describes the survival probability of a group of particles.  Describing a group is necessary since the dimension x is \emph{continuous}.  Given a particle packet containing N particles and $\Sigma$, their interaction probability over $d$x, the change the population over $d$x is the product of the population N and the interaction probability, as show in \eqref{pop_diff}.
 
