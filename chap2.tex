@@ -201,13 +201,13 @@ V_{_\mathrm{c}}^{\prime} &= \sqrt{ V_{_\mathrm{c}}^{2} + \frac{2Q}{mA(A+1)}  }
 \label{finalvCM}
 \end{equation}
 
-At first glance, it seems like the interaction has been fully characterized, but \eqref{rotationCM} only relates the initial states of the neutron and the target to one another and the final states of neutron and the target to one another.  The initial state and final state of the neutron still need to be related.  It has been mentioned already that the interaction is only a rotation in the CM frame, so the initial and final state of the neutron's direction can be related by a three-dimensional rotation formula.  An efficient algorithm is given by \eqref{vector_rot} \cite{openmc}.  In the formula, $\mu=\cos \theta$, and $\hat{v}_x$, $\hat{v}_y$, and $\hat{v}_z$ are the axis projections of the velocity's unit vector.  It is ``efficient'' in the sense that to rotate a vector, a full 3x3 matrix does not need to be constructed and multiplied by the vector. In other words, matrix-vector operations are not needed and it can be carried out with only vector operations.
+At first glance, it seems like the interaction has been fully characterized, but \eqref{rotationCM} only relates the initial states of the neutron and the target to one another and the final states of neutron and the target to one another.  The initial state and final state of the neutron still need to be related.  It has been mentioned already that the interaction is only a rotation in the CM frame, so the initial and final state of the neutron's direction can be related by a three-dimensional rotation formula.  An efficient algorithm is given by \eqref{vector_rot} \cite{openmc}.  In the formula, $\mu=\cos \theta$, and $\hat{{\Omega}}_x$, $\hat{\Omega}_y$, and $\hat{\Omega}_z$ are the cartesian projections of the velocity's unit vector.  It is ``efficient'' in the sense that to rotate a vector, a full 3x3 matrix does not need to be constructed and multiplied by the vector. In other words, matrix-vector operations are not needed and it can be carried out with only vector operations.
 
 \begin{equation}
 \begin{split}
-\hat{v}_x^{\prime} &= \mu \hat{v}_x + \frac{\sqrt{1-\mu^2} (\hat{v}_x \hat{v}_z \cos \phi - \hat{v}_y \sin \phi)}{ \sqrt{1-\mu \hat{v}_z^2}} \\
-\hat{v}_y^{\prime} &= \mu \hat{v}_y + \frac{\sqrt{1-\mu^2} (\hat{v}_y \hat{v}_z \cos \phi + \hat{v}_x \sin \phi)}{ \sqrt{1-\mu \hat{v}_z^2}} \\
-\hat{v}_z^{\prime} &= \mu \hat{v}_z - \sqrt{ (1-\mu^2) (1-\mu \hat{v}_z^2) }  \cos \phi 
+\hat{\Omega}_x^{\prime} &= \mu \hat{\Omega}_x + \frac{\sqrt{1-\mu^2} (\hat{\Omega}_x \hat{\Omega}_z \cos \phi - \hat{\Omega}_y \sin \phi)}{ \sqrt{1-\mu \hat{\Omega}_z^2}} \\
+\hat{\Omega}_y^{\prime} &= \mu \hat{\Omega}_y + \frac{\sqrt{1-\mu^2} (\hat{\Omega}_y \hat{\Omega}_z \cos \phi + \hat{\Omega}_x \sin \phi)}{ \sqrt{1-\mu \hat{\Omega}_z^2}} \\
+\hat{\Omega}_z^{\prime} &= \mu \hat{\Omega}_z - \sqrt{ (1-\mu^2) (1-\mu \hat{\Omega}_z^2) }  \cos \phi 
 \end{split}
 \label{vector_rot}
 \end{equation}
@@ -354,9 +354,9 @@ ACE data files typically come pre-processed at different temperatures.  This pro
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Neutron Transport}
 
-Now that the events which can happen to neutrons have been outlined, we will move to describing the neutron population itself.  Since the neutron population in reactors is large, on the order of $10^{XXX}/\mathrm{cm}^3$, and the neutrons themselves have very small radii, about $1.75\times10^{-17}$ cm, the distribution of neutrons can be treated as an continuum.  We will eventually derive the \emph{neutron transport equation}, which is a linearized version of the Boltzmann transport equation.  It is linear since it is assumed that neutrons do not interact with each other.  This is usually a good assumption in normal matter since the neutron density present in reactors is many orders of magnitude smaller than the material density and neutrons are much more likely to interact with it than each other.  
+Now that the events which can happen to neutrons have been outlined, we will move to describing the neutron population itself.  Since the neutron population in reactors is large, on the order of $10^{8}/\mathrm{cm}^3$ \cite{duderstadt}, and the neutrons themselves have very small radii, about $1.75\times10^{-17}$ cm \cite{krane}, the distribution of neutrons can be treated as an continuum.  The neutrons are actually discrete particles, but since they have a very large population, only the average behavior matters, and their distribution can be well-approximated by a continuous distribution function.  We will eventually derive the \emph{neutron transport equation}, which is a linearized version of the Boltzmann transport equation.  It is linear since it is assumed that neutrons do not interact with each other.  This is usually a good assumption in normal matter since the neutron density present in reactors is many orders of magnitude smaller than the material density and neutrons are much more likely to interact with the nuclei than each other \cite{duderstadt}.  
 
-Other than eliminating neutron self interaction, there are a handful of other assumptions that go into the equation that will hold true for the rest of the derivations.  One that follows veery closely is that neutrons are assumed to be points in space, so even at very high densities they sill will not interact with each other, and later when we start to discretize spaces, neutrons cannot be in more than one unique volume by overlapping.  The next assumption is that any relativistic effects are negligible.  The energies of importance in reactor physics are below 10MeV, which is about where they start to become non-negligible for neutrons.  Since neutrons are neutral and have long interaction distances compared to their radii, they are also assumed to move in straight lines between collisions.  Materials are also assumed to be in thermal equilibrium and have isotropic properties.  Materials like graphic and water do not have isotropic properties when it comes to scattering, however.  As will be explained later, this can be corrected by adjusting the scattering kernel.
+Other than eliminating neutron self interaction, there are a handful of other assumptions that go into the equation that will hold true for the rest of the derivations.  One that follows veery closely is that neutrons are assumed to be points in space, so even at very high densities they sill will not interact with each other, and later when we start to discretize spaces, neutrons cannot be in more than one unique volume by overlapping.  The next assumption is that any relativistic effects are negligible.  The energies of importance in reactor physics are below 10 MeV, which is about where they start to become non-negligible for neutrons.  Since neutrons are neutral, they are also assumed to move in straight lines between collisions.  Materials are also assumed to be in thermal equilibrium and have isotropic properties \cite{duderstadt}.  Materials like graphic and water do not have isotropic properties when it comes to scattering, however.  As will be explained later, this can be corrected by adjusting the scattering kernel.
 
 \subsection{Neutron Balance Equation}
 
@@ -366,16 +366,16 @@ Other than eliminating neutron self interaction, there are a handful of other as
      \caption{The differential volume of the neutron balance equation. \label{diff_volume}}
 \end{figure}
 
-Before any explicit terms need to defined to capture the necessary physics of the transport problem, a balance equation can be written for a differential volume.  This equation simply describes the amount of neutrons entering and exiting a infinitesimally small volume and their difference being equal to the rate of change of neutrons in the volume.  We know about the reactions that neutrons can undergo, and we know they move through material, so we should have  enough information the write this abstract equation. Figure \ref{diff_volume} shows an illustration of the differential volume.
+Before any explicit terms need to defined to capture the necessary physics of the transport problem, a balance equation can be written for a differential volume.  This equation simply describes the amount of neutrons entering and exiting a infinitesimally small volume and the difference being equal to the rate of change of the neutrons within the volume.  The reactions that neutrons can undergo and how neutrons move within the material are both known, so there is enough information the write this abstract equation.   The neutron balance equation is shown in \eqref{NBE}, and Figure \ref{diff_volume} shows an illustration of the differential volume.
 
 \begin{equation}
 \footnotesize
-\label{NBE}
 \begin{array}{c}
-\mathrm{rate\:of\:change} = (\mathrm{neutrons\:in}) - (\mathrm{neutrons\:out}) \\
+\mathrm{rate\:of\:change} = (\mathrm{production\:and\:neutrons\:in}) - (\mathrm{loss\:and\:neutrons\:out}) \\
 \\
-\frac{\partial n}{\partial t} = ( \mathrm{movement\:in} + \mathrm{source} + \mathrm{scatter\:in}) - ( \mathrm{movement\:out} + \mathrm{disappearance} + \mathrm{scatter\:out})
+\frac{\partial n}{\partial t} = ( \mathrm{movement\:in} + \mathrm{source} + \mathrm{scatter\:in}) - ( \mathrm{movement\:out} + \mathrm{absorbtion} + \mathrm{scatter\:out})
 \end{array}
+\label{NBE}
 \end{equation}
 
 Now that this equation has been written, we can start to explicitly define the terms.  One quantity has already been touched upon - the neutron density.  The neutron density is the fundamental quantity in reactor physics.  This is shown in \eqref{NBE} as $n$, but in the subsequent sections its dependencies will be elaborated on, as will all other dependencies.
@@ -383,7 +383,15 @@ Now that this equation has been written, we can start to explicitly define the t
 
 \subsection{Neutron Distribution Function}
 
-The \emph{neutron distribution function} simply describes the number of neutrons present in each differential quantity it represents.  The most detailed version is differential in space, angle, energy (or velocity), and time, and has inverse units of these dimensions.  In other words, it describes a density in each of it components.  In the subsequent derivations, the spatial, or position vector will be represented by $\boldsymbol{\vec{r}}$, the angular vector by $\boldsymbol{\hat{\Omega}}$, energy by $E$, and time by $t$.  The angle vector is a unit vector that specifies direction only, not magnitude.  It is easiest to express the directional vector as a unit vector in spherical coordinates $(\theta, \phi)$, the polar angle and the azimuthal angle, respectively.  Their cartesian projections are given by \eqref{ang_cart} and shown in Figure \ref{ang_relations}.
+The \emph{neutron distribution function} simply describes the number of neutrons present in each differential quantity it represents.  In the subsequent derivations, the spatial, or position vector will be represented by $\boldsymbol{\vec{r}}$, the angular vector by $\boldsymbol{\hat{\Omega}}$, energy by $E$, and time by $t$.   The most detailed version is shown in \eqref{NDF}, and is differential in space, angle, energy (or velocity), and time, and has inverse units of these dimensions.  In other words, it is the number of neutrons in $d\boldsymbol{\vec{r}}$ around volume $\boldsymbol{\vec{r}}$, in $d \boldsymbol{\hat{\Omega}}$ around angle $\boldsymbol{\hat{\Omega}}$, $dE$ around energy $E$, and $dt$ around time $t$. 
+
+\begin{equation}
+\label{NDF}
+n(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) \:\: d\boldsymbol{\vec{r}} \: d \boldsymbol{\hat{\Omega}} \: dE \: dt
+\end{equation}
+
+
+The angle vector is a unit vector that specifies direction only, not magnitude.  It is easiest to express the directional vector as a unit vector in spherical coordinates $(\theta, \phi)$, the polar angle and the azimuthal angle, respectively.  Their cartesian projections are given by \eqref{ang_cart} and shown in Figure \ref{ang_relations}.
 
 \begin{equation}
 \label{ang_cart}
@@ -400,7 +408,7 @@ The \emph{neutron distribution function} simply describes the number of neutrons
      \caption{The cartesian projections of the directional vector. \label{ang_relations}}
 \end{figure}
 
-Like any continuous distribution, it must be integrated over to calculate any quantities.  If we define the $i$th moment of the distribution according to \eqref{NDF_moments}, then the $0$th moment would be the population and the $1$st moment would be the mean.
+Like any continuous distribution, it must be integrated over to calculate any quantities.  If we define the $i$th moment of the distribution according to \eqref{NDF_moments}, then the $0$th moment would be the population and the $1$st moment would be the mean if divided by the $0$th moment.
 
 \begin{equation}
 \label{NDF_moments}
@@ -411,17 +419,17 @@ For example, if we are given a neutron distribution which has no time dependence
 
 \begin{equation}
 \label{NDF_sample}
-N_V = \int_0^\infty \int_{\boldsymbol{\hat{\Omega}}} \int_{V} n(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E) dV d\boldsymbol{\hat{\Omega}} dE
+N_V = \int_0^\infty dE \int_{\boldsymbol{\hat{\Omega}}} d\boldsymbol{\hat{\Omega}}  \int_{V} d\boldsymbol{\vec{r}} \: n(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E)  
 \end{equation}
 
 \begin{equation}
 \label{NDF_avg}
-\bar{E} = \int_0^\infty \int_{\boldsymbol{\hat{\Omega}}} \int_{V} E n(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E) dV d\boldsymbol{\hat{\Omega}} dE
+\bar{E} = \frac{1}{N_V } \int_0^\infty dE \int_{\boldsymbol{\hat{\Omega}}} d\boldsymbol{\hat{\Omega}}  \int_{V} d\boldsymbol{\vec{r}} \: E n(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E) 
 \end{equation}
 
 \subsection{Reaction Rates}
 
-A \emph{reaction rate} is the rate at which a certain reaction is happening in a volume.  If we go to a pulse-type scenario once more, we have $N_\mathrm{p}$ particles which travel at speed $v$ in one direction.  If $\Sigma$ is the interaction probability per unit length, multiplying it by the speed gives the probability of interaction per second, or the \emph{collision rate}.  Since there are $N$ particles, multiplying the rate by it gives the overall reaction rate, $N_\mathrm{p} v \Sigma$, of the pulse in an infinite medium.  If $N$ is now substituted for the neutron distribution function instead of a pulse, the expression now becomes the reaction rate per distribution differential, or the \emph{reaction rate density}.  This expression is shown in \eqref{RR} and is the first building block of the \emph{neutron balance equation}.
+A \emph{reaction rate} is the rate at which a certain reaction is happening in a volume.  If we go to a pulse-type scenario once more, we have $N_\mathrm{p}$ particles which travel at speed $v$ in one direction.  If $\Sigma$ is the interaction probability per unit length, multiplying it by the speed gives the probability of interaction per second, or the \emph{collision rate}.  Since there are $N$ particles, multiplying the rate by it gives the overall reaction rate, $N_\mathrm{p} v \Sigma$, of the pulse in an infinite medium.  If $N$ is now substituted for the neutron distribution function instead of a pulse, the expression now becomes the reaction rate per distribution differential, or the \emph{reaction rate density}.  This expression is shown in \eqref{RR} and is the first building block of the explicit neutron balance equation.
 
 \begin{equation}
 \label{RR}
@@ -433,14 +441,14 @@ If we assume there is only one energy, $E_0$ and one direction, $\hat{x}$, and i
 
 \begin{equation}
 \label{1d_diff}
-\int_A \int_{\boldsymbol{\hat{\Omega}}} \int_0^{\infty}  dE d\boldsymbol{\hat{\Omega}} dxdydz  v(E) n(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) \Sigma(\boldsymbol{\vec{r}},E) \delta(E-E_0) \delta(\boldsymbol{\hat{\Omega}}-\hat{x})  = v \Sigma A n(x)dx 
+ \int_0^\infty dE \int_{\boldsymbol{\hat{\Omega}}} d\boldsymbol{\hat{\Omega}}  \int_{V} dx dy dz \:  v(E) n(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) \Sigma(\boldsymbol{\vec{r}},E) \delta(E-E_0) \delta(\boldsymbol{\hat{\Omega}}-\hat{x})  = v \Sigma A n(x)dx 
 \end{equation}
 
-This is effectively the loss term for a beam in the $\hat{x}$ direction, and if we set it as such, we recover the beam-type expression \eqref{recover_beam}, which is equivalent to \eqref{pop_diff}.  
+This is effectively the loss term for a beam in the $\hat{x}$ direction, and if we set it as such, we recover the linear attenuation expression shown in \eqref{recover_beam}, which is equivalent to \eqref{pop_diff}.  
 
 \begin{equation}
 \label{recover_beam}
-dn(x) = - v \Sigma A n(x)dx  \qquad \Rightarrow \qquad  \frac{dI(x)}{dx}= - \Sigma I
+dn(x) = - v \Sigma A n(x)dx  \qquad \Rightarrow \qquad  \frac{dN(x)}{dx}= - \Sigma N
 \end{equation}
 
 
