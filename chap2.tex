@@ -46,7 +46,7 @@ T &= \frac{l_p}{k_\mathrm{eff} -1}
 The multiplication factor is the most important parameter in a nuclear reactor because it dictates the time rate of change of its power.  It is a global number, and a lot of physics gets integrated into it.   The reaction cross sections, the naming of which is discussed in the next section, describe the probabilities of neutron reactions occurring as a function of energy.  There are many individual reactions, but from a high level and speaking in broad terms, there are six probabilities that can influence the multiplication factor \cite{duderstadt}: 
 the thermal reproduction factor, $\eta$, or the average number of neutrons produced per neutron absorbed in the fuel;
 the thermal utilization factor, $f$, or the probability that an absorbed thermal neutron was absorbed by a fissile nuclide;
-the resonance escape probability, $p$, or the probability that neutrons are not captures in large resonances as they scatter down from high energy; 
+the resonance escape probability, $p$, or the probability that neutrons are not captured in resonances as they scatter down from high energy to low energy; 
 the fast fission factor, $\epsilon$, the ratio of total fission neutrons (including high-energy fissions) to those born from thermal fissions;
 the fast non-leakage probability, $P_\mathrm{FNL}$, the probability that high-energy neutrons will not leak out of the system;
 the thermal non-leakage probability, $P_\mathrm{TNL}$, the probability that low-energy neutrons will not leak out of the system.
@@ -65,7 +65,7 @@ k_\mathrm{eff}  = \eta f p  \epsilon P_\mathrm{FNL} P_\mathrm{TNL}
      \caption{The reaction chain represented by probabilities in the six factor formula. \label{six_ff_chain}}
 \end{figure}
 
-The six factor formula relates to the Monte Carlo method since it is basically dimensionally-average Monte Carlo.  In other words, it describes what happens to the average neutron, and an individual neutron history could be simulated by sampling the constant probabilities that the factors represent as shown in Figure \ref{six_ff_chain}.  After a large group, or ensemble, of these histories is assembled, they can be averaged to determine the multiplication factor.  This is the basic idea of Monte Carlo neutron transport.  The results are trivial in this case, since there is no dimensionally in the problem and the probabilities are constant and the multiplication can be found analytically, but the six factor formula is way to think about the process without complicating it with dimensionality.
+The six factor formula describes what happens to the average neutron. An individual neutron history could be simulated by sampling the constant probabilities that the factors represent, as shown in Figure \ref{six_ff_chain}.  After a large group of these histories is simulated, they can be averaged to determine the multiplication factor.  This is the basic idea of Monte Carlo neutron transport.  The results are trivial in this case, since there is no dimensionally in the problem, the probabilities are constant, and the multiplication factor can be found analytically.  More broadly, though, the six factor formula is way to think about the process without complicating it with dimensionality.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -80,9 +80,9 @@ There are many types of different absorption reactions, which are categorized by
 
 The probabilities for individual reactions occurring are expressed in terms of cross sections.  Cross sections are referred to in two ways - microscopically and macroscopically.  Microscopic cross sections, represented by greek lowercase sigma ($\sigma$), describe the individual nucleus interaction probabilities.  Macroscopic cross sections, represented by greek capital sigma ($\Sigma$), take into account the density of a nucleus in space, and describe the interaction probability over a distance.  
 
-Microscopic cross sections are like a geometric cross sections - they represent the ``size'' of the target nucleus for a particular reaction.  The classical analogy is that if neutrons and nuclei are hard spheres, and neutrons are randomly shot through a material, more neutrons will hit the larger targets than the smaller ones.  Cross sections are also expressed in units of area, the ``barn,'' which is $10^{-24}$ cm$^2$.  This unit was coined by Baker and Holloway while performing scattering experiments with uranium since ``a cross section of $10^{-24}$ cm$^2$ for nuclear purposes was really as big as a barn''\cite{LAMS523}.  Of course, nuclear cross sections have no literal meaning in terms of the actual sizes of the nuclei, they only represent the likelihood of a particular reaction occurring.  
+Microscopic cross sections are like a geometric cross sections -- they represent the ``size'' of the target nucleus for a particular reaction.  The classical analogy is that if neutrons and nuclei are hard spheres, and neutrons are randomly shot through a material, more neutrons will hit the larger targets than the smaller ones.  Cross sections are also expressed in units of area, the ``barn,'' which is $10^{-24}$ cm$^2$.  This unit was coined by Baker and Holloway while performing scattering experiments with uranium since ``a cross section of $10^{-24}$ cm$^2$ for nuclear purposes was really as big as a barn''\cite{LAMS523}.  Of course, nuclear cross sections have no literal meaning in terms of the actual sizes of the nuclei, they only represent the likelihood of a particular reaction occurring.  
 
-Working from the macroscopic scale, which is where measurements are taken, a macroscopic cross section is the probability of a reaction happening per unit distance.  With this parameter, an equation can be written that describes the survival probability of a group of particles.  Describing a group is necessary since neutrons are discrete particles, but the dimension x is \emph{continuous}.  Given a particle packet containing N particles and $\Sigma$, their interaction probability per unit distance, the change the population over $d$x is the product of the population N and the interaction probability, as show in \eqref{pop_diff} \cite{duderstadt}.  $N$ is simply the number of neutrons and does not take any dimensionality into account.  When number densities are discussed later, they will be represented by a lowercase $n$.
+Working at the macroscopic scale, which is where measurements are taken, a macroscopic cross section is the probability of a reaction happening per unit distance.  With this parameter, an equation can be written that describes the survival probability of a group of particles.  Describing a group is necessary since neutrons are discrete particles, but the dimension x is \emph{continuous}.  Given a particle packet containing N particles and $\Sigma$, their interaction probability per unit distance, the change the population over $d$x is the product of the population N and the interaction probability, as show in \eqref{pop_diff} \cite{duderstadt}.  $N$ is simply the number of neutrons and does not take any dimensionality into account.  When number densities are discussed later, they will be represented by a lowercase $n$.
 
 \begin{equation}
 \frac{d N}{d x} = - \Sigma N
@@ -123,7 +123,7 @@ n_i = f_i n_\mathrm{avg} = f_i \frac{\rho}{M_\mathrm{avg}}
 \label{material_sum_xs}
 \end{equation}
 
-The above expressions do not take energy into account, so they are assumed to be at a single energy.  Using such simple expressions to determine the cross section of an isotope would only be valid with the use of a very, very precisely mono-energetic neutron population.  The quantum mechanical details that go into cross sections can cause them to depend strongly on the energy (or velocity) of the neutron and the target nucleus.  Many nuclides have resonances where the interactions probability spikes to very large values.  This typically happens when the incoming energy is exactly that of an energy level of the resultant compound nucleus \cite{duderstadt}.   Figure \ref{xs_e_dependence_li} shows the energy dependence of various reactions type in $^6$Li and Figure \ref{xs_e_dependence_u} shows the dependence of others in $^{235}$U.  
+The above expressions are assumed to be at a single energy. The quantum mechanical that are present in reality can cause cross sections to depend strongly on the energy (or velocity) of the neutron and the target nucleus.  Many nuclides have resonances where the interactions probability spikes to very large values.  This typically happens when the incoming energy is exactly that of an energy level of the resultant compound nucleus \cite{duderstadt}.   Figure \ref{xs_e_dependence_li} shows the energy dependence of various reactions type in $^6$Li and Figure \ref{xs_e_dependence_u} shows the dependence of others in $^{235}$U.  
 
 \begin{figure}[h!]
   \centering
@@ -137,11 +137,13 @@ The above expressions do not take energy into account, so they are assumed to be
     \caption{The energy dependence of some reactions in $^{235}$U.   \label{xs_e_dependence_u}}
 \end{figure}
 
-It is important to note the complexity shown in $^{235}$U in the 0.1eV to 40keV range.  This is referred to as the ``resonance region'' and adds much of the complexity in accurately modeling neutron transport.  There are no simple functional representations available for these types of cross sections, so they must be represented in a point-wise tabular format.  It is also important to note that at low energies, cross sections typically lose structure and exhibit t ``1/$v$'' scaling.  This is due to the particle and the target having more time to interact with each other.  The energy levels where this phenomenon exists is similar the thermal energy of the target and the target no longer appears stationary from the neutrons perspective.  If the neutron is slow enough, the targets appear to be moving instead of the neutron, and more of them come into the neutrons sphere of interaction.  This is the qualitative reason for 1/$v$ scaling at low energies.  Due to to their identical scaling, the ratios between the reaction types stays constant as velocity is decreased but the overall interaction probability with respect to distance increases \cite{duderstadt}.
+It is important to note the complexity shown in $^{235}$U in the 0.1 eV to 40 keV range.  This is referred to as the ``resonance region'' and adds much of the complexity in accurately modeling neutron transport.  There are no simple functional representations available for these types of cross sections, so they must be represented in a point-wise tabular format.  
+
+It is also important to note that at low energies, cross sections typically lose structure and exhibit t ``1/$v$'' scaling.  This is due to the particle and the target having more time to interact with each other.  This phenomenon exists at energy levels similar the thermal energy of the target.  Since the neutron has a similar energy, the target no longer appears stationary from the neutrons perspective.  If the neutron is slow enough, the targets appear to be moving instead of the neutron, and more of them come into the neutrons sphere of interaction.  This is the qualitative reason for 1/$v$ scaling at low energies.  Because of their identical scaling, the ratios between the reaction types stays constant as velocity is decreased but the overall interaction probability with respect to distance increases \cite{duderstadt}.
 
 \subsection{Elastic Scattering}
 
-Elastic scattering conserves both the momentum and the kinetic energy of the reacting particles and occurs when the neutron does not enter the nucleus, only bounces off of it's potential field.  Since there is only a single exiting particle, elastic scattering is a two-body interaction and the exiting energies can be determined if the angle between the exiting particle is known.  This problem is greatly simplified if the velocities of the interacting neutron and nucleus are transformed into the center-of-mass (CM) frame, where net momentum is zero. The velocity of the CM is defined in \eqref{vCM} where $m$ and $M$ are the neutron's and the target's respective masses, $v$ and $V$ are their respective velocity vectors, and $A$ is the ratio of the target's mass to the neutron's mass (also know as the ``atomic mass ratio'' or AMR).  The derivation from here follows closely with that in \cite{jaakko}.
+Elastic scattering conserves both the momentum and the kinetic energy of the reacting particles and occurs when the neutron does not enter the nucleus, but bounces off of it's potential field.  Since there is only a single exiting particle, elastic scattering is a two-body interaction and the exiting energies can be determined if the angle between the exiting particle is known.  This problem is greatly simplified if the velocities of the interacting neutron and nucleus are transformed into the center-of-mass (CM) frame, where net momentum is zero. The velocity of the CM is defined in \eqref{vCM} where $m$ and $M$ are the neutron's and the target's respective masses, $v$ and $V$ are their respective velocity vectors, and $A$ is the ratio of the target's mass to the neutron's mass (also know as the ``atomic mass ratio'' or AMR).  The derivation from here follows closely with that in \cite{jaakko}.
 
 \begin{equation}
 A = \frac{M}{m}
@@ -149,7 +151,7 @@ A = \frac{M}{m}
 \end{equation}
 
 \begin{equation}
-\boldsymbol{v_{\mathrm{CM}}} = \frac{ m \boldsymbol{v} + M \boldsymbol{V} }    {m+M} = \frac{ \boldsymbol{v} + A \boldsymbol{V} }    {1+A}
+\boldsymbol{\vec{v}_{\mathrm{CM}}} = \frac{ m \boldsymbol{\vec{v}} + M \boldsymbol{\vec{V}} }    {m+M} = \frac{ \boldsymbol{\vec{v}} + A \boldsymbol{\vec{V}} }    {1+A}
 \label{vCM}
 \end{equation}
 
@@ -157,31 +159,31 @@ The CM velocities of the target and the neutron are then calculated by subtracti
 
 \begin{equation}
 \begin{split}
- \boldsymbol{v_{_\mathrm{c}}} &= \boldsymbol{v} - \boldsymbol{v_{\mathrm{CM}}} \\  
- \boldsymbol{V_{\mathrm{c}}} &= \boldsymbol{V} - \boldsymbol{v_{\mathrm{CM}}}
+ \boldsymbol{\vec{v}_{_\mathrm{c}}} &= \boldsymbol{\vec{v}} - \boldsymbol{\vec{v}_{\mathrm{CM}}} \\  
+ \boldsymbol{\vec{V}_{\mathrm{c}}} &= \boldsymbol{\vec{V}} - \boldsymbol{\vec{v}_{\mathrm{CM}}}
  \end{split}
 \label{CM}
 \end{equation}
 
-Once in the CM frame, the equation for conservation of momentum can be written as \eqref{consMomCM}.  The primed values are those after the collision.  Since the net momentum is zero, the directions of the neutron and the target must be in opposite directions as shown in \eqref{rotationCM}.
+Once in the CM frame, the equation for conservation of momentum can be written as \eqref{consMomCM}, where the primed values are those after the collision.  Since the net momentum is zero, the directions of the neutron and the target must be in opposite directions as shown in \eqref{rotationCM}.
 
 \begin{equation}
 \begin{split}
-m \boldsymbol{v_{_\mathrm{c}}} + M \boldsymbol{V_{_\mathrm{c}}} &= m \boldsymbol{v_{_\mathrm{c}}^\prime} + M \boldsymbol{V_{_\mathrm{c}}^\prime} = 0\\
-    \boldsymbol{v_{_\mathrm{c}}} + A  \boldsymbol{V_{_\mathrm{c}}} &=     \boldsymbol{v_{_\mathrm{c}}^\prime} + A  \boldsymbol{V_{_\mathrm{c}}^\prime} = 0
+m \boldsymbol{\vec{v}_{_\mathrm{c}}} + M \boldsymbol{\vec{V}_{_\mathrm{c}}} &= m \boldsymbol{\vec{v}_{_\mathrm{c}}^\prime} + M \boldsymbol{\vec{V}_{_\mathrm{c}}^\prime} = 0\\
+    \boldsymbol{\vec{v}_{_\mathrm{c}}} + A  \boldsymbol{\vec{V}_{_\mathrm{c}}} &=     \boldsymbol{\vec{v}_{_\mathrm{c}}^\prime} + A  \boldsymbol{\vec{V}_{_\mathrm{c}}^\prime} = 0
 \end{split}
 \label{consMomCM}
 \end{equation}
 
 \begin{equation}
 \begin{split}
-\boldsymbol{v_{_\mathrm{c}}^\prime} &= - A  \boldsymbol{V_{_\mathrm{c}}^\prime} \\
-\boldsymbol{v_{_\mathrm{c}}} &= -A  \boldsymbol{V_{_\mathrm{c}}}
+\boldsymbol{\vec{v}_{_\mathrm{c}}^\prime} &= - A  \boldsymbol{\vec{V}_{_\mathrm{c}}^\prime} \\
+\boldsymbol{\vec{v}_{_\mathrm{c}}} &= -A  \boldsymbol{\vec{V}_{_\mathrm{c}}}
 \end{split}
 \label{rotationCM}
 \end{equation}
 
-The equation for conservation of energy is shown in \ref{consECM}.  $Q$ is the amount of energy released by the reaction and is zero for elastic scattering.  It is convenient to include in this derivation for use in inelastic collision kinematics where it is nonzero.
+The equation for conservation of energy is shown in \ref{consECM}.  $Q$ is the amount of energy released by the reaction and is zero for elastic scattering.  It is convenient to include in this derivation for use later in inelastic collision kinematics where it is nonzero.
 
 \begin{equation}
 \begin{split}
@@ -191,7 +193,7 @@ m v_{_\mathrm{c}}^2 + M V_{_\mathrm{c}}^2 &= m v_{_\mathrm{c}}^{\prime2} + M V_{
 \label{consECM}
 \end{equation}
 
-There are now two unknowns (the primed values) and two equations, and the final velocities of the neutron and the target can be determined.  Substituting \eqref{rotationCM} into \eqref{consECM} and solving yields either equation in \eqref{finalvCM}, depending on how the substitution is done.  It can be seen that if $Q$ is zero, as it is in elastic scattering, the initial and final velocities are the same for the particles and the interaction only causes a rotation in the CM frame.
+There are now two unknowns (the primed values) and two equations, and the final velocities of the neutron and the target can be determined.  Substituting \eqref{rotationCM} into \eqref{consECM} and solving yields either equation in \eqref{finalvCM}, depending on how the substitution is done.  If $Q$ is zero, as it is in elastic scattering, the initial and final velocities are the same for the particles and the interaction only causes a rotation in the CM frame.
 
 \begin{equation}
 \begin{split}
@@ -201,7 +203,9 @@ V_{_\mathrm{c}}^{\prime} &= \sqrt{ V_{_\mathrm{c}}^{2} + \frac{2Q}{mA(A+1)}  }
 \label{finalvCM}
 \end{equation}
 
-At first glance, it seems like the interaction has been fully characterized, but \eqref{rotationCM} only relates the initial states of the neutron and the target to one another and the final states of neutron and the target to one another.  The initial state and final state of the neutron still need to be related.  It has been mentioned already that the interaction is only a rotation in the CM frame, so the initial and final state of the neutron's direction can be related by a three-dimensional rotation formula.  An efficient algorithm is given by \eqref{vector_rot} \cite{openmc}.  In the formula, $\mu=\cos \theta$, and $\hat{{\Omega}}_x$, $\hat{\Omega}_y$, and $\hat{\Omega}_z$ are the cartesian projections of the velocity's unit vector.  It is ``efficient'' in the sense that to rotate a vector, a full 3x3 matrix does not need to be constructed and multiplied by the vector. In other words, matrix-vector operations are not needed and it can be carried out with only vector operations.
+At first glance, it seems like the interaction has been fully characterized, but \eqref{rotationCM} only relates the initial states of the neutron and the target to one another and the final states of neutron and the target to one another.  The initial state and final state of the neutron still need to be related.  It has been mentioned already that the interaction is only a rotation in the CM frame, so the initial and final state of the neutron's direction can be related by a three-dimensional rotation formula.  
+
+An efficient algorithm is given by \eqref{vector_rot} \cite{openmc}.  In the formula, $\mu=\cos \theta$, and $\hat{{\Omega}}_x$, $\hat{\Omega}_y$, and $\hat{\Omega}_z$ are the cartesian projections of the velocity's unit vector.  It is ``efficient'' in the sense that to rotate a vector, a full 3x3 matrix does not need to be constructed and multiplied by the vector. In other words, matrix-vector operations are not needed and it can be carried out with only vector operations.
 
 \begin{equation}
 \begin{split}
@@ -216,8 +220,8 @@ If the polar and azimuthal rotation angles, $\theta$ and $\phi$, respectively, a
 
 \begin{equation}
 \begin{split}
- \boldsymbol{v^{\prime}}  &= \boldsymbol{v_{\mathrm{c}}^{\prime}} + \boldsymbol{v_{\mathrm{CM}}} \\  
- \boldsymbol{V^{\prime}} &= \boldsymbol{V_{\mathrm{c}}^{\prime}} + \boldsymbol{v_{\mathrm{CM}}}
+ \boldsymbol{\vec{v}^{\prime}}  &= \boldsymbol{\vec{v}_{\mathrm{c}}^{\prime}} + \boldsymbol{\vec{v}_{\mathrm{CM}}} \\  
+ \boldsymbol{\vec{V}^{\prime}} &= \boldsymbol{\vec{V}_{\mathrm{c}}^{\prime}} + \boldsymbol{\vec{v}_{\mathrm{CM}}}
  \end{split}
 \label{xformbackCM}
 \end{equation}
@@ -231,14 +235,14 @@ If the polar and azimuthal rotation angles, $\theta$ and $\phi$, respectively, a
      \caption{The energy levels of $^{177}$Hf \cite{krane}. \label{Elevels}}
 \end{figure}
 
-Inelastic scattering is the other type of scattering a neutron can undergo where kinetic energy is no longer conserved.  There is an amount of energy, $Q$, that is released from the reaction to the particles, or more commonly, taken from the particles and lost to the reaction.  In neutron-nucleus collisions, the target nucleus can be excited to a higher energy state than its ground state if the colliding neutron has a high enough energy to do so.  If it does and the collision excites the nucleus, a discrete amount of energy is lost to the reaction.  These excited states typically do not have long half lives, and a gamma ray is emitted when the nucleus relaxes to its ground state.  This type of reaction is called inelastic level scattering due to a an excited energy \emph{level} becoming occupied by the target nucleus.  
+Inelastic scattering is the other type of scattering a neutron can undergo, but in this case kinetic energy is no longer conserved.  There is an amount of energy, $Q$, that is released from the reaction to the particles, or more commonly, taken from the particles and lost to the reaction.  In neutron-nucleus collisions, the target nucleus can be excited to a higher energy state than its ground state if the colliding neutron has a high enough energy to do so.  If it does and the collision excites the nucleus, a discrete amount of energy is lost to the reaction.  These excited states typically do not have long half lives, and a gamma ray is emitted when the nucleus relaxes to its ground state.  This type of reaction is called inelastic level scattering because an excited energy \emph{level} becomes occupied by the target nucleus.  
 
-Since it is still a two-body interaction, the kinematics of the reaction are identical to elastic scattering except the $Q$ value is nonzero and negative.  These reactions have a threshold energy below which their cross sections are zero since the neutron would not have enough energy to excite the target nucleus.   Figure \ref{Elevels} shows the energy levels in $^{177}$Hf, which is often used as a thermal neutron absorber, but also could be used as a fast neutron moderator due to its low-lying energy levels and its large inelastic scattering cross sections.
+Since this reaction is still a two-body interaction, the kinematics of the reaction are identical to elastic scattering except the $Q$ value is nonzero and negative.  These reactions have a threshold energy below which their cross sections are zero since the neutron would not have enough energy to excite the target nucleus.   Figure \ref{Elevels} shows the energy levels in $^{177}$Hf, which is often used as a thermal neutron absorber, but also could be used as a fast neutron moderator because it has many low-lying energy levels and its large inelastic scattering cross sections.
 
 
 \subsection{Inelastic Continuum Scattering}
 
-At energies above the distinct levels there lies a continuum in the nuclear energy states.  This isn't truly a ``continuum'' in the strictest sense, but the energy levels become so close together they they effectively form a domain where energy can take continuous values.  Unlike the discrete $Q$ values corresponding to a single excited state used in inelastic level scattering, the $Q$ value of the reaction now follows a distribution \cite{krane}.  
+At energies above the distinct levels there lies a continuum in the nuclear energy states.  This isn't truly a ``continuum'' a strict sense, but the energy levels become so close together they they effectively form a domain where energy can take continuous values.  Unlike the discrete $Q$ values corresponding to a single excited state used in inelastic level scattering, the $Q$ value of the reaction now follows a distribution \cite{krane}.  
 
 \subsection{Fission}
 
