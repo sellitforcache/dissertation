@@ -69,6 +69,9 @@ def get_mcnp_mctal(filepath):
 	alldata = numpy.array([ene,vals,errs])
 	return alldata
 
+def reduce_resolution(input_array,factor):
+	# factor MUST BE INTEGER
+	return (input_array.reshape(input_array.shape[0]/factor, factor, input_array.shape[1]/factor, factor).sum(axis=1).sum(axis=2) ) / (1.0*factor*factor)
 
 #
 #  Get input arguments
@@ -88,6 +91,7 @@ if case=='':
 	reso=256
 else:
 	reso=512
+
 reso=500
 
 #
@@ -224,6 +228,7 @@ ax0 = plt.subplot(gs[0])
 ax1 = plt.subplot(gs[1])
 data=np.array(open("serpent-benchmark"+case+"/homfuel_mesh1.dist1").read().split(),dtype=float)
 serp_xy=data.reshape(500,500,order='F')
+serp_xy=reduce_resolution(serp_xy,500/reso)
 serp_xy=serp_xy/np.max(serp_xy)
 ax0.imshow(serp_xy,extent=[xmin, xmax, ymin, ymax] )#, normed=True)#norm=LogNorm())
 ax0.set_xlabel('x (cm)')
@@ -232,6 +237,7 @@ ax0.grid('on',color='k')
 
 data=np.array(open("serpent-benchmark"+case+"/homfuel_mesh2.dist1").read().split(),dtype=float)
 serp_xz=data.reshape(500,500,order='F')
+serp_xz=reduce_resolution(serp_xz,500/reso)
 serp_xz=serp_xz/np.max(serp_xz)
 ax1.imshow(serp_xz,extent=[xmin, xmax, ymin, ymax])
 ax1.set_xlabel('x (cm)')
@@ -408,6 +414,7 @@ xmin = ymin = -5
 xmax = ymax =  5
 data=np.array(open("serpent-benchmark"+case+"/pincell_mesh1.dist1").read().split(),dtype=float)
 serp_xy=data.reshape(500,500,order='F')
+serp_xy=reduce_resolution(serp_xy,500/reso)
 serp_xy=serp_xy/np.max(serp_xy)
 ax0.imshow(serp_xy ,extent=[xmin, xmax, ymin, ymax])#, normed=True)#norm=LogNorm())
 ax0.set_xlabel('x (cm)')
@@ -420,6 +427,7 @@ ymin = -25
 ymax =  25
 data=np.array(open("serpent-benchmark"+case+"/pincell_mesh2.dist1").read().split(),dtype=float)
 serp_xz=data.reshape(500,500,order='F')
+serp_xz=reduce_resolution(serp_xz,500/reso)
 serp_xz=serp_xz/np.max(serp_xz)
 ax1.imshow(serp_xz,extent=[xmin, xmax, ymin, ymax])
 ax1.set_xlabel('x (cm)')
@@ -600,6 +608,7 @@ xmin = ymin = -5.1
 xmax = ymax =  5.1
 data=np.array(open("serpent-benchmark"+case+"/godiva_mesh1.dist1").read().split(),dtype=float)
 serp_xy=data.reshape(500,500,order='F')
+serp_xy=reduce_resolution(serp_xy,500/reso)
 serp_xy=serp_xy/np.max(serp_xy)
 ax0.imshow(serp_xy ,extent=[xmin, xmax, ymin, ymax])#, normed=True)#norm=LogNorm())
 ax0.set_xlabel('x (cm)')
@@ -612,6 +621,7 @@ ymin = -5.1
 ymax =  5.1
 data=np.array(open("serpent-benchmark"+case+"/godiva_mesh2.dist1").read().split(),dtype=float)
 serp_xz=data.reshape(500,500,order='F')
+serp_xz=reduce_resolution(serp_xz,500/reso)
 serp_xz=serp_xz/np.max(serp_xz)
 ax1.imshow(serp_xz,extent=[xmin, xmax, ymin, ymax])
 ax1.set_xlabel('x (cm)')
@@ -787,6 +797,7 @@ xmin = ymin = -48
 xmax = ymax =  48
 data=np.array(open("serpent-benchmark"+case+"/assembly_mesh1.dist1").read().split(),dtype=float)
 serp_xy=data.reshape(500,500,order='F')
+serp_xy=reduce_resolution(serp_xy,500/reso)
 serp_xy=serp_xy/np.max(serp_xy)
 ax0.imshow(serp_xy ,extent=[xmin, xmax, ymin, ymax])#, normed=True)#norm=LogNorm())
 ax0.set_xlabel('x (cm)')
@@ -799,6 +810,7 @@ ymin = -48
 ymax =  48
 data=np.array(open("serpent-benchmark"+case+"/assembly_mesh2.dist1").read().split(),dtype=float)
 serp_xz=data.reshape(500,500,order='F')
+serp_xz=reduce_resolution(serp_xz,500/reso)
 serp_xz=serp_xz/np.max(serp_xz)
 ax1.imshow(serp_xz,extent=[xmin, xmax, ymin, ymax])
 ax1.set_xlabel('x (cm)')
