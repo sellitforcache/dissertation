@@ -44,12 +44,12 @@ It seems that GPU cards would be perfect for running Monte Carlo neutron transpo
 Processor & Intel i7 (Westmere-EP) & NVIDIA Tesla C2075 (Fermi) \\
 \hline
 \hline
-Processing Elements & 6 cores, 2 issue, & 16 cores, 2 issue, \\
+Processing Elements & 6 cores, 2 issue, & 14 cores, 2 issue, \\
 & 4-way SIMD &  16-way SIMD  \\
 \hline
 Frequency & 3.46GHz &  1.15 Ghz \\
 \hline
-Resident Strands / Threads (max) & 48 & 24,576 \\
+Resident Strands / Threads (max) & 48 & 21,504 \\
 \hline
 SP GFLOP/s & 166 & 1030 \\
 \hline
@@ -61,7 +61,7 @@ FLOPs / byte & 5.2  & 7.2 \\
 \hline
 Register File & 6kB & 2MB \\
 \hline
-Local Storage / L1 Cache & 192 kB & 1024 kB \\
+Local Storage / L1 Cache & 192 kB & 896 kB \\
 \hline
 L2 Cache & 1536 kB & 0.75 MB \\
 \hline
@@ -107,19 +107,20 @@ per TeraFLOP (\$.05 / kWh)   & & \\
 \end{tabular}
 \end{table}
 
-Table \ref{gpu_money} shows a cost comparison of an AMD Opteron 6128 CPU and an NVIDIA Tesla C2075 GPU \cite{cpu_latency,cuda}.  The prices shown are rounded values from purchases made by the UC Berkeley Department Nuclear Engineering \cite{cost_sheets1,cost_sheets2}.  The CPU price is for a complete server, basically CPUs and RAM.  The disk and  other components are a secondary cost.  The price shown for the GPUs are for the cards only since they can live in a very cheap host server with very little RAM and budget CPUs.  The main benefit from using GPUs is the substantially lower electric cost per FLOP, though the capital cost per amount of work can also be lower that an equivalent CPU configuration.  To put this in a nuclear engineering context, it is useful to compare cost per unit work done, where work done will be called ``history power'': histories run per second.  Assuming a GPU speedup factor of 25 (approximately the average value of the accelerated applications reported by NVIDIA \cite{nvidia_speedups}) and that CPU codes scale perfectly linearly, the price per history power of the GPU configuration shown in Table \ref{gpu_money} is about three times lower than that of CPU configuration.  
+Table \ref{gpu_money} shows a cost comparison of an AMD Opteron 6128 CPU and an NVIDIA Tesla C2075 GPU \cite{cpu_latency,cuda}.  The prices shown are rounded values from purchases made by the UC Berkeley Department Nuclear Engineering \cite{cost_sheets1,cost_sheets2}.  The CPU price is for four Opteron 6172 processors, and the GPU price is for three NVIDIA Tesla C2075 cards.  These numbers are shown because the department's computer cluster contains CPU and GPU nodes with these configurations.  The main benefit from using GPUs is the substantially lower electric cost per FLOP, though the capital cost per amount of work can also be lower that an equivalent CPU configuration.  To put this in a nuclear engineering context, it is useful to compare cost per unit work done, where work done will be called ``history power'': histories run per second.  Assuming a GPU speedup factor of 25 (approximately the average value of the accelerated applications reported by NVIDIA \cite{nvidia_speedups}) and that CPU codes scale perfectly linearly, the price per history power of the GPU configuration shown in Table \ref{gpu_money} is about 31\% lower than that of CPU configuration.  This indicates that GPUs may have lower capital costs as well as lower power costs per history power if they are able to provide a speedup greater than 16 over serial CPU codes (this is where their history powers are equal under the stated assumptions). 
 % I changed the history power discussion to be consistent with your table.
 
 \section{Goals and Impacts}
 
-Many supercomputers are incorporating GPUs into their nodes to gain efficiency, which is the main obstacle in exascale computing.  Monte Carlo simulations are very computationally intensive, but their use is often required to adequately characterize nuclear reactors.  To perform Monte Carlo computations in a reasonable amount of time, supercomputers are needed.  Monte Carlo codes written for use on CPUs cannot be directly run on GPUs, and no Monte Carlo applications exist for the GPU.
-% Is that true? What about professor Xu from RPI? I know that he does MC on GPU for medical applications...
-Thus, the incorporation of GPUs into supercomputers does not yet benefit the nuclear engineering community in terms of computational resources for Monte Carlo.  
+Many supercomputers are incorporating GPUs into their nodes to gain efficiency, which is the main obstacle in exascale computing.  Monte Carlo simulations are very computationally intensive, but their use is often required to adequately characterize nuclear reactors.  To perform Monte Carlo computations in a reasonable amount of time, supercomputers are needed.  Monte Carlo codes written for use on CPUs cannot be directly run on GPUs, and no high-fidenlity Monte Carlo neutron transport applications exist for the GPU.  
 
-The goal of this work is to produce a program, WARP, that accelerates accurate continuous energy neutron transport simulations in general, 3D geometries by using a GPU.  Even though GPU computing is still in its very early stages, developing WARP hedges risk against the nuclear engineering community's computational tools becoming under powered or even obsolete. In addition, GPUs are common in personal computers and workstations.  Developing WARP will expose a substantial amount of  computing power that couldn't otherwise be used and which could drastically reduce simulation times for people without access to ``traditional" supercomputers.  If WARP is able to produce accurate results around 20 times faster than a CPU code, the GPU could indeed be called a ``personal supercomputer.''   Many supercomputers have nodes with around 20 CPU cores in them, and a 20x speedup with the WARP would make have a GPU equivalent to having a supercomputer node in a personal computer.
-%GPUs have CPU cores? This is the first time you use this language...
+Running Monte Carlo simulations on GPUs is not a new idea.  Ever since they became programmable, people have been trying to take advantage of their highly parallel, high computational throughput features.  There are several codes that perform photon transport very well on GPUs \cite{henderson, tianyu}, and there has also been a study that ran criticality simulations on a GPU using an event-based algorithm, but artificial, single-group cross sections and simple geometries were used \cite{tianyu}.  An even earlier study attempted to use continuous-energy cross sections to perform criticality calculations, but did not use standard data, did not perform inelastic scattering according to the full ENDF laws, did not incorporate a general or scalable geometry representation, and did not implement an effective data-parallel algorithm \cite{nelson}.  Due to all of their various shortcomings, none of these code were able to produces results comparable to production Monte Carlo neutron transport codes.
+% Is that true? What about professor Xu from RPI? I know that he does MC on GPU for medical applications...  I misspoke, there are no codes that do CE MC neutron transport.  They used single-group cross sections, and handling XS is where most of the work is!!!  Also, nobody did sorting or a global event based algorithm properly!
 
-To be a competitive Monte Carlo neutron transport code, WARP must be able to run in fixed source and criticality source modes, produce neutron spectra, plot fission source distributions, calculate multiplication factors, and use standard nuclear data files. Implementing these features will determine which existing Monte Carlo algorithms can be preserved and which need to be modified to take full advantage of these new, powerful processors.  
+The goal of this work is to produce a program, WARP, that accelerates \emph{accurate} continuous energy neutron transport simulations in general, 3D geometries by using a GPU.  Even though GPU computing is still in its very early stages, developing WARP hedges risk against the nuclear engineering community's computational tools becoming under powered or even obsolete. In addition, GPUs are common in personal computers and workstations.  Developing WARP will expose a substantial amount of  computing power that couldn't otherwise be used and which could drastically reduce simulation times for people without access to ``traditional" supercomputers.  If WARP is able to produce accurate results around 20 times faster than a CPU code, the GPU could indeed be called a ``personal supercomputer.''   Many supercomputers have nodes with around 20 CPU cores in them, and a 20x speedup with the WARP would make have a GPU equivalent to having a supercomputer node in a personal computer.
+%GPUs have CPU cores? This is the first time you use this language...  sorry, definitely confusing, fixed.
+
+To be a competitive Monte Carlo neutron transport code, WARP must be able to run in fixed source and criticality source modes, produce neutron spectra, plot fission source distributions, calculate multiplication factors, and use standard nuclear data files.  Implementing these features will determine which existing Monte Carlo algorithms can be preserved and which need to be modified to take full advantage of these new, powerful processors.  
 
 If the name ``WARP'' were an acronym, it would stand for ``weaving all the random particles,'' with the word ``weaving'' referring to the lock-step way in which ``all the random particles'', i.e. the neutrons, are sorted into coherent bundles and transported.  Using the word ``warp'' is also a nod to NVIDIA's terminology for a group of 32 concurrent threads.
 
@@ -144,8 +145,8 @@ Like many Monte Carlo neutron transport codes (MCNP and Keno-VI included), Serpe
 % I think this is true and what you meant by however.
 The Woodcock method ``has proven efficient and well suited for geometries where the neutron mean-free-path is long compared to the dimensions, which is typically the case in fuel assemblies, and especially in HTGR particle fuels'' \cite{serpent}, and limits excess geometry sampling that can occur when strong absorbers are present.
 
-Serpent also pioneered the use of a unionized energy grid format for the cross section and reaction data.
-% You might want to explain what a unionized energy grid format is.
+Serpent also pioneered the use of a unionized energy grid format for the cross section and reaction data.  The native way nuclear data is formatted gives each isotope cross sections a unique energy grid.  It is done this way so the minimum number of data points is included in the cross section to achieve an accuracy level.  Since each isotope's grid is different, a search must be done on it to determine what data points a neutron's energy lies between.  When there are many isotopes present, doing many energy searches to look up cross sections can become expensive.  Serpent's method is to unionize all the energy grid for all the isotopes so they all have the same energy structure and only a single grid search is needed.  
+% You might want to explain what a unionized energy grid format is. done.
   This reformatting of the nuclear data regularizes the access of the data and increases performance, but comes at the cost of a larger memory footprint.  Serpent can also perform cross section preprocessing at arbitrary temperatures for more accurate calculations with minimal computational cost. Serpent also does on-the-fly Doppler broadening from 0K data, so only one set of nuclear data needs to be stored in memory (though this strategy has an additional computational cost) \cite{serpent}.
 
 %Serpent has also been extensively validated against benchmark problems as well as against other Monte Carlo codes like MCNP and Keno-VI.  It shows good agreement  with the reference cases, but can sometimes have statistically significant differences from the other codes, depending on the problem.  Despite this, Serpent is very accurate for most problems \cite{serpent}.
