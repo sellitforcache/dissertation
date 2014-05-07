@@ -27,7 +27,7 @@ Conversely, deterministic methods discretize the spatial and energy domains, int
 
 GPUs have gradually increased in computational power from the small, job-specific boards of the early 1990s to the programmable powerhouses of today.  Compared to CPUs, they have a higher aggregate memory bandwidth, much higher floating-point operations per second (FLOPS), and lower energy consumption per FLOP \cite{cuda}.  Because one of the main obstacles in exascale computing is power consumption \cite{exascale}, many new supercomputing platforms are gaining much of their computational capacity by incorporating GPUs into their compute nodes.  In the November 2013 Top 500 list, there are 41 GPU-accelerated supercomputers, some of which gain 50\% of their computational capacity from GPU coprocessor cards \cite{top500}.  Supercomputers in the number two and six spots use GPUs as well.  Since CPU-optimized parallel algorithms are usually not directly portable to GPU architectures (or at least not without losing substantial performance), transport codes may need to be rewritten to execute efficiently on GPUs.  Unless this is done, nuclear engineers cannot take full advantage of these new supercomputers for reactor simulations.
 
-Table \ref{gpu_cpu_comp} shows a breakdown of features of both an Intel Westmere-EP (i7) CPU and an NVIDIA Tesla C2075 (Fermi) GPU \cite{cent, cpu_latency}.  An AMD CPU was used in this work, but the i7 has similar enough characteristics to be representative, and the data of interest was more readily available.  The AMD processor has similar values apart from the frequency, therefore comparisons made here are still valid.  
+Table \ref{gpu_cpu_comp} shows a breakdown of features of both an Intel i7 (Westmere-EP) CPU and an NVIDIA Tesla C2075 (Fermi) GPU \cite{cent, cpu_latency}.  An AMD CPU was used in this work, but the i7 has similar enough characteristics to be representative, and the data of interest was more readily available.  The AMD processor has similar values apart from the frequency, therefore comparisons made here are still valid.  
 
 At first glance, it may appear that the GPU completely outstrips the CPU.  The GPU has higher single precision FLOPs, which indicates that the GPU can do work faster than the CPU.  The GPU also has a higher memory bandwidth, which implies that data can be loaded from memory at a higher rate than a CPU.  Data is necessary to do calculations, and the higher arithmetic rate of the GPU would be wasted if the processors couldn't be fed with data at a high rate.  GPUs also have a higher concurrent thread capability.  ``Thread'' is the sequence of instructions given to a processor to execute in order to complete a specified task.  
 
@@ -37,29 +37,29 @@ It seems that GPU cards would be perfect for running Monte Carlo neutron transpo
 
 \begin{table}[h]
 \centering
-\caption{A comparison of an NVIDIA GPU and an Intel CPU \cite{cent, cpu_latency}.}
+\caption{A comparison of an NVIDIA GPU and an Intel CPU \cite{cent, cpu_latency,opteronperformance}.}
 \label{gpu_cpu_comp}
 \begin{tabular}{| l | r | r |}
 \hline
-Processor & Intel Westmere-EP (i7) & NVIDIA Tesla C2075 (Fermi) \\
+Processor & Intel i7 (Westmere-EP) & NVIDIA Tesla C2075 (Fermi) \\
 \hline
 \hline
 Processing Elements & 6 cores, 2 issue, & 16 cores, 2 issue, \\
 & 4-way SIMD &  16-way SIMD  \\
 \hline
-Frequency & 3.46GHz &  1.54 Ghz \\
+Frequency & 3.46GHz &  1.15 Ghz \\
 \hline
 Resident Strands / Threads (max) & 48 & 24,576 \\
 \hline
-SP GFLOP/s & 166 & 1577 \\
+SP GFLOP/s & 166 & 1030 \\
 \hline
-Mem. Bandwidth &  32 GB/s & 192 GB/s \\
+Mem. Bandwidth &  32 GB/s & 144 GB/s \\
 \hline
-Global Latency & 200-800 clocks & ~50 clocks \\
+Global Latency & $\sim$50 clocks & 200-800 clocks  \\
 \hline
-FLOPs / byte & 12.5  & 16.1 \\
+FLOPs / byte & 5.2  & 7.2 \\
 \hline
-Register Fils & 6kB & 2MB \\
+Register File & 6kB & 2MB \\
 \hline
 Local Storage / L1 Cache & 192 kB & 1024 kB \\
 \hline
@@ -74,33 +74,34 @@ The memory subsystems of GPUs also function in a SIMD-like way.  In order to use
 % Great explanation!
 
 Another undesirable feature of the GPU is that they have very high global memory latency compared to a CPU.  Memory latency is the number of clock cycles, or amount of time, it takes for a data request to be fulfilled.  As Table \ref{gpu_cpu_comp} shows, the GPU's global memory latency is about an order of magnitude higher than the CPU's \cite{cpu_latency,cuda}.  
-% Wait, isn't 200-800 clocks longer than 50 clocks? I'm confused...
+% Wait, isn't 200-800 clocks longer than 50 clocks? I'm confused... oops.  typo fixed!
 GPUs try to eliminate the effect of large global latency by pipelining memory access.  Pipelining means threads that have their data can execute as other threads are waiting for their data to load.  If many requests are known, the data can be continually loaded as threads start to execute their jobs.  The hope is that the jobs take longer than the memory loads, eventually all data arrives, and the later threads appear to have zero latency for their memory access.  This is why it is important for GPUs to have such a large number of concurrent threads.  It allows them to pipeline data access and minimize the impact of memory latency.
 
 Another notable feature is that the GPU has a greater FLOPs/byte of memory bandwidth ratio than the CPU.  This implies that GPUs could be used to turn a compute-bound problem into a bandwidth-bound problem.  This may seem like a deficit, but the GPU has a higher maximum memory bandwidth, so even though a problem is bandwidth-bound on a GPU, it may still require less execution time than on a CPU.
 
 \begin{table}[h]
 \centering
-\caption{Breakdown of the cost benefits of GPUs \cite{cost_sheets1,cost_sheets2,c2075,opterondate}}
+\caption{Breakdown of the cost benefits of GPUs assuming maximum performance and linear CPU scaling \cite{cost_sheets1,cost_sheets2,c2075,opterondate,opteronperformance}}
 \label{gpu_money}
 \begin{tabular}{| l | r | r |}
 \hline
-Processor & 4x AMD Opteron 6128  & 3x NVIDIA Telsa C2075 \\
-  & @ 2.1 GHz &  (cards only)  \\
+Processor & 4x AMD Opteron 6172  & 3x NVIDIA Tesla C2075 \\
+  & @ 2.1 GHz (processors only) &  (cards only)  \\
 \hline
 \hline
-Approximate Price (Q2 2012)& \$10,000 & \$6,000 \\
+Approximate Price (Q2 2012)& \$8,000 & \$ 7,000 \\
 \hline
-Max.TeraFLOP & 0.4 & 3.1 \\
+Max.TeraFLOP & 0.8 & 3.1 \\
 \hline
-Price / GigaFLOP & \$25 & \$1.94 \\
+Price / GigaFLOP & \$10 & \$2.26 \\
 \hline
-Price / History Power (10$^3$ h / s) & \$1.00 & \$0.38 \\
-(assuming 25x GPU speedup) & & \\
+Price / History Power & \$0.16 & \$0.11 \\
+(assuming 10$^3$ histories/s & & \\
+per core and 25x GPU speedup) & & \\
 \hline
-Thermal Power & 225W & 130W \\
+Thermal Power & 460 W & 675 W \\
 \hline
-Yearly electricity cost & \$503.70  & \$95.37 \\
+Yearly electricity cost & \$252  & \$96  \\
 per TeraFLOP (\$.05 / kWh)   & & \\
 \hline
 \end{tabular}
