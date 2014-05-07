@@ -238,7 +238,7 @@ If the polar and azimuthal rotation angles, $\theta$ and $\phi$, respectively, a
 \begin{figure}[h!]
   \centering
     \includegraphics[width=0.6\textwidth]{graphics/wiley_levels.pdf}
-     \caption{The energy levels of $^{177}$Hf \cite{krane}. \label{Elevels}}
+     \caption[The energy levels of $^{177}$Hf.]{The energy levels of $^{177}$Hf \cite{krane}. \label{Elevels}}
 \end{figure}
 
 Inelastic scattering is the other type of scattering a neutron can undergo, but in this case kinetic energy is no longer conserved.  There is an amount of energy, $Q$, that is released from the reaction to the particles, or more commonly, taken from the particles and lost to the reaction.  In neutron-nucleus collisions, the target nucleus can be excited to a higher energy state than its ground state if the colliding neutron has a high enough energy to do so.  If the colliding neutron has enough energy and the collision excites the nucleus, a discrete amount of energy is lost to the reaction.  These excited states typically do not have long half lives, and a gamma ray is emitted when the nucleus relaxes to its ground state.  This type of reaction is called inelastic level scattering because an excited energy \emph{level} becomes occupied by the target nucleus.  
@@ -259,12 +259,12 @@ The released energy isn't deposited as heat directly, however.  It is released i
 \begin{figure}[h!]
   \centering
     \includegraphics[width=0.8\textwidth]{graphics/binding_energy.pdf}
-     \caption{Average binding energy per nucleon \cite{wikimedia_binding}.\label{binding_e_per_nuc}}
+     \caption[Average binding energy per nucleon.]{Average binding energy per nucleon \cite{wikimedia_binding}.\label{binding_e_per_nuc}}
 \end{figure}
 
 \begin{table}[h]
 \centering
-\caption{Average distribution of fission energy \cite{duderstadt}.\label{fission_dist}}
+\caption[Average distribution of fission energy.]{Average distribution of fission energy \cite{duderstadt}.\label{fission_dist}}
 \begin{tabular}{| l | c | r | r |}
 \hline
 Particle & Energy (\%) & Range & Time \\
@@ -1187,7 +1187,7 @@ Now that the mathematical theory and simulation methods have been framed, the ha
 \begin{figure}[h!] 
   \centering
     \includegraphics[width=0.6\textwidth]{graphics/computational_cap.pdf}
-     \caption{The maximum theoretical GigaFLOPs of various NVIDIA GPUs vs. flagship Intel processors \cite{cuda}. \label{computational_cap}}
+     \caption[The maximum theoretical GigaFLOPs of various NVIDIA GPUs vs. flagship Intel processors.]{The maximum theoretical GigaFLOPs of various NVIDIA GPUs vs. flagship Intel processors \cite{cuda}. \label{computational_cap}}
 \end{figure}
 
 To break into the supercomputing market, they crated the first programmable, general purpose GPU which focused on power efficiency and parallelism.  As figure \ref{computational_cap} shows, the maximum theoretical computational capacity of NVIDA GPUs has been increasing faster than that of CPUs \cite{cuda}.  The single-precision performance is much better than the double-precision, however.  The traditional role of GPUs as graphics accelerators did not require double precision capabilities, which is why double precision performance is emphasized.  Double precision arithmetic is supported on devices with compute capability of 1.3 and above, but gaming cards in the GeForce series have fewer double precision units than the high-end Tesla cards.  The Tesla cards have substantially more double precision units than the GeForce cards, which is why GeForce double precision is not shown \cite{fermi}.  As Figure \ref{computational_cap} also shows, CPUs have almost equivalent single and double precision performance. 
@@ -1201,14 +1201,14 @@ A NVIDIA GPU's basic processing unit is called a multiprocessor.  These multipro
 \begin{figure}[h!] 
   \centering
     \includegraphics[width=0.3\textwidth]{graphics/fermi_SM.eps}
-     \caption{The architecture of a Fermi multiprocessor \cite{cuda}. \label{fermi_SM}}
+     \caption[The architecture of a Fermi multiprocessor.]{The architecture of a Fermi multiprocessor \cite{cuda}. \label{fermi_SM}}
 \end{figure}
 
 
 \begin{figure}[h!] 
   \centering
     \includegraphics[width=0.8\textwidth]{graphics/CUDA_transistors.eps}
-     \caption{Relative transistor space use in GPUs and CPUs \cite{cuda}. \label{cuda_transistors}}
+     \caption[Relative transistor space use in GPUs and CPUs.]{Relative transistor space use in GPUs and CPUs \cite{cuda}. \label{cuda_transistors}}
 \end{figure}
 
 Part of the reason GPUs are able to perform efficiently is do to their reliance on single instruction, multiple data (SIMD) execution.  This execution method uses the same instructions simultaneously carried out over multiple pieces of data.  This reduces the amount of power used in control and therefore more math can be done per watt, which is the main why they are being used in supercomputers \cite{exascale}.  The GPU programming model abstracts SIMD execution by using threads, which can be thought of in the traditional sense. There are some tradeoffs for this power efficiency, however, such as requiring relatively simple tasks due to limited cache and control space and requiring data parallelism for full utilization.  Single-instruction multiple-thread (SIMT) and SIMD are similar in the sense that identical instructions are carried out across different pieces of data, but SIMT allows threads to act independently, albeit with a performance penalty.   When a thread in a multiprocessor executes different instruction than the other resident threads, the multiprocessor masks it from execution, executes the identically-executing threads, then masks the identically-executing threads and executes the \emph{divergent} thread.  This effectively serializes operations if they require different instructions.  This masking and serializing makes many empty spaces in the SIMD lanes of the multiprocessor, and thus can incur severe performance penalties.  The magnitude of the penalty depends on the rate at which data is being delivered to the multiprocessor, of course, since work can only be done if data is present.  If the multiprocessor can completes all jobs, even if they need some serialization, before the next set of data arrives, then the penalty will be invisible \cite{cuda}.
@@ -1224,7 +1224,7 @@ The overarching theme for CUDA is that a host CPU thread directs the GPUs operat
 \begin{figure}[h!] 
   \centering
     \includegraphics[width=0.4\textwidth,trim= 0cm 2.5cm 0cm 0cm]{graphics/CUDA_grid_launch.eps}
-     \caption{ Host-device execution in CUDA and the organization of threads into blocks and blocks into the grid \cite{cuda_ptx_isa}. \label{cuda_grid_launch}}
+     \caption[Host-device execution in CUDA and the organization of threads into blocks and blocks into the grid.]{ Host-device execution in CUDA and the organization of threads into blocks and blocks into the grid \cite{cuda_ptx_isa}. \label{cuda_grid_launch}}
 \end{figure}
 
 Grids and block dimensions can be 1D, 2D or 3D arrays, which simply influences how the data is indexed.  Every thread has unique variables, ``threadIdx'' and ``blockIdx,'' that are automatically generated upon kernel launch.  The grid dimensions (the number of blocks in each grid dimension) and the block dimensions (the number of threads in each block dimension) are also broadcast to every thread.  Based on these quantities, a unique thread identification number can be computer and used to access the data.   For example, if the grid is 2x2 and blocks are 4x4, a unique thread coordinate can be computed by doing id$_y$ = blockIdx.y * blockDim.y + threadIdx.y and id$_x$ = blockIdx.x * blockDim.x + threadIdx.x.  If the grid is 1D as well as the blocks, indexing is much simpler, e.g. id = blockIdx.x*blockDim.x+threadIdx.x \cite{cuda}.
@@ -1238,7 +1238,7 @@ High bandwidth is necessary to feed the many hungry mouths of the arithmetic uni
 \begin{figure}[h!] 
   \centering
     \includegraphics[width=0.6\textwidth]{graphics/memory_bandwidth.pdf}
-     \caption{The total gloabl memory bandwidth of NVIDIA GPUs vs. flagship Intel processors \cite{cuda}. \label{bandwidth}}
+     \caption[The total global memory bandwidth of NVIDIA GPUs vs. flagship Intel processors.]{The total global memory bandwidth of NVIDIA GPUs vs. flagship Intel processors \cite{cuda}. \label{bandwidth}}
 \end{figure}
 
 In order to maximize bandwidth and take advantage of spatial locality in memory, the memory subsystem on a GPU is also SIMD-like, as are most modern CPU subsystems.  When a thread requests a piece of data, not just the piece that is request is delivered by the subsystem, but rather a chunk of aligned data that contains the requested piece.  If the other values in load are not used, memory bandwidth is lost.  For best performance, CUDA requires adjacent threads to access adjacent pieces of data.  This way, memory transactions are ``coalesced.''   In coalesced transactions, every piece of data in the memory payload is used and bandwidth is maximized \cite{cuda}.  Figure \ref{coalesced} shows this graphically, and helps convey and important subtlety \cite{programming_massively}.  If a thread needs to load an entire array, it is better to interleave values in memory so that adjacent memory is accessed at the \emph{same time} by neighboring threads rather than adjacent data is loaded sequentially by a single thread \cite{cuda}.
@@ -1246,7 +1246,7 @@ In order to maximize bandwidth and take advantage of spatial locality in memory,
 \begin{figure}[h!] 
   \centering
     \includegraphics[width=0.8\textwidth]{graphics/coalesced.eps}
-     \caption{Memory transactions of CUDA threads.  Coalesced access on the left and non-coalesced access on the right \cite{programming_massively}. \label{coalesced}}
+     \caption[Memory transactions of CUDA threads.]{Memory transactions of CUDA threads.  Coalesced access on the left and non-coalesced access on the right \cite{programming_massively}. \label{coalesced}}
 \end{figure}
 
 GPUs have even higher global memory latency than CPUs, from 200 on newer cards up to 800 clock cycles on older cards, compared to about 50 cycles on a typical CPU.  CPUs, which are for serial execution, want low latency memory access and do this through multilevel cache structures and large control spaces that allow them to do out of order and speculative execution.  GPUs, which are geared for throughput, want high bandwidth and hide latency by pipelining many threads.  More transistor space is allocated for computation rather than for trying to minimize memory latency, which is hidden though parallelism.  Figure \ref{pipeline} shows how GPU threads are pipelined to hide latency whereas CPUs rely on low latency to quickly execute different threads in series \cite{cuda_gtc_pres}.  This is GPUs performance best when as many threads as possible are launched \cite{cuda}.
@@ -1254,7 +1254,7 @@ GPUs have even higher global memory latency than CPUs, from 200 on newer cards u
 \begin{figure}[h!] 
   \centering
     \includegraphics[width=\textwidth]{graphics/pipeline.eps}
-     \caption{Pipelining many threads in order to hide high memory latency \cite{cuda_gtc_pres}. \label{pipeline}}
+     \caption[Pipelining many threads in order to hide high memory latency.]{Pipelining many threads in order to hide high memory latency \cite{cuda_gtc_pres}. \label{pipeline}}
 \end{figure}
 
 Even though there are fewer levels of cache in a GPU than a CPU, there are still many different spaces, each of which have different properties.  The global memory space is the largest and has the greatest latency ($\sim$200 memory clock cycles).  This is the amount of total RAM specified for each card, which can be as small as 512 MB for very low-end cards, up to 12 GB for the largest high-end card.  This memory space is accessible by all threads in all blocks.  The next level down is the shared memory space.  This acts as a user-programmable cache, and is not used unless explicitly coded.  It resides on the multiprocessor and has very low latency (on the order of 1 processor clock cycle), and the data can be seen by all threads within a block, hence the ``shared'' name.  It can allow intra-block communication  without incurring the high penalty of global memory transactions and can improve performance by acting as a cache and storing any data that is reused by threads \cite{cuda}.  The next level down is the local memory, which is thread-specific.  It is not really local in the sense that it is actually stored in global memory, but in Fermi and newer architectures, it is cached by a  L1 cache on the multiprocessor.  It serves to hold any data that the registers cannot hold.  The registers, the lowest level of memory, are what the arithmetic units directly load their data from.  They are fast, but have a limited size, which is why local memory is used to page them.  A Fermi GPU  has a large register file (2MB), but each multiprocessor only has 128k, which is further subdivided by each thread (maximum register size per thread is 63) \cite{fermi}.
@@ -1262,7 +1262,7 @@ Even though there are fewer levels of cache in a GPU than a CPU, there are still
 \begin{figure}[h!] 
   \centering
     \includegraphics[width=0.4\textwidth]{graphics/CUDA_memory.eps}
-     \caption{The memory spaces in CUDA and NVIDIA GPUs \cite{cuda}. \label{cuda_mem}}
+     \caption[The memory spaces in CUDA and NVIDIA GPUs.]{The memory spaces in CUDA and NVIDIA GPUs \cite{cuda}. \label{cuda_mem}}
 \end{figure}
 
 The other memory spaces are the constant memory and the texture memory, which are both visible to all threads in all blocks.  They aren't truly separate spaces, but rather global memory that is handled differently.  Storing data in the constant space means that it cannot be written to, hence the ``constant'' name, but it is cached so data reuse by threads can result in a cache hit and the global memory itself does not need to be queried \cite{cuda}.  it is limited to 64kB, however, and is cached by 8kB caches on each multiprocessor, so large datasets cannot be stored in constant memory.  It also performs best when values are broadcast to all threads.  Texture memory memory, on the other hand, is also cached but its cache is optimized for 2D spatial locality in the texture coordinate system instead of actual memory locality, and it also does not have a maximum size.  Another feature of the texture memory is that is can perform low precision linear interpolation in the same transaction as a read \cite{cuda}.
@@ -1278,7 +1278,7 @@ As stated before, the developer must provide all the programs for OptiX.  These 
 \begin{figure}[h!] 
   \centering
     \includegraphics[width=0.5\textwidth]{graphics/optix_flow.eps}
-     \caption{The program flow in a launched OptiX context \cite{optix_paper}. \label{optix_flow}}
+     \caption[The program flow in a launched OptiX context.]{The program flow in a launched OptiX context \cite{optix_paper}. \label{optix_flow}}
 \end{figure}
 
 The ``ray generation'' program is like a main function in the ray tracer. It initializes rays, their starting points and directions, as well as specifies the data that they report.  Once this is done, the trace is executed, which traverses the geometry and find intersection points.  If \emph{any} geometry primitive is intersected, the ``any hit'' program is executed.  This program is typically used for determining areas that are completely occluded from the light source in graphics rendering problems, therefore terminating the trace, but normally this program just returns and allows the trace to continue.  As OptiX queries the primitives along a ray, it tightens an interval on $t$, the path length of the parameterized ray \cite{optix}.  The equation for a parameterized ray is shown in \eqref{parameterized_ray}, where $\vec{r}_P$ is the end point of the ray, $\vec{r}_O$ is the origin point of the ray, and $\vec{r}_D$ is the directional unit vector of the ray.  Figure \ref{ray_surface} shows an illustration of a ray-surface intersection.
@@ -1317,7 +1317,7 @@ t &= \frac{-b \pm \sqrt{b^2-4ac}}{2a} = -b_2 \pm \sqrt{b_2^2-c}
  \begin{figure}[h!] 
   \centering
     \includegraphics[width=0.8\textwidth]{graphics/node_graph.eps}
-     \caption{Node graph used for geometry representation in OptiX \cite{optix}. \label{node_graph}}
+     \caption[Node graph used for geometry representation in OptiX.]{Node graph used for geometry representation in OptiX \cite{optix}. \label{node_graph}}
 \end{figure}
 
 The framework by which geometric primitives are arranged into a scene is very flexible in OptiX.  Figure \ref{node_graph} shows the node graph representation of the geometry that OptiX traverses while tracing.   A ``group'' can have children of any kind, whereas a ``geometry group'' can only have ``geometry instance'' children.  A ``geometry instance'' is a object that combines a geometry primitive and a ``material.''  The material is simply the closest and any hit programs for a ray type.  OptiX can handle different ray types, typically one for radiance and one for shadow, but WARP only needs radiance.  This way a geometry can be attached to multiple different materials to handle different ray types.  A root node, or ``entry point,'' must be specified before a trace can begin.  This root node is where all rays begin their graph traversal \cite{optix}.
@@ -1352,7 +1352,7 @@ BVH is object-centric in the sense that it places boundaries around groups of ob
 \begin{figure}[h!] 
 \centering
 \includegraphics[width=0.8\textwidth, trim= 8cm 0cm 0cm 0cm ]{graphics/bvh_kd.eps}
-\caption{Partitioning schemes (top) with the resulting trees (bottom). A BVH tree \cite{wikimedia_bvh} is on the left and a k-d tree is on the right \cite{wikimedia_kd}.   \label{bvh_kd}}
+\caption[Spatial partitioning schemes with the resulting trees.]{Spatial partitioning schemes (top) with the resulting trees (bottom). A BVH tree \cite{wikimedia_bvh} is on the left and a k-d tree is on the right \cite{wikimedia_kd}.   \label{bvh_kd}}
 \end{figure}
 
 The benefit of these structures is that they can be queried in $\log(N)$ time rather than in linear time since major portions of the geometry do not need to be queried or intersected.  OptiX automatically builds theses trees over the geometry without any user input other than to specify the type.  The different types have tradeoffs with size, build speed, and performance, but since WARP's geometry is static and relatively simple compared to photorealistic rendering jobs, the build speed and size have negligible impact, so the highest performance structure is used is WARP.  Which structure prevodes the best performance is the goal of one of the preliminary studies in Section \ref{sec:prelim}.  
