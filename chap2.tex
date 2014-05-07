@@ -803,7 +803,7 @@ Using these two methods of sampling from probability distributions, expressions 
 
 \subsubsection{Cross Section Interpolation}
 
-When a Monte Carlo simulation is referred to as ``Continuous Energy,'' it means that the cross sections are evaluated on the fly at the exact energy the neutron is currently at instead of using a fixed value for a range of energies.  The cross section data is finite, of course, and only includes data at discrete points in energy.  Therefore, interpolation must be performed between the data points.  This is done by linear interpolation.  It assumes that the cross section is a straight line between the surrounding energy points, $E_i$ and $E_{i+1}$, and the interpolated value is calculated using the slope of the line via \eqref{xs_interp}.
+When a Monte Carlo simulation is referred to as ``Continuous Energy,'' it means that the cross sections are evaluated on the fly at the exact energy the neutron is currently at instead of using a fixed value for a range of energies.  The cross section data is finite, however, and only includes data at discrete points in energy.  Therefore, interpolation must be performed between the data points to get values for any specific energy.  This is done by linear interpolation.  This assumes that the cross section is a straight line between the surrounding energy points, $E_i$ and $E_{i+1}$, and the interpolated value is calculated using the slope of the line via \eqref{xs_interp}.
 
  \begin{equation}
 \label{xs_interp}
@@ -813,9 +813,58 @@ E_i < E < E_{i+1} \\
 \end{gathered}
 \end{equation}
 
+
+
+\subsubsection{Distance To Interaction}
+
+The first step in stochastically transporting a neutron through matter is finding the distance to the next interaction.  The expression for the probability of non-interaction was shown in \eqref{pop_NI}.  The probability of interaction in $dx$ around $x$ is $\Sigma_t dx$.  Therefore the probability of not interacting from 0 to x and then interacting at $dx$ around $x$ is simply the product of these two probabilities.  The resulting expression, shown in \eqref{first_col}, is commonly referred to as the \emph{first collision probability}.
+%
+\begin{equation}
+\label{first_col}
+P(x) = \Sigma_t e^{- \Sigma_t  x}
+\end{equation}
+%
+This expression is simple and can be inverted for direct sampling as seen in \eqref{first_col_cdf}.  The sampling scheme is shown in \eqref{first_col_samp}.  The expression $1-\xi$ can be replaced with $\xi$ since it is identically distributed.
+%
+\begin{equation}
+\label{first_col_cdf}
+CDF(x) = \int_0^x \Sigma_t e^{- \Sigma_t  x^\prime} dx^\prime = 1- e^{- \Sigma_t  x} = \xi
+\end{equation}
+
+\begin{equation}
+\label{first_col_samp}
+x_i=CDF^{-1}(\xi) \qquad \Rightarrow \qquad x_i=\frac{-\ln(1-\xi) }{\Sigma_t}=\frac{-\ln(\xi) }{\Sigma_t}
+\end{equation}
+
+%The total cross section $\Sigma_t$ is the total macroscopic cross section of the material the neutron is traveling through, i.e. it is the sum of the total macroscopic cross sections of its constituent isotopes as was shown in \eqref{material_sum_xs}.
+% unnecessary at this point
+
+\subsubsection{Isotope and Reaction Selection}
+
+Once a neutron has been determined to interact, the isotope with which it interacts must be decided.  The discrete PDF of this process is shown in \eqref{isotope_selection}, where there are $i$ isotopes in the material each having a total macroscopic cross section $\Sigma_{t,i}$.  The distribution is sampled by generating a uniform random number, $\xi_1$, on $[0,1)$ and performing a running sum over the individual isotope's total macroscopic cross sections.  When $CDF_i > \xi_1$, the neutron collision is sampled to happened in isotope $i$.
+
+\begin{equation}
+\label{isotope_selection}
+PDF_i = \frac{\Sigma_{t,i}}{\Sigma_t} \qquad \Rightarrow \qquad CDF_i = \frac{1}{\Sigma_t } \sum_{n=1}^i \Sigma_{t,n}
+\end{equation}
+
+Determining the reaction type is done in a similar fashion, except the number density of the material is no longer a concern since the isotope has already been selected.  Therefore, the running sum of the CDF is done over isotope $i$'s microscopic cross sections.  Another random number is generated, and when $CDF_k > \xi_2$, the neutron is sampled to undergo reaction $k$ in isotope $i$.
+
+\begin{equation}
+\label{reaction_selection}
+PDF_k = \frac{\sigma_k}{\sigma_t} \qquad \Rightarrow \qquad CDF_k = \frac{1}{\sigma_{t} } \sum_{n=1}^k \sigma_{n}
+\end{equation}
+
+
 \subsubsection{Tabular Distribution Interpolation}
 
-For reactions that have any exiting neutrons, like scattering and fission, there are probability tables that specify at what probability neutrons will be emitted with certain angles and energies.  These tables typically have a CDF specified in a tabular format.  To sample from these tabular CDFs, a random number $\xi$ is generated.  Again, since the data is discrete, some type of interpolation must be performed to generated a value between the data points.  There are two methods specified in the ENDF format.  The first is histogram interpolation, which is similar to the linear cross section in the previous section.  It assumes the CDF is a line in between the data points, and the interpolated value is calculated to lie on this line.  A tabular PDF is also usually specified, but is not used in the actual computations in this study since the PDF value can be computed from the CDF and doing so reduces the global memory access of a GPU kernel.  Histogram interpolation is shown in \eqref{histo_interp} where $C_{i}$ is the value of the CDF at point $i$.  The outgoing cosine, $\mu^\prime$, is used, but this method can be used to sampled a CDF of any quantity.  $\mu^\prime_i$ represents the corresponding value of $\mu^\prime$ in the table for $P_i$ and $C_i$ \cite{openmc}.
+For reactions that have exiting neutrons, like scattering and fission, there are probability tables containing CDFs that specify at what probability neutrons will be emitted with certain angles and energies.  To sample from these tabular CDFs, a random number, $\xi$, is generated.  Again, since the data is discrete, some type of interpolation must be performed to generate a value between the data points.  
+
+There are two interpolation methods specified in the ENDF format.  The first is histogram interpolation, which is similar to the linear cross section in the previous section.  Histogram interpolation assumes the CDF is a line between the data points, and the interpolated value is calculated to lie on this line.  The data for the histogram could be obtained from using a tabulated PDF that is typically provided to compute the CDF. Using the PDF data is unnecessary, however, since these values can be computed from the CDF and this approach reduces the global memory access of a GPU kernel. 
+% I think what I wrote makes sense? fix it if it's not. what you had before was confusing...
+
+An example of using histogram interpolation to determine outgoing cosine, $\mu^\prime$, is shown in \eqref{histo_interp}, where $C_{i}$ is the value of the CDF at point $i$.  $\mu^\prime_i$ represents the corresponding value of $\mu^\prime$ in the table for $P_i$ and $C_i$ \cite{openmc}. % What's P_i?
+  While this example is for $\mu^\prime$, this method can be used to sampled a CDF of any quantity.
 
  \begin{equation}
 \label{histo_interp}
@@ -826,7 +875,7 @@ C_i < \xi < C_{i+1} \\
 \end{equation}
 
 The second method is called linear-linear interpolation.  Instead of assuming the CDF is linear, it assumes the first derivative (the PDF) is linear over the interval $C_i < \xi < C_{i+1}$.  The linear expression for the PDF as in \eqref{lin_pdf} is substituted into \eqref{CDF_property1} and integrated to $\mu^\prime$.  Again this derivation is shown for $\mu^\prime$, but is valid for any CDF \cite{openmc}.
-
+% adding these to make this all one paragraph.
 \begin{equation}
 \label{lin_pdf}
 \begin{gathered}
@@ -834,16 +883,16 @@ C_i < \xi < C_{i+1} \\
 P(\mu^\prime) = \frac{P_{i+1}-P_i}{\mu^\prime_{i+1}-\mu^\prime_i}(\mu^\prime - \mu^\prime_i) + P_i = a \mu^\prime + b
 \end{gathered}
 \end{equation}
-
+%
 Integration of \eqref{lin_pdf} to $\mu^\prime$ yields \eqref{lin_pdf_int}.  This expression for $CDF(\mu^\prime)$ is set equal to the random number $\xi$ and solved for $\mu^\prime$ to give the interpolation function.
-
+%
 \begin{equation}
 \label{lin_pdf_int}
 C(\mu^\prime) = C_i  + \int_i^{\mu^\prime} P(\mu^{\prime\prime}) d\mu^{\prime\prime}  = C_i  + \frac{a}{2}(\mu^{\prime 2}-\mu^{\prime 2}_i) + b(\mu^\prime-\mu^\prime_i) = \xi 
 \end{equation}
-
+% What does the lower bound of i mean, and why does \mu_i get integrated as well? I thought that was a fixed value? 
 Taking advantage of the relationship between $a$ and $b$, the interpolation function can be simplified to \eqref{lin_lin} \cite{openmc}.
-
+%
 \begin{equation}
 \label{lin_lin}
 \begin{gathered}
@@ -851,63 +900,37 @@ a = \frac{P_{i+1}-P_i}{\mu^\prime_{i+1}-\mu^\prime_i} \qquad , \qquad b = P_i - 
 \mu^\prime = \mu_1 + \frac{1}{a}\left( \sqrt{P^2_i + 2a(\xi -C_i)} -P_i \right)
 \end{gathered}
 \end{equation}
+% what is \mu_1 here for?
+%
+% I don't quite understand the equation progression here. I'd write the definition of a and b as part of lin_pdf since you establish this relationship already and it will make the leap from lin_pdf_int to lin_lin clearer. I also don't understand lin_pdf_int result.
 
-Which interpolation method is used is specified in the data on a case-by-case basis.
 
-\subsubsection{Distance To Interaction}
+Which interpolation method is used is specified in the data on a case-by-case basis. % what does this mean? is it because of what data is available? what you're trying to do? what's most accurate? 
 
-The first step in stochastically transporting a neutron through matter is finding the distance to the next interaction.  The expression for the probability of non-interaction was shown in \eqref{pop_NI}.  The probability of interaction in $dx$ around $x$ is $\Sigma_t dx$.  Therefore the probability of not interacting from 0 to x and then interacting at $dx$ around $x$ is simply the product.  This expression, shown in \eqref{first_col}, is commonly referred to as the \emph{first collision probability}.
-
-\begin{equation}
-\label{first_col}
-P(x) = \Sigma_t e^{- \Sigma_t  x}
-\end{equation}
-
-This expression is simple and can be inverted for direct sampling.  The sampling scheme is shown in \eqref{first_col_samp}.  The expression $1-\xi$ can be replaced with $\xi$ since it is identically distributed.
-
-\begin{equation}
-\label{first_col}
-CDF(x) = \int_0^x \Sigma_t e^{- \Sigma_t  x^\prime} dx^\prime = 1- e^{- \Sigma_t  x} = \xi
-\end{equation}
-
-\begin{equation}
-\label{first_col_samp}
-x_i=CDF^{-1}(\xi) \qquad \Rightarrow \qquad x_i=\frac{-\ln(1-\xi) }{\Sigma_t}=\frac{-\ln(\xi) }{\Sigma_t}
-\end{equation}
-
-The total cross section $\Sigma_t$ is the total macroscopic cross section of the material the neutron is traveling through, i.e. it is the sum of the total macroscopic cross sections of its constituent isotopes as was shown in \eqref{material_sum_xs}.
-
-\subsubsection{Isotope and Reaction Selection}
-
-Now that the neutron has been determined to interact, the isotope with which it interacts must be decided.  The discrete PDF of this process is shown in \eqref{isotope_selection}, where there are $i$ isotopes in the material each having a total macroscopic cross section $\Sigma_{t,i}$.  The distribution is sampled by generating a uniform random number, $\xi$, on $[0,1)$ and performing a running sum over the individual isotope's total macroscopic cross sections.  When $CDF_i > \xi$, the neutron collision is sampled to happened in isotope $i$.
-
-\begin{equation}
-\label{isotope_selection}
-PDF_i = \frac{\Sigma_{t,i}}{\Sigma_t} \qquad \Rightarrow \qquad CDF_i = \frac{1}{\Sigma_t } \sum_{n=1}^i \Sigma_{t,n}
-\end{equation}
-
-Determining the reaction type is done in a similar fashion, except the number density of the material is no longer a concern since the isotope has already been selected.  Therefore, the running sum of the CDF is done over the isotope $i$'s microscopic cross sections.  Another random number is generated, and when $CDF_k > \xi$, the neutron is sampled to undergo reaction $k$ in isotope $i$.
-
-\begin{equation}
-\label{reaction_selection}
-PDF_k = \frac{\sigma_k}{\sigma_t} \qquad \Rightarrow \qquad CDF_k = \frac{1}{\sigma_{t} } \sum_{n=1}^k \sigma_{n}
-\end{equation}
 
 \subsubsection{Free Gas Treatment}
 
-As stated previously, the data in the cross section libraries are broadened for a certain material temperature.  This is done to account for the effect the nuclides' thermal motion has on the apparent width of resonances even when they are modeled as stationary.  Modeling the targets as stationary is a good approximation when the neutron has much larger velocities, but such a model would allow a neutron to scatter down to absolute zero.  In reality, they scatter until they come into thermal equilibrium with the target nuclides.  Once they are in equilibrium, on average they lose the same amount of energy as they gain from scattering events and their population becomes stationary in energy.  
+As stated previously, the data in the cross section libraries are Doppler broadened for a certain material temperature.  This is done to account for the effect the target nuclides' thermal motion has on the apparent width of resonances when the target nuclides are modeled as stationary. As a result, Doppler broadening produces accurate reaction rates in the resonance region when target nuclides are modeled to be stationary, and modeling the targets as stationary is a good approximation when the neutron velocities in the resonance region. 
 
-To preserve this collection phenomena, or \emph{thermal peak}, in Monte Carlo simulations, the velocity of the target nuclide must be explicitly modeled.  Elastic scattering is the only interaction that has a neutron in the exit channel at thermal energies, and therefore is the only reaction that needs to consider target velocity.  Fission produces secondary neutrons in distributions uncorrelated with incoming neutron energy or target velocity at thermal energies, so the target motion can be disregarded.  Since the Doppler-broadened cross sections produce accurate reaction rates when the targets are modeled to be stationary, this quantity must be preserved when giving the targets a nonzero velocity.  The targets follow a Maxwell-Boltzmann speed distribution, but this cannot be sampled directly for simulation purposes due to the Doppler broadening preprocessing done to the cross section data.  Near resonances, portions of the thermal distribution within the resonance contribute much more to the overall reaction rate than the portions outside of it.  Directly sampling a target velocity from the thermal distribution would produce incorrect exiting neutron energies.  Rather the distribution of target velocities which contributed to the reaction rate (and therefore the thermally averaged cross section) must be calculated and sampled from.
+However, a stationary target model would incorrectly allow a neutron to scatter down to absolute zero.  In reality, they scatter until they come into thermal equilibrium with the target nuclides.  Once they are in equilibrium, on average they lose the same amount of energy as they gain from scattering events and their population becomes stationary in energy.  To preserve this collection phenomena, or \emph{thermal peak}, in Monte Carlo simulations, the velocity of the target nuclide must be explicitly modeled.  
 
-The only use for the target velocity is in scattering kinematics to reproduce an accurate thermal peak while maintaining reaction rates.  For the sake of completeness, the following derivation is included and closely follows the that in \cite{openmc} and \cite{gelbard}.  The reaction rate in terms of the target and neutron velocities is shown in \eqref{RR_vel} and is equivalent to \eqref{broaden} in Section \ref{sec:temp}.
+%Elastic scattering is the only interaction that has a neutron at thermal energies in the exit channel, and therefore is the only reaction that needs to consider target velocity.  Fission produces secondary neutrons in distributions uncorrelated with incoming neutron energy or target velocity at thermal energies, so the target motion can be disregarded.  Since the Doppler-broadened cross sections produce accurate reaction rates when the targets are modeled to be stationary, this quantity must be preserved when giving the targets a nonzero velocity.  
+% you might not need this paragraph anymore
+
+The targets follow a Maxwell-Boltzmann speed distribution, but this cannot be sampled directly for simulation purposes because of the Doppler broadening preprocessing done to the cross section data.  Near resonances, portions of the thermal distribution within the resonance contribute much more to the overall reaction rate than the portions outside of it.  Directly sampling a target velocity from the thermal distribution would produce incorrect exiting neutron energies.  Rather, the distribution of target velocities that contributed to the reaction rate (and therefore the thermally averaged cross section) must be calculated and sampled from.
+
+Elastic scattering is the only interaction that has a neutron at thermal energies in the exit channel, and therefore the only use for the target velocity is in scattering kinematics to reproduce an accurate thermal peak while maintaining reaction rates.  For the sake of completeness, the following derivation is included and closely follows that in \cite{openmc} and \cite{gelbard}.  The reaction rate in terms of the target and neutron velocities is shown in \eqref{RR_vel} and is equivalent to \eqref{broaden} in Section \ref{sec:temp}.
 
 \begin{equation}
 \label{RR_vel}
 R = ||\boldsymbol{v_n}-\boldsymbol{v_t}|| \sigma(||\boldsymbol{v_n}-\boldsymbol{v_t}||) M(v_t)
 \end{equation}
 
-Since elastic scattering is the only reaction of interest, $\sigma(v_\mathrm{rel})$ can be assumed to be a constant.  This assumption is good for most nuclides since the elastic cross sections are in fact relatively constant at low energies.  If there is a low energy scattering resonance, this approximation may produce results that skew the distribution towards lower energies \cite{openmc}, but it is good for most nuclides.  Substituting the Maxwell-Boltzmann speed distribution for $M(v_t)$, the simplified PDF for target velocities can be written as \eqref{RR_vel_simp} where $C$ is the normalization constant calculated from \eqref{RR_vel}.
+Since elastic scattering is the only reaction of interest, $\sigma(v_\mathrm{rel})$ can be assumed to be constant.  This assumption is good for most nuclides since the elastic cross sections are in fact relatively constant at low energies.  If there is a low-energy scattering resonance, this approximation may produce results that skew the distribution towards lower energies \cite{openmc}, but it is good for most nuclides.  
 
+Substituting the Maxwell-Boltzmann speed distribution for $M(v_t)$, the simplified PDF for target velocities can be written as \eqref{RR_vel_simp} where $C$ is the normalization constant calculated from \eqref{RR_vel}.
+% there's no $C$ in \eqref{RR_vel} ?
+%
 \begin{equation}
 \label{RR_vel_simp}
 \begin{gathered}
@@ -915,7 +938,7 @@ Since elastic scattering is the only reaction of interest, $\sigma(v_\mathrm{rel
 PDF(\boldsymbol{v_t}) = C v_\mathrm{rel} \sigma \left[   \frac{4}{\sqrt{\pi}} \beta^3 v_T^2  \exp (- \beta^2  v_T^2 )      \right]
 \end{gathered}
 \end{equation}
-
+% define m
 Applying the law of cosines to $v_\mathrm{rel} = ||\boldsymbol{v_n}-\boldsymbol{v_t}||$ yields \eqref{RR_vel_expanded}, which has changed from a vector equation to a scalar one.   The new PDF has two unknowns, the target velocity $v_T$ and the angle between it and the neutron velocity, $\mu$.
 
 \begin{equation}
@@ -926,7 +949,11 @@ PDF(v_t) = C \sigma  \sqrt{v_n^2+v_t^2-2 v_n v_t \mu} \left[   \frac{4}{\sqrt{\p
 \end{gathered}
 \end{equation}
 
-There is a restriction on $\mu$, however.  There can be no cases where sampled values of $\mu$ and $v_T$ produce a negative $v_\mathrm{rel}$, which corresponds to the target neutron ``running away'' from the incident neutron.  Such a case is non-physical since it would imply that the reaction never happened.  This PDF cannot be directly inverted, but can be split into two PDFs, $f_1(v_T)$ and $f_2(v_T)$, and sampled by rejection.  The sampling scheme is to normalize $f_2(v_T)$ and sample from it.  The sampled is accepted based on the probability in \eqref{RR_vel_split_samp}\cite{openmc}.
+Note that there is a restriction on $\mu$.  There cannot be cases where sampled values of $\mu$ and $v_T$ produce a negative $v_\mathrm{rel}$, which corresponds to the target neutron ``running away'' from the incident neutron.  Such a case is non-physical since it would imply that the reaction never happened.  % does this translate into math that you use? If so, add it. If not, you probably don't need this paragraph?
+
+The PDF in \eqref{RR_vel_expanded} cannot be directly inverted, but can be split into two PDFs, $f_1(v_T)$ and $f_2(v_T)$ as seen in \eqref{RR_vel_split}, and sampled by rejection.  The sampling scheme is to normalize $f_2(v_T)$ and sample from it.  The sample is accepted based on the probability in \eqref{RR_vel_split_samp}\cite{openmc}.
+% these last two sentences are not so clear.
+The multiplication and division by $v_n^2+v_t^2$ seen in \eqref{RR_vel_split} guarantees that $f_1$ is bounded between 0 and 1.  This is necessary since $v_\mathrm{rel}$ is not bounded in any way.  The normalization using $f_2$ to make ``$CDF(v_T)$" is expanded in and simplified in \eqref{RR_vel_split_norm}, where $y=\beta v_n$ and $x=\beta v_t$.
 
 \begin{equation}
 \label{RR_vel_split}
@@ -943,8 +970,7 @@ f_2(v_T) =  \frac{4}{\sqrt{\pi}} (v_n^2+v_t^2) \beta^3 v_T^2  \exp ( -\beta^2  v
 p_\mathrm{accept} &= \frac{f_1(v_T^\prime,\mu)}{ f_1(v_T^\prime,\mu=0)}
 \end{split}
 \end{equation}
-
-The multiplication and division by $v_n^2+v_t^2$ seen in \eqref{RR_vel_split} guarantees that $f_1$ is bounded between 0 and 1.  This is necessary since $v_\mathrm{rel}$ is not bounded in any way.  The normalized version of $f_2$ is shown in \eqref{RR_vel_split_norm} as well as a simplified version where $y=\beta v_n$ and $x=\beta v_t$.
+% I'd put the cdf terms all together and make the acceptance probability separate.
 
 \begin{equation}
 \label{RR_vel_split_norm}
@@ -954,7 +980,8 @@ The multiplication and division by $v_n^2+v_t^2$ seen in \eqref{RR_vel_split} gu
 \end{split}
 \end{equation}
 
-Since this scheme has two separate weighted distributions, the combined PDF can be sampled by sampling the second term with a probability of $2/(\sqrt{\pi}y+2)$ and the first term otherwise.  Luckily, both distributions can be directly sampled via the schemes C49 and C61 listed in the Third Monte Carlo Sampler manual \cite{3rdsampler}.  Sampling scheme C49 is for expressions of the form $\nu^{2n-1}e^{-\nu^2}$ where $n$ is an integer $\ge 1$, i.e. for gaussians multiplied by variables of odd powers.  For $n=2$, this is scheme is for the second term in \eqref{RR_vel_split_norm}, and is shown in \eqref{C49}.
+Since this scheme has two separate weighted distributions, the combined PDF can be sampled by sampling the second term with a probability of $2/(\sqrt{\pi}y+2)$ and the first term otherwise. % explain this more clearly. Are the two distributions independt? Why are we sampling them separately? don't you need both terms to get the CDF?
+  While both distributions are complicated, each can be directly sampled via the schemes C49 and C61 provided in the Third Monte Carlo Sampler manual \cite{3rdsampler}.  Sampling scheme C49 is for expressions of the form $\nu^{2n-1}e^{-\nu^2}$ where $n$ is an integer $\ge 1$, i.e.\ for Gaussians multiplied by variables of odd powers.  This is scheme is for the second term in \eqref{RR_vel_split_norm} when $n=2$ and $\nu=x$, and is shown in \eqref{C49}.
 
 \begin{equation}
 \label{C49}
@@ -963,8 +990,9 @@ Since this scheme has two separate weighted distributions, the combined PDF can 
 n = 2 \qquad \Rightarrow \qquad x^\prime = \sqrt{- \ln \left( \xi_1 \xi_2 \right)}
 \end{gathered}
 \end{equation}
+% what are \nu and x'? how are they used? You don't need to re-tell us that n=2
 
-Sampling scheme C61 is for expressions of the for $\nu^{2n-1}e^{-\nu^2}$ where $n$ is a half integer $\ge 1/2$, i.e. for gaussians multiplied by variables of even powers.  When $n=3/2$, this is a sampling scheme for the first term in \eqref{RR_vel_split_norm}, and is shown in \eqref{C61}.
+Sampling scheme C61 is for expressions of the for $\nu^{2n-1}e^{-\nu^2}$ where $n$ is a half integer $\ge 1/2$, i.e.\ for Gaussians multiplied by variables of even powers.  When $n=3/2$, this is a sampling scheme for the first term in \eqref{RR_vel_split_norm}, and is shown in \eqref{C61}.
 
 \begin{equation}
 \label{C61}
@@ -975,8 +1003,11 @@ h = n-1/2 \\
 n = 3/2 \quad h=1 \qquad \Rightarrow \qquad x^\prime =   \sqrt{- \ln( \xi_1) - \ln(\xi_2) \cos^2(\frac{\pi}{2}\xi_3)}
 \end{gathered}
 \end{equation}
+% same questions about what this is.
 
-After this is done and $x^\prime$ is sampled, the rejection criterion in \eqref{RR_vel_split_samp} comes into play.  The sampled value of $x^\prime$ is transformed to $v_T^\prime=x^\prime/\beta$, and a value for $\mu$ is sampled isotropically as in \eqref{mu_samp}.  Once $\mu$ is sampled, $f_1(v_T,\mu)$ can be calculated, and the sampled values of $v_T^\prime$ and $\mu$ are accepted with the probability $p_\mathrm{accept}$ as shown in \eqref{prob_accept}, i.e. if another random number $\xi<p_\mathrm{accept}$.  If the sample is rejected, the whole process is repeated until a pair of $v_T^\prime$ and $\mu$ are accepted.  Even though this is a rejections method, it has fairly high efficiency, with samples being accepted at minimum 68\% of the time and 100\% of the time as the neutron velocity goes to zero or values much greater than the target temperature \cite{mcnp}.
+After this %what?%
+ is done and $x^\prime$ is sampled, the rejection criterion in \eqref{RR_vel_split_samp} is used to%do what?% give us a map of what's you're going to tell us so we can figure out where we're going.
+.  The sampled value of $x^\prime$ determines $v_T^\prime$ via $v_T^\prime=x^\prime/\beta$, and a value for $\mu$ is sampled isotropically as in \eqref{mu_samp}.  Once $\mu$ is sampled, $f_1(v_T,\mu)$ can be calculated, and the sampled values of $v_T^\prime$ and $\mu$ are accepted with the probability $p_\mathrm{accept}$ as shown in \eqref{prob_accept}, i.e.\ the values are accepted if random number, $xi$, fulfils $\xi<p_\mathrm{accept}$.  If the sample is rejected, the whole process is repeated until a pair of $v_T^\prime$ and $\mu$ are accepted.  
 
 \begin{equation}
 \label{mu_samp}
@@ -987,6 +1018,8 @@ After this is done and $x^\prime$ is sampled, the rejection criterion in \eqref{
 \label{prob_accept}
 p_\mathrm{accept} = \frac{\sqrt{v_n^2+v_t^2-2 v_n v_t \mu}}{v_n^2+v_t^2}
 \end{equation}
+
+Even though this is a rejection method, it is fairly efficient, with samples being accepted at minimum 68\% of the time and up to 100\% of the time as the neutron velocity either goes to zero or to values much greater than the target temperature \cite{mcnp}.
 
 \subsubsection{Stochastic Mixing}
 
