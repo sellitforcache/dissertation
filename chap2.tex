@@ -826,7 +826,7 @@ Using these two methods of sampling from probability distributions, expressions 
 
 \subsubsection{Cross Section Interpolation}
 
-When a Monte Carlo simulation is referred to as ``Continuous Energy,'' it means that the cross sections are evaluated on the fly at the exact energy the neutron is currently at instead of using a fixed value for a range of energies.  The cross section data is finite, of course, and only includes data at discrete points in energy.  Therefore, interpolation must be performed between the data points.  This is done by linear interpolation.  It assumes that the cross section is a straight line between the surrounding energy points, $E_i$ and $E_{i+1}$, and the interpolated value is calculated using the slope of the line via \eqref{xs_interp}.
+When a Monte Carlo simulation is referred to as ``Continuous Energy,'' it means that the cross sections are evaluated on the fly at the exact energy the neutron is currently at instead of using a fixed value for a range of energies.  The cross section data is finite, however, and only includes data at discrete points in energy.  Therefore, interpolation must be performed between the data points to get values for any specific energy.  This is done by linear interpolation.  This assumes that the cross section is a straight line between the surrounding energy points, $E_i$ and $E_{i+1}$, and the interpolated value is calculated using the slope of the line via \eqref{xs_interp}.
 
  \begin{equation}
 \label{xs_interp}
@@ -836,9 +836,58 @@ E_i < E < E_{i+1} \\
 \end{gathered}
 \end{equation}
 
+
+
+\subsubsection{Distance To Interaction}
+
+The first step in stochastically transporting a neutron through matter is finding the distance to the next interaction.  The expression for the probability of non-interaction was shown in \eqref{pop_NI}.  The probability of interaction in $dx$ around $x$ is $\Sigma_t dx$.  Therefore the probability of not interacting from 0 to x and then interacting at $dx$ around $x$ is simply the product of these two probabilities.  The resulting expression, shown in \eqref{first_col}, is commonly referred to as the \emph{first collision probability}.
+%
+\begin{equation}
+\label{first_col}
+P(x) = \Sigma_t e^{- \Sigma_t  x}
+\end{equation}
+%
+This expression is simple and can be inverted for direct sampling as seen in \eqref{first_col_cdf}.  The sampling scheme is shown in \eqref{first_col_samp}.  The expression $1-\xi$ can be replaced with $\xi$ since it is identically distributed.
+%
+\begin{equation}
+\label{first_col_cdf}
+CDF(x) = \int_0^x \Sigma_t e^{- \Sigma_t  x^\prime} dx^\prime = 1- e^{- \Sigma_t  x} = \xi
+\end{equation}
+
+\begin{equation}
+\label{first_col_samp}
+x_i=CDF^{-1}(\xi) \qquad \Rightarrow \qquad x_i=\frac{-\ln(1-\xi) }{\Sigma_t}=\frac{-\ln(\xi) }{\Sigma_t}
+\end{equation}
+
+%The total cross section $\Sigma_t$ is the total macroscopic cross section of the material the neutron is traveling through, i.e. it is the sum of the total macroscopic cross sections of its constituent isotopes as was shown in \eqref{material_sum_xs}.
+% unnecessary at this point
+
+\subsubsection{Isotope and Reaction Selection}
+
+Once a neutron has been determined to interact, the isotope with which it interacts must be decided.  The discrete PDF of this process is shown in \eqref{isotope_selection}, where there are $i$ isotopes in the material each having a total macroscopic cross section $\Sigma_{t,i}$.  The distribution is sampled by generating a uniform random number, $\xi_1$, on $[0,1)$ and performing a running sum over the individual isotope's total macroscopic cross sections.  When $CDF_i > \xi_1$, the neutron collision is sampled to happened in isotope $i$.
+
+\begin{equation}
+\label{isotope_selection}
+PDF_i = \frac{\Sigma_{t,i}}{\Sigma_t} \qquad \Rightarrow \qquad CDF_i = \frac{1}{\Sigma_t } \sum_{n=1}^i \Sigma_{t,n}
+\end{equation}
+
+Determining the reaction type is done in a similar fashion, except the number density of the material is no longer a concern since the isotope has already been selected.  Therefore, the running sum of the CDF is done over isotope $i$'s microscopic cross sections.  Another random number is generated, and when $CDF_k > \xi_2$, the neutron is sampled to undergo reaction $k$ in isotope $i$.
+
+\begin{equation}
+\label{reaction_selection}
+PDF_k = \frac{\sigma_k}{\sigma_t} \qquad \Rightarrow \qquad CDF_k = \frac{1}{\sigma_{t} } \sum_{n=1}^k \sigma_{n}
+\end{equation}
+
+
 \subsubsection{Tabular Distribution Interpolation}
 
-For reactions that have any exiting neutrons, like scattering and fission, there are probability tables that specify at what probability neutrons will be emitted with certain angles and energies.  These tables typically have a CDF specified in a tabular format.  To sample from these tabular CDFs, a random number $\xi$ is generated.  Again, since the data is discrete, some type of interpolation must be performed to generated a value between the data points.  There are two methods specified in the ENDF format.  The first is histogram interpolation, which is similar to the linear cross section in the previous section.  It assumes the CDF is a line in between the data points, and the interpolated value is calculated to lie on this line.  A tabular PDF is also usually specified, but is not used in the actual computations in this study since the PDF value can be computed from the CDF and doing so reduces the global memory access of a GPU kernel.  Histogram interpolation is shown in \eqref{histo_interp} where $C_{i}$ is the value of the CDF at point $i$.  The outgoing cosine, $\mu^\prime$, is used, but this method can be used to sampled a CDF of any quantity.  $\mu^\prime_i$ represents the corresponding value of $\mu^\prime$ in the table for $P_i$ and $C_i$ \cite{openmc}.
+For reactions that have exiting neutrons, like scattering and fission, there are probability tables containing CDFs that specify at what probability neutrons will be emitted with certain angles and energies.  To sample from these tabular CDFs, a random number, $\xi$, is generated.  Again, since the data is discrete, some type of interpolation must be performed to generate a value between the data points.  
+
+There are two interpolation methods specified in the ENDF format.  The first is histogram interpolation, which is similar to the linear cross section in the previous section.  Histogram interpolation assumes the CDF is a line between the data points, and the interpolated value is calculated to lie on this line.  The data for the histogram could be obtained from using a tabulated PDF that is typically provided to compute the CDF. Using the PDF data is unnecessary, however, since these values can be computed from the CDF and this approach reduces the global memory access of a GPU kernel. 
+% I think what I wrote makes sense? fix it if it's not. what you had before was confusing...
+
+An example of using histogram interpolation to determine outgoing cosine, $\mu^\prime$, is shown in \eqref{histo_interp}, where $C_{i}$ is the value of the CDF at point $i$.  $\mu^\prime_i$ represents the corresponding value of $\mu^\prime$ in the table for $P_i$ and $C_i$ \cite{openmc}. % What's P_i?
+  While this example is for $\mu^\prime$, this method can be used to sampled a CDF of any quantity.
 
  \begin{equation}
 \label{histo_interp}
@@ -849,7 +898,7 @@ C_i < \xi < C_{i+1} \\
 \end{equation}
 
 The second method is called linear-linear interpolation.  Instead of assuming the CDF is linear, it assumes the first derivative (the PDF) is linear over the interval $C_i < \xi < C_{i+1}$.  The linear expression for the PDF as in \eqref{lin_pdf} is substituted into \eqref{CDF_property1} and integrated to $\mu^\prime$.  Again this derivation is shown for $\mu^\prime$, but is valid for any CDF \cite{openmc}.
-
+% adding these to make this all one paragraph.
 \begin{equation}
 \label{lin_pdf}
 \begin{gathered}
@@ -857,16 +906,16 @@ C_i < \xi < C_{i+1} \\
 P(\mu^\prime) = \frac{P_{i+1}-P_i}{\mu^\prime_{i+1}-\mu^\prime_i}(\mu^\prime - \mu^\prime_i) + P_i = a \mu^\prime + b
 \end{gathered}
 \end{equation}
-
+%
 Integration of \eqref{lin_pdf} to $\mu^\prime$ yields \eqref{lin_pdf_int}.  This expression for $CDF(\mu^\prime)$ is set equal to the random number $\xi$ and solved for $\mu^\prime$ to give the interpolation function.
-
+%
 \begin{equation}
 \label{lin_pdf_int}
 C(\mu^\prime) = C_i  + \int_i^{\mu^\prime} P(\mu^{\prime\prime}) d\mu^{\prime\prime}  = C_i  + \frac{a}{2}(\mu^{\prime 2}-\mu^{\prime 2}_i) + b(\mu^\prime-\mu^\prime_i) = \xi 
 \end{equation}
-
+% What does the lower bound of i mean, and why does \mu_i get integrated as well? I thought that was a fixed value? 
 Taking advantage of the relationship between $a$ and $b$, the interpolation function can be simplified to \eqref{lin_lin} \cite{openmc}.
-
+%
 \begin{equation}
 \label{lin_lin}
 \begin{gathered}
@@ -874,63 +923,37 @@ a = \frac{P_{i+1}-P_i}{\mu^\prime_{i+1}-\mu^\prime_i} \qquad , \qquad b = P_i - 
 \mu^\prime = \mu_1 + \frac{1}{a}\left( \sqrt{P^2_i + 2a(\xi -C_i)} -P_i \right)
 \end{gathered}
 \end{equation}
+% what is \mu_1 here for?
+%
+% I don't quite understand the equation progression here. I'd write the definition of a and b as part of lin_pdf since you establish this relationship already and it will make the leap from lin_pdf_int to lin_lin clearer. I also don't understand lin_pdf_int result.
 
-Which interpolation method is used is specified in the data on a case-by-case basis.
 
-\subsubsection{Distance To Interaction}
+Which interpolation method is used is specified in the data on a case-by-case basis. % what does this mean? is it because of what data is available? what you're trying to do? what's most accurate? 
 
-The first step in stochastically transporting a neutron through matter is finding the distance to the next interaction.  The expression for the probability of non-interaction was shown in \eqref{pop_NI}.  The probability of interaction in $dx$ around $x$ is $\Sigma_t dx$.  Therefore the probability of not interacting from 0 to x and then interacting at $dx$ around $x$ is simply the product.  This expression, shown in \eqref{first_col}, is commonly referred to as the \emph{first collision probability}.
-
-\begin{equation}
-\label{first_col}
-P(x) = \Sigma_t e^{- \Sigma_t  x}
-\end{equation}
-
-This expression is simple and can be inverted for direct sampling.  The sampling scheme is shown in \eqref{first_col_samp}.  The expression $1-\xi$ can be replaced with $\xi$ since it is identically distributed.
-
-\begin{equation}
-\label{first_col}
-CDF(x) = \int_0^x \Sigma_t e^{- \Sigma_t  x^\prime} dx^\prime = 1- e^{- \Sigma_t  x} = \xi
-\end{equation}
-
-\begin{equation}
-\label{first_col_samp}
-x_i=CDF^{-1}(\xi) \qquad \Rightarrow \qquad x_i=\frac{-\ln(1-\xi) }{\Sigma_t}=\frac{-\ln(\xi) }{\Sigma_t}
-\end{equation}
-
-The total cross section $\Sigma_t$ is the total macroscopic cross section of the material the neutron is traveling through, i.e. it is the sum of the total macroscopic cross sections of its constituent isotopes as was shown in \eqref{material_sum_xs}.
-
-\subsubsection{Isotope and Reaction Selection}
-
-Now that the neutron has been determined to interact, the isotope with which it interacts must be decided.  The discrete PDF of this process is shown in \eqref{isotope_selection}, where there are $i$ isotopes in the material each having a total macroscopic cross section $\Sigma_{t,i}$.  The distribution is sampled by generating a uniform random number, $\xi$, on $[0,1)$ and performing a running sum over the individual isotope's total macroscopic cross sections.  When $CDF_i > \xi$, the neutron collision is sampled to happened in isotope $i$.
-
-\begin{equation}
-\label{isotope_selection}
-PDF_i = \frac{\Sigma_{t,i}}{\Sigma_t} \qquad \Rightarrow \qquad CDF_i = \frac{1}{\Sigma_t } \sum_{n=1}^i \Sigma_{t,n}
-\end{equation}
-
-Determining the reaction type is done in a similar fashion, except the number density of the material is no longer a concern since the isotope has already been selected.  Therefore, the running sum of the CDF is done over the isotope $i$'s microscopic cross sections.  Another random number is generated, and when $CDF_k > \xi$, the neutron is sampled to undergo reaction $k$ in isotope $i$.
-
-\begin{equation}
-\label{reaction_selection}
-PDF_k = \frac{\sigma_k}{\sigma_t} \qquad \Rightarrow \qquad CDF_k = \frac{1}{\sigma_{t} } \sum_{n=1}^k \sigma_{n}
-\end{equation}
 
 \subsubsection{Free Gas Treatment}
 
-As stated previously, the data in the cross section libraries are broadened for a certain material temperature.  This is done to account for the effect the nuclides' thermal motion has on the apparent width of resonances even when they are modeled as stationary.  Modeling the targets as stationary is a good approximation when the neutron has much larger velocities, but such a model would allow a neutron to scatter down to absolute zero.  In reality, they scatter until they come into thermal equilibrium with the target nuclides.  Once they are in equilibrium, on average they lose the same amount of energy as they gain from scattering events and their population becomes stationary in energy.  
+As stated previously, the data in the cross section libraries are Doppler broadened for a certain material temperature.  This is done to account for the effect the target nuclides' thermal motion has on the apparent width of resonances when the target nuclides are modeled as stationary. As a result, Doppler broadening produces accurate reaction rates in the resonance region when target nuclides are modeled to be stationary, and modeling the targets as stationary is a good approximation when the neutron velocities in the resonance region. 
 
-To preserve this collection phenomena, or \emph{thermal peak}, in Monte Carlo simulations, the velocity of the target nuclide must be explicitly modeled.  Elastic scattering is the only interaction that has a neutron in the exit channel at thermal energies, and therefore is the only reaction that needs to consider target velocity.  Fission produces secondary neutrons in distributions uncorrelated with incoming neutron energy or target velocity at thermal energies, so the target motion can be disregarded.  Since the Doppler-broadened cross sections produce accurate reaction rates when the targets are modeled to be stationary, this quantity must be preserved when giving the targets a nonzero velocity.  The targets follow a Maxwell-Boltzmann speed distribution, but this cannot be sampled directly for simulation purposes due to the Doppler broadening preprocessing done to the cross section data.  Near resonances, portions of the thermal distribution within the resonance contribute much more to the overall reaction rate than the portions outside of it.  Directly sampling a target velocity from the thermal distribution would produce incorrect exiting neutron energies.  Rather the distribution of target velocities which contributed to the reaction rate (and therefore the thermally averaged cross section) must be calculated and sampled from.
+However, a stationary target model would incorrectly allow a neutron to scatter down to absolute zero.  In reality, they scatter until they come into thermal equilibrium with the target nuclides.  Once they are in equilibrium, on average they lose the same amount of energy as they gain from scattering events and their population becomes stationary in energy.  To preserve this collection phenomena, or \emph{thermal peak}, in Monte Carlo simulations, the velocity of the target nuclide must be explicitly modeled.  
 
-The only use for the target velocity is in scattering kinematics to reproduce an accurate thermal peak while maintaining reaction rates.  For the sake of completeness, the following derivation is included and closely follows the that in \cite{openmc} and \cite{gelbard}.  The reaction rate in terms of the target and neutron velocities is shown in \eqref{RR_vel} and is equivalent to \eqref{broaden} in Section \ref{sec:temp}.
+%Elastic scattering is the only interaction that has a neutron at thermal energies in the exit channel, and therefore is the only reaction that needs to consider target velocity.  Fission produces secondary neutrons in distributions uncorrelated with incoming neutron energy or target velocity at thermal energies, so the target motion can be disregarded.  Since the Doppler-broadened cross sections produce accurate reaction rates when the targets are modeled to be stationary, this quantity must be preserved when giving the targets a nonzero velocity.  
+% you might not need this paragraph anymore
+
+The targets follow a Maxwell-Boltzmann speed distribution, but this cannot be sampled directly for simulation purposes because of the Doppler broadening preprocessing done to the cross section data.  Near resonances, portions of the thermal distribution within the resonance contribute much more to the overall reaction rate than the portions outside of it.  Directly sampling a target velocity from the thermal distribution would produce incorrect exiting neutron energies.  Rather, the distribution of target velocities that contributed to the reaction rate (and therefore the thermally averaged cross section) must be calculated and sampled from.
+
+Elastic scattering is the only interaction that has a neutron at thermal energies in the exit channel, and therefore the only use for the target velocity is in scattering kinematics to reproduce an accurate thermal peak while maintaining reaction rates.  For the sake of completeness, the following derivation is included and closely follows that in \cite{openmc} and \cite{gelbard}.  The reaction rate in terms of the target and neutron velocities is shown in \eqref{RR_vel} and is equivalent to \eqref{broaden} in Section \ref{sec:temp}.
 
 \begin{equation}
 \label{RR_vel}
 R = ||\boldsymbol{v_n}-\boldsymbol{v_t}|| \sigma(||\boldsymbol{v_n}-\boldsymbol{v_t}||) M(v_t)
 \end{equation}
 
-Since elastic scattering is the only reaction of interest, $\sigma(v_\mathrm{rel})$ can be assumed to be a constant.  This assumption is good for most nuclides since the elastic cross sections are in fact relatively constant at low energies.  If there is a low energy scattering resonance, this approximation may produce results that skew the distribution towards lower energies \cite{openmc}, but it is good for most nuclides.  Substituting the Maxwell-Boltzmann speed distribution for $M(v_t)$, the simplified PDF for target velocities can be written as \eqref{RR_vel_simp} where $C$ is the normalization constant calculated from \eqref{RR_vel}.
+Since elastic scattering is the only reaction of interest, $\sigma(v_\mathrm{rel})$ can be assumed to be constant.  This assumption is good for most nuclides since the elastic cross sections are in fact relatively constant at low energies.  If there is a low-energy scattering resonance, this approximation may produce results that skew the distribution towards lower energies \cite{openmc}, but it is good for most nuclides.  
 
+Substituting the Maxwell-Boltzmann speed distribution for $M(v_t)$, the simplified PDF for target velocities can be written as \eqref{RR_vel_simp} where $C$ is the normalization constant calculated from \eqref{RR_vel}.
+% there's no $C$ in \eqref{RR_vel} ?
+%
 \begin{equation}
 \label{RR_vel_simp}
 \begin{gathered}
@@ -938,7 +961,7 @@ Since elastic scattering is the only reaction of interest, $\sigma(v_\mathrm{rel
 PDF(\boldsymbol{v_t}) = C v_\mathrm{rel} \sigma \left[   \frac{4}{\sqrt{\pi}} \beta^3 v_T^2  \exp (- \beta^2  v_T^2 )      \right]
 \end{gathered}
 \end{equation}
-
+% define m
 Applying the law of cosines to $v_\mathrm{rel} = ||\boldsymbol{v_n}-\boldsymbol{v_t}||$ yields \eqref{RR_vel_expanded}, which has changed from a vector equation to a scalar one.   The new PDF has two unknowns, the target velocity $v_T$ and the angle between it and the neutron velocity, $\mu$.
 
 \begin{equation}
@@ -949,7 +972,11 @@ PDF(v_t) = C \sigma  \sqrt{v_n^2+v_t^2-2 v_n v_t \mu} \left[   \frac{4}{\sqrt{\p
 \end{gathered}
 \end{equation}
 
-There is a restriction on $\mu$, however.  There can be no cases where sampled values of $\mu$ and $v_T$ produce a negative $v_\mathrm{rel}$, which corresponds to the target neutron ``running away'' from the incident neutron.  Such a case is non-physical since it would imply that the reaction never happened.  This PDF cannot be directly inverted, but can be split into two PDFs, $f_1(v_T)$ and $f_2(v_T)$, and sampled by rejection.  The sampling scheme is to normalize $f_2(v_T)$ and sample from it.  The sampled is accepted based on the probability in \eqref{RR_vel_split_samp}\cite{openmc}.
+Note that there is a restriction on $\mu$.  There cannot be cases where sampled values of $\mu$ and $v_T$ produce a negative $v_\mathrm{rel}$, which corresponds to the target neutron ``running away'' from the incident neutron.  Such a case is non-physical since it would imply that the reaction never happened.  % does this translate into math that you use? If so, add it. If not, you probably don't need this paragraph?
+
+The PDF in \eqref{RR_vel_expanded} cannot be directly inverted, but can be split into two PDFs, $f_1(v_T)$ and $f_2(v_T)$ as seen in \eqref{RR_vel_split}, and sampled by rejection.  The sampling scheme is to normalize $f_2(v_T)$ and sample from it.  The sample is accepted based on the probability in \eqref{RR_vel_split_samp}\cite{openmc}.
+% these last two sentences are not so clear.
+The multiplication and division by $v_n^2+v_t^2$ seen in \eqref{RR_vel_split} guarantees that $f_1$ is bounded between 0 and 1.  This is necessary since $v_\mathrm{rel}$ is not bounded in any way.  The normalization using $f_2$ to make ``$CDF(v_T)$" is expanded in and simplified in \eqref{RR_vel_split_norm}, where $y=\beta v_n$ and $x=\beta v_t$.
 
 \begin{equation}
 \label{RR_vel_split}
@@ -966,8 +993,7 @@ f_2(v_T) =  \frac{4}{\sqrt{\pi}} (v_n^2+v_t^2) \beta^3 v_T^2  \exp ( -\beta^2  v
 p_\mathrm{accept} &= \frac{f_1(v_T^\prime,\mu)}{ f_1(v_T^\prime,\mu=0)}
 \end{split}
 \end{equation}
-
-The multiplication and division by $v_n^2+v_t^2$ seen in \eqref{RR_vel_split} guarantees that $f_1$ is bounded between 0 and 1.  This is necessary since $v_\mathrm{rel}$ is not bounded in any way.  The normalized version of $f_2$ is shown in \eqref{RR_vel_split_norm} as well as a simplified version where $y=\beta v_n$ and $x=\beta v_t$.
+% I'd put the cdf terms all together and make the acceptance probability separate.
 
 \begin{equation}
 \label{RR_vel_split_norm}
@@ -977,7 +1003,8 @@ The multiplication and division by $v_n^2+v_t^2$ seen in \eqref{RR_vel_split} gu
 \end{split}
 \end{equation}
 
-Since this scheme has two separate weighted distributions, the combined PDF can be sampled by sampling the second term with a probability of $2/(\sqrt{\pi}y+2)$ and the first term otherwise.  Luckily, both distributions can be directly sampled via the schemes C49 and C61 listed in the Third Monte Carlo Sampler manual \cite{3rdsampler}.  Sampling scheme C49 is for expressions of the form $\nu^{2n-1}e^{-\nu^2}$ where $n$ is an integer $\ge 1$, i.e. for gaussians multiplied by variables of odd powers.  For $n=2$, this is scheme is for the second term in \eqref{RR_vel_split_norm}, and is shown in \eqref{C49}.
+Since this scheme has two separate weighted distributions, the combined PDF can be sampled by sampling the second term with a probability of $2/(\sqrt{\pi}y+2)$ and the first term otherwise. % explain this more clearly. Are the two distributions independt? Why are we sampling them separately? don't you need both terms to get the CDF?
+  While both distributions are complicated, each can be directly sampled via the schemes C49 and C61 provided in the Third Monte Carlo Sampler manual \cite{3rdsampler}.  Sampling scheme C49 is for expressions of the form $\nu^{2n-1}e^{-\nu^2}$ where $n$ is an integer $\ge 1$, i.e.\ for Gaussians multiplied by variables of odd powers.  This is scheme is for the second term in \eqref{RR_vel_split_norm} when $n=2$ and $\nu=x$, and is shown in \eqref{C49}.
 
 \begin{equation}
 \label{C49}
@@ -986,8 +1013,9 @@ Since this scheme has two separate weighted distributions, the combined PDF can 
 n = 2 \qquad \Rightarrow \qquad x^\prime = \sqrt{- \ln \left( \xi_1 \xi_2 \right)}
 \end{gathered}
 \end{equation}
+% what are \nu and x'? how are they used? You don't need to re-tell us that n=2
 
-Sampling scheme C61 is for expressions of the for $\nu^{2n-1}e^{-\nu^2}$ where $n$ is a half integer $\ge 1/2$, i.e. for gaussians multiplied by variables of even powers.  When $n=3/2$, this is a sampling scheme for the first term in \eqref{RR_vel_split_norm}, and is shown in \eqref{C61}.
+Sampling scheme C61 is for expressions of the for $\nu^{2n-1}e^{-\nu^2}$ where $n$ is a half integer $\ge 1/2$, i.e.\ for Gaussians multiplied by variables of even powers.  When $n=3/2$, this is a sampling scheme for the first term in \eqref{RR_vel_split_norm}, and is shown in \eqref{C61}.
 
 \begin{equation}
 \label{C61}
@@ -998,8 +1026,11 @@ h = n-1/2 \\
 n = 3/2 \quad h=1 \qquad \Rightarrow \qquad x^\prime =   \sqrt{- \ln( \xi_1) - \ln(\xi_2) \cos^2(\frac{\pi}{2}\xi_3)}
 \end{gathered}
 \end{equation}
+% same questions about what this is.
 
-After this is done and $x^\prime$ is sampled, the rejection criterion in \eqref{RR_vel_split_samp} comes into play.  The sampled value of $x^\prime$ is transformed to $v_T^\prime=x^\prime/\beta$, and a value for $\mu$ is sampled isotropically as in \eqref{mu_samp}.  Once $\mu$ is sampled, $f_1(v_T,\mu)$ can be calculated, and the sampled values of $v_T^\prime$ and $\mu$ are accepted with the probability $p_\mathrm{accept}$ as shown in \eqref{prob_accept}, i.e. if another random number $\xi<p_\mathrm{accept}$.  If the sample is rejected, the whole process is repeated until a pair of $v_T^\prime$ and $\mu$ are accepted.  Even though this is a rejections method, it has fairly high efficiency, with samples being accepted at minimum 68\% of the time and 100\% of the time as the neutron velocity goes to zero or values much greater than the target temperature \cite{mcnp}.
+After this %what?%
+ is done and $x^\prime$ is sampled, the rejection criterion in \eqref{RR_vel_split_samp} is used to%do what?% give us a map of what's you're going to tell us so we can figure out where we're going.
+.  The sampled value of $x^\prime$ determines $v_T^\prime$ via $v_T^\prime=x^\prime/\beta$, and a value for $\mu$ is sampled isotropically as in \eqref{mu_samp}.  Once $\mu$ is sampled, $f_1(v_T,\mu)$ can be calculated, and the sampled values of $v_T^\prime$ and $\mu$ are accepted with the probability $p_\mathrm{accept}$ as shown in \eqref{prob_accept}, i.e.\ the values are accepted if random number, $xi$, fulfils $\xi<p_\mathrm{accept}$.  If the sample is rejected, the whole process is repeated until a pair of $v_T^\prime$ and $\mu$ are accepted.  
 
 \begin{equation}
 \label{mu_samp}
@@ -1011,10 +1042,12 @@ After this is done and $x^\prime$ is sampled, the rejection criterion in \eqref{
 p_\mathrm{accept} = \frac{\sqrt{v_n^2+v_t^2-2 v_n v_t \mu}}{v_n^2+v_t^2}
 \end{equation}
 
+Even though this is a rejection method, it is fairly efficient, with samples being accepted at minimum 68\% of the time and up to 100\% of the time as the neutron velocity either goes to zero or to values much greater than the target temperature \cite{mcnp}.
+
 \subsubsection{Stochastic Mixing}
 
 The ENDF data tables have probability distributions for reactions at discrete energy points, but this is not physically accurate.  The reactions do not abruptly transition from one PDF to another at a single energy, they smoothly transition.  This is why \emph{stochastic mixing} is prescribed in the ENDF tables.  If the neutron energy, $E$, falls between the ENDF data energy grid values $i$ and $i+1$, the neutron will use data from table $i+1$ with probability $f$, defined in \eqref{mixing_prob} \cite{openmc}.
-
+%
 \begin{equation}
 \label{mixing_prob}
 \begin{gathered}
@@ -1022,8 +1055,8 @@ E_i < E < E_{i+1} \\
 f = \frac{E-E_i}{E_{i+1}-E_i}
 \end{gathered}
 \end{equation}
-
-As $E$ approaches $E_{i+1}$, the probability it will sample from the $i+1$ distribution go to 1 linearly.  This ensures smooth transitions between reaction data tables.
+%
+As $E$ approaches $E_{i+1}$, the probability it will sample from the $i+1$ distribution goes to 1 linearly.  This ensures smooth transitions between reaction data tables.
 
 
 \subsubsection{Elastic Scattering}
@@ -1036,28 +1069,31 @@ The kinematics of elastic scattering were outlined in Section \ref{subsec:intera
      \caption{Elastic scattering anisotropy at high energies in $^{16}$O.  \label{scattering_anisotropy}}
 \end{figure}
 
-It is essential to model this phenomena accurately since the scattering angle factors heavily into the energy exchange between the particles.  Figure \ref{scattering_error} shows what can happen when elastic scattering is treated as isotropic for all energies.  The figure shows the normalized flux per lethargy in a one meter cube of water with a 2 MeV point source at its center.  The neutron flux spectra immediately under scattering resonances are too large due to neutrons not losing enough energy in scattering events.  The large backward scattering probability causes more energy to be lost on average than purely isotropic scattering.
+It is essential to model this phenomena accurately since the scattering angle factors heavily into the energy exchange between the particles.  Figure \ref{scattering_error} shows what can happen when elastic scattering is treated as isotropic for all energies.  The figure shows the normalized flux per unit lethargy in a one meter cube of water with a 2 MeV point source at its center as calculated by WARP and by Serpent.  The neutron flux spectra immediately under scattering resonances are too large due to neutrons not losing enough energy in scattering events. %how do you know that? do you have a reference? how are you deciding what is wrong? we also don't know where the resonances are...
+  The large backward scattering probability causes more energy to be lost on average than purely isotropic scattering.% okay, how does this relate to the previous sentence? and the point you're making here?
 
 \begin{figure}[h!] 
   \centering
     \includegraphics[width=0.8\textwidth]{graphics/scattering_error.eps}
      \caption{Error in the energy spectrum caused by treating elastic scattering as isotropic for all energies.\label{scattering_error}}
 \end{figure}
+% This isn't a plot of error, it's a plot of flux
 
-After the target and neutron are transformed to the CM frame, the scattering CDF histogram interpolated and sampled as described in previous subsections.  Once the scattering angle is known, the rotated angle is calculated via the rotation formula shown in \eqref{vector_rot}.  The CM-rotated neutron velocity vector is then transformed back to the Lab frame and the reaction is complete.
+After the target and neutron are transformed to the CM frame, the scattering CDF histogram is interpolated and sampled as described in previous subsections. %which one? there were many. Maybe just slightly more explanation. 
+ Once the scattering angle is known, the rotated angle is calculated via the rotation formula shown in \eqref{vector_rot}.  The CM-rotated neutron velocity vector is then transformed back to the Lab frame and the reaction is complete.
 
 \subsubsection{Inelastic Reactions}
 
-Inelastic level scattering is treated identically to elastic scattering except that the $Q$ value in \eqref{finalvCM} is now nonzero.  This value is reaction-specific and must be given by the data tables.  
+Inelastic level scattering is treated identically to elastic scattering except that the $Q$ value in \eqref{finalvCM} is now nonzero.  This value is reaction-specific and must be obtained from the data tables.  
 
-Inelastic continuum scattering is treated differently, however.  Instead of having a well-defined kinematic formula relating the scattering angle to the final neutron energy, continuum reactions are defined by correlated scattering and energy tables.  They follow ENDF ``law'' number 44, the Kalbach-Mann correlated energy-angle scattering law \cite{mcnp} \cite{openmc}.  In this sampling scheme, a CDF is histogram or linearly-linearly interpolated and sampled from just like other reactions, except the sampled value is now a set of ``precompound factors,'' $R$, and ``angular slopes,'' $A$, instead of $\mu$ directly.  These values correspond to a secondary PDF, shown in \eqref{law44}, which is again sampled from to find $\mu$.
+Inelastic continuum scattering is treated differently, however.  Instead of having a well-defined kinematic formula relating the scattering angle to the final neutron energy, continuum reactions are defined by correlated scattering and energy tables.  They follow ENDF ``law'' number 44, the Kalbach-Mann correlated energy-angle scattering law \cite{mcnp} \cite{openmc}.  In this sampling scheme, a CDF is histogram or linear-linear interpolated and sampled from just like other reactions, except the sampled value is now a set of ``precompound factors,'' $R$, and ``angular slopes,'' $A$, instead of $\mu$ directly.  These values correspond to a secondary PDF, shown in \eqref{law44}, which is again sampled from to find $\mu$.
 
 \begin{equation}
 \label{law44}
 PDF = \frac{A}{2 \sinh (A)} ( \cosh(A\mu)+R \sinh (A\mu))
 \end{equation}
 
-The sampling scheme for this probability distribution shown in \eqref{law44samp}, where $\xi_1$ and $\xi_2$ are two additional random numbers.  Since this is a correlated angle-energy distribution, there there is an energy value along with the factors $A$ and $R$ that corresponds to a CDF bin.  This sampled energy value is scaled via \eqref{energy_scaling} just like those from a tabular energy distribution, which is the topic of the next subsection \cite{3rdsampler}\cite{openmc}.
+The sampling scheme for this probability distribution shown in \eqref{law44samp}, where $\xi_1$ and $\xi_2$ are two random numbers.  Since this is a correlated angle-energy distribution, there is an energy value along with the factors $A$ and $R$ that corresponds to a CDF bin.  This sampled energy value is scaled via \eqref{energy_scaling} just like those from a tabular energy distribution, which is the topic of the next subsection \cite{3rdsampler}\cite{openmc}.
 
 \begin{equation}
 \label{law44samp}
@@ -1071,7 +1107,7 @@ The sampling scheme for this probability distribution shown in \eqref{law44samp}
 
 \subsubsection{Tabular Energy Distributions}
 
-Continuous, independent energy distributions, like those specified for fission spectra, have multiple CDFs specified at various incoming neutron energies.  Stochastic mixing probability $f$, shown in \eqref{mixing_prob}, is used to select if the lower-bounding or upper-bounding distribution will be sampled from for $E_i < E < E_{i+1}$.  After the distribution is selected, the CDF is sampled with histogram or linear-linear interpolation, which ever is specified in the library.  Once the sampled energy, $E_\mathrm{sampled}$, is calculated, it must be scaled to the bounding incoming energy bins to preserve any thresholds.  This is done via \eqref{energy_scaling} where $E_{i,\mathrm{first}}$ and $E_{i,\mathrm{last}}$ are the first and last energy values of the CDF in $E_i$; and $E_{i+1,\mathrm{first}}$ and $E_{i+1,\mathrm{last}}$ are the first and last energy values of the CDF in $E_{i+1}$ \cite{mcnp}.
+Continuous, independent energy distributions, like those specified for fission spectra, have different CDFs for various incoming neutron energies.  Stochastic mixing probability, $f$, shown in \eqref{mixing_prob}, is used to select if the lower-bounding or upper-bounding distribution will be sampled from for $E_i < E < E_{i+1}$.  After the distribution is selected, the CDF is sampled with histogram or linear-linear interpolation, whichever is specified in the library.  Once the sampled energy, $E_\mathrm{sampled}$, is calculated, it must be scaled to the bounding incoming energy bins to preserve any thresholds.  This is done via \eqref{energy_scaling} where $E_{i,\mathrm{first}}$ and $E_{i,\mathrm{last}}$ are the first and last energy values of the CDF in $E_i$; and $E_{i+1,\mathrm{first}}$ and $E_{i+1,\mathrm{last}}$ are the first and last energy values of the CDF in $E_{i+1}$ \cite{mcnp}.
 
 \begin{equation}
 \label{energy_scaling}
@@ -1080,29 +1116,34 @@ E_a &= E_{i,\mathrm{first}} +  f( E_{i+1,\mathrm{first}} - E_{i,\mathrm{first}} 
 E_b &= E_{i,\mathrm{last}} +  f( E_{i+1,\mathrm{last}} - E_{i,\mathrm{last}} ) \\
 \mathrm{if\:i+1\:sampled:} \quad \mathrm{diff} &= E_{i+1,\mathrm{last}}  - E_{i+1,\mathrm{first}}  \qquad E_\mathrm{start}= E_{i+1,\mathrm{first}}  \\
 \mathrm{else:}          \qquad \quad       \mathrm{diff} &= E_{i,\mathrm{last}}  - E_{i,\mathrm{first}}  \qquad \qquad E_\mathrm{start}= E_{i,\mathrm{first}}  \\
-E^\prime &=  E1  +  ( E_\mathrm{sampled} - E_\mathrm{start})  \frac{ E_b - E_a}{ \mathrm{diff} }  
+E^\prime &=  E_1  +  ( E_\mathrm{sampled} - E_\mathrm{start})  \frac{ E_b - E_a}{ \mathrm{diff} }  
 \end{split}
-\end{equation}
+\end{equation}%what's E1?
 
 
 \subsection{Flux Estimation and Tallies}
 
-Reactions that happen within a volume can be scored, or tallied.  This is just like what a detector would do - integrate the physical response across energy and space.  MCNP uses the word ``tally'' and Serpent uses the word ``detector'' for the same measurement \cite{serpent,mcnp}.  Evidently, ``tally'' does not translate into Finnish, which is why ``detector'' is used.  ``Tally'' will be used here for consistency with the majority of neutron transport codes.  Other than determining the multiplication factor, one of the main purposes of simulation reactors is determining the neutron flux spectrum.  The reaction rates and therefore the power of the reactor are proportional to the flux, making it a very important quantity in determining how a rectors will behave.  Since reactions are explicitly simulated with the  Monte Carlo method, an estimator can be used to estimate the neutron flux.  It does not directly calculate the flux, but relies on the fact that the total reaction rate is proportional to the flux.  If every interaction point is counted within a volume, this number can be used to estimate the volume-averaged flux in that volume.  Since the reaction rate is directly proportional to the flux, as per \eqref{scalar_flux_RR}, the flux can be written in terms of the reaction rate and the material's total macroscopic cross section as shown in \eqref{flux_from_RR}.
+Reactions that happen within a volume can be scored or tallied.  %This is just like what a detector would do - integrate the physical response across energy and space.  
+% this seems random and not applicable to all tallies.
+MCNP uses the word ``tally'' and Serpent uses the word ``detector'' for the same measurement \cite{serpent,mcnp}.  Evidently, ``tally'' does not translate into Finnish, which is why ``detector'' is used.  ``Tally'' will be used here for consistency with the majority of neutron transport code syntax.  
+
+Other than determining the multiplication factor, one of the main purposes of simulation reactors is determining the neutron flux spectrum.  The reaction rates and, therefore, power of the reactor are proportional to the flux, making it a very important quantity in determining how a rector will behave.  Since reactions are explicitly simulated with the  Monte Carlo method, an estimator can be used to estimate the neutron flux.  An estimator does not directly calculate the flux, but relies on the fact that the total reaction rate is proportional to the flux.  
+If every interaction within a volume is counted, the number of interactions can be used to estimate the volume-averaged flux in that volume.  Since the reaction rate is directly proportional to the flux, per \eqref{scalar_flux_RR}, the flux can be written in terms of the reaction rate and a material's total macroscopic cross section as shown in \eqref{flux_from_RR}.
 
 \begin{equation}
 \label{flux_from_RR}
 \phi(\boldsymbol{\vec{r}},E) = \frac{ R_t(\boldsymbol{\vec{r}},E) }{  \Sigma_t(\boldsymbol{\vec{r}},E) }
 \end{equation}
 
-For a representation on a computer, a discrete set of energy bins $E_1 \rightarrow E_g$ must be specified in order to calculate the flux.  The flux in group $g$, such that $E_g < E < E_{g+1}$, and in volume $j$ is shown in \eqref{flux_discrete}.
-
+To calculate the flux a computer, a discrete set of energy bins, $E_1 \rightarrow E_g$, must be specified.  The flux in group $g$, such that $E_g < E < E_{g+1}$, and in volume $j$ is shown in \eqref{flux_discrete}.
+%
 \begin{equation}
 \label{flux_discrete}
 \bar{\phi}_{g,j} = \frac{1}{V_j} \int_{v_j} dV \int_{E_g}^{E_{g+1}} dE \: \phi(\boldsymbol{\vec{r}},E) = \frac{1}{V_j} \int_{v_j} dV \int_{E_g}^{E_{g+1}} dE \:\frac{ R_t(\boldsymbol{\vec{r}},E) }{  \Sigma_t(\boldsymbol{\vec{r}},E) } \\
 \end{equation}
-
-Since the reaction rate $R_{g,j}$ is simply the number of collisions $N_{g,j}$ within the energy interval and within the volume $V_j$, as shown in \eqref{RR_coll}, the expression for flux can be written as the sum of the inverse total macroscopic cross section of the material in volume $V_j$.
-
+%
+Since the reaction rate at energy $g$ in volume $j$, $R_{g,j}$, is simply the number of collisions $N_{g,j}$ within the energy interval and within the volume $V_j$, as shown in \eqref{RR_coll}, the expression for flux can be written as the sum of the inverse total macroscopic cross section of the material in volume $V_j$. % Give us some reason why we're learning about R_{g,j} before teaching us about it. Actually, why are you teaching us about this?
+%
 \begin{equation}
 \label{RR_coll}
 \begin{gathered}
@@ -1110,23 +1151,23 @@ R_{g,j} = \int_{v_j} dV \int_{E_g}^{E_{g+1}} dE \: R_t(\boldsymbol{\vec{r}},E) =
 \end{gathered}
 \end{equation}
 
-The expression shown in \eqref{flux_tally} is \emph{analog estimator} of the flux.  It is called analog in the sense that the reactions are counted directly and it is analogous to physical phenomnena.  Since every collision is related to the total flux, counting every collision gives an estimate of the flux.  If a reaction has a finite cross section in a material and the reaction does not occur during the transport simulation, a reaction rate estimate is impossible to make using an analog estimator. 
+The expression shown in \eqref{flux_tally} is an \emph{analog estimator} of the flux.  It is analog in the sense that the reactions are counted directly.  Since every collision is related to the total flux, counting every collision gives an estimate of the flux.  If a reaction has a finite cross section in a material and the reaction does not occur during the transport simulation, a reaction rate estimate is impossible to make using an analog estimator. 
 
 \begin{equation}
 \label{flux_tally}
 \begin{gathered}
 E_g < E_i < E_{g+1} \\
-\bar{\phi}_{g,j} =  \frac{1}{V_j} \sum_{i=1}^{N_j} \frac{1}{\Sigma_t(E_i)} =  \frac{1}{V_j} \int_{V_j} dV \int_{E_g}^{E_{g+1}} dE \: \phi(\boldsymbol{\vec{r}},E) 
+\bar{\phi}_{g,j} =  \frac{1}{V_j} \sum_{i=1}^{N_{g,j}} \frac{1}{\Sigma_t(E_i)} =  \frac{1}{V_j} \int_{V_j} dV \int_{E_g}^{E_{g+1}} dE \: \phi(\boldsymbol{\vec{r}},E) 
 \end{gathered}
 \end{equation}
 
-If a \emph{collision estimator} is used instead, this is not longer the case.  A collision estimator differs by using every interaction point, no matter what actual reaction occurs.  This total score is simply weighted by the interaction probability for a particular reaction as shown in \eqref{flux_average_xs_tally} \cite{jaakko}.  The fractional interaction probability, $P_{k,m}(E_i)$, is for reaction $k$ in isotope $m$ in the material in volume $j$ at the energy $E_i$.
-
+If a \emph{collision estimator} is used instead, it is possible to estimate the reaction rate even if reactions do not occur in the volume of interest.  A collision estimator differs by using every interaction point, no matter what actual reaction occurs.  This total score is simply weighted by the interaction probability for a particular reaction as shown in \eqref{flux_average_xs_tally} \cite{jaakko}.  The fractional interaction probability, $P_{k,m}(E_i)$, is for reaction $k$ in isotope $m$ in the material in volume $j$ at the energy $E_i$.
+%
 \begin{equation}
 \label{flux_average_xs}
 \bar{\Sigma}_{k,m} =  \frac{1}{V_j \bar{\phi}_{g,j} } \int_{v_j} dV \int_{E_g}^{E_{g+1}} dE \: \phi(\boldsymbol{\vec{r}},E) \Sigma_{k,m}(\boldsymbol{\vec{r}},E)
-\end{equation}
-
+\end{equation} % you don't refer to this equation?
+%
 This is equivalent to summing the macroscopic cross section for a particular isotope's reaction instead of the material's total cross section.  This way, even rare events can be scored.  The result is no longer the flux, however, but rather the \emph{flux averaged cross section}.  
 
 \begin{equation}
@@ -1134,31 +1175,39 @@ This is equivalent to summing the macroscopic cross section for a particular iso
 \begin{gathered}
 E_g < E_i < E_{g+1} \\
 P_{k,m}(E_i)= \frac{\Sigma_{k,m}(E_i)}{\Sigma_t(E_i)} \\
-\bar{\Sigma}_{g,j,k,m} =  \frac{1}{V_j} \sum_{i=1}^{N_j} \frac{P_{i,j}(E_i)}{\Sigma_t(E_i)} = \frac{1}{V_j} \sum_{i=1}^{N_j} \frac{1}{\Sigma_{k,m}(E_i)}
+\bar{\Sigma}_{g,j,k,m} =  \frac{1}{V_j} \sum_{i=1}^{N_{g,j}} \frac{P_{i,j}(E_i)}{\Sigma_t(E_i)} = \frac{1}{V_j} \sum_{i=1}^{N_{g,j}} \frac{1}{\Sigma_{k,m}(E_i)}
 \end{gathered}
 \end{equation}
 
-The flux averaged cross section is useful in determining the physics of a system since it weights reactions by the flux present at a certain spatial region and/or energy bin.  This way, the reaction channels that neutrons undergo can be compared on a one-to-one basis in terms of their fraction of the total number of reactions instead of having to worry about the energy spectrum and the isotope's number density as well as the normal cross section.  Of course, all tallies are subject to the statistical laws mentioned in the previous statistics subsection.
+The flux averaged cross section is useful in determining the physics of a system since it weights reactions by the flux present at a certain spatial region and/or energy bin.  This way, the reaction channels that neutrons undergo can be compared on a one-to-one basis in terms of their fraction of the total number of reactions instead of having to worry about the energy spectrum and the isotope's number density as well as the normal cross section.% I think the incorporation of eq{flux_average_xs} and a bit more explanation is needed. Right now I don't completley see how this follows. 
+  Of course, all tallies are subject to the statistical laws mentioned in the previous statistics subsection. %? okay, why tell us this now?
 
 
 \subsection{Neutron Sources}
 
-So far, all that has been mentioned is how to handle the different reactions in a Monte Carlo neutron transport simulation.  This is important since reactions describe what happens to neutrons and where they go during their random walk, but how to handle \emph{where} they come from still needs to be defined.  The source terms on the right hand side of the neutron transport equation, other than the scattering source, have not been defined yet.  In this subsection, the other two source terms, the external source and the criticality source, are discussed.
+So far, all that has been mentioned is how to handle the different reactions in a Monte Carlo neutron transport simulation.  This is important since reactions describe what happens to neutrons and where they go during their random walk, but how to handle \emph{where} neutrons come from still needs to be defined.  The source terms on the right hand side of the neutron transport equation, other than the scattering source, have not been defined yet.  In this subsection, the other two source terms, the external source and the criticality source, are discussed.
 
 \subsubsection{External Source}
 
-An external, or fixed, source is simply a source which does not depend on the neutron population itself.  Physically, such a source could be from natural radioactive decay, an accelerator source, etc.  The only concern with an external source in a Monte Carlo simulation is in accurately measuring the response of the system, more specifically, the response of the system if it contains fissile material.  If a single neutron is ``shot'' into a multiplying material, all the secondary particles the primary neutron induces also need to be simulated in order to simulate the response of the system.  The number of secondary neutrons produced is fully defined by the multiplication factor since it gives the ratio of subsequent neutron generations.  An expression for the converge infinite series is shown in \eqref{sub_crit_mult}\cite{duderstadt}\cite{jaakko}.
+An external, or fixed, source is simply a source that does not depend on the neutron population itself.  Physically, such a source could be from natural radioactive decay, an accelerator source, etc.  In this work we are largely concerned with accurately measuring the response of the system to that external source if it contains fissile material.
+% Many many MC calculations are done with non-multiplying media...trying to shit the focus to limit it to this work, where you're only talking about reactors. 
 
+If a single neutron is ``shot'' into a multiplying material, all the secondary particles the primary neutron induces also need to be simulated in order to simulate the response of the system.  The number of secondary neutrons produced is fully defined by the multiplication factor since it gives the ratio of subsequent neutron generations.  An expression for the number of neutrons in an infinite series based on $k$ is shown in \eqref{sub_crit_mult}\cite{duderstadt}\cite{jaakko}.
+%
 \begin{equation}
 \label{sub_crit_mult}
 N_\mathrm{total} = N_0 + k N_0 + k^2 N_0 + \dots = N_0 \sum_{i=0}^\infty k^i = \frac{N_0}{1-k}
 \end{equation}
+%
+This series only converges for $k<1$, which sets a restriction for fixed-source simulations.  If the multiplication factor is greater than one it will require infinitely many secondary neutrons to be tracked, so this situation must be avoided.
 
-This series only converges for $k<1$, which sets a restriction for fixed-source simulations.  If the multiplication factor is greater than one, it will require infinitely many secondary neutrons to be tracked, so this situation must be avoided.
+% Do you want to mention how you handle the multiplication in MC? From this discussion I don't really know how this is handled.
 
 \subsubsection{Fission Source, $k$-Eigenvalue Method}
 
-When a fission source is specified, the simulation will run in a manner different to an external source problem.  The neutron source now depends on the neutron population itself, and a method must be used which directly ties the source to the population.  This is done by using any points where neutrons any secondary-producing reactions as source points for subsequent neutron histories.  When neutrons are born from these induced points, they of course must follow the emissions laws specified by the data.  For fission reactions, there is usually a tabulated energy spectrum, which is sampled and interpolated in the data-specified ways, and then scaled to the incoming energy bins via \eqref{energy_scaling}.  The angle is isotropic in the Lab frame, and this is easily sampled via \eqref{iso_samp}.
+When a fission source is specified, the simulation will run in a manner different from an external source problem.  The neutron source now depends on the neutron population itself, and a method must be used that directly ties the source to the population.  This is done by using any points where neutrons experience secondary-producing reactions as source points for subsequent neutron histories.  
+
+When neutrons are born from these induced reactions, they must follow the emission laws specified by the data.  For fission reactions, there is usually a tabulated energy spectrum, which is sampled and interpolated in the data-specified ways, and then scaled to the incoming energy bins via \eqref{energy_scaling}.  The angle is isotropic in the Lab frame, and this is easily sampled via \eqref{iso_samp}.
 
 \begin{equation}
 \label{iso_samp}
@@ -1168,16 +1217,20 @@ When a fission source is specified, the simulation will run in a manner differen
 \end{split}
 \end{equation}
 
-In criticality simulations, the parameter of interest is usually the effective multiplication factor, $k_\mathrm{eff}$.  It is defined by \eqref{k_eff_batch}, where $N_{s,n}$ is the number of source neutrons in the current generation, and $N_{s,n+1}$ is the number of neutrons in the next generation, which equals $N_{f,n}$, the yielf of secondary particles from both fission and (n,2/3/4n)) \cite{jaakko}.  Calculating this quantity in a Monte Carlo simulation is straightforward, but generation information must be preserved.  Correct results cannot be obtained if yields from source particles in different generation are used to calculate the number of sources in the next generation.  This is why criticality source simulations are usually run in a batched mode where a preset number of source particles from a single generation are all transported until termination.  The secondary-producing reaction points are then used as the starting points for the next generation.  The generations are not interleaved, and correct values for the multiplication factor can be calculated.
+In criticality simulations, the parameter of interest is usually the effective multiplication factor, $k_\mathrm{eff}$.  It is defined by \eqref{k_eff_batch}, where $N_{s,n}$ is the number of source neutrons in the current generation, and $N_{s,n+1}$ is the number of neutrons in the next generation. Further, $N_{s,n+1}$ equals $N_{f,n}$, the yield of secondary particles from both fission and (n,2/3/4n) reactions \cite{jaakko}.  Calculating this quantity in a Monte Carlo simulation is straightforward, but neutron generation information must be preserved.  Correct results cannot be obtained if yields from source particles in different generation are used to calculate the number of sources in the next generation.  This is why criticality source simulations are usually run in a batched mode where a pre-set number of source particles from a single generation are all transported until termination.  The secondary-producing reaction points are then used as the starting points for the next generation.  The generations are not interleaved, and therefore correct values for the multiplication factor can be calculated.
 
 \begin{equation}
 \label{k_eff_batch}
 k_{\mathrm{eff},n} = \frac{N_{s,n+1}}{N_{s,n}} = \frac{N_{f,n}}{N_{s,n}}
 \end{equation}
 
-Modeling the fission chain reaction is simple in Monte Carlo simulations when a system is exactly critical.  In batched criticality mode, the next generation of neutrons have starting points which are determined by the previous generation.  When the system is exactly critical, there is a one-to-one mapping of induced secondary neutrons to preset number of source particles to be transported in the next batch.  But when the system is sub- or super-critical, there is no longer a one-to-one mapping and starting points either have to be reused or discarded, respectively.  This is done by using the \emph{k-eigenvalue method}, which used by the Serpent code \cite{jaakko}.  After $k_\mathrm{eff}$ is calculated via \eqref{k_eff_batch}, it is used to renormalized the fission source of the next generation, i.e. the secondary yield values are divided by $k_\mathrm{eff}$.  This is an analog to dividing the fission source term in \eqref{time_ind_NTE} by $k_\mathrm{eff}$ to enforce the time derivative to be zero.  By dividing the yield values by $k_\mathrm{eff}$, the multiplication factor should be 1, and a one-to-one mapping is recovered.  It should be noted that WARP treats (n,2n) reactions and any reactions that produce secondary particles other than scattering as neutron sources.  MCNP calculates $k_\mathrm{eff}$ by treating tthese kinds of reactions as negative absorbtions, i.e. is subtracts an absobtion out of the global tally for an (n,2n) instead of adding it to a fission yield tally \cite{mcnp}.  Normally reactions other than fission are rare, but this scoring difference may be a source of disagreement when results are compared on a sub-$10^{-2}$ level as they are with multiplication factors.
+Modeling the fission chain reaction is simple in Monte Carlo simulations when a system is exactly critical.  In batched criticality mode, the next generation of neutrons has starting points that are determined by the previous generation.  When the system is exactly critical, there is a one-to-one mapping of induced secondary neutrons to a pre-set number of source particles that will be transported in the next batch.  But when the system is sub- or super-critical, there is no longer a one-to-one mapping and starting points either have to be reused or discarded, respectively.  This is done by using the \emph{k-eigenvalue method}, which is used by the Serpent code \cite{jaakko}. %what about MCNP?
+ After $k_\mathrm{eff}$ is calculated via \eqref{k_eff_batch}, it is used to renormalize the fission source of the next generation, i.e.\ the secondary yield values are divided by $k_\mathrm{eff}$.  This is an analog to dividing the fission source term in \eqref{time_ind_NTE} by $k_\mathrm{eff}$ to enforce a time derivative of zero.  By dividing the yield values by $k_\mathrm{eff}$, the multiplication factor should be 1, and a one-to-one mapping is recovered.  
+ 
+It should be noted that WARP treats (n,2n) reactions and any reactions that produce secondary particles other than scattering as neutron sources.  MCNP calculates $k_\mathrm{eff}$ by treating these kinds of reactions as negative absorptions, i.e.\ for an (n,2n) reaction MCNP subtracts an absorption out of the global tally instead of adding it to a fission yield tally \cite{mcnp}.  Normally, reactions other than fission are rare, but this scoring difference may be a source of disagreement when results are compared on a sub-$10^{-2}$ level as they are with multiplication factors.%I think writing the equations rather than the words of these two differences would be clearer - like what we did during the group meeting.
 
-Since $k_\mathrm{eff}$ is continuous, calculating an integer value of secondary particles is done stochastically to preserve the aggregate mean.  The renormalized yield, $y_r$, is stochastically rounded based on a random number $\xi$ as shown in  \eqref{stoch_rounding}.  Doing this ensures that over a large batch size, the multiplication factor is renormalized as close to one as possible.  In the case where $y_r$ is slightly less than one, the last few source points from the previous generation are simply reused.  This should not introduce much bias in the results if the source distribution is converged.
+Since $k_\mathrm{eff}$ is continuous, calculating an integer value of secondary particles is done stochastically to preserve the aggregate mean.  The renormalized yield, $y_r$, is stochastically rounded based on a random number, $\xi$, as shown in  \eqref{stoch_rounding}.  This ensures that, over a large batch size, the multiplication factor is renormalized to be as close to one as possible.  In the case where $y_r$ is slightly less than one, the last few source points from the previous generation are simply reused. %what about if it's slightly greater?
+ This should not introduce much bias in the results if the source distribution is converged, which is the subject of the next paragraph.
 
 \begin{equation}
 \label{stoch_rounding}
@@ -1189,9 +1242,11 @@ Since $k_\mathrm{eff}$ is continuous, calculating an integer value of secondary 
 \end{split}
 \end{equation}
 
-To start the simulation, a guess must be made for the initial points neutrons are born.  in some codes, one can specify a single initial point where all of the first generation neutrons are born.  As the simulation progresses, the source expands and converges to the true distribution.  The initial batches, or cycles, when the source distribution is far from the correct distribution are therefore discarded.  No quantities are accumulated and the multiplication factors values are not used in calculating the final value.  The discarded cycles only serve to converge the fission source so the accumulated quantities later in the simulation are not biased due to an incorrect source distribution.  In order to accelerated this process, WARP uses a similar method to Serpent to guess the initial source distribution.  The materials in the geometry are all flagged as fissile or non-fissile.  Then a uniform, random distribution of source neutrons are distributed across the geometry.  If the particles lies in a fissile material, it is recorded in a buffer.  This process is repeated until the required amount of source points are accumulated in the starting point buffer.  This method is called the \emph{flat source approximation}, and should require fewer cycles to be discard than the point source method since the initial distribution has spatial extent and fewer cycles will be needed to simply push neutrons into all geometrical regions \cite{jaakko}.
+To start a criticality simulation, a guess for the initial points neutrons are born is required. As the simulation progresses, the source expands and converges to the true distribution.  The initial batches, or cycles, in which the source distribution is likely far from the correct distribution are therefore discarded.  No quantities are accumulated, and the multiplication factors values are not used in calculating the final value.  The discarded cycles only serve to converge the fission source so the accumulated quantities later in the simulation are not biased by an incorrect source distribution.  
 
-When all the cycles are complete, the individual estimates of $k_\mathrm{eff}$ are averaged to make a final estimate for the system.  This is typically called the \emph{generation estimate} of $k_\mathrm{eff}$ \cite{jaakko}.  As the simulation runs, a recursion relation can be made so the values for every cycle does not need to be stored individually.  Expressions for the generation estimate are shown in \eqref{k_eff_final}.  It may be of interest to keep values for every cycle in order to perform statistical checks to assure convergence, however.
+One way to specify the initial source distribution is by choosing a single initial point where all of the first generation neutrons are born; this is called the \emph{point source} method. To accelerate the source convergence process, WARP uses a similar method to Serpent to guess the initial source distribution.  The materials in the geometry are all flagged as fissile or non-fissile.  Then a uniform, random distribution of source neutrons are distributed across the geometry.  If a particle lies in a fissile material, it is recorded in a buffer.  This process is repeated until the required amount of source points are accumulated in the starting point buffer.  This method is called the \emph{flat source approximation}. Since the initial distribution has spatial extent and fewer discard cycles will be needed to push neutrons into all geometrical regions than in the point source method \cite{jaakko}.
+
+When all the cycles are complete, the individual estimates of $k_\mathrm{eff}$ are averaged to make a final estimate for the system.  This is typically called the \emph{generation estimate} of $k_\mathrm{eff}$ \cite{jaakko}.  As the simulation runs, a recursion relation can be made so the values for every cycle do not need to be stored individually.  Expressions for the generation estimate are shown in \eqref{k_eff_final}.  It may be of interest to keep values for every cycle in order to perform statistical checks to assure convergence, however.
 
 \begin{equation}
 \label{k_eff_final}
