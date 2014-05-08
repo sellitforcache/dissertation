@@ -12,12 +12,21 @@ Nuclear reactors generate electricity from the heat produced by fissions induced
 
 Many things influence the neutron distribution, and therefore must be incorporated into the solution method.  The neutron distribution has strong feedback mechanisms from the materials present in the reactor.  Each isotope in the system can have different interactions with neutrons, and these reaction probabilities may have very strong dependence on the incoming neutron energy.  Using the Monte Carlo Method to approximate solutions to the neutron transport equation requires all of the neutron interactions to be explicitly modeled.  The reactor geometry also effects the neutron distribution, since it describes the spatial extent of the reactor materials.   The Monte Carlo Method tracks neutrons as they move through the reactor materials, sampling the reactions they can undergo along the way.  Of foremost importance is tracking fission reactions, since these are the reactions that sustain the fission chain reaction and maintain the reactor's effective multiplication factor.
 
-\subsection{Point Kinetics, Multiplication Factor}
-
-When a uranium (or other fissile heavy metal) nucleus fissions, two or more neutrons are released.  If, on average, exactly one of these neutrons goes on to induce another fission, the system in which the fissions are occurring is \emph{critical}, or able to maintain a constant neutron population and fission reaction rate (and correspondingly constant power) without any external neutron sources.  This is a stable fission chain reaction.
+When a uranium (or other fissile heavy metal) nucleus fissions, two or more neutrons are released.  If, on average, exactly one of these neutrons goes on to induce another fission, the system in which the fissions are occurring is \emph{critical}, or able to maintain a constant neutron population and fission reaction rate (and correspondingly constant power) without any external neutron sources.  This is a stable fission chain reaction.  The fissile nucleus rarely splits evenly, and the spectrum of lighter isotopes that are created by fission are called \emph{fission products} \cite{duderstadt}.  Fission products accumulate in the fuel material and can inhibit the fission chain reaction through absorption when the reach a high enough concentration.
+% what fission products are
 
 A \emph{fissionable} isotope is one that has a non-zero fission cross section, i.e. it can undergo fission, by absorbing a neutron.  A \emph{fissile} isotope is one that can be induced to fission by a neutron at any energy.  Some isotopes, like $^{235}$U, can absorb a neutron a very low energies and fission.  This is because the energy imparted to the nucleus through the absorption reaction is enough to destabilize to the point where it splits \cite{duderstadt}.  For some isotopes, like $^{238}$U, absorbing a low-energy neutron does not impart enough energy to the nucleus to induce fission.  It only fissions when a high-energy neutron is absorbed and the neutron brings additional energy with it to destabilize the nucleus sufficiently for fission to occur.  Therefore, $^{238}$U is fissionable, but not fissile.  $^{238}$U is also considered a \emph{fertile} isotope since when it captures a neutron, it becomes $^{239}$U which decays to $^{239}$Np and then to $^{239}$Pu, which is fissile.  Absorbing a neutron and only producing no secondary particles other than a gamma rays is called ``capture'' since the neutron is added to the nucleus of the previous isotope.  Fertile isotopes are those that decay to fissile isotopes after capturing a neutron \cite{duderstadt}.
 %define fissile/fertile here, you might want to mention why nu exists at very low energies since this seems inconsistent.
+
+The most common type of commercial reactor, by far, is an oxide-fueled light water reactor \cite{reactor_numbers}.   These reactors use ceramic fuel elements made of uranium oxide, UO$_2$, due to its high melting point.  They are also cooled and moderated with light water, which is water containing predominately $^1$H with trace amounts of $^2$H.  In the nuclear engineering lexicon, ``moderator'' means a material that reduces neutron energies to thermal levels \cite{duderstadt}.  The most effective moderators are light nuclei, like hydrogen, since they have a mass similar to that of a neutron and an elastic scattering reaction can transfer a large amount of the neutron's energy to the nucleus.  Light water reactors, or LWRs, are called ``thermal'' as well, since their mode of operation relies on the neutrons' energies being at thermal levels.  ``Fast'' rectors, on the other hand, operate with high energy neutrons, and want to avoid moderating them.  For this reason, oxide fuel and water are typically not used in fast reactors, since they include light nuclei \cite{duderstadt}.
+%describe typical fuel compositions.
+
+%add additional descriptions here, get rid of PK equations, describe meultiplication, add delayed to NTE and get rid of, just metnion them here.
+
+%describe the need to model all reactions here, go into the dominant types for fast/thermal
+
+
+\subsection{Point Kinetics, Multiplication Factor}
 
 The most important parameter of a nuclear reactor is its effective multiplication factor, $k_\mathrm{eff}$, which is the ratio of the number of neutrons in subsequent neutron generations.  All of the work put into reactor analysis and solving the neutron transport equations can usually be condensed into the effective multiplication factor.  It describes the growth rate of the neutron population in terms of generations.  If $k_\mathrm{eff}=1$, then subsequent neutron generations are exactly the same size and the reactor is critical.  If it is below 1, subsequent neutron generation are smaller and the reactor is subcritical.  If $k_\mathrm{eff}$ is greater than 1, subsequent generations are larger and the reactor is supercritical.  
 
@@ -286,7 +295,7 @@ Nonfission reactions from n capture & 4 & 100cm & delayed \\
 
 Fission is technically considered an absorption reaction since the fission-inducing neutron enters the nucleus and creates a compound nucleus.  Even though the neutron is absorbed, on average more than two new neutrons are released by each fission, enabling a fission chain reaction.  An important parameter of the fission chain reaction is $\nu_\mathrm{T}$, the average total number of neutrons per fission.  This number is called ``total'' since includes prompt neutrons, which appear immediately after fission, and delayed neutrons, which appear later.  Delayed neutrons are produced from photon-induced emission and from fission product decay.  These neutrons are not ``prompt'' in that they are not emitted immediately from the fission itself.  The processes that create these ``delayed'' neutrons (decay and nuclear relaxation) take time to occur and these neutrons can therefore appear anywhere between 0.6 to 80 seconds after a fission event \cite{duderstadt}. 
 
-The kinetics of a nuclear chain reaction depends heavily on the mean neutron lifetime, as was shown by the point kinetics equation in \ref{sec:analysis}.  If only prompt neutrons are considered, the mean neutron lifetime is approximately $10^{-4}$ seconds in light water (thermal spectrum) reactors \cite{duderstadt}.  Having a reactor that is critical solely on prompt neutrons means that it's power can change on the order of the prompt neutron lifetime.  At this speed, it would be difficult for control systems to respond in time to suppress any power excursions before damage occurred.  This is where delayed neutrons come into play.  If a reactor is not critical with prompt neutrons, but is critical with the incorporation of the delayed neutrons, the long appearance time of delayed neutrons shifts the mean neutron lifetime to larger values; typically to around 0.1 seconds for light water reactors \cite{duderstadt}.  The reactor is much easier to control with this much slower mean neutron lifetime.
+The kinetics of a nuclear chain reaction depends heavily on the mean neutron lifetime, as was shown by the point kinetics equation in \ref{sec:analysis}.  If only prompt neutrons are considered, the mean neutron lifetime is approximately $10^{-4}$ seconds in light water (thermal spectrum) reactors fueled by $^{235}$U \cite{duderstadt}.  Having a reactor that is critical solely on prompt neutrons means that it's power can change on the order of the prompt neutron lifetime.  At this speed, it would be difficult for control systems to respond in time to suppress any power excursions before damage occurred.  This is where delayed neutrons come into play.  If a reactor is not critical with prompt neutrons, but is critical with the incorporation of the delayed neutrons, the long appearance time of delayed neutrons shifts the mean neutron lifetime to larger values; typically to around 0.1 seconds for light water reactors \cite{duderstadt}.  The reactor is much easier to control with this much slower mean neutron lifetime.
 
 % for context, you should probably talk about prompt neutron lifetime of at least U235 fissions...
 % wait, we usually bundle the generations together to get one effective neutron lifetime. this paragraph doesn't make sense b/c you start out talking about how we need delayed neutrons to slow down the generation time, and end with two different times.
@@ -321,7 +330,7 @@ Unlike scattering reactions, where the energy and direction of the neutron is ch
 
 \subsection{Other Secondary-Producing Absorption Reactions}
 
-This category encompasses all the other reactions neutrons undergo.  There are two types: reactions that produce secondary neutrons in some amount and reactions that do not.  Those that do not may still produce other particles, like alpha particles, tritons, protons, et cetera.  Since these do not produce secondary neutrons, however, they are basically equivalent to a capture reaction in the scope of neutron transport.  Even though they aren't strictly capture reactions, they can contribute significantly to an isotope's absorption of neutrons.  Figure \ref{xs_e_dependence_li} shows that the (n,$^3$H) in lithium-6 is by far the main component of the total cross section, making lithium-6 a very strong absorber of low energy neutrons.  Boron-10 is another great example of this.  Its (n,$\alpha$) reaction has a very high cross section for low energy neutrons, and $^10$B is widely used in safety and control systems in thermal-spectrum reactors.
+This category encompasses all the other reactions neutrons undergo.  There are two types: reactions that produce secondary neutrons in some amount and reactions that do not.  Those that do not may still produce other particles, like alpha particles, tritons, protons, et cetera.  Since these do not produce secondary neutrons, however, they are basically equivalent to a capture reaction in the scope of neutron transport.  Even though they aren't strictly capture reactions, they can contribute significantly to an isotope's absorption of neutrons.  Figure \ref{xs_e_dependence_li} shows that the (n,$^3$H) in $^{6}$Li is by far the main component of the total cross section, making $^{6}$Li a very strong absorber of low energy neutrons.  $^{10}$B is another great example of this.  Its (n,$\alpha$) reaction has a very high cross section for low energy neutrons, and $^10$B is widely used in safety and control systems in thermal-spectrum reactors.
 
 Of the reactions that produce secondary neutrons, the (n,2n) reaction is most significant because it has the lowest threshold energy.  At higher incident neutron energies, (n,3n) and even (n,4n) can become possible.  Other particle combinations are possible as well, such as (n,n$\alpha$), and these reactions act like an inelastic scatter interaction where the relationship between scattering angle and energy no longer applies due to there being three bodies to distribute energy to instead of only two.
 
@@ -342,14 +351,14 @@ MCNP sets the threshold above which the target nuclide can be assumed stationary
      \caption{Maxwell-Boltzmann distribution for the speed of heavy and light nuclides at different temperatures.   \label{MB_dist}}
 \end{figure}
 
-The other effect that thermal motion has is the \emph{Doppler effect}.  This is where resonances are broadened as temperature increases due to the thermal distribution becoming wider.  The effect is also known as \emph{Doppler broadening} for this reason.  Figure \ref{MB_dist} shows the Maxwell-Boltzmann distributions at various temperatures for a heavy particle and for a light particle.  This is the distribution of speeds particles in a ``gas'' have if they only interact by scattering off of one another.  Most solids can be modeled as a dense gas when there are no strong anisotropies in their structure, which is why modeling the target velocities in this way is called the ``free gas model.''  Note that the broadening effect is much more pronounced for light nuclei \cite{duderstadt}.  % you sort of describe this above as well (I think) in case you want to refer to that. 
+The other effect that thermal motion has is the \emph{Doppler effect}.  This is where resonances are broadened as temperature increases due to the thermal distribution becoming wider.  The effect is also known as \emph{Doppler broadening} for this reason.  Figure \ref{MB_dist} shows the Maxwell-Boltzmann distributions at various temperatures for a heavy particle and for a light particle.  This is the distribution of speeds particles in a ``gas'' have if they only interact by scattering off of one another.  Most solids can be modeled as a dense gas when there are no strong anisotropies in their structure, which is why modeling the target velocities in this way is called the ``free gas model.''  Note that the broadening effect is much more pronounced for light nuclei \cite{duderstadt}.  % you sort of describe this above as well (I think) in case you want to refer to that.  Hmmmm, I don't think I do.  I may have mentioned it, but no details, so I'd like to keep this
 
-The widening of resonances affects reactors in significant ways, most notable is that more neutrons are absorbed in the resonance region as they scatter down to thermal energies.  The number of neutrons lost to capture increases and correspondingly reduces the overall multiplication factor.  It is important for reactor safety that this occurs since it produces a negative reactivity feedback for temperature and helps prevent power excursions and meltdowns.  If the multiplication factor is above unity, the power starts to rise, and therefore so does the fuel temperature.
-% I don't think you need the assumption because the temperature in the fuel will rise more rapidly than any coolant mechanism can respond, which is why the doppler effect always applies at least in an instantaneous sense.
+The widening of resonances affects reactors in significant ways, most notable is that more neutrons are absorbed in the resonance region as they scatter down to thermal energies.  The number of neutrons lost to capture increases and correspondingly reduces the overall multiplication factor.  It is important for reactor safety that this occurs since it produces a negative reactivity feedback for temperature and helps prevent power excursions and meltdowns.  If the multiplication factor is above unity, the power starts to rise.  In the short term, the fuel temperature will rise more rapidly than any coolant mechanism can respond, so a increase in power corresponds directly to an increase in fuel temperature.
+% I don't think you need the assumption because the temperature in the fuel will rise more rapidly than any coolant mechanism can respond, which is why the doppler effect always applies at least in an instantaneous sense.  DONE.
   When the temperature goes up, the increased captures causes the fission rate and thus temperature to decrease, stopping the power from increasing \cite{duderstadt}. There are many different types of reactivity feedback phenomena, but the temperature feedback is generally negative because of Doppler broadening.  
   
 Capture increases most in fission products since they often have strong absorption resonances and are lighter than fuel nuclides.  Very light nuclides typically do not have absorption resonances, so Doppler broadening has littler effect on their absorption rates.
-% You don't ever tell us what fuel is made of, so we don't know what proportion is light. Actually, you don't ever tell us about what fission products are either (though without that this part still makes sense so long as you explain fuel)
+% You don't ever tell us what fuel is made of, so we don't know what proportion is light. Actually, you don't ever tell us about what fission products are either (though without that this part still makes sense so long as you explain fuel).  added description in the beginning.
   This is why temperature feedback is least effective in fresh fuel where there are few fission products.  Figure \ref{xs_eu_broaden} shows the effect in  $^{155}$Eu, a fission product with a high capture cross section.
 
 \begin{figure}[h!]
@@ -360,14 +369,16 @@ Capture increases most in fission products since they often have strong absorpti
 
 %At 0 K, resonances are very sharp and can be treated as delta functions \cite{duderstadt}. you need to connect this idea more clearly to the rest of the paragraph.
 Reaction rates depend on the relative velocity of the neutron and the target nuclide, and since the target nuclides have a spectrum of energies, the relative velocity does as well.  Assuming the target is at rest, which is done in Monte Carlo codes, requires summing all the contributions to the reaction rate at a given energy from the different relative velocities given a single neutron energy.  From the reaction rate, a \emph{thermally averaged} cross section, $\bar{\sigma}$, can be calculated and used in simulations assuming a target at rest.  This is especially significant at resonances since slight movements in velocity can produce very large differences in cross section.  The overall effect is that sharp resonances are \emph{effectively} broadened since they start to contribute to reaction rates once the thermal distribution of relative velocities starts overlap them.  
-% This whole paragraph is kinda confusing. I tried to make it a little more clear, but I'm not sure I was successful.
+% This whole paragraph is kinda confusing. I tried to make it a little more clear, but I'm not sure I was successful.  I think it is clear, but that's just me haha.
  
-The expression for thermally-averaged cross sections is shown in \eqref{broaden} \cite{openmc}, where $v_n$ and $\boldsymbol{v_n}$ are the speed and velocity of the neutron, respectively, $\boldsymbol{v_t}$ is the velocity of the target, $v_\mathrm{rel} = || \boldsymbol{v_n} -\boldsymbol{v_t}||$ is the velocity of the neutron relative to the target, and $M(v_t)$ is the thermal distribution of target speeds.
+The expression for thermally-averaged cross sections is shown in \eqref{broaden} \cite{openmc}, where $v_n$ and $\boldsymbol{v_n}$ are the speed and velocity of the neutron, respectively, $\boldsymbol{v_t}$ is the velocity of the target, $v_\mathrm{rel} = || \boldsymbol{v_n} -\boldsymbol{v_t}||$ is the velocity of the neutron relative to the target, and $M(v_t)$ is the thermal distribution of target speeds.  
 
 \begin{equation}
 \bar{\sigma} = \frac{1}{v_n} \int v_\mathrm{rel} \sigma(v_\mathrm{rel}) M(v_t) dv_t
 \label{broaden}
 \end{equation}
+
+The fact that cross sections have been adjusted for a material temperature will be significant in Section \ref{sec:MC} when the target-at-rest assumption breaks down and it becomes necessary to preserve the correct reaction rates while still using the temperature-processed cross sections.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Nuclear Data}
@@ -526,7 +537,7 @@ Scattering is highly dependent on angle and energy and requires a more detailed 
 
 \begin{equation}
 \label{scattering_DD_xs}
-\Sigma_s = \Sigma_s(E^\prime \rightarrow E,\boldsymbol{\hat{\Omega}}^\prime \rightarrow \boldsymbol{\hat{\Omega}})
+\Sigma_s = \int_{\boldsymbol{\hat{\Omega}}} d\boldsymbol{\hat{\Omega}}^\prime \int_0^\infty dE^\prime \: \: \Sigma_s(E^\prime \rightarrow E,\boldsymbol{\hat{\Omega}}^\prime \rightarrow \boldsymbol{\hat{\Omega}})
  \end{equation}
 
 There is a practical reason for separating scattering into a cross
@@ -573,21 +584,27 @@ R_f(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) =  \int_0^\infty dE^\pri
 \begin{equation}
 \label{fiss_source2}
 \begin{split}
-R_f(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) & = \frac{\chi(E)}{4\pi} \int_0^\infty  \int_{4\pi}   \nu(E^\prime) \Sigma_f(\boldsymbol{\vec{r}},E^\prime) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}}^\prime,E^\prime,t) d\boldsymbol{\Omega}^\prime  dE^\prime \\
+R_f(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) & = \frac{\chi(E)}{4\pi} \int_0^\infty  \int_{\boldsymbol{\hat{\Omega}}}   \nu(E^\prime) \Sigma_f(\boldsymbol{\vec{r}},E^\prime) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}}^\prime,E^\prime,t) d\boldsymbol{\Omega}^\prime  dE^\prime \\
 &= \frac{\chi(E)}{4\pi} \int_0^\infty   \nu(E^\prime) \Sigma_f(\boldsymbol{\vec{r}},E^\prime) \phi(\boldsymbol{\vec{r}},E^\prime,t)  dE^\prime
 \end{split}
  \end{equation}
-% you switched from angle integration limits of omega to 4pi. just an fyi.
+% you switched from angle integration limits of omega to 4pi. just an fyi.  oops, FIXED!
 
 
 \subsection{Streaming}
 
-So far all that has been touched on is how neutrons within a volume move in angle and energy or are removed outright.  Now we will go over how they move in space, and to do this we consider a surface $S$ around our differential volume.  We want to find an expression for the net number of neutrons passing through this surface, and this will be our net leakage term (incoming minus outgoing).  The angular neutron flux describes the number of neutrons crossing a differential surface at angle $\boldsymbol{\hat{\Omega}}$, but in order to perform any vector operations on it, we must multiply it by the unit vector.  We can then write and expression for the leakage by performing a surface integral over the current and surface normal's dot product, shown in \eqref{leakage_surface}.
-% you haven't defined current.
+So far all that has been touched on is how neutrons within a volume move in angle and energy or are removed outright.  Now we will go over how they move in space, and to do this we consider a surface $S$ around our differential volume.  We want to find an expression for the net number of neutrons passing through this surface, and this will be our net leakage term (incoming minus outgoing).  The angular neutron flux describes the number of neutrons crossing a differential surface at angle $\boldsymbol{\hat{\Omega}}$, but in order to perform any vector operations on it, we must multiply it by the unit vector.  This new quantity is called the \emph{current density}, $\vec{\boldsymbol{J}}$, and is shown in \eqref{current}.
+
+\begin{equation}
+\label{current}
+\vec{\boldsymbol{J}}(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) =  \boldsymbol{\hat{\Omega}} \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t)
+\end{equation}
+
+We can then write and expression for the leakage by performing a surface integral over the current and surface normal's dot product, shown in \eqref{leakage_surface}.
 
 \begin{equation}
 \label{leakage_surface}
-\mathrm{Leakage} = \int_S ds \cdot \boldsymbol{\hat{\Omega}} \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t)
+\mathrm{Leakage} = \int_S ds \cdot  \vec{\boldsymbol{J}}(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) = \int_S ds \cdot  \boldsymbol{\hat{\Omega}} \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t)
 \end{equation}
  
  We can turn this into a volume integral by applying the divergence theorem, shown in \eqref{div_theorem}.  If the volume of interest is shrunk to an infinitesimal volume and we switch the order of the dot product, we come to an expression that can be used in the balance equation.  This expression, shown in \eqref{streaming}, is often called the \emph{streaming} term, since it describes the net movement of neutrons into the differential volume due to their physical movement.
@@ -614,16 +631,16 @@ Now all the terms of \eqref{NBE} have been explicitly defined.  Substituting the
 \boldsymbol{\hat{\Omega}}  \cdot \nabla \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) &+ \\
 \Sigma_t(\boldsymbol{\vec{r}},E) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) & \\
 & =  \\
-& \quad \int_0^\infty  \int_{4\pi} \Sigma_s(E^\prime \rightarrow E,\boldsymbol{\hat{\Omega}}^\prime \rightarrow \boldsymbol{\hat{\Omega}}) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}}^\prime,E^\prime,t) d\boldsymbol{\Omega}^\prime dE^\prime  \\
-&+ \frac{\chi(E)}{4\pi} \int_0^\infty  \int_{4\pi}   \nu(E^\prime) \Sigma_f(\boldsymbol{\vec{r}},E^\prime) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}}^\prime,E^\prime,t) d\boldsymbol{\Omega}^\prime  dE^\prime\\
+& \quad \int_0^\infty dE^\prime \int_{\boldsymbol{\hat{\Omega}}} d\boldsymbol{\Omega}^\prime \:\: \Sigma_s(E^\prime \rightarrow E,\boldsymbol{\hat{\Omega}}^\prime \rightarrow \boldsymbol{\hat{\Omega}}) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}}^\prime,E^\prime,t)    \\
+&+ \frac{\chi(E)}{4\pi} \int_0^\infty dE^\prime  \int_{\boldsymbol{\hat{\Omega}}} d\boldsymbol{\Omega}^\prime \:\:  \nu(E^\prime) \Sigma_f(\boldsymbol{\vec{r}},E^\prime) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}}^\prime,E^\prime,t)  \\
 & + S_{\mathrm{external}}
 \end{split}
  \end{equation}
- % you moved where the differential values are, it's okay, just fyi.
+% add delayed neutrons here
  
- The neutron transport equation in this form is an integro-differential equation since it has both derivates and integrals in it.  Its spatial and temporal parts are differential, whereas its angular and energy parts are integral.  It is linear and relatively easy to solve for simple geometries and reaction parameters.  The complexity in solving it comes from the complex energy dependence of the reaction parameters and the large and complex domains over which it must be solved in order to capture all the relevant physics. 
-% the juxtaposition of the two previous sentences doesn't match. they should have the same form.
-  The energy range of interest can span more then 12 orders of magnitude, from $1\times 10 ^{-11}$ to $1\times 10 ^{1}$ MeV and above, and the geometries involved can include millions of individual material regions containing many different mixtures of materials. 
+ The neutron transport equation in this form is an integro-differential equation since it has both derivates and integrals in it.  Its spatial and temporal parts are differential, whereas its angular and energy parts are integral.  It is linear and relatively easy to solve for simple geometries and reaction parameters, but in order to capture all the relevant physics for real-world problems, complex geometries and energy-dependent reaction parameters must be used.  Despite it's linearity, the neutron transport can be difficult to solve because of the large, heterogeneous domains over which it must be solved and the complex energy dependence of the cross sections.  
+% the juxtaposition of the two previous sentences doesn't match. they should have the same form.  fixed??
+ The energy range of interest can span more then 12 orders of magnitude, from $1\times 10 ^{-11}$ to $1\times 10 ^{1}$ MeV and above, and the geometries involved can include millions of individual material regions containing many different mixtures of materials. 
  
  \subsection{Time Independent Neutron Transport Equation}
 
@@ -635,8 +652,8 @@ In most situations, the equilibrium state of the neutron population is of intere
 \boldsymbol{\hat{\Omega}}  \cdot \nabla \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E) &+ \\
 \Sigma_t(\boldsymbol{\vec{r}},E) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) & \\
 & =  \\
-& \quad \int_0^\infty  \int_{4\pi} \Sigma_s(E^\prime \rightarrow E,\boldsymbol{\hat{\Omega}}^\prime \rightarrow \boldsymbol{\hat{\Omega}}) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}}^\prime,E^\prime) d\boldsymbol{\Omega}^\prime dE^\prime  \\
-&+ \frac{1}{k_{\mathrm{eff}}}\frac{\chi(E)}{4\pi} \int_0^\infty  \int_{4\pi}   \nu(E^\prime) \Sigma_f(\boldsymbol{\vec{r}},E^\prime) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}}^\prime,E^\prime) d\boldsymbol{\Omega}^\prime  dE^\prime\\
+& \quad \int_0^\infty dE^\prime   \int_{\boldsymbol{\hat{\Omega}}} d\boldsymbol{\Omega}^\prime \:\: \Sigma_s(E^\prime \rightarrow E,\boldsymbol{\hat{\Omega}}^\prime \rightarrow \boldsymbol{\hat{\Omega}}) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}}^\prime,E^\prime)  \\
+&+ \frac{1}{k_{\mathrm{eff}}}\frac{\chi(E)}{4\pi} \int_0^\infty dE^\prime  \int_{\boldsymbol{\hat{\Omega}}}  d\boldsymbol{\Omega}^\prime \:\:  \nu(E^\prime) \Sigma_f(\boldsymbol{\vec{r}},E^\prime) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}}^\prime,E^\prime)  \\
 \end{split}
  \end{equation}
  
@@ -651,6 +668,7 @@ In most situations, the equilibrium state of the neutron population is of intere
 % I still feel a little weak about this section, but it's just my need to be super specific about discrete methods; this is fine. 
 
 \section{Monte Carlo}
+\label{sec:MC}
 
 Deterministic methods solve the neutron transport equation directly.  They treat the neutron population as a continuous distribution and discretize the spatial, angular, energy, and temporal dimensions that the distribution depends on and solve the transport equation at these discrete points.  The Monte Carlo Method takes a different approach in mapping the transport problem to a computer.  It attempts to directly simulate what happens in reality.  Instead of the neutron population being continuous and the spatial, angular, and energy dimensions being discretized, it leaves the dimensions continuous and discretizes the neutron population.  This is how the neutrons actually exist.  They can be very well approximated by a continuous distribution, but it is still an approximation.  Quantities of interest are then determined by integrating over the neutron population.   
 
