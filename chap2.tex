@@ -706,19 +706,25 @@ To understand how the Monte Carlo Method performs integration, simple equations 
 \bar{X}_N = \frac{1}{N} \sum_i^N x_i
 \end{equation}
 
-The shape of the distribution about the mean is important as well since it quantifies the uncertainty.  The variance can be computed by performing the central second moment on $P$ and estimated by Bessel's Correction on the standard variance estimator \eqref{varience_est} \cite{openmc}.  It is useful that the sample mean can be removed from the sum of the sample squares since this means that only the sample sum and the sum of sample squares need be stored.  The entire sample set does not need to be stored and used to compute the variance at the end when the sample mean is known.
-% what? you might want to define true mean vs. sample mean and give some more words connecting the dots here. 
+The shape of the distribution about the mean is important as well since it quantifies the uncertainty.  The variance can be computed by performing the central second moment on $P$, shown in \eqref{variance}.  The discrete equation is shown in \eqref{variance_discrete}.
 
 \begin{equation}
-\label{varience}
-\sigma^2 = \int_{-\infty}^{\infty} x^2 P(x) dx- \mu^2
+\label{variance}
+\sigma^2 = \int_{-\infty}^{\infty} x^2 P(x) dx- \mu^2 
 \end{equation}
-% you don't refer to eqref{varience}
+
+\begin{equation}
+\label{variance_discrete}
+\mathrm{Var}(X) = \frac{1}{N} \sum_i^N \left( x_i - \mu  \right)^2
+\end{equation}
 
 \begin{equation}
 \label{varience_est}
 \sigma_N^2 =  \frac{1}{N-1} \sum_i^N (x_i-\mu)^2 =  \frac{1}{N-1} \left( \sum_i^N x_i^2-N\bar{X}_N^2 \right)
 \end{equation}
+
+To compute the variance, however,  estimated by Bessel's Correction, shown in \eqref{varience_est} \cite{openmc}.  It is useful that the sample mean can be removed from the sum of the sample squares since this means that only the sample sum and the sum of sample squares need be stored.  The entire sample set does not need to be stored and used to compute the variance at the end when the sample mean is known.
+% what? you might want to define true mean vs. sample mean and give some more words connecting the dots here. 
 
 The law of large number states that \eqref{arith_mean}, the sample mean, will converge to the true mean \eqref{int_mean} in the limit where $N\rightarrow\infty$.  
 
