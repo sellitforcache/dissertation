@@ -966,7 +966,7 @@ Note that there is a restriction on $\mu$.  There cannot be cases where sampled 
 
 The second reason rejection sampling is used is that the PDF in \eqref{RR_vel_expanded} cannot be directly inverted.  However, it can be split into two PDFs, $f_1(v_T)$ and $f_2(v_T)$ as seen in \eqref{RR_vel_split}, which can be inverted.  Sampling from the product of two invertible functions is possible by rejection.  The sampling scheme for this is to normalize $f_2(v_T)$ (so its integral is one) and sample from it directly.  The sample from $f_2(v_T)$ is accepted based on the probability in \eqref{RR_vel_split_samp} \cite{openmc}.
 % these last two sentences are not so clear.
-The multiplication and division by $v_n^2+v_t^2$ seen in \eqref{RR_vel_split} guarantees that $f_1$ is bounded between 0 and 1.  This is necessary since $v_\mathrm{rel}$ is not bounded in any way.  The normalization using $f_2$ to make ``$CDF(v_T)$" is expanded and simplified in \eqref{RR_vel_split_norm}, where $y=\beta v_n$ and $x=\beta v_t$.
+The multiplication and division by $v_n^2+v_t^2$ seen in \eqref{RR_vel_split} guarantees that $f_1$ is bounded between 0 and 1.  This is necessary since $v_\mathrm{rel}$ is not bounded in any way.  The normalization using $f_2$ to make ``$CDF(v_T)$" is expanded and simplified in \eqref{RR_vel_split_norm}, where $y=\beta v_n$ and $x=\beta v_t$.  The acceptance probability of the sample is shown in \eqref{RR_vel_split_accept}
 
 \begin{equation}
 \label{RR_vel_split}
@@ -978,10 +978,12 @@ f_2(v_T) =  \frac{4}{\sqrt{\pi}} (v_n^2+v_t^2) \beta^3 v_T^2  \exp ( -\beta^2  v
 
 \begin{equation}
 \label{RR_vel_split_samp}
-\begin{split}
-``CDF(v_T)" &= \frac{f_2(v_T)}{\int f_2(v_T)} \qquad \Rightarrow \qquad v_T^\prime  \\
-p_\mathrm{accept} &= \frac{f_1(v_T^\prime,\mu)}{ f_1(v_T^\prime,\mu=0)}
-\end{split}
+``CDF(v_T)" = \frac{f_2(v_T)}{\int f_2(v_T)} \qquad \Rightarrow \qquad v_T^\prime 
+\end{equation}
+
+\begin{equation}
+\label{RR_vel_split_accept}
+p_\mathrm{accept} = \frac{f_1(v_T^\prime,\mu)}{ f_1(v_T^\prime,\mu=0)}
 \end{equation}
 % I'd put the cdf terms all together and make the acceptance probability separate.
 
@@ -993,19 +995,22 @@ p_\mathrm{accept} &= \frac{f_1(v_T^\prime,\mu)}{ f_1(v_T^\prime,\mu=0)}
 \end{split}
 \end{equation}
 
-Since this scheme has two separate weighted distributions, the combined PDF can be sampled by sampling the second term with a probability of $2/(\sqrt{\pi}y+2)$ and the first term otherwise. % explain this more clearly. Are the two distributions independt? Why are we sampling them separately? don't you need both terms to get the CDF?
-  While both distributions are complicated, each can be directly sampled via the schemes C49 and C61 provided in the Third Monte Carlo Sampler manual \cite{3rdsampler}.  Sampling scheme C49 is for expressions of the form $\nu^{2n-1}e^{-\nu^2}$ where $n$ is an integer $\ge 1$, i.e.\ for Gaussians multiplied by variables of odd powers.  This is scheme is for the second term in \eqref{RR_vel_split_norm} when $n=2$ and $\nu=x$, and is shown in \eqref{C49}.
+Since this CDF is the weighted sum of two independent distributions, the combined PDF can be sampled by sampling the second term with a probability of $2/(\sqrt{\pi}y+2)$ and the first term otherwise.  % explain this more clearly. Are the two distributions independent? Why are we sampling them separately? don't you need both terms to get the CDF?  Is this better?
+While both distributions appear complicated, each can be directly sampled via the schemes C49 and C61 provided in the Third Monte Carlo Sampler manual \cite{3rdsampler}.  Sampling scheme C49, shown in \eqref{C49}, is for sampling distributions of the form $\nu^{2n-1}e^{-\nu^2}$ where $n$ is an integer $\ge 1$ and $\nu$ is a continuous random variable, i.e.\ for Gaussians multiplied by variables of odd powers.  This is scheme is appropriate for sampling a value of $x^\prime$ from the second term in \eqref{RR_vel_split_norm} when $n=2$, and is shown in \eqref{C49_x}.
 
 \begin{equation}
 \label{C49}
-\begin{gathered}
-\nu = \sqrt{- \ln \left( \prod_{i=1}^n \xi_i \right)} \\ 
-n = 2 \qquad \Rightarrow \qquad x^\prime = \sqrt{- \ln \left( \xi_1 \xi_2 \right)}
-\end{gathered}
+\nu = \sqrt{- \ln \left( \prod_{i=1}^n \xi_i \right) } 
 \end{equation}
+
+\begin{equation}
+\label{C49_x}
+ x^\prime = \sqrt{- \ln \left( \xi_1 \xi_2 \right)}
+\end{equation}
+
 % what are \nu and x'? how are they used? You don't need to re-tell us that n=2
 
-Sampling scheme C61 is for expressions of the for $\nu^{2n-1}e^{-\nu^2}$ where $n$ is a half integer $\ge 1/2$, i.e.\ for Gaussians multiplied by variables of even powers.  When $n=3/2$, this is a sampling scheme for the first term in \eqref{RR_vel_split_norm}, and is shown in \eqref{C61}.
+Sampling scheme C61, shown in \eqref{C61}, is for expressions of the for $\nu^{2n-1}e^{-\nu^2}$ where $n$ is a half integer $\ge 1/2$, i.e.\ for Gaussians multiplied by variables of even powers.  When $n=3/2$, this is a sampling scheme for the first term in \eqref{RR_vel_split_norm}, and is shown in \eqref{C61_x}.
 
 \begin{equation}
 \label{C61}
@@ -1013,14 +1018,19 @@ Sampling scheme C61 is for expressions of the for $\nu^{2n-1}e^{-\nu^2}$ where $
 h = n-1/2 \\
 \nu = \sqrt{- \ln \left( \prod_{i=1}^h \xi_i  \right)+ \tau^2} \\ 
 \tau^2 = -\ln(\xi_1) \cos^2(\frac{\pi}{2}\xi_2)\\
-n = 3/2 \quad h=1 \qquad \Rightarrow \qquad x^\prime =   \sqrt{- \ln( \xi_1) - \ln(\xi_2) \cos^2(\frac{\pi}{2}\xi_3)}
 \end{gathered}
 \end{equation}
-% same questions about what this is.
 
-After this %what?%
- is done and $x^\prime$ is sampled, the rejection criterion in \eqref{RR_vel_split_samp} is used to%do what?% give us a map of what's you're going to tell us so we can figure out where we're going.
-.  The sampled value of $x^\prime$ determines $v_T^\prime$ via $v_T^\prime=x^\prime/\beta$, and a value for $\mu$ is sampled isotropically as in \eqref{mu_samp}.  Once $\mu$ is sampled, $f_1(v_T,\mu)$ can be calculated, and the sampled values of $v_T^\prime$ and $\mu$ are accepted with the probability $p_\mathrm{accept}$ as shown in \eqref{prob_accept}, i.e.\ the values are accepted if random number, $xi$, fulfils $\xi<p_\mathrm{accept}$.  If the sample is rejected, the whole process is repeated until a pair of $v_T^\prime$ and $\mu$ are accepted.  
+\begin{equation}
+\label{C61_x}
+x^\prime =   \sqrt{- \ln( \xi_1) - \ln(\xi_2) \cos^2(\frac{\pi}{2}\xi_3)}
+\end{equation}
+
+% same questions about what this is.  Better?
+
+After the first or second term of \eqref{RR_vel_split_norm} is sampled (RHS sampled with probability $2/(\sqrt{\pi}y+2)$) to give $x^\prime$, it can be transformed to $v_T^\prime$ via $v_T^\prime=x^\prime/\beta$.  Once a value for $v_T^\prime$ is determined, it must be accepted or rejected based on the angular constraint imposed by the rejection criterion \eqref{RR_vel_split_accept}.  The rejection criterion requires a value for $\mu^\prime$, however.  Since this is for a thermal distribution, $\mu$ is sampled isotropically as shown in \eqref{mu_samp}.  Once $\mu$ is sampled, $f_1(v_T,\mu)$ can be calculated, and the sampled values of $v_T^\prime$ and $\mu$ are accepted with the probability $p_\mathrm{accept}$ as shown in \eqref{prob_accept}, i.e.\ the values are accepted if random number $\xi$ satisfies $\xi<p_\mathrm{accept}$.  If the sample is rejected, the whole process is repeated until a pair of $v_T^\prime$ and $\mu$ are accepted.  
+% make sure the above is clear, is it now?
+
 
 \begin{equation}
 \label{mu_samp}
@@ -1032,7 +1042,7 @@ After this %what?%
 p_\mathrm{accept} = \frac{\sqrt{v_n^2+v_t^2-2 v_n v_t \mu}}{v_n^2+v_t^2}
 \end{equation}
 
-Even though this is a rejection method, it is fairly efficient, with samples being accepted at minimum 68\% of the time and up to 100\% of the time as the neutron velocity either goes to zero or to values much greater than the target temperature \cite{mcnp}.
+Even though this is a rejection method, it is fairly efficient, with samples being accepted 68\% up to 100\% of the time as the neutron velocity either goes from zero to values much greater than the target velocity \cite{mcnp}.
 
 \subsubsection{Stochastic Mixing}
 
