@@ -1058,7 +1058,6 @@ f = \frac{E-E_i}{E_{i+1}-E_i}
 %
 As $E$ approaches $E_{i+1}$, the probability it will sample from the $i+1$ distribution goes to 1 linearly.  This ensures smooth transitions between reaction data tables.
 
-
 \subsubsection{Elastic Scattering}
 
 The kinematics of elastic scattering were outlined in Section \ref{subsec:interactions}, and even though it seems only the velocities and masses of the target and neutron are needed, data tables still need to be queried to carry out the interaction.  At energies below the MeV range, elastic scattering is isotropic in the CM frame, but at these energies and above, it becomes significantly anisotropic.  Figure \ref{scattering_anisotropy} shows this in $^{16}$O.  At high energies, the scattering is both forward- and backward-peaked.  
@@ -1069,18 +1068,34 @@ The kinematics of elastic scattering were outlined in Section \ref{subsec:intera
      \caption{Elastic scattering anisotropy at high energies in $^{16}$O.  \label{scattering_anisotropy}}
 \end{figure}
 
-It is essential to model this phenomena accurately since the scattering angle factors heavily into the energy exchange between the particles.  Figure \ref{scattering_error} shows what can happen when elastic scattering is treated as isotropic for all energies.  The figure shows the normalized flux per unit lethargy in a one meter cube of water with a 2 MeV point source at its center as calculated by WARP and by Serpent.  The neutron flux spectra immediately under scattering resonances are too large due to neutrons not losing enough energy in scattering events. %how do you know that? do you have a reference? how are you deciding what is wrong? we also don't know where the resonances are...
-  The large backward scattering probability causes more energy to be lost on average than purely isotropic scattering.% okay, how does this relate to the previous sentence? and the point you're making here?
+It is essential to model this phenomena accurately since the scattering angle factors heavily into the energy exchange between the particles.  Figure \ref{scattering_error} shows what can happen when elastic scattering is treated as isotropic for all energies.  The figure shows the normalized flux per unit lethargy in a one meter cube of water with a 2 MeV point source at its center as calculated by WARP (red) and by Serpent (blue).  The neutron flux spectra at scattering resonances (which are apparent at 0.32, 1.0, and 1.2 MeV from the sharp dips in the flux) is too small, and the flux immediately after the resonances is too large.   
 
 \begin{figure}[h!] 
   \centering
     \includegraphics[width=0.8\textwidth]{graphics/scattering_error.eps}
-     \caption{Error in the energy spectrum caused by treating elastic scattering as isotropic for all energies.\label{scattering_error}}
+     \caption{An inaccurate flux spectrum produced by WARP compared to a correct one from Serpent highlighting the errors caused by treating elastic scattering as isotropic for all energies.\label{scattering_error}}
 \end{figure}
-% This isn't a plot of error, it's a plot of flux
+% This isn't a plot of error, it's a plot of flux.  FIXED.
 
-After the target and neutron are transformed to the CM frame, the scattering CDF histogram is interpolated and sampled as described in previous subsections. %which one? there were many. Maybe just slightly more explanation. 
- Once the scattering angle is known, the rotated angle is calculated via the rotation formula shown in \eqref{vector_rot}.  The CM-rotated neutron velocity vector is then transformed back to the Lab frame and the reaction is complete.
+The anisotropy shown in \ref{scattering_anisotropy} at the 1 MeV resonance indicates that a neutron should either lose a little (forward-peaked elastic scattering) or a large (backward-peaked elastic scattering) amount of energy in the elastic scattering event.  It should not lose an intermediate amount.  The minimum fraction of energy than can be lost to $^{16}$O is zero and the maximum is $1-((16+1)/(16-1))^2=0.22$ \cite{duderstadt}.  The errors shown in Figure \ref{scattering_error} typically span 2 octaves in the logarithmic flux plots, which is consistent with the maximum factional energy loss.  In the completely isotropic flux, the higher flux at intermediate energies indicates that neutrons are being scattered to these energies at a higher rate than Serpent.  It is low immediately on the resonance because neutrons are leaving the energy bin faster than they should be and are not scattering multiple times within the bin (as they would if they lost no energy in the elastic scattering event).  
+
+The point of highlighting this phenomenon is that sampling angular dependence of the scattering kernels is very important for obtaining correct results, especially for elastic scattering where the energy exchange are completely defined by the scattering angle and the target momentum.  The energy dependencies cannot be ignored and the distributions specified in the nuclear data must be sampled as specified in the data tables.  Elastic scattering is very common (and often dominant) reaction and modeling it accurately is essential to obtaining correct results.
+% how do you know that? do you have a reference? how are you deciding what is wrong? we also don't know where the resonances are...
+% okay, how does this relate to the previous sentence? and the point you're making here?
+% does it make more sense now?   I need to make a point here unless i just want to say refer to section 2.2
+WARP used the tabular CDF format to sample the outgoing CM angle of the neutron in elastic scattering, which normally uses histogram interpolation.  The process is as follows:    
+\begin{enumerate}
+ \item The neutron energy and direction are converted to velocity.
+ \item The target velocity is sampled as described in the previous subsection.
+ \item The center of mass velocity is calculated and the neutron and target velocities are transformed to the CM frame.
+ \item The polar scattering angle is sampled from the appropriate angular distribution for incoming neutron energy and the target isotope.
+ \item The azimuthal scattering angle is sampled isotropicaly (uniformly) in $2\pi$.
+ \item The neutron velocity is rotated from its initial CM direction through the sampled polar and azimuthal angles according to \eqref{vector_rot}.
+ \item The neutron velocity is transformed by to the Lab frame and its new energy is calculated.
+\end{enumerate}
+
+
+%which one? there were many. Maybe just slightly more explanation.  Added more explanation.
 
 \subsubsection{Inelastic Reactions}
 
