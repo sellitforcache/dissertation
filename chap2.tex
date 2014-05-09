@@ -1250,7 +1250,7 @@ k_{\mathrm{eff},n} = \frac{ \int_{V} dV \int_0^\infty dE \int_{\boldsymbol{\hat{
 %
 \begin{equation}
 \label{k_eff_warp}
-k_{\mathrm{eff},n} = \frac{ \int_{V} dV \int_0^\infty dE \int_{\boldsymbol{\hat{\Omega}}} d\boldsymbol{\Omega} \:\: (\nu \Sigma_f + \Sigma_{n,2n} + 2\Sigma_{n,3n})\phi}{\int_{V} dV \int_0^\infty dE \int_{\boldsymbol{\hat{\Omega}}} d\boldsymbol{\Omega} \:\: \nabla \cdot \boldsymbol{\vec{J}}  + \int_{V} dV \int_0^\infty dE \int_{\boldsymbol{\hat{\Omega}}} d\boldsymbol{\Omega} \:\: (\Sigma_c + \Sigma_f + \Sigma_{n,2n} + \Sigma_{n,3n}) \phi}
+k_{\mathrm{eff},n} = \frac{ \int_{V} dV \int_0^\infty dE \int_{\boldsymbol{\hat{\Omega}}} d\boldsymbol{\Omega} \:\: (\nu \Sigma_f + 2\Sigma_{n,2n} + 3\Sigma_{n,3n})\phi}{\int_{V} dV \int_0^\infty dE \int_{\boldsymbol{\hat{\Omega}}} d\boldsymbol{\Omega} \:\: \nabla \cdot \boldsymbol{\vec{J}}  + \int_{V} dV \int_0^\infty dE \int_{\boldsymbol{\hat{\Omega}}} d\boldsymbol{\Omega} \:\: (\Sigma_c + \Sigma_f + \Sigma_{n,2n} + \Sigma_{n,3n}) \phi}
 \end{equation}
 %
 WARP treats all secondary-producing reactions as neutron sources since it is simpler to implement in parallel.  Only a single secondary particle yield vectors needs to be reduced at the end of a batch if \eqref{k_eff_warp} is used.  Two reductions would be need to use \eqref{k_eff_mcnp}, one for the fission yields and one for the multiplicity yields.
