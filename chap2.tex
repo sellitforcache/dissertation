@@ -935,22 +935,23 @@ Elastic scattering is the only interaction that has a neutron at thermal energie
 
 \begin{equation}
 \label{RR_vel}
-R = ||\boldsymbol{v_n}-\boldsymbol{v_t}|| \sigma(||\boldsymbol{v_n}-\boldsymbol{v_t}||) M(v_t)
+R (\boldsymbol{v_t}) = ||\boldsymbol{v_n}-\boldsymbol{v_t}|| \sigma(||\boldsymbol{v_n}-\boldsymbol{v_t}||) M(v_t)
 \end{equation}
 
 Since elastic scattering is the only reaction of interest, $\sigma(v_\mathrm{rel})$ can be assumed to be constant.  This assumption is good for most nuclides since the elastic cross sections are in fact relatively constant at low energies.  If there is a low-energy scattering resonance, this approximation may produce results that skew the distribution towards lower energies \cite{openmc}, but it is good for most nuclides.  
 
-Substituting the Maxwell-Boltzmann speed distribution for $M(v_t)$, the simplified PDF for target velocities can be written as \eqref{RR_vel_simp} where $C$ is the normalization constant calculated from \eqref{RR_vel}.
-% there's no $C$ in \eqref{RR_vel} ?
+Substituting the Maxwell-Boltzmann speed distribution for $M(v_t)$, the simplified PDF for target velocities can be written as \eqref{RR_vel_simp} where $C$ is the normalization constant calculated from \eqref{RR_vel}, and $m$ is the mass of the target nucleus.
+% there's no $C$ in \eqref{RR_vel} ?    added to eq.
 %
 \begin{equation}
 \label{RR_vel_simp}
 \begin{gathered}
+C = \int_0^\infty d\boldsymbol{v_t} \:\: R(\boldsymbol{v_t}) \\
 \beta = \sqrt{\frac{m}{2kT}} \\
 PDF(\boldsymbol{v_t}) = C v_\mathrm{rel} \sigma \left[   \frac{4}{\sqrt{\pi}} \beta^3 v_T^2  \exp (- \beta^2  v_T^2 )      \right]
 \end{gathered}
 \end{equation}
-% define m
+% define m. done.
 Applying the law of cosines to $v_\mathrm{rel} = ||\boldsymbol{v_n}-\boldsymbol{v_t}||$ yields \eqref{RR_vel_expanded}, which has changed from a vector equation to a scalar one.   The new PDF has two unknowns, the target velocity $v_T$ and the angle between it and the neutron velocity, $\mu$.
 
 \begin{equation}
@@ -961,11 +962,11 @@ PDF(v_t) = C \sigma  \sqrt{v_n^2+v_t^2-2 v_n v_t \mu} \left[   \frac{4}{\sqrt{\p
 \end{gathered}
 \end{equation}
 
-Note that there is a restriction on $\mu$.  There cannot be cases where sampled values of $\mu$ and $v_T$ produce a negative $v_\mathrm{rel}$, which corresponds to the target neutron ``running away'' from the incident neutron.  Such a case is non-physical since it would imply that the reaction never happened.  % does this translate into math that you use? If so, add it. If not, you probably don't need this paragraph?
+Note that there is a restriction on $\mu$.  There cannot be cases where sampled values of $\mu$ and $v_T$ produce a negative $v_\mathrm{rel}$, which corresponds to the target neutron ``running away'' from the incident neutron.  Such a case is non-physical since it would imply that the reaction never happened.  This is the first reason why rejection sampling is needed to determine an appropriate target velocity.  The PDF in \eqref{RR_vel_expanded} is sampled and the velocity is rejected if it violates the restriction on $\mu$. % does this translate into math that you use? If so, add it. If not, you probably don't need this paragraph?  Yes, this is the reason rejections sampling is needed, otherwise it could be directly inverted.
 
-The PDF in \eqref{RR_vel_expanded} cannot be directly inverted, but can be split into two PDFs, $f_1(v_T)$ and $f_2(v_T)$ as seen in \eqref{RR_vel_split}, and sampled by rejection.  The sampling scheme is to normalize $f_2(v_T)$ and sample from it.  The sample is accepted based on the probability in \eqref{RR_vel_split_samp}\cite{openmc}.
+The second reason rejection sampling is used is that the PDF in \eqref{RR_vel_expanded} cannot be directly inverted.  However, it can be split into two PDFs, $f_1(v_T)$ and $f_2(v_T)$ as seen in \eqref{RR_vel_split}, which can be inverted.  Sampling from the product of two invertible functions is possible by rejection.  The sampling scheme for this is to normalize $f_2(v_T)$ (so its integral is one) and sample from it directly.  The sample from $f_2(v_T)$ is accepted based on the probability in \eqref{RR_vel_split_samp} \cite{openmc}.
 % these last two sentences are not so clear.
-The multiplication and division by $v_n^2+v_t^2$ seen in \eqref{RR_vel_split} guarantees that $f_1$ is bounded between 0 and 1.  This is necessary since $v_\mathrm{rel}$ is not bounded in any way.  The normalization using $f_2$ to make ``$CDF(v_T)$" is expanded in and simplified in \eqref{RR_vel_split_norm}, where $y=\beta v_n$ and $x=\beta v_t$.
+The multiplication and division by $v_n^2+v_t^2$ seen in \eqref{RR_vel_split} guarantees that $f_1$ is bounded between 0 and 1.  This is necessary since $v_\mathrm{rel}$ is not bounded in any way.  The normalization using $f_2$ to make ``$CDF(v_T)$" is expanded and simplified in \eqref{RR_vel_split_norm}, where $y=\beta v_n$ and $x=\beta v_t$.
 
 \begin{equation}
 \label{RR_vel_split}
