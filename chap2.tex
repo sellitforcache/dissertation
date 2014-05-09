@@ -694,7 +694,7 @@ A hazard associated with the statistical requirements is that very small but ver
 \subsection{Statistics}
 \label{sec:stat}
 
-To understand how the Monte Carlo Method performs integration, simple equations and derivations such as calculating $\pi$ can be done.   First, given a continuous random variable, $x$, that follows the probability distribution, $P$, the mean value can be calculated by taking the first moment as was shown in \eqref{NDF_moments} and is reproduced in \eqref{int_mean}.  However, we are interested in determining the mean from a set samples rather than directly from the underlying distribution.  If we have $N$ independent measurements of quantity $x$, this is simply taking the arithmetic mean, as shown in \eqref{arith_mean}.
+To understand how the Monte Carlo Method performs integration, simple equations and derivations such as calculating $\pi$ can be done.   First, given a continuous random variable, $x$, that follows the probability distribution, $P(x)$, the mean value can be calculated by taking the first moment as was shown in \eqref{NDF_moments} and is reproduced in \eqref{int_mean}.  However, we are interested in determining the mean from a set samples rather than directly from the underlying distribution.  If we have $N$ independent measurements of quantity $x$, this is simply taking the arithmetic mean, as shown in \eqref{arith_mean}.  This value, computed from a finite set of measurements, $X$, is called the \emph{sample mean}, $\bar{X}$, since it is based on samples from the underlying probability distribution $P(x)$.  The \emph{true mean} is $\mu$, which is computed directly from $P(x)$. 
 
 \begin{equation}
 \label{int_mean}
@@ -703,10 +703,17 @@ To understand how the Monte Carlo Method performs integration, simple equations 
 
 \begin{equation}
 \label{arith_mean}
-\bar{X}_N = \frac{1}{N} \sum_i^N x_i
+\bar{X} = \frac{1}{N} \sum_i^N x_i
 \end{equation}
 
-The shape of the distribution about the mean is important as well since it quantifies the uncertainty.  The variance can be computed by performing the central second moment on $P$, shown in \eqref{variance}.  The discrete equation is shown in \eqref{variance_discrete}.
+The law of large number states that the sample mean converges to the true mean in the limit where $N\rightarrow\infty$.  
+
+\begin{equation}
+\label{LLN}
+Pr\left(\lim_{N\rightarrow\infty} \bar{X}_N = \mu \right) = 1
+\end{equation}
+
+The shape of the distribution of samples about the mean is important as well since it quantifies the uncertainty.  The variance can be computed by performing the central second moment on $P$, shown in \eqref{variance}. 
 
 \begin{equation}
 \label{variance}
@@ -714,43 +721,27 @@ The shape of the distribution about the mean is important as well since it quant
 \end{equation}
 
 \begin{equation}
-\label{variance_discrete}
-\mathrm{Var}(X) = \frac{1}{N} \sum_i^N \left( x_i - \mu  \right)^2
-\end{equation}
-
-\begin{equation}
 \label{varience_est}
-\sigma_N^2 =  \frac{1}{N-1} \sum_i^N (x_i-\mu)^2 =  \frac{1}{N-1} \left( \sum_i^N x_i^2-N\bar{X}_N^2 \right)
+\mathrm{Var}(X)  =  \frac{1}{N-1} \sum_i^N (x_i-\bar{X})^2 =  \frac{1}{N-1} \left( \sum_i^N x_i^2-N\bar{X}^2 \right)
 \end{equation}
 
-To compute the variance, however,  estimated by Bessel's Correction, shown in \eqref{varience_est} \cite{openmc}.  It is useful that the sample mean can be removed from the sum of the sample squares since this means that only the sample sum and the sum of sample squares need be stored.  The entire sample set does not need to be stored and used to compute the variance at the end when the sample mean is known.
-% what? you might want to define true mean vs. sample mean and give some more words connecting the dots here. 
+Again, we are interested in determining the variance from a set samples rather than directly from the underlying distribution.  The discrete equation for computing the variance of a set of independent measurements, $X$, is shown in \eqref{varience_est}.  Dividing by $N-1$ instead of $N$ is called Bessel's Correction \cite{openmc}.  It is useful that the sample mean can be removed from the sum of the sample squares since this means that only the sample sum and the sum of sample squares need be stored.  The entire sample set does not need to be stored and used to compute the variance at the end when the sample mean is known.
 
-The law of large number states that \eqref{arith_mean}, the sample mean, will converge to the true mean \eqref{int_mean} in the limit where $N\rightarrow\infty$.  
-
-\begin{equation}
-\label{LLN}
-Pr\left(\lim_{N\rightarrow\infty} \bar{X}_N = \mu \right) =0
-\end{equation}
-
-The rate at which the estimate, \eqref{arith_mean}, converges to the true mean, \eqref{int_mean}, comes from the central limit theorem.  Shown in \eqref{CLT}, the theorem states that the distribution of the means taken from a large set of independent random variables will be normally distributed \cite{openmc}.  
+The rate at which the sample mean converges to the true mean, i.e. how the uncertainty scales with the number of samples, comes from the central limit theorem.  Shown in \eqref{CLT}, the theorem states that the distribution of the means taken from a large set of independent random variables will be normally distributed \cite{openmc}.  
 
 \begin{equation}
 \label{CLT}
-\sqrt{N}\left(\left(\frac{1}{N} \sum_i^N x_i \right)-\mu\right) \xrightarrow[]{d} \mathcal{N}(0,\sigma^2)
+\sqrt{N}\left(\left(\frac{1}{N} \sum_i^N x_i \right)-\mu\right) \xrightarrow[]	{d} \mathcal{N}(0,\sigma^2)
 \end{equation}
-% I'd put this earlier so you know what you're talking about in your first variance discussion, and put the two varianes next to each other.
 
-% Maybe try to be more careful about true mean/var vs. sample mean/var - it will help people follow.
-We would like to know how close the mean of such an independent set of measurements will be to the true mean.  In other words, the variance of the mean is desired.  Luckily, this can be estimated with only one measurement instead of directly computing the variance with many measurements.  The Bienaym\'e formula, shown in \eqref{bien}, states that the variance of a sum of uncorrelated random variables is equal to the sum of the variances of the variables.
+We would like to know how close the mean of such an independent set of measurements will be to the true mean.  In other words, the variance of the mean is desired.  Luckily, this can be estimated with only one measurement for the mean instead of directly computing the variance of the mean with many measurements of the mean.  The Bienaym\'e formula, shown in \eqref{bien}, states that the variance of a sum of uncorrelated random variables is equal to the sum of the variances of the variables.
 
 \begin{equation}
 \label{bien}
 Var\left(\sum_{i=0}^N x_i \right) = \sum_{i=0}^N Var(x_i)
 \end{equation}      
 
-
-Applying the Bienaym\'e formula and the variance relation show in \eqref{basic_var_scaling} to the sample mean results in an expression for the variance of the mean, $Var(\bar{X}_N)$, in terms of the variance of the sample, $\sigma_N^2$.  This expression is shown in \eqref{sum_var}.  
+Applying the Bienaym\'e formula and the variance relation shown in \eqref{basic_var_scaling} to the sample mean results in an expression for the variance of the mean, $Var(\bar{X}_N)$, in terms of the variance of the sample, $\sigma_N^2$.  This expression is shown in \eqref{sum_var}.  
 
 \begin{equation}
 \label{basic_var_scaling}
@@ -788,7 +779,7 @@ CDF(x) = \int_{x_1}^{x_2} PDF(x^\prime) dx^\prime
 \end{equation}
 %define x_1 and x_2
 
-Since a PDF must be positive and normalized by definition, the CDF must range from 0 to 1 and increase monotonically.  Setting the CDF equal to a uniformly distributed random number, $\xi$, and solving for the value to be sampled yields the sampling scheme.  
+The bounds of integration are $x_1$ and $x_2$, which should span the entire domain of the PDF, i.e. that CDF$(x_2) - $CDF$(x_1) = 1$. Since a PDF must be positive and normalized by definition, the CDF must range from 0 to 1 and increase monotonically.  Setting the CDF equal to a uniformly distributed random number, $\xi$, and solving for the value to be sampled yields the sampling scheme.  
 
 Figure \ref{direct_samp} shows this graphically.  The CDF describes the probability that a value of a random number, $xi$, obeying the PDF will be less than or equal to the value $x$.  Taking an integral gives the probability that $x$ will be in the interval, as shown in \eqref{CDF_property1}.  Since the width of the CDF is directly proportional to the PDF at the same value of $x$, as shown in \eqref{CDF_property2}, and if $\xi$ is uniformly distributed on [0,1), the interval $\Delta \xi$ will contain a fraction of samples on [0,1) equal to $P( x_1 < x_i < x_2)$.  As the interval width is reduced to 0, $P(x_i)= PDF(x)dx = d\xi$ (again, since $\xi$ is uniformly distributed on [0,1)), leading to the sampling scheme shown in \eqref{CDF_inversion}.  This method is only useful if the CDF is simple enough to be inverted analytically.
 
@@ -813,13 +804,14 @@ CDF(x_2) - CDF(x_1) = \Delta \xi =  \int_{x_1}^{x_2} PDF(x) dx
      \caption{Sampling $PDF(x)=\frac{1}{2\pi^2}(x \cos x - x)$ by the direct inversion method on the domain $(0,2\pi)$. \label{direct_samp}}
 \end{figure}
 
-When the CDF is not invertible, the \emph{rejection sampling} method can be used.  It uses a secondary PDF, $f(x)$, that is greater at all points in the primary PDF, $g(x)$ to be sampled from and whose CDF is easily inverted.  Since the primary PDF is normalized, $f(x)$ now corresponds to probabilities greater than one.  This is simply a scaling problem, and the random numbers used to directly sample from it must be uniform on $[0,\int_\mathrm{domain}f(x))$ instead of $[0,1)$.   Then, two random numbers are generated.  The first, $\xi_1$ is sampled from a $f(x)$ using a scaled random number as mentioned, and the second, $\xi_2$ is uniformly distributed on $[0,f(\xi_1))$.  If $\xi_2 < g(\xi_1)$, the sampled value $(\xi_1)$, is added to the population, else it is \emph{rejected}, or discarded from the population.  The set of accepted values of ${\xi_2}$ will then follow $g(x)$.  Figure \ref{rejection_samp} shows an illustration of rejection sampling. %I think I modified this to be clearer?
+When the CDF is not invertible, the \emph{rejection sampling} method can be used.  It uses a secondary PDF, $f(x)$, that is greater at all points in the primary PDF, $g(x)$ to be sampled from and whose CDF is easily inverted.  Since the primary PDF is normalized, $f(x)$ now corresponds to probabilities greater than one.  This is simply a scaling problem, and the random numbers used to directly sample from it must be uniform on $[0,\int_\mathrm{domain}f(x))$ instead of $[0,1)$.   Then, two random numbers are generated.  The first, $\xi_1$ is sampled from a $f(x)$ using a scaled random number as mentioned, and the second, $\xi_2$ is uniformly distributed on $[0,f(\xi_1))$.  If $\xi_2 < g(\xi_1)$, the sampled value $(\xi_1)$, is added to the population, else it is \emph{rejected}, or discarded from the population.  The set of accepted values of ${\xi_2}$ will then follow $g(x)$.  Figure \ref{rejection_samp} shows an illustration of rejection sampling. The red shaded area is the space between the primary and auxiliary PDFs where samples are rejected (red dots), and the blue shaded area is where they are accepted (blue dots).  In this illustration, the main benefit of choosing a line as the auxiliary function instead of a constant is that a line produces less red shaded area and more samples will be accepted.
+%I think I modified this to be clearer?
 % explain the colors and what this means.
 
 \begin{figure}[h!] 
   \centering
     \includegraphics[width=0.8\textwidth]{graphics/rejection_samp.pdf}
-     \caption{Sampling $PDF(x)=\frac{1}{2\pi^2}(x \cos x - x)$ by the rejection method on the domain $(0,2\pi)$.  The auxiliary function $f(x)=x/\pi$ and the random number used to sample from it must be on $[0,2\pi)$ instead of $[0,1)$. \label{rejection_samp}}
+     \caption{Sampling $PDF(x)=\frac{1}{2\pi^2}(x \cos x - x)$ by the rejection method on the domain $(0,2\pi)$.  The auxiliary function is $f(x)=x/\pi$ and the random number used to sample from it is uniformly distributed on $[0,2\pi)$ instead of $[0,1)$. \label{rejection_samp}}
 \end{figure}
 
 Using these two methods of sampling from probability distributions, expressions can be found for every reaction type and transport phenomenon that a neutron undergoes in its random walk through matter.  The specific schemes are described in the following subsections.
@@ -883,10 +875,10 @@ PDF_k = \frac{\sigma_k}{\sigma_t} \qquad \Rightarrow \qquad CDF_k = \frac{1}{\si
 
 For reactions that have exiting neutrons, like scattering and fission, there are probability tables containing CDFs that specify at what probability neutrons will be emitted with certain angles and energies.  To sample from these tabular CDFs, a random number, $\xi$, is generated.  Again, since the data is discrete, some type of interpolation must be performed to generate a value between the data points.  
 
-There are two interpolation methods specified in the ENDF format.  The first is histogram interpolation, which is similar to the linear cross section in the previous section.  Histogram interpolation assumes the CDF is a line between the data points, and the interpolated value is calculated to lie on this line.  The data for the histogram could be obtained from using a tabulated PDF that is typically provided to compute the CDF. Using the PDF data is unnecessary, however, since these values can be computed from the CDF and this approach reduces the global memory access of a GPU kernel. 
+There are two interpolation methods specified in the ENDF format.  The first is histogram interpolation, which is similar to the linear cross section in the previous section.  Histogram interpolation assumes the CDF is a line between the data points, and the interpolated value is calculated to lie on this line.  Since the CDF is the integral of the PDF, assuming the CDF is a line is the same as assuming the PDF is a constant, i.e. the PDF is a histogram.  The data for the histogram could be obtained from using a tabulated PDF that is typically provided to compute the CDF.  Using the PDF data is unnecessary, however, since these values can be computed from the CDF and this approach reduces the global memory access of a GPU kernel. 
 % I think what I wrote makes sense? fix it if it's not. what you had before was confusing...
 
-An example of using histogram interpolation to determine outgoing cosine, $\mu^\prime$, is shown in \eqref{histo_interp}, where $C_{i}$ is the value of the CDF at point $i$.  $\mu^\prime_i$ represents the corresponding value of $\mu^\prime$ in the table for $P_i$ and $C_i$ \cite{openmc}. % What's P_i?
+An example of using histogram interpolation to determine outgoing cosine, $\mu^\prime$, is shown in \eqref{histo_interp}, where $C_{i}$ is the value of the CDF at point $i$ and $P_i$ is the value of the PDF at point $i$.  $\mu^\prime_i$ represents the corresponding value of $\mu^\prime$ in the table at point $i$ \cite{openmc}.
   While this example is for $\mu^\prime$, this method can be used to sampled a CDF of any quantity.
 
  \begin{equation}
@@ -897,7 +889,7 @@ C_i < \xi < C_{i+1} \\
 \end{gathered}
 \end{equation}
 
-The second method is called linear-linear interpolation.  Instead of assuming the CDF is linear, it assumes the first derivative (the PDF) is linear over the interval $C_i < \xi < C_{i+1}$.  The linear expression for the PDF as in \eqref{lin_pdf} is substituted into \eqref{CDF_property1} and integrated to $\mu^\prime$.  Again this derivation is shown for $\mu^\prime$, but is valid for any CDF \cite{openmc}.
+The second method is called linear-linear interpolation.  Instead of assuming the PDF is constant between the tabular points (and CDF is linear), it assumes the first derivative (the PDF) is linear over the interval $C_i < \xi < C_{i+1}$.  The linear expression for the PDF as in \eqref{lin_pdf} is substituted into \eqref{CDF_property1} and integrated to $\mu^\prime$.  Again this derivation is shown for $\mu^\prime$, but is valid for any CDF \cite{openmc}.
 % adding these to make this all one paragraph.
 \begin{equation}
 \label{lin_pdf}
@@ -911,25 +903,22 @@ Integration of \eqref{lin_pdf} to $\mu^\prime$ yields \eqref{lin_pdf_int}.  This
 %
 \begin{equation}
 \label{lin_pdf_int}
-C(\mu^\prime) = C_i  + \int_i^{\mu^\prime} P(\mu^{\prime\prime}) d\mu^{\prime\prime}  = C_i  + \frac{a}{2}(\mu^{\prime 2}-\mu^{\prime 2}_i) + b(\mu^\prime-\mu^\prime_i) = \xi 
+C(\mu^\prime) = C_i  + \int_i^{\mu^\prime} P(\mu^{\prime\prime}) d\mu^{\prime\prime}  =  C_i  + \int_i^{\mu^\prime} \left( a \mu^{\prime\prime} + b \right) d\mu^{\prime\prime} = C_i  + \frac{a}{2}(\mu^{\prime 2}-\mu^{\prime 2}_i) + b(\mu^\prime-\mu^\prime_i) = \xi 
 \end{equation}
 % What does the lower bound of i mean, and why does \mu_i get integrated as well? I thought that was a fixed value? 
-Taking advantage of the relationship between $a$ and $b$, the interpolation function can be simplified to \eqref{lin_lin} \cite{openmc}.
+\eqref{lin_pdf_int} can be solved for $\mu^\prime$, yielding \eqref{lin_lin}, the final form of the linear-linear sampling scheme \cite{openmc}.
 %
 \begin{equation}
 \label{lin_lin}
 \begin{gathered}
 a = \frac{P_{i+1}-P_i}{\mu^\prime_{i+1}-\mu^\prime_i} \qquad , \qquad b = P_i - a \mu^\prime_i \\
-\mu^\prime = \mu_1 + \frac{1}{a}\left( \sqrt{P^2_i + 2a(\xi -C_i)} -P_i \right)
+\mu^\prime = \mu_i + \frac{1}{a}\left( \sqrt{P^2_i + 2a(\xi -C_i)} -P_i \right)
 \end{gathered}
 \end{equation}
-% what is \mu_1 here for?
-%
 % I don't quite understand the equation progression here. I'd write the definition of a and b as part of lin_pdf since you establish this relationship already and it will make the leap from lin_pdf_int to lin_lin clearer. I also don't understand lin_pdf_int result.
 
-
-Which interpolation method is used is specified in the data on a case-by-case basis. % what does this mean? is it because of what data is available? what you're trying to do? what's most accurate? 
-
+Each tabular distribution in the ACE data file specifies if the histogram or linear-linear method should be used to perform interpolation on it.  It is not up to the user to decide what scheme to use if results consistent with Serpent or MCNP are desired.  The CDFs are tabulated with the specified interpolation method in mind, and using the incorrect scheme will produce incorrect results.  The interpolation scheme must be checked for each distribution on a case-by-case basis. 
+% what does this mean? is it because of what data is available? what you're trying to do? what's most accurate? 
 
 \subsubsection{Free Gas Treatment}
 
@@ -1123,7 +1112,7 @@ E^\prime &=  E_1  +  ( E_\mathrm{sampled} - E_\mathrm{start})  \frac{ E_b - E_a}
 
 \subsection{Flux Estimation and Tallies}
 
-Reactions that happen within a volume can be scored or tallied.  %This is just like what a detector would do - integrate the physical response across energy and space.  
+%Reactions that happen within a volume can be scored or tallied.  %This is just like what a detector would do - integrate the physical response across energy and space.  
 % this seems random and not applicable to all tallies.
 MCNP uses the word ``tally'' and Serpent uses the word ``detector'' for the same measurement \cite{serpent,mcnp}.  Evidently, ``tally'' does not translate into Finnish, which is why ``detector'' is used.  ``Tally'' will be used here for consistency with the majority of neutron transport code syntax.  
 
@@ -1190,7 +1179,7 @@ So far, all that has been mentioned is how to handle the different reactions in 
 \subsubsection{External Source}
 
 An external, or fixed, source is simply a source that does not depend on the neutron population itself.  Physically, such a source could be from natural radioactive decay, an accelerator source, etc.  In this work we are largely concerned with accurately measuring the response of the system to that external source if it contains fissile material.
-% Many many MC calculations are done with non-multiplying media...trying to shit the focus to limit it to this work, where you're only talking about reactors. 
+% Many many MC calculations are done with non-multiplying media...trying to shift the focus to limit it to this work, where you're only talking about reactors. 
 
 If a single neutron is ``shot'' into a multiplying material, all the secondary particles the primary neutron induces also need to be simulated in order to simulate the response of the system.  The number of secondary neutrons produced is fully defined by the multiplication factor since it gives the ratio of subsequent neutron generations.  An expression for the number of neutrons in an infinite series based on $k$ is shown in \eqref{sub_crit_mult}\cite{duderstadt}\cite{jaakko}.
 %
