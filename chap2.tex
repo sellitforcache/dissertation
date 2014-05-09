@@ -1042,7 +1042,7 @@ After the first or second term of \eqref{RR_vel_split_norm} is sampled (RHS samp
 p_\mathrm{accept} = \frac{\sqrt{v_n^2+v_t^2-2 v_n v_t \mu}}{v_n^2+v_t^2}
 \end{equation}
 
-Even though this is a rejection method, it is fairly efficient, with samples being accepted 68\% up to 100\% of the time as the neutron velocity either goes from zero to values much greater than the target velocity \cite{mcnp}.
+Even though this is a rejection method, it is fairly efficient, with samples being accepted 68\% up to 100\% of the time as the neutron velocity goes from zero to much greater than the target velocity \cite{mcnp}.
 
 \subsubsection{Stochastic Mixing}
 
@@ -1154,7 +1154,8 @@ To calculate the flux a computer, a discrete set of energy bins, $E_1 \rightarro
 \bar{\phi}_{g,j} = \frac{1}{V_j} \int_{v_j} dV \int_{E_g}^{E_{g+1}} dE \: \phi(\boldsymbol{\vec{r}},E) = \frac{1}{V_j} \int_{v_j} dV \int_{E_g}^{E_{g+1}} dE \:\frac{ R_t(\boldsymbol{\vec{r}},E) }{  \Sigma_t(\boldsymbol{\vec{r}},E) } \\
 \end{equation}
 %
-Since the total reaction rate at energy $g$ in volume $j$, $R_{g,j}$, is simply the number of collisions $N_{g,j}$ within the energy interval and within the volume $V_j$, as shown in \eqref{RR_coll}, the expression for flux can be written as the sum of the inverse total macroscopic cross section of the material in volume $V_j$. % Give us some reason why we're learning about R_{g,j} before teaching us about it. Actually, why are you teaching us about this?   Ok, explicitly defined.
+\eqref{flux_discrete} says that the flux is the sum of 
+%Since the total reaction rate at energy $g$ in volume $j$, $R_{g,j}$, is simply the number of collisions $N_{g,j}$ within the energy interval and within the volume $V_j$, as shown in \eqref{RR_coll}, the expression for flux can be written as the sum of the inverse total macroscopic cross section of the material in volume $V_j$. % Give us some reason why we're learning about R_{g,j} before teaching us about it. Actually, why are you teaching us about this?   Ok, explicitly defined.
 \begin{equation}
 \label{RR_coll}
 \begin{gathered}
