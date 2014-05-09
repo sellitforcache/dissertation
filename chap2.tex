@@ -1089,12 +1089,10 @@ WARP used the tabular CDF format to sample the outgoing CM angle of the neutron 
  \item The target velocity is sampled as described in the previous subsection.
  \item The center of mass velocity is calculated and the neutron and target velocities are transformed to the CM frame.
  \item The polar scattering angle is sampled from the appropriate angular distribution for incoming neutron energy and the target isotope.
- \item The azimuthal scattering angle is sampled isotropicaly (uniformly) in $2\pi$.
+ \item The azimuthal scattering angle is sampled isotropically in $2\pi$.
  \item The neutron velocity is rotated from its initial CM direction through the sampled polar and azimuthal angles according to \eqref{vector_rot}.
- \item The neutron velocity is transformed by to the Lab frame and its new energy is calculated.
+ \item The neutron velocity is transformed by to the Lab frame and its new energy and direction are calculated.
 \end{enumerate}
-
-
 %which one? there were many. Maybe just slightly more explanation.  Added more explanation.
 
 \subsubsection{Inelastic Reactions}
@@ -1131,9 +1129,9 @@ E_a &= E_{i,\mathrm{first}} +  f( E_{i+1,\mathrm{first}} - E_{i,\mathrm{first}} 
 E_b &= E_{i,\mathrm{last}} +  f( E_{i+1,\mathrm{last}} - E_{i,\mathrm{last}} ) \\
 \mathrm{if\:i+1\:sampled:} \quad \mathrm{diff} &= E_{i+1,\mathrm{last}}  - E_{i+1,\mathrm{first}}  \qquad E_\mathrm{start}= E_{i+1,\mathrm{first}}  \\
 \mathrm{else:}          \qquad \quad       \mathrm{diff} &= E_{i,\mathrm{last}}  - E_{i,\mathrm{first}}  \qquad \qquad E_\mathrm{start}= E_{i,\mathrm{first}}  \\
-E^\prime &=  E_1  +  ( E_\mathrm{sampled} - E_\mathrm{start})  \frac{ E_b - E_a}{ \mathrm{diff} }  
+E^\prime &=  E_a  +  ( E_\mathrm{sampled} - E_\mathrm{start})  \frac{ E_b - E_a}{ \mathrm{diff} }  
 \end{split}
-\end{equation}%what's E1?
+\end{equation}%what's E1?  Oops, it is Ea
 
 
 \subsection{Flux Estimation and Tallies}
@@ -1157,7 +1155,7 @@ To calculate the flux a computer, a discrete set of energy bins, $E_1 \rightarro
 \bar{\phi}_{g,j} = \frac{1}{V_j} \int_{v_j} dV \int_{E_g}^{E_{g+1}} dE \: \phi(\boldsymbol{\vec{r}},E) = \frac{1}{V_j} \int_{v_j} dV \int_{E_g}^{E_{g+1}} dE \:\frac{ R_t(\boldsymbol{\vec{r}},E) }{  \Sigma_t(\boldsymbol{\vec{r}},E) } \\
 \end{equation}
 %
-Since the reaction rate at energy $g$ in volume $j$, $R_{g,j}$, is simply the number of collisions $N_{g,j}$ within the energy interval and within the volume $V_j$, as shown in \eqref{RR_coll}, the expression for flux can be written as the sum of the inverse total macroscopic cross section of the material in volume $V_j$. % Give us some reason why we're learning about R_{g,j} before teaching us about it. Actually, why are you teaching us about this?
+Since the reaction rate at energy $g$ in volume $j$, $R_{g,j}$, is simply the number of collisions $N_{g,j}$ within the energy interval and within the volume $V_j$, as shown in \eqref{RR_coll}, the expression for flux can be written as the sum of the inverse total macroscopic cross section of the material in volume $V_j$. % Give us some reason why we're learning about R_{g,j} before teaching us about it. Actually, why are you teaching us about this? NEED TO TALK ABOUT THE COLLISION RATE, YOU DEFINED IT WHEN YOU DEFINED RR IN NTE!!!!  TAKE IT FROM THERE DUMMY.
 %
 \begin{equation}
 \label{RR_coll}
@@ -1194,7 +1192,7 @@ P_{k,m}(E_i)= \frac{\Sigma_{k,m}(E_i)}{\Sigma_t(E_i)} \\
 \end{gathered}
 \end{equation}
 
-The flux averaged cross section is useful in determining the physics of a system since it weights reactions by the flux present at a certain spatial region and/or energy bin.  This way, the reaction channels that neutrons undergo can be compared on a one-to-one basis in terms of their fraction of the total number of reactions instead of having to worry about the energy spectrum and the isotope's number density as well as the normal cross section.% I think the incorporation of eq{flux_average_xs} and a bit more explanation is needed. Right now I don't completley see how this follows. 
+The flux averaged cross section is useful in determining the physics of a system since it weights reactions by the flux present at a certain spatial region and/or energy bin.  This way, the reaction channels that neutrons undergo can be compared on a one-to-one basis in terms of their fraction of the total number of reactions instead of having to worry about the energy spectrum and the isotope's number density as well as the normal cross section.% I think the incorporation of eq{flux_average_xs} and a bit more explanation is needed. Right now I don't completely see how this follows. 
   Of course, all tallies are subject to the statistical laws mentioned in the previous statistics subsection. %? okay, why tell us this now?
 
 
