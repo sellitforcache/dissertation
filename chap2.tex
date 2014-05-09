@@ -1180,18 +1180,23 @@ E_g < E < E_{g+1} \\
 \end{gathered}
 \end{equation}
 %
-The expression shown in \eqref{flux_tally} is an \emph{analog estimator} of the flux.  It is analog in the sense that the reactions are counted directly.  Since every collision is proportional to the flux, counting every collision gives an estimate of the flux itself.  If a reaction has a finite cross section in a material and the reaction does not occur during the transport simulation, a reaction rate estimate is impossible to make using an analog estimator.  If a \emph{collision estimator} is used instead, it is possible to estimate the reaction rate even if reactions do not occur in the volume of interest.  A collision estimator differs by using every interaction point, no matter what actual reaction occurs.  This total score is simply weighted by the interaction probability for a particular reaction as shown in \eqref{flux_average_xs_tally} \cite{jaakko}.  The fractional interaction probability, $P_{k,m}(E_i)$, is for reaction $k$ in isotope $m$ in the material in volume $j$ at the energy $E_i$.
+The expression shown in \eqref{flux_tally} is a collision estimator, but it is also technically an \emph{analog estimator} of the flux.  It is analog in the sense that the reactions are counted directly.  Since every collision is proportional to the flux, counting every collision gives an estimate of the flux itself.  Using an analog estimator for specific reactions, however, means they are only scored when the reaction is sampled to happen.  If a reaction has a very small cross section, the reaction will not happen very often and its estimated reaction rate will have a high statistical uncertainly even though the flux may be well resolved.  In an extreme case, the reaction may never happen and an analog estimate of its reaction rate would be impossible to make.  
+
+A collision estimator can be used for estimating specific reaction rates as well as the flux.  For specific reaction rates, ``collision'' means they are scored for every collision, not just ones where the reaction is sampled to happen.  This total score is simply weighted by the interaction probability for a particular reaction as shown in \eqref{collision_tally} \cite{jaakko}, where $P_{k,m}(E_i)$ is the fractional interaction probability for reaction $k$ in isotope $m$ in the volume $j$ and the energy group $g$.
 
 \begin{equation}
 \label{collision_tally}
 \begin{gathered}
+E_g < E < E_{g+1} \\
 P_{k,m}(E)= \frac{\Sigma_{k,m}(E)}{\Sigma_t(E)} \\
 R_{g,j,k,m} =  \frac{1}{V_j} \sum_{i=1}^{N_{g,j}} \frac{P_{k,m}(E)}{\Sigma_t(E)}
 \end{gathered}
 \end{equation}
 
-The flux averaged cross section is useful in determining the physics of a system since it weights reactions by the flux present at a certain spatial region and/or energy bin.  This way, the reaction channels that neutrons undergo can be compared on a one-to-one basis in terms of their fraction of the total number of reactions instead of having to worry about the energy spectrum and the isotope's number density as well as the normal cross section.% I think the incorporation of eq{flux_average_xs} and a bit more explanation is needed. Right now I don't completely see how this follows. 
-  Of course, all tallies are subject to the statistical laws mentioned in the previous statistics subsection. %? okay, why tell us this now?
+
+
+%The flux averaged cross section is useful in determining the physics of a system since it weights reactions by the flux present at a certain spatial region and/or energy bin.  This way, the reaction channels that neutrons undergo can be compared on a one-to-one basis in terms of their fraction of the total number of reactions instead of having to worry about the energy spectrum and the isotope's number density as well as the normal cross section.% I think the incorporation of eq{flux_average_xs} and a bit more explanation is needed. Right now I don't completely see how this follows. 
+%  Of course, all tallies are subject to the statistical laws mentioned in the previous statistics subsection. %? okay, why tell us this now?
 
 
 \subsection{Neutron Sources}
