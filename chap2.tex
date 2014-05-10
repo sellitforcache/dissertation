@@ -1121,60 +1121,61 @@ Reactions that happen within a volume can be scored or tallied.  %This is just l
 % this seems random and not applicable to all tallies.
 MCNP uses the word ``tally'' and Serpent uses the word ``detector'' for the same measurement \cite{serpent,mcnp}.  Evidently, ``tally'' does not translate into Finnish, which is why ``detector'' is used.  ``Tally'' will be used here for consistency with the majority of neutron transport code syntax.  
 
-Other than determining the multiplication factor, one of the main purposes of simulation reactors is determining the neutron flux spectrum.  The reaction rates and, therefore, power of the reactor are proportional to the flux, making it a very important quantity in determining how a rector will behave.  Since reactions are explicitly simulated with the  Monte Carlo method, an estimator can be used to estimate the neutron flux.  An estimator does not directly calculate the flux, but relies on the fact that the total reaction rate is proportional to the flux.  
-If every interaction within a volume is counted, the number of interactions can be used to estimate the volume-averaged flux in that volume.  Since the reaction rate is directly proportional to the flux, per \eqref{scalar_flux_RR}, the flux can be written in terms of the reaction rate and a material's total macroscopic cross section as shown in \eqref{flux_from_RR}.
-
+Other than determining the multiplication factor, one of the main purposes of simulating reactors is determining the neutron flux spectrum.  The reaction rates and, therefore, power of the reactor are proportional to the flux, making it a very important quantity in determining how a rector will behave.  Since reactions are explicitly simulated with the  Monte Carlo method, a collision estimator can be used to estimate the neutron flux.  A collision estimator does not directly calculate the flux, but relies on the fact that the total collision rate is the flux multiplied by the total macroscopic cross section, as was shown in \eqref{RR}.  If every collision within a volume is counted in a Monte Carlo simulation, this corresponds directly to the total reaction rate density integrated over the volume and can be used to estimate the volume-averaged flux in that volume per \eqref{scalar_flux_RR}.  Once the reaction rate is know, the flux can be written in terms of it and the material's total macroscopic cross section as shown in \eqref{flux_from_RR}.
+%
 \begin{equation}
 \label{flux_from_RR}
 \phi(\boldsymbol{\vec{r}},E) = \frac{ R_t(\boldsymbol{\vec{r}},E) }{  \Sigma_t(\boldsymbol{\vec{r}},E) }
 \end{equation}
-
+%
+The reaction rates is simple the number of collisions at energy $E$, and this can be rewritten as a sum over all the collisions that happen at energy $E$, as shown in \eqref{flux_recast_to_sum}.
+%
+\begin{equation}
+\label{flux_recast_to_sum}
+\begin{gathered}
+\phi(\boldsymbol{\vec{r}},E) = \sum_{i}^{R_t(\boldsymbol{\vec{r}},E)} \frac{ 1 }{  \Sigma_t(\boldsymbol{\vec{r}},E) }
+\end{gathered}
+\end{equation}
+%
 To calculate the flux a computer, a discrete set of energy bins, $E_1 \rightarrow E_g$, must be specified.  The flux in group $g$, such that $E_g < E < E_{g+1}$, and in volume $j$ is shown in \eqref{flux_discrete}.
 %
 \begin{equation}
 \label{flux_discrete}
-\bar{\phi}_{g,j} = \frac{1}{V_j} \int_{v_j} dV \int_{E_g}^{E_{g+1}} dE \: \phi(\boldsymbol{\vec{r}},E) = \frac{1}{V_j} \int_{v_j} dV \int_{E_g}^{E_{g+1}} dE \:\frac{ R_t(\boldsymbol{\vec{r}},E) }{  \Sigma_t(\boldsymbol{\vec{r}},E) } \\
+\bar{\phi}_{g,j} = \frac{1}{V_j} \int_{V_j} dV \int_{E_g}^{E_{g+1}} dE \: \phi(\boldsymbol{\vec{r}},E) = \frac{1}{V_j} \int_{V_j} dV \int_{E_g}^{E_{g+1}} dE \: \sum_{i}^{R_t(\boldsymbol{\vec{r}},E)} \frac{ 1 }{  \Sigma_t(\boldsymbol{\vec{r}},E) }
 \end{equation}
 %
-Since the reaction rate at energy $g$ in volume $j$, $R_{g,j}$, is simply the number of collisions $N_{g,j}$ within the energy interval and within the volume $V_j$, as shown in \eqref{RR_coll}, the expression for flux can be written as the sum of the inverse total macroscopic cross section of the material in volume $V_j$. % Give us some reason why we're learning about R_{g,j} before teaching us about it. Actually, why are you teaching us about this?
+The integrals in \eqref{flux_discrete} are carried out over $R_t(\boldsymbol{\vec{r}},E)$ as shown in \eqref{RR_coll}, and the reaction rate is relabeled for clarity as $N_{g,j}$, the number of collisions in the energy group $g$ and volume $j$. 
 %
 \begin{equation}
 \label{RR_coll}
-\begin{gathered}
-R_{g,j} = \int_{v_j} dV \int_{E_g}^{E_{g+1}} dE \: R_t(\boldsymbol{\vec{r}},E) = N_{g,j}
-\end{gathered}
+\int_{V_j} dV \int_{E_g}^{E_{g+1}} dE \: R_t(\boldsymbol{\vec{r}},E) = R_{g,j} = N_{g,j}
 \end{equation}
-
-The expression shown in \eqref{flux_tally} is an \emph{analog estimator} of the flux.  It is analog in the sense that the reactions are counted directly.  Since every collision is related to the total flux, counting every collision gives an estimate of the flux.  If a reaction has a finite cross section in a material and the reaction does not occur during the transport simulation, a reaction rate estimate is impossible to make using an analog estimator. 
-
+%
+The flux estimator can now be written as \eqref{flux_tally}, where $\Sigma_{t,j}(E)$ is the total macroscopic cross section  of the material in volume $j$ at energy $E_g < E < E_{g+1}$.
+%
 \begin{equation}
 \label{flux_tally}
 \begin{gathered}
-E_g < E_i < E_{g+1} \\
-\bar{\phi}_{g,j} =  \frac{1}{V_j} \sum_{i=1}^{N_{g,j}} \frac{1}{\Sigma_t(E_i)} =  \frac{1}{V_j} \int_{V_j} dV \int_{E_g}^{E_{g+1}} dE \: \phi(\boldsymbol{\vec{r}},E) 
+E_g < E < E_{g+1} \\
+\bar{\phi}_{g,j} =  \frac{1}{V_j} \sum_{i=1}^{N_{g,j}} \frac{1}{\Sigma_{t,j}(E)} 
 \end{gathered}
 \end{equation}
+%
+The expression shown in \eqref{flux_tally} is a collision estimator, but it is also technically an \emph{analog estimator} of the flux.  It is analog in the sense that the reactions are counted directly.  Since every collision is proportional to the flux, counting every collision gives an estimate of the flux itself.  Using an analog estimator for specific reactions, however, means they are only scored when the reaction is sampled to happen.  If a reaction has a very small cross section, the reaction will not happen very often and its estimated reaction rate will have a high statistical uncertainly even though the flux may be well resolved.  In an extreme case, the reaction may never happen and an analog estimate of its reaction rate would be impossible to make.  
 
-If a \emph{collision estimator} is used instead, it is possible to estimate the reaction rate even if reactions do not occur in the volume of interest.  A collision estimator differs by using every interaction point, no matter what actual reaction occurs.  This total score is simply weighted by the interaction probability for a particular reaction as shown in \eqref{flux_average_xs_tally} \cite{jaakko}.  The fractional interaction probability, $P_{k,m}(E_i)$, is for reaction $k$ in isotope $m$ in the material in volume $j$ at the energy $E_i$.
-%
-\begin{equation}
-\label{flux_average_xs}
-\bar{\Sigma}_{k,m} =  \frac{1}{V_j \bar{\phi}_{g,j} } \int_{v_j} dV \int_{E_g}^{E_{g+1}} dE \: \phi(\boldsymbol{\vec{r}},E) \Sigma_{k,m}(\boldsymbol{\vec{r}},E)
-\end{equation} % you don't refer to this equation?
-%
-This is equivalent to summing the macroscopic cross section for a particular isotope's reaction instead of the material's total cross section.  This way, even rare events can be scored.  The result is no longer the flux, however, but rather the \emph{flux averaged cross section}.  
+A collision estimator can be used for estimating specific reaction rates as well as the flux.  For specific reaction rates, ``collision'' means they are scored for every collision, not just ones where the reaction is sampled to happen.  This total score is simply weighted by the interaction probability for a particular reaction as shown in \eqref{collision_tally} \cite{jaakko}, where $P_{k,m}(E_i)$ is the fractional interaction probability for reaction $k$ in isotope $m$ in the volume $j$ and the energy group $g$.
 
 \begin{equation}
-\label{flux_average_xs_tally}
+\label{collision_tally}
 \begin{gathered}
-E_g < E_i < E_{g+1} \\
-P_{k,m}(E_i)= \frac{\Sigma_{k,m}(E_i)}{\Sigma_t(E_i)} \\
-\bar{\Sigma}_{g,j,k,m} =  \frac{1}{V_j} \sum_{i=1}^{N_{g,j}} \frac{P_{i,j}(E_i)}{\Sigma_t(E_i)} = \frac{1}{V_j} \sum_{i=1}^{N_{g,j}} \frac{1}{\Sigma_{k,m}(E_i)}
+E_g < E < E_{g+1} \\
+P_{k,m}(E)= \frac{\Sigma_{k,m}(E)}{\Sigma_t(E)} \\
+R_{g,j,k,m} =  \frac{1}{V_j} \sum_{i=1}^{N_{g,j}} \frac{P_{k,m}(E)}{\Sigma_t(E)}
 \end{gathered}
 \end{equation}
 
-The flux averaged cross section is useful in determining the physics of a system since it weights reactions by the flux present at a certain spatial region and/or energy bin.  This way, the reaction channels that neutrons undergo can be compared on a one-to-one basis in terms of their fraction of the total number of reactions instead of having to worry about the energy spectrum and the isotope's number density as well as the normal cross section.% I think the incorporation of eq{flux_average_xs} and a bit more explanation is needed. Right now I don't completley see how this follows. 
-  Of course, all tallies are subject to the statistical laws mentioned in the previous statistics subsection. %? okay, why tell us this now?
+%The flux averaged cross section is useful in determining the physics of a system since it weights reactions by the flux present at a certain spatial region and/or energy bin.  This way, the reaction channels that neutrons undergo can be compared on a one-to-one basis in terms of their fraction of the total number of reactions instead of having to worry about the energy spectrum and the isotope's number density as well as the normal cross section.% I think the incorporation of eq{flux_average_xs} and a bit more explanation is needed. Right now I don't completely see how this follows. 
+%  Of course, all tallies are subject to the statistical laws mentioned in the previous statistics subsection. %? okay, why tell us this now?
 
 
 \subsection{Neutron Sources}
@@ -1183,18 +1184,16 @@ So far, all that has been mentioned is how to handle the different reactions in 
 
 \subsubsection{External Source}
 
-An external, or fixed, source is simply a source that does not depend on the neutron population itself.  Physically, such a source could be from natural radioactive decay, an accelerator source, etc.  In this work we are largely concerned with accurately measuring the response of the system to that external source if it contains fissile material.
-% Many many MC calculations are done with non-multiplying media...trying to shit the focus to limit it to this work, where you're only talking about reactors. 
+An external, or fixed, source is simply a source that does not depend on the neutron population itself.  Physically, such a source could be from natural radioactive decay, an accelerator source, etc.  This type of source is simpler than a fission source since the source is completely independent of the system response and the source distribution does not need to be converged before tallies are accumulated.  Transporting neutrons in materials that produce no secondary neutrons is straight-forward, the source neutrons are initialized according to the specified source definition and are transported until the leak out of the system or are absorbed.  Transport becomes more complicated when there are isotopes present than can produce secondary neutrons.  If a single neutron is ``shot'' into a multiplying material, all the secondary particles the primary neutron induces also need to be simulated in order to simulate the response of the system.
 
-If a single neutron is ``shot'' into a multiplying material, all the secondary particles the primary neutron induces also need to be simulated in order to simulate the response of the system.  The number of secondary neutrons produced is fully defined by the multiplication factor since it gives the ratio of subsequent neutron generations.  An expression for the number of neutrons in an infinite series based on $k$ is shown in \eqref{sub_crit_mult}\cite{duderstadt}\cite{jaakko}.
+Materials that produce secondary neutrons are called ``multiplying'' materials since the total number of neutrons needed to be transported is a multiple of the source number.  The number of secondary neutrons produced is fully defined by the multiplication factor since it gives the ratio of subsequent neutron generations.  An expression for the number of neutrons in an infinite series based on $k$ is shown in \eqref{sub_crit_mult} \cite{duderstadt}\cite{jaakko}.
 %
 \begin{equation}
 \label{sub_crit_mult}
 N_\mathrm{total} = N_0 + k N_0 + k^2 N_0 + \dots = N_0 \sum_{i=0}^\infty k^i = \frac{N_0}{1-k}
 \end{equation}
 %
-This series only converges for $k<1$, which sets a restriction for fixed-source simulations.  If the multiplication factor is greater than one it will require infinitely many secondary neutrons to be tracked, so this situation must be avoided.
-
+This series only converges for $k<1$, which sets a restriction for fixed-source simulations.  If the multiplication factor is greater than one it will require infinitely many secondary neutrons to be tracked, so this situation must be avoided.  The algorithmic details of how secondary neutrons are transported will be discussed in Section \ref{sec:tasks}.
 % Do you want to mention how you handle the multiplication in MC? From this discussion I don't really know how this is handled.
 
 \subsubsection{Fission Source, $k$-Eigenvalue Method}
@@ -1218,12 +1217,25 @@ In criticality simulations, the parameter of interest is usually the effective m
 k_{\mathrm{eff},n} = \frac{N_{s,n+1}}{N_{s,n}} = \frac{N_{f,n}}{N_{s,n}}
 \end{equation}
 
-Modeling the fission chain reaction is simple in Monte Carlo simulations when a system is exactly critical.  In batched criticality mode, the next generation of neutrons has starting points that are determined by the previous generation.  When the system is exactly critical, there is a one-to-one mapping of induced secondary neutrons to a pre-set number of source particles that will be transported in the next batch.  But when the system is sub- or super-critical, there is no longer a one-to-one mapping and starting points either have to be reused or discarded, respectively.  This is done by using the \emph{k-eigenvalue method}, which is used by the Serpent code \cite{jaakko}. %what about MCNP?
+Modeling the fission chain reaction is simple in Monte Carlo simulations when a system is exactly critical.  In batched criticality mode, the next generation of neutrons has starting points that are determined by the previous generation.  When the system is exactly critical, there is a one-to-one mapping of induced secondary neutrons to a pre-set number of source particles that will be transported in the next batch.  But when the system is sub- or super-critical, there is no longer a one-to-one mapping and starting points either have to be reused or discarded, respectively.  This is done by using the \emph{k-eigenvalue method}, which is used by both Serpent and MCNP \cite{jaakko,mcnp}.%what about MCNP?  Yep, it does too. 
  After $k_\mathrm{eff}$ is calculated via \eqref{k_eff_batch}, it is used to renormalize the fission source of the next generation, i.e.\ the secondary yield values are divided by $k_\mathrm{eff}$.  This is an analog to dividing the fission source term in \eqref{time_ind_NTE} by $k_\mathrm{eff}$ to enforce a time derivative of zero.  By dividing the yield values by $k_\mathrm{eff}$, the multiplication factor should be 1, and a one-to-one mapping is recovered.  
  
-It should be noted that WARP treats (n,2n) reactions and any reactions that produce secondary particles other than scattering as neutron sources.  MCNP calculates $k_\mathrm{eff}$ by treating these kinds of reactions as negative absorptions, i.e.\ for an (n,2n) reaction MCNP subtracts an absorption out of the global tally instead of adding it to a fission yield tally \cite{mcnp}.  Normally, reactions other than fission are rare, but this scoring difference may be a source of disagreement when results are compared on a sub-$10^{-2}$ level as they are with multiplication factors.%I think writing the equations rather than the words of these two differences would be clearer - like what we did during the group meeting.
+It should be noted that WARP treats (n,2n) and similar reactions, which are called ``multiplicity reactions,'' as neutron sources.  MCNP calculates $k_\mathrm{eff}$ by treating these kinds of reactions as negative absorptions, i.e. MCNP subtracts an absorption out of the global tally instead of adding it to a fission yield tally for an (n,2n) reaction \cite{mcnp}.  The expression for $k_\mathrm{eff}$ that MCNP uses is shown in \eqref{k_eff_mcnp} \cite{mcnp}, and the expression that WARP uses is shown in \eqref{k_eff_warp}.  Normally, reactions other than fission are rare, but this scoring difference may be a source of disagreement when results are compared on a sub-$10^{-2}$ level as they are with multiplication factors.
+%
+\begin{equation}
+\label{k_eff_mcnp}
+k_{\mathrm{eff},n} = \frac{ \int_{V} dV \int_0^\infty dE \int_{\boldsymbol{\hat{\Omega}}} d\boldsymbol{\Omega} \:\: \nu \Sigma_f \phi}{\int_{V} dV \int_0^\infty dE \int_{\boldsymbol{\hat{\Omega}}} d\boldsymbol{\Omega} \:\: \nabla \cdot \boldsymbol{\vec{J}}  + \int_{V} dV \int_0^\infty dE \int_{\boldsymbol{\hat{\Omega}}} d\boldsymbol{\Omega} \:\: (\Sigma_c + \Sigma_f - \Sigma_{n,2n} - 2\Sigma_{n,3n}) \phi}
+\end{equation}
+%
+\begin{equation}
+\label{k_eff_warp}
+k_{\mathrm{eff},n} = \frac{ \int_{V} dV \int_0^\infty dE \int_{\boldsymbol{\hat{\Omega}}} d\boldsymbol{\Omega} \:\: (\nu \Sigma_f + 2\Sigma_{n,2n} + 3\Sigma_{n,3n})\phi}{\int_{V} dV \int_0^\infty dE \int_{\boldsymbol{\hat{\Omega}}} d\boldsymbol{\Omega} \:\: \nabla \cdot \boldsymbol{\vec{J}}  + \int_{V} dV \int_0^\infty dE \int_{\boldsymbol{\hat{\Omega}}} d\boldsymbol{\Omega} \:\: (\Sigma_c + \Sigma_f + \Sigma_{n,2n} + \Sigma_{n,3n}) \phi}
+\end{equation}
+%
+WARP treats all secondary-producing reactions as neutron sources since it is simpler to implement in parallel.  Only a single secondary particle yield vectors needs to be reduced at the end of a batch if \eqref{k_eff_warp} is used.  Two reductions would be need to use \eqref{k_eff_mcnp}, one for the fission yields and one for the multiplicity yields.
+%I think writing the equations rather than the words of these two differences would be clearer - like what we did during the group meeting.  done.
 
-Since $k_\mathrm{eff}$ is continuous, calculating an integer value of secondary particles is done stochastically to preserve the aggregate mean.  The renormalized yield, $y_r$, is stochastically rounded based on a random number, $\xi$, as shown in  \eqref{stoch_rounding}.  This ensures that, over a large batch size, the multiplication factor is renormalized to be as close to one as possible.  In the case where $y_r$ is slightly less than one, the last few source points from the previous generation are simply reused. %what about if it's slightly greater?
+Since $k_\mathrm{eff}$ is continuous, calculating an integer value of secondary particles is done stochastically to preserve the aggregate mean.  The renormalized yield, $y_r$, is stochastically rounded based on a random number, $\xi$, as shown in  \eqref{stoch_rounding}.  This ensures that, over a large batch size, the multiplication factor is renormalized to be as close to one as possible.  In the case where $y_r$ is slightly less than one, the last few source points from the previous generation are simply reused. If the number is slightly larger, the last few source points from the previous generation are simply not used. %what about if it's slightly greater?  added.
  This should not introduce much bias in the results if the source distribution is converged, which is the subject of the next paragraph.
 
 \begin{equation}
@@ -1238,7 +1250,7 @@ Since $k_\mathrm{eff}$ is continuous, calculating an integer value of secondary 
 
 To start a criticality simulation, a guess for the initial points neutrons are born is required. As the simulation progresses, the source expands and converges to the true distribution.  The initial batches, or cycles, in which the source distribution is likely far from the correct distribution are therefore discarded.  No quantities are accumulated, and the multiplication factors values are not used in calculating the final value.  The discarded cycles only serve to converge the fission source so the accumulated quantities later in the simulation are not biased by an incorrect source distribution.  
 
-One way to specify the initial source distribution is by choosing a single initial point where all of the first generation neutrons are born; this is called the \emph{point source} method. To accelerate the source convergence process, WARP uses a similar method to Serpent to guess the initial source distribution.  The materials in the geometry are all flagged as fissile or non-fissile.  Then a uniform, random distribution of source neutrons are distributed across the geometry.  If a particle lies in a fissile material, it is recorded in a buffer.  This process is repeated until the required amount of source points are accumulated in the starting point buffer.  This method is called the \emph{flat source approximation}. Since the initial distribution has spatial extent and fewer discard cycles will be needed to push neutrons into all geometrical regions than in the point source method \cite{jaakko}.
+One way to specify the initial source distribution is by choosing a single initial point where all of the first generation neutrons are born; this is called the \emph{point source} method. To accelerate the source convergence process, WARP uses a similar method to Serpent to guess the initial source distribution.  The materials in the geometry are all flagged as fissile or non-fissile.  Then a uniform, random distribution of source neutrons are distributed across the geometry.  If a particle lies in a fissile material, it is recorded in a buffer.  This process is repeated until the required amount of source points are accumulated in the starting point buffer.  This method is called the \emph{flat source approximation}. Since the initial distribution has spatial extent, fewer discard cycles will be needed to push neutrons into all geometrical regions than using a point source \cite{jaakko}.
 
 When all the cycles are complete, the individual estimates of $k_\mathrm{eff}$ are averaged to make a final estimate for the system.  This is typically called the \emph{generation estimate} of $k_\mathrm{eff}$ \cite{jaakko}.  As the simulation runs, a recursion relation can be made so the values for every cycle do not need to be stored individually.  Expressions for the generation estimate are shown in \eqref{k_eff_final}.  It may be of interest to keep values for every cycle in order to perform statistical checks to assure convergence, however.
 
