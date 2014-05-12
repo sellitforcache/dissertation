@@ -10,77 +10,85 @@ This chapter explains the fundamental theory and mathematics that went into the 
 
 Nuclear reactors generate electricity from the heat produced by fissions induced in heavy nuclei.  Fissions are induced by a free neutron population present in the reactor, and this free neutron population is self-sustaining if the reactor environment is maintained within certain property ranges.  The neutron density in the reactor is much smaller than the nuclei density and it can change much more quickly.  Reactor power is directly proportional to the neutron flux, which is derived from the neutron density, and thus can change as quickly as the flux.  Therefore, to know a reactor's most basic state, one must know the neutron distribution.  Knowing how reactor power will change given changes in the environment means knowing how the neutron distribution will respond to the changes.  Accurately solving the neutron transport equation is essential for characterizing reactor behavior. 
 
-Many things influence the neutron distribution, and therefore must be incorporated into the solution method.  The neutron distribution has strong feedback mechanisms from the materials present in the reactor.  Each isotope in the system can have different interactions with neutrons, and these reaction probabilities may have very strong dependence on the incoming neutron energy.  Using the Monte Carlo Method to approximate solutions to the neutron transport equation requires all of the neutron interactions to be explicitly modeled.  The reactor geometry also effects the neutron distribution, since it describes the spatial extent of the reactor materials.   The Monte Carlo Method tracks neutrons as they move through the reactor materials, sampling the reactions they can undergo along the way.  Of foremost importance is tracking fission reactions, since these are the reactions that sustain the fission chain reaction and maintain the reactor's effective multiplication factor.
-
 When a uranium (or other fissile heavy metal) nucleus fissions, two or more neutrons are released.  If, on average, exactly one of these neutrons goes on to induce another fission, the system in which the fissions are occurring is \emph{critical}, or able to maintain a constant neutron population and fission reaction rate (and correspondingly constant power) without any external neutron sources.  This is a stable fission chain reaction.  The fissile nucleus rarely splits evenly, and the spectrum of lighter isotopes that are created by fission are called \emph{fission products} \cite{duderstadt}.  Fission products accumulate in the fuel material and can inhibit the fission chain reaction through absorption when the reach a high enough concentration.
 % what fission products are
 
-A \emph{fissionable} isotope is one that has a non-zero fission cross section, i.e. it can undergo fission, by absorbing a neutron.  A \emph{fissile} isotope is one that can be induced to fission by a neutron at any energy.  Some isotopes, like $^{235}$U, can absorb a neutron a very low energies and fission.  This is because the energy imparted to the nucleus through the absorption reaction is enough to destabilize to the point where it splits \cite{duderstadt}.  For some isotopes, like $^{238}$U, absorbing a low-energy neutron does not impart enough energy to the nucleus to induce fission.  It only fissions when a high-energy neutron is absorbed and the neutron brings additional energy with it to destabilize the nucleus sufficiently for fission to occur.  Therefore, $^{238}$U is fissionable, but not fissile.  $^{238}$U is also considered a \emph{fertile} isotope since when it captures a neutron, it becomes $^{239}$U which decays to $^{239}$Np and then to $^{239}$Pu, which is fissile.  Absorbing a neutron and only producing no secondary particles other than a gamma rays is called ``capture'' since the neutron is added to the nucleus of the previous isotope.  Fertile isotopes are those that decay to fissile isotopes after capturing a neutron \cite{duderstadt}.
+A \emph{fissionable} isotope is one that has a non-zero fission cross section, i.e. it there is a probability that it will fission if it absorbs a neutron.  A \emph{fissile} isotope is one that can be induced to fission by absorbing a neutron at any energy.  Some isotopes, like $^{235}$U, can absorb a neutron a very low energies and fission.  This is because the energy imparted to the nucleus through the absorption reaction is enough to destabilize to the point where it splits \cite{duderstadt}.  For some isotopes, like $^{238}$U, absorbing a low-energy neutron does not impart enough energy to the nucleus to induce fission.  It only fissions when a high-energy neutron is absorbed and the neutron brings additional energy with it to destabilize the nucleus sufficiently for fission to occur.  Therefore, $^{238}$U is fissionable, but not fissile.  $^{238}$U is also considered a \emph{fertile} isotope since when it captures a neutron, it becomes $^{239}$U which decays to $^{239}$Np and then to $^{239}$Pu, which is fissile.  Absorbing a neutron and only producing no secondary particles other than a gamma rays is called ``capture'' since the neutron is added to the nucleus of the previous isotope.  Fertile isotopes are those that decay to fissile isotopes after capturing a neutron \cite{duderstadt}.
 %define fissile/fertile here, you might want to mention why nu exists at very low energies since this seems inconsistent.
 
-The most common type of commercial reactor, by far, is an oxide-fueled light water reactor \cite{reactor_numbers}.   These reactors use ceramic fuel elements made of uranium oxide, UO$_2$, due to its high melting point.  They are also cooled and moderated with light water, which is water containing predominately $^1$H with trace amounts of $^2$H.  In the nuclear engineering lexicon, ``moderator'' means a material that reduces neutron energies to thermal levels \cite{duderstadt}.  The most effective moderators are light nuclei, like hydrogen, since they have a mass similar to that of a neutron and an elastic scattering reaction can transfer a large amount of the neutron's energy to the nucleus.  Light water reactors, or LWRs, are called ``thermal'' as well, since their mode of operation relies on the neutrons' energies being at thermal levels.  ``Fast'' rectors, on the other hand, operate with high energy neutrons, and want to avoid moderating them.  For this reason, oxide fuel and water are typically not used in fast reactors, since they include light nuclei \cite{duderstadt}.
-%describe typical fuel compositions.
-
-%add additional descriptions here, get rid of PK equations, describe meultiplication, add delayed to NTE and get rid of, just metnion them here.
-
-%describe the need to model all reactions here, go into the dominant types for fast/thermal
-
-
-\subsection{Point Kinetics, Multiplication Factor}
-
-The most important parameter of a nuclear reactor is its effective multiplication factor, $k_\mathrm{eff}$, which is the ratio of the number of neutrons in subsequent neutron generations.  All of the work put into reactor analysis and solving the neutron transport equations can usually be condensed into the effective multiplication factor.  It describes the growth rate of the neutron population in terms of generations.  If $k_\mathrm{eff}=1$, then subsequent neutron generations are exactly the same size and the reactor is critical.  If it is below 1, subsequent neutron generation are smaller and the reactor is subcritical.  If $k_\mathrm{eff}$ is greater than 1, subsequent generations are larger and the reactor is supercritical.  
-
-The effective multiplication factor can also describe the time rate of change of the neutron population if the average neutron lifetime is known.  If a reactor is treated as a point (which means it has no spatial \emph{dependence}, not that it has no spatial \emph{extent}), the rate of change of its neutron population can be described with the differential equation shown in \eqref{point_kin1}, where $N(t)$ is the neutron population at time $t$ and $l_p$ is the average neutron lifetime \cite{duderstadt}.  The expression on the left side is the neutron population after a mean neutron lifetime, which is equal to the multiplication factor multiplied by the initial neutron population.  The expression on the left hand side can be Taylor expanded to first order by the middle expression.  Rearranging this equation yields the ODE shown in  \eqref{point_kin2} \cite{duderstadt}.
-
-\begin{equation}
-\label{point_kin1}
-N(t+l_p) \simeq N(t)+l_p \frac{dN(t)}{dt} = k_\mathrm{eff} N(t) 
-\end{equation}
-
-\begin{equation}
-\label{point_kin2}
-\frac{dN(t)}{dt} \simeq \frac{k_\mathrm{eff} -1}{l_p}N(t)
-\end{equation}
-
-The solution to this equation is show in \eqref{reactor_period}, where $T$ is the reactor period and is defined as... \cite{duderstadt}.  The neutron lifetime is usually treated as constant since it largely depends on the materials present in the reactor, which change very slowly compared to the neutron population. Thus, the only parameter that influences the reaction period, $T$, is $k_\mathrm{eff}$.  This does not mean that the mean neutron lifetime is not important, but rather that the only readily-changeable value in the reactor period expression is the multiplication factor.  The mean neutron lifetime, however, affects how \emph{fast} changes occur in the neutron population, which is of huge consequence in reactor control \cite{duderstadt}.  
-
-When the multiplication factor is unity, the reactor period is infinity, implying that the neutron population is in a steady state.  When it is less than one, the period is negative, implying that the neutron population will decrease.  The converse it true when it is positive.  Then the period is positive and the neutron population increases with time.
-
-\begin{equation}
-\label{reactor_period}
-\begin{split}
-N(t) &= N_0 \exp \left( \frac{t}{T} \right) \\
-T &= \frac{l_p}{k_\mathrm{eff} -1}
-\end{split}
-\end{equation}
-
-\subsection{Six Factor Formula}
-
-The multiplication factor is the most important parameter in a nuclear reactor because it dictates the time rate of change of its power.  It is a global number, and a lot of physics is integrated into it.   The reaction cross sections, the naming of which is discussed in the next section, describe the probabilities of neutron reactions occurring as a function of energy.  There are many individual reactions, but from a high level and speaking in broad terms, there are six probabilities that can influence the multiplication factor \cite{duderstadt}: 
-\begin{itemize}
- \item the thermal reproduction factor, $\eta$, or the average number of neutrons produced per neutron absorbed in the fuel;
- \item the thermal utilization factor, $f$, or the probability that an absorbed thermal neutron was absorbed by a fissile nuclide;
- \item the resonance escape probability, $p$, or the probability that neutrons are not captured in resonances as they scatter down from high energy to low energy;
- \item the fast fission factor, $\epsilon$, or the ratio of total fission neutrons (including high-energy fissions) to those born from thermal fissions;
- \item the fast non-leakage probability, $P_\mathrm{FNL}$, or the probability that high-energy neutrons will not leak out of the system; and
- \item the thermal non-leakage probability, $P_\mathrm{TNL}$, or the probability that low-energy neutrons will not leak out of the system.	
-\end{itemize}
-
-Multiplying all these factors together yields the number of neutrons born from fission given a single entering neutron, i.e. the multiplication factor.  This formula, known as the ``six factor formula,'' is shown in \eqref{six_ff_eq} \cite{duderstadt}.  Many physics factors go into each of the formula's factors, like geometrical configuration, cross section energy dependence, material composition, and scattering kinematics, et cetera.  A graphical interpretation of the six factor formula is shown in Figure \ref{six_ff_chain}.
-
-\begin{equation}
-\label{six_ff_eq}
-k_\mathrm{eff}  = \eta f p  \epsilon P_\mathrm{FNL} P_\mathrm{TNL}
-\end{equation}
-
+The \emph{effective multiplication factor}, $k_\mathrm{eff}$, is the ratio of the number of neutrons in subsequent neutron generations. It is an integral quantity, and describes how many secondary neutrons are induced by an an average neutron in a reactor.  In other words, describes the growth rate of the neutron population in terms of generations.  If $k_\mathrm{eff}=1$, then subsequent neutron generations are exactly the same size and the reactor is critical.  If it is below 1, subsequent neutron generation are smaller and the reactor is subcritical.  If $k_\mathrm{eff}$ is greater than 1, subsequent generations are larger and the reactor is supercritical.  The effective multiplication factor can also describe the time rate of change of the neutron population if the average neutron lifetime is known.  The multiplication factor is an important quantity in characterizing nuclear reactor behavior because the reactor power is directly proportional to the neutron population, and the multiplication factor therefore dictates the time rate of change of its power.
 
 \begin{figure}[h!]
   \centering
-    \includegraphics[width=0.8\textwidth]{graphics/six_ff.eps}
-     \caption{The reaction chain represented by probabilities in the six factor formula. \label{six_ff_chain}}
+    \includegraphics[width=0.8\textwidth]{graphics/k_chain.eps}
+     \caption{The fission chain reaction and its relation to the multiplication factor. \label{k_chain}}
 \end{figure}
 
-The six factor formula describes what happens to the average neutron. An individual neutron history could be simulated by sampling the constant probabilities that the factors represent.  After a large group of these histories is simulated, they can be averaged to determine the multiplication factor.  This is the basic idea of Monte Carlo neutron transport.  The results are trivial in this case, since there is no dimensionally in the problem, the probabilities are constant, and the multiplication factor can be found analytically.  More broadly, though, the six factor formula is way to think about the process without complicating it with dimensionality.
+The most common type of commercial reactor is an oxide-fueled light water reactor \cite{reactor_numbers}.   These reactors use ceramic fuel elements made of uranium oxide, UO$_2$, due to its high melting point.  They are also cooled and moderated with light water, which is water containing predominately $^1$H with trace amounts of $^2$H.  In the nuclear engineering lexicon, ``moderator'' means a material that reduces neutron energies to thermal levels \cite{duderstadt}.  The most effective moderators are light nuclei, like hydrogen, since they have a mass similar to that of a neutron and an elastic scattering reaction can transfer a large amount of the neutron's energy to the nucleus.  Light water reactors, or LWRs, are called ``thermal'' as well, since their mode of operation relies on the neutrons' energies being at thermal levels.  ``Fast'' rectors, on the other hand, operate with high energy neutrons, and want to avoid moderating them.  For this reason, oxide fuel and water are typically not used in fast reactors, since they include light nuclei \cite{duderstadt}.
+%describe typical fuel compositions. done.
+
+%I SUGGEST YOU WILL DESCRIBE ALL THE PHENOMENA THE FISSION-BORN NEUTRON CAN UNDERGO -- AS THE M.C. CODE NEEDS TO SIMULATE THEM ALL, BUT DO NOT DEFINE THE SIX FACTORS. IT MAY BE BEST (BUT NOT NECESSARY) TO DO SO FOR A FAST REACTOR, A THERMAL REACTOR, A SUBCRITICAL SYSTEM SUBJECTED TO AN EXTERNAL NEUTRON SOURCE  AND A NON-MULTIPLYING SYSTEM SUBJECTED TO AN EXTERNAL SOURCE. -- YOU ARE ADDRESSING ALL THESE SYSTEMS IN YOUR BENCHMARKS
+
+%describe the need to model all reactions here, go into the dominant types for fast/thermal
+
+Many factors influence the neutron population, and therefore must be incorporated into the solution method.  The neutron population has strong feedback mechanisms from the materials present in the reactor.  Each isotope in the system can have different interactions with neutrons, and these reaction probabilities may have very strong dependence on the incoming neutron energy.  Using the Monte Carlo Method to approximate solutions to the neutron transport equation requires all of the neutron interactions to be explicitly modeled.  The reactor geometry also effects the neutron distribution, since it describes the spatial extent of the reactor materials.   The Monte Carlo Method tracks neutrons as they move through the reactor materials, sampling the reactions they can undergo along the way.  Of foremost importance is tracking fission reactions, since these are the reactions that sustain the fission chain reaction and maintain the reactor's effective multiplication factor.  Since a neutron's every interaction to be explicitly modeled, the next section will discuss all the possible reaction types a neutron can undergo when it collides with a nucleus and how interaction probabilities are classified and quantified.
+
+
+%\subsection{Point Kinetics, Multiplication Factor}
+
+%The most important parameter of a nuclear reactor is its effective multiplication factor, $k_\mathrm{eff}$, .  All of the work put into reactor analysis and solving the neutron transport equations can usually be condensed into the effective multiplication factor.    
+
+%The effective multiplication factor can also describe the time rate of change of the neutron population if the average neutron lifetime is known.  If a reactor is treated as a point (which means it has no spatial \emph{dependence}, not that it has no spatial \emph{extent}), the rate of change of its neutron population can be described with the differential equation shown in \eqref{point_kin1}, where $N(t)$ is the neutron population at time $t$ and $l_p$ is the average neutron lifetime \cite{duderstadt}.  The expression on the left side is the neutron population after a mean neutron lifetime, which is equal to the multiplication factor multiplied by the initial neutron population.  The expression on the left hand side can be Taylor expanded to first order by the middle expression.  Rearranging this equation yields the ODE shown in  \eqref{point_kin2} \cite{duderstadt}.
+
+%\begin{equation}
+%\label{point_kin1}
+%N(t+l_p) \simeq N(t)+l_p \frac{dN(t)}{dt} = k_\mathrm{eff} N(t) 
+%\end{equation}
+%
+%\begin{equation}
+%\label{point_kin2}
+%\frac{dN(t)}{dt} \simeq \frac{k_\mathrm{eff} -1}{l_p}N(t)
+%\end{equation}
+
+%The solution to this equation is show in \eqref{reactor_period}, where $T$ is the reactor period and is defined as... \cite{duderstadt}.  The neutron lifetime is usually treated as constant since it largely depends on the materials present in the reactor, which change very slowly compared to the neutron population. Thus, the only parameter that influences the reaction period, $T$, is $k_\mathrm{eff}$.  This does not mean that the mean neutron lifetime is not important, but rather that the only readily-changeable value in the reactor period expression is the multiplication factor.  The mean neutron lifetime, however, affects how \emph{fast} changes occur in the neutron population, which is of huge consequence in reactor control \cite{duderstadt}.  
+
+%When the multiplication factor is unity, the reactor period is infinity, implying that the neutron population is in a steady state.  When it is less than one, the period is negative, implying that the neutron population will decrease.  The converse it true when it is positive.  Then the period is positive and the neutron population increases with time.
+
+%\begin{equation}
+%\label{reactor_period}
+%\begin{split}
+%N(t) &= N_0 \exp \left( \frac{t}{T} \right) \\
+%T &= \frac{l_p}{k_\mathrm{eff} -1}
+%\end{split}
+%\end{equation}
+%
+%\subsection{Six Factor Formula}
+
+%The multiplication factor is the most important parameter in a nuclear reactor because it dictates the time rate of change of its power.  It is a global number, and a lot of physics is integrated into it.   The reaction cross sections, the naming of which is discussed in the next section, describe the probabilities of neutron reactions occurring as a function of energy.  There are many individual reactions, but from a high level and speaking in broad terms, there are six probabilities that can influence the multiplication factor \cite{duderstadt}: 
+%\begin{itemize}
+% \item the thermal reproduction factor, $\eta$, or the average number of neutrons produced per neutron absorbed in the fuel;
+% \item the thermal utilization factor, $f$, or the probability that an absorbed thermal neutron was absorbed by a fissile nuclide;
+% \item the resonance escape probability, $p$, or the probability that neutrons are not captured in resonances as they scatter down from high energy to low energy;
+% \item the fast fission factor, $\epsilon$, or the ratio of total fission neutrons (including high-energy fissions) to those born from thermal fissions;
+% \item the fast non-leakage probability, $P_\mathrm{FNL}$, or the probability that high-energy neutrons will not leak out of the system; and
+% \item the thermal non-leakage probability, $P_\mathrm{TNL}$, or the probability that low-energy neutrons will not leak out of the system.	
+%\end{itemize}
+
+%Multiplying all these factors together yields the number of neutrons born from fission given a single entering neutron, i.e. the multiplication factor.  This formula, known as the ``six factor formula,'' is shown in \eqref{six_ff_eq} \cite{duderstadt}.  Many physics factors go into each of the formula's factors, like geometrical configuration, cross section energy dependence, material composition, and scattering kinematics, et cetera.  A graphical interpretation of the six factor formula is shown in Figure \ref{six_ff_chain}.
+
+%\begin{equation}
+%\label{six_ff_eq}
+%k_\mathrm{eff}  = \eta f p  \epsilon P_\mathrm{FNL} P_\mathrm{TNL}
+%\end{equation}
+%
+%
+%\begin{figure}[h!]
+%  \centering
+%    \includegraphics[width=0.8\textwidth]{graphics/six_ff.eps}
+%     \caption{The reaction chain represented by probabilities in the six factor formula. \label{six_ff_chain}}
+%\end{figure}
+%
+%The six factor formula describes what happens to the average neutron. An individual neutron history could be simulated by sampling the constant probabilities that the factors represent.  After a large group of these histories is simulated, they can be averaged to determine the multiplication factor.  This is the basic idea of Monte Carlo neutron transport.  The results are trivial in this case, since there is no dimensionally in the problem, the probabilities are constant, and the multiplication factor can be found analytically.  More broadly, though, the six factor formula is way to think about the process without complicating it with dimensionality.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -637,6 +645,7 @@ Now all the terms of \eqref{NBE} have been explicitly defined.  Substituting the
 \end{split}
  \end{equation}
 % add delayed neutrons here
+% add expression for keff here.
  
  The neutron transport equation in this form is an integro-differential equation since it has both derivates and integrals in it.  Its spatial and temporal parts are differential, whereas its angular and energy parts are integral.  It is linear and relatively easy to solve for simple geometries and reaction parameters, but in order to capture all the relevant physics for real-world problems, complex geometries and energy-dependent reaction parameters must be used.  Despite it's linearity, the neutron transport can be difficult to solve because of the large, heterogeneous domains over which it must be solved and the complex energy dependence of the cross sections.  
 % the juxtaposition of the two previous sentences doesn't match. they should have the same form.  fixed??
@@ -644,6 +653,8 @@ Now all the terms of \eqref{NBE} have been explicitly defined.  Substituting the
  
  \subsection{Time Independent Neutron Transport Equation}
 
+%no longer  driven, becomes an eigenvalue problem, inf solutions, 
+%From the Mats point of view, our criticality equations have infinite number of solutions, i.e. the pair of solutions: the eigenfunctions (fluxes) and corresponding eigenvalues. We are searching for the fundamental mode which corresponds to the smallest system eigenvalue (which is the largest k-eigenvalues, or our multiplication coefficient). See my slides for NE-150 on that topic (slide 32, for example).
 In most situations, the equilibrium state of the neutron population is of interest.  By setting all time derivates to zero, \eqref{NTE} becomes the time-independent neutron transport equation shown in \eqref{time_ind_NTE}.  In \eqref{time_ind_NTE} another parameter has been introduced, the effective multiplication factor, $k_\mathrm{eff}$, which was described earlier using the six factor formula.  It is introduced here since, by forcing the time derivates to be zero, it is implied that the multiplication factor must be equal to one.  The physical properties of a problem may say otherwise, however, and failing to divide the fission source by the effective multiplication factor could make the time-independent equation inconsistent.  Of course there will be no inequality if the source and sink terms are actually balanced and $k_\mathrm{eff}$ calculated from \eqref{NTE} is one.  The external source term is also dropped for this formulation, called criticality calculations.
 
 \begin{equation}
