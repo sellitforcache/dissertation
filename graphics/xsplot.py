@@ -47,7 +47,7 @@ ax.loglog(ene,xs_2,label='Elastic Scatter')
 ax.loglog(ene,xs_3,label='Fission (total)')
 ax.loglog(ene,xs_4,label='Capture')
 ax.loglog(ene[xs_5_start:],xs_5,label='Inelastic Scatter to 1st Excited State')
-pl.title('Uranium-235 at '+tempstr+'K')
+pl.title(r'$^{235}$U at '+tempstr+'K')
 pl.ylabel('Cross Section (barns)')
 pl.xlabel('Energy (MeV)')
 handles, labels = ax.get_legend_handles_labels()
@@ -61,7 +61,7 @@ else:
 	print 'xs_u235.eps'
 	fig.savefig('xs_u235.eps')
 ###################
-tope_number=3006
+tope_number=5010
 temp_extension='.03c'
 lib=ace.Library('/usr/local/SERPENT/xsdata/endfb7/acedata/'+str(tope_number)+'ENDF7.ace')
 lib.read()
@@ -70,8 +70,8 @@ tempstr = '%6.2f' % (lib.temp/8.617332478e-11)
 ene=lib.energy
 xs_1=lib.sigma_t
 xs_2=lib.reactions[2].sigma
-xs_3=lib.reactions[105].sigma
-xs_3_start=lib.reactions[105].IE-1
+xs_3=lib.reactions[107].sigma
+xs_3_start=lib.reactions[107].IE-1
 xs_4=lib.reactions[102].sigma
 xs_5=lib.reactions[51].sigma
 xs_5_start=lib.reactions[51].IE-1
@@ -79,10 +79,10 @@ fig = pl.figure(figsize=(10,6))
 ax = fig.add_subplot(1,1,1)
 ax.loglog(ene,xs_1,label='Total')
 ax.loglog(ene,xs_2,label='Elastic Scatter')
-ax.loglog(ene[xs_3_start:],xs_3,label='(n,$^3$H)')
+ax.loglog(ene[xs_3_start:],xs_3,label=r'(n,$\alpha$)')
 ax.loglog(ene,xs_4,label='Capture')
 ax.loglog(ene[xs_5_start:],xs_5,label='Inelastic Scatter to 1st Excited State')
-pl.title('Lithium-6 at '+tempstr+'K')
+pl.title(r'$^{10}$B at '+tempstr+'K')
 pl.ylabel('Cross Section (barns)')
 pl.xlabel('Energy (MeV)')
 handles, labels = ax.get_legend_handles_labels()
@@ -120,10 +120,10 @@ ene_238=lib_238.energy
 xs_238 =lib_238.reactions[18].sigma
 fig = pl.figure(figsize=(10,6))
 ax = fig.add_subplot(1,1,1)
-ax.loglog(ene_u,xs_u,label='U-235')
-ax.loglog(ene_238,xs_238,label='U-238')
-ax.loglog(ene_pu,xs_pu,label='Pu-239')
-pl.title('Fission cross sections for U-235, U-238 , and Pu-239 at '+tempstr+'K')
+ax.loglog(ene_u,xs_u,label=r'$^{235}$U')
+ax.loglog(ene_238,xs_238,label=r'$^{238}$U')
+ax.loglog(ene_pu,xs_pu,label=r'$^{239}$Pu')
+pl.title(r'Fission cross sections for $^{235}$U, $^{238}$U, and $^{239}$Pu at '+tempstr+'K')
 pl.ylabel('Total Fission Cross Section (barns)')
 pl.xlabel('Energy (MeV)')
 handles, labels = ax.get_legend_handles_labels()
@@ -168,7 +168,7 @@ dex3_2=np.where(ene_3>emax)[0][0]
 ax.semilogy(ene_1[dex1_1:dex1_2]*1e6,   xs_1[dex1_1:dex1_2],    label=temp1+'K')
 ax.semilogy(ene_2[dex2_1:dex2_2]*1e6,   xs_2[dex2_1:dex2_2],    label=temp2+'K')
 ax.semilogy(ene_3[dex3_1:dex3_2]*1e6,   xs_3[dex3_1:dex3_2],    label=temp3+'K')
-pl.title('Asorbtion cross section of Eu-155')
+pl.title(r'Asorbtion cross section of $^{155}$Eu')
 pl.ylabel('Total Fission Cross Section (barns)')
 pl.xlabel('Energy (eV)')
 handles, labels = ax.get_legend_handles_labels()
@@ -213,12 +213,12 @@ nu_238_cold 	= lib_238.nu_t_value
 nu_238_cold_e 	= lib_238.nu_t_energy
 fig = pl.figure(figsize=(10,6))
 ax = fig.add_subplot(1,1,1)
-ax.semilogx( nu_u_cold_e, nu_u_cold,label='U-235')
-ax.semilogx(nu_238_cold_e,nu_238_cold,label='U-238')
-ax.semilogx(nu_pu_cold_e,nu_pu_cold,label='Pu-235')
+ax.semilogx( nu_u_cold_e, nu_u_cold,label=r'$^{235}$U')
+ax.semilogx(nu_238_cold_e,nu_238_cold,label=r'$^{238}$U')
+ax.semilogx(nu_pu_cold_e,nu_pu_cold,label=r'$^{239}$Pu')
 #ax.loglog( nu_u_hot_e, nu_u_hot,label= 'U-235 at '+temp_hot+'K')
 #ax.loglog(nu_pu_hot_e,nu_pu_hot,label='Pu-235 at '+temp_hot+'K')
-pl.title('Fission neutron yields for U-235, U-238, and Pu-239')
+pl.title(r'Fission neutron yields for $^{235}$U, $^{238}$U, and $^{239}$Pu')
 pl.ylabel('Cross Section (barns)')
 pl.xlabel('Energy (MeV)')
 handles, labels = ax.get_legend_handles_labels()
@@ -241,9 +241,9 @@ u_e 		= lib_u.reactions[18].energy_dist.energy_out[1]
 u_spec		= lib_u.reactions[18].energy_dist.pdf[1]
 pu_e 		= lib_pu.reactions[18].energy_dist.energy_out[1]
 pu_spec		= lib_pu.reactions[18].energy_dist.pdf[1]
-ax.semilogx( u_e, u_spec ,label='U-235')
-ax.semilogx( pu_e , pu_spec ,label='Pu-239')
-pl.title('Fission spectra for U-235 and Pu-239')
+ax.semilogx( u_e, u_spec ,label=r'$^{235}$U')
+ax.semilogx( pu_e , pu_spec ,label=r'$^{239}$Pu')
+pl.title(r'Fission spectra for $^{235}$U and $^{239}$Pu')
 pl.ylabel('Probability Density Function')
 pl.xlabel('Energy (MeV)')
 handles, labels = ax.get_legend_handles_labels()
