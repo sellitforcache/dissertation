@@ -956,6 +956,7 @@ a = \frac{P_{i+1}-P_i}{\mu^\prime_{i+1}-\mu^\prime_i} \qquad , \qquad b = P_i - 
 Each tabular distribution in the ACE data file specifies if the histogram or linear-linear method should be used to perform interpolation on it.  It is not up to the user to decide what scheme to use if results consistent with Serpent or MCNP are desired.  The CDFs are tabulated with the specified interpolation method in mind, and using the incorrect scheme will produce incorrect results.  The interpolation scheme must be checked for each distribution on a case-by-case basis. 
 % what does this mean? is it because of what data is available? what you're trying to do? what's most accurate? 
 
+\subsubsection{Free Gas Treatment}
 
 As stated previously, the data in the cross section libraries are Doppler broadened for a certain material temperature.  This is done to account for the effect the target nuclides' thermal motion has on the apparent width of resonances when the target nuclides are modeled as stationary. As a result, Doppler broadening produces accurate reaction rates in the resonance region when target nuclides are modeled to be stationary, and modeling the targets as stationary is a good approximation when the neutron velocities in the resonance region. 
 
