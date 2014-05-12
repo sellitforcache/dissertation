@@ -49,9 +49,9 @@ The CUDPP compaction function does just this - it takes an input vector and a va
 \end{figure}
 
 % I think it makes more sense to talk about this up where you're talking about the methods you implemented...
-The studies done by Yu, Henderson, and Xu all employ a particle-popping algorithm to do...  %at some point, which is not considered in this study 
+The studies done by Liu and Henderson both employ a particle-popping algorithm to do...  %at some point, which is not considered in this study 
 % in past work you don't discuss work by Yu or Xu, unless Yu is the Chinese university work, but you don't mention the name. 
-% Come to think of it, you should also add a discussion about the work of Xu.
+% Come to think of it, you should also add a discussion about the work of Xu.  ---->  Xu is the chinese (not RPI), Yu is a mistake (should be Liu from RPI)
 This algorithm is task-based, but each thread holds a bank of particle data so when its initial data terminates it can immediately start transporting a new particle \cite{tianyu, henderson, qixu}.  This is a clever way of doing things and \emph{might} be the faster overall. This particle-popping algorithm is not, however, investigated in this work because GPU-specific library use and task-based algorithms are incompatible. 
 
 Libraries currently available for the GPU carry out a single task on a dataset; they are not coded for single-thread operation and must be launched as their own kernels.  Having threads in different states wouldn't allow the library routines to be dropped in and used consistently across all the active particle data.  Further, much of the performance from optimized algorithms in the libraries comes from thread blocks cooperating, and using a task-based algorithm would be like treating each SM as a separate CPU (using a stack-popping method).  The CUB libary can perform sorts and scans in a per-block or per-warp fashion, but OptiX would be incompatible with a non-global transport scheme \cite{optix}.
