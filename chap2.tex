@@ -630,7 +630,7 @@ We can then write and expression for the leakage by performing a surface integra
 
 \subsection{Neutron Transport Equation}
 
-Now all the terms of \eqref{NBE} have been explicitly defined.  Substituting them all in yields \eqref{NTE}, the \emph{neutron transport equation}, written here with the neutron sinks on the left side and the neutron sources on the right side.  An additional external source term, $S_{\mathrm{external}}$, has been added to account for any neutron sources not induced by the neutron flux itself, i.e.\ external sources.  This form of the equation does not include delayed neutrons, which are neutrons emitted by fission products when they undergo radioactive decay.
+Now all the terms of \eqref{NBE} have been explicitly defined.  Substituting them all in yields \eqref{NTE}, the \emph{neutron transport equation}, written here with the neutron sinks on the left side and the neutron sources on the right side.  An additional external source term, $S_{\mathrm{external}}$, has been added to account for any neutron sources not induced by the neutron flux itself, i.e.\ external sources.  This form of the equation also includes delayed neutrons.  For delayed neutron precursor group $j$, $C_j$ is the concentration, $\chi_{d,j}$ is the energy spectrum ($d$ only signifies ``delayed''), and $\lambda_j$ is the decay constant \cite{jasmina_book}.  As was stated before, delayed neutrons are important for reactor control.  WARP is concerned with time-independent solutions, and the spectral and fission yield effects of delayed neutrons are incorporated into the data WARP uses.
 
 \begin{equation}
 \label{NTE}
@@ -641,6 +641,7 @@ Now all the terms of \eqref{NBE} have been explicitly defined.  Substituting the
 & =  \\
 & \quad \int_0^\infty dE^\prime \int_{\boldsymbol{\hat{\Omega}}} d\boldsymbol{\Omega}^\prime \:\: \Sigma_s(E^\prime \rightarrow E,\boldsymbol{\hat{\Omega}}^\prime \rightarrow \boldsymbol{\hat{\Omega}}) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}}^\prime,E^\prime,t)    \\
 &+ \frac{\chi(E)}{4\pi} \int_0^\infty dE^\prime  \int_{\boldsymbol{\hat{\Omega}}} d\boldsymbol{\Omega}^\prime \:\:  \nu(E^\prime) \Sigma_f(\boldsymbol{\vec{r}},E^\prime) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}}^\prime,E^\prime,t)  \\
+& + \sum_{j=1}^{6}\frac{\chi_{d,j}(E)}{4\pi} \lambda_j C_j(r,t)     \\
 & + S_{\mathrm{external}}
 \end{split}
  \end{equation}
