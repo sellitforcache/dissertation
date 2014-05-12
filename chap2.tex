@@ -323,13 +323,13 @@ The kinetics of a nuclear chain reaction depends heavily on the mean neutron lif
      \caption{Fission cross sections for $^{235}$U, $^{238}$U, and  $^{239}$Pu. \label{xs_fission_only}}
 \end{figure}
 
-Figure \ref{nu_compare} shows the energy dependence of the average total number of neutrons per fission, $\nu_\mathrm{T}$, for several fissionable isotopes.  $\nu_\mathrm{T}$ is shown at one temperature since it has very weak temperature dependence for most energies.   For all three isotopes shown, $\nu_\mathrm{T}$ is nearly constant from low energies up to energies in the MeV range, where it increases sharply due to the energy the incident neutron provides being sufficient to eject additional bound neutrons.  
+Figure \ref{nu_compare} shows the energy dependence of the average total number of neutrons per fission, $\nu_\mathrm{T}$, for several fissionable isotopes.  $\nu_\mathrm{T}$ is shown at a single target material temperature since it has very weak temperature dependence for most incoming neutron energies.   For all three isotopes shown, $\nu_\mathrm{T}$ is nearly constant from low energies up to energies in the MeV range, where it increases sharply due to the energy the incident neutron provides being sufficient to eject additional bound neutrons.  
 
 % Okay, I got to here and had thought \nu up above was total. what does \nu include then? I'm confused by your previous discussion now. I have relabeled it so I am always talking about nu_T
 % In this discussion you should indicate which \nu_T you're talking about or talk about them collectively (the figure has 3 values)
 %  I am speaking about nu_T in general.  I never once mention a specific value for it, I only am discussing what it means and the figure is for illustration
 
-Figure \ref{xs_fission_only} shows the total fission cross sections for two fissile isotopes, $^{235}$U and $^{239}$Pu, and one fertile isotope, $^{238}$U.  The figure shows that  $^{238}$U has a fission cross section, but it isn't significant until above 1 MeV.  For $^{238}$U, fission is a threshold reaction.  Simply absorbing a neutron does not provide enough energy to split the nucleus.  Additional energy is required, which can be provided in the form of an incident neutron's kinetic energy.  $^{238}$U isn't fissile, but it can be a significant contributor of fission reactions in reactors where the neutron population is \emph{fast}, i.e.\ mainly high-energy.  As mentioned before, $^{238}$U is considered fertile because it is converted to the fissile isotope $^{239}$Pu \cite{duderstadt}.  
+Figure \ref{xs_fission_only} shows the total fission cross sections for two fissile isotopes, $^{235}$U and $^{239}$Pu, and one fertile isotope, $^{238}$U.  The figure shows that  $^{238}$U has a fission cross section, but it isn't significant until above 1 MeV.  For $^{238}$U, fission is practically a threshold reaction.  Simply absorbing a neutron does not provide enough energy to split the nucleus.  Additional energy is required, which can be provided in the form of an incident neutron's kinetic energy.  $^{238}$U isn't fissile, but it can be a significant contributor of fission reactions in reactors where the neutron population is \emph{fast}, i.e.\ mainly high-energy.  As mentioned before, $^{238}$U is considered fertile because it is converted to the fissile isotope $^{239}$Pu \cite{duderstadt}.  
   
 WARP uses $\nu_\mathrm{T}$ and fission neutron energy spectra that incorporate delayed neutron energies since is more physically accurate and produces the overall effective multiplication factor.  
 
@@ -340,9 +340,18 @@ Unlike scattering reactions, where the energy and direction of the neutron is ch
 
 \subsection{Other Secondary-Producing Absorption Reactions}
 
-This category encompasses all the other reactions neutrons undergo.  There are two types: reactions that produce secondary neutrons in some amount and reactions that do not.  Those that do not may still produce other particles, like alpha particles, tritons, protons, et cetera.  Since these do not produce secondary neutrons, however, they are basically equivalent to a capture reaction in the scope of neutron transport.  Even though they aren't strictly capture reactions, they can contribute significantly to an isotope's absorption of neutrons.  Figure \ref{xs_e_dependence_li} shows that the (n,$^3$H) in $^{6}$Li is by far the main component of the total cross section, making $^{6}$Li a very strong absorber of low energy neutrons.  $^{10}$B is another great example of this.  Its (n,$\alpha$) reaction has a very high cross section for low energy neutrons, and $^10$B is widely used in safety and control systems in thermal-spectrum reactors.
+This category encompasses all the other reactions neutrons undergo.  There are two types: reactions that produce secondary neutrons in some amount and reactions that do not.  Those that do not may still produce other particles, like alpha particles, tritons, protons, et cetera.  Since these do not produce secondary neutrons, however, they are basically equivalent to capture reactions from a neutron transport standpoint.  Even though they aren't strictly capture reactions, they can contribute significantly to an isotope's absorption of neutrons.  Figure \ref{xs_e_dependence_li} shows that the (n,$\alpha$) in $^{10}$B is by far the main component of the total cross section, making $^{10}$B a very strong absorber of low energy neutrons.  $^10$B is widely used in safety and control systems in thermal-spectrum reactors.
 
 Of the reactions that produce secondary neutrons, the (n,2n) reaction is most significant because it has the lowest threshold energy.  At higher incident neutron energies, (n,3n) and even (n,4n) can become possible.  Other particle combinations are possible as well, such as (n,n$\alpha$), and these reactions act like an inelastic scatter interaction where the relationship between scattering angle and energy no longer applies due to there being three bodies to distribute energy to instead of only two.
+
+\subsection{Bound Nuclei and Unresolved Resonances}
+
+Treating matter as a collection of free nuclei is a good approximation most of the time since the neutron energies are much larger then the thermal energies of the nuclei, and the recoil energies imparted on the targets is typically much larger than any cohesive forces between them.  This  \cite{jaakko}.
+light water, heavy water and graphite
+
+S($\alpha$,$\beta$) coupled energy-angle representation, replaces the free gas treatment discussed in the following section \cite{mcnp}.
+
+Unresolved resonances \cite{mcnp}.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -351,7 +360,7 @@ Of the reactions that produce secondary neutrons, the (n,2n) reaction is most si
 
 Thus far there has only been mention of the target nuclide's velocity by how it manifests itself in the 1/$v$ behavior of cross sections at low energy.  It is a good assumption that the thermal motion of the target nuclide is negligible when neutrons are at MeV-range energies.  However, when neutrons scatter and lose energy they can come near the thermal energy of the material, which is on the order of .01 eV.  When this happens, the target nuclide no longer appears stationary, and assuming that it has zero velocity in scattering calculations is inaccurate as discussed above. 
 
-MCNP sets the threshold above which the target nuclide can be assumed stationary at 400 kT, which corresponds to about 10 eV for materials at room temperature \cite{mcnp}.  Below this threshold, it is important to model thermal effects.  If this wasn't done, a neutron could keep scattering off of zero-energy targets and its energy could approach zero, which is not physical.  Neutrons can only scatter down to a state where they are in thermal equilibrium with the material they are traveling through.  This creates a ``thermal peak'' at low energies where neutrons collect, especially in materials where the scattering cross section is large and neutrons scatter many times before they are absorbed.
+MCNP sets the threshold above which the target nuclide can be assumed stationary at 400 kT, which corresponds to about 10 eV for materials at room temperature \cite{mcnp}.  Below this threshold, it is important to model thermal effects.  If this wasn't done, a neutron could keep scattering off of zero-energy targets and its energy could approach zero, which is not physical.  Neutrons can only scatter down to a state where they are in thermal equilibrium with the material they are traveling through.  This creates a ``thermal peak'' at low energies where neutrons collect, especially in materials where the absorption-to-scattering cross section ratio is small and neutrons scatter many times before they are absorbed.
 
 \subsection{Doppler Effect}
 
