@@ -561,7 +561,7 @@ As was mentioned previously, when the simulation is run in criticality mode, the
 \sum_{j=0}^{N_d}  \frac{y_j }{k_{\mathrm{eff},n}} = \frac{N_{f,n}}{k_{\mathrm{eff},n}} \Rightarrow N_{s,n+1} = N_{s,n}
 \end{equation}
 
-Since WARP handless all neutrons with equal importance, yields must be integers, but $y_j/k_\mathrm{eff}$ rarely will be.  Stochastic rounding is used to round $y_j/k_\mathrm{eff}$ to the lower integer with probability $y_j/k_\mathrm{eff} - \mathrm{floor}(y_j/k_\mathrm{eff})$.  Since yields range from 2-5 neutrons, there will be many individual instances of each yield, and yields will approach the mean $y_j/k_\mathrm{eff}$.
+Since WARP handless all neutrons with equal weight, yields must be integers, but $y_j/k_\mathrm{eff}$ rarely will be.  Stochastic rounding is used to round $y_j/k_\mathrm{eff}$ to the lower integer with probability $y_j/k_\mathrm{eff} - \mathrm{floor}(y_j/k_\mathrm{eff})$.  Since yields range from 2-5 neutrons, there will be many individual instances of each yield, and yields will approach the mean $y_j/k_\mathrm{eff}$.
 
 Once the yield vector is rebased by dividing by $k_\mathrm{eff}$ and stochastically rounding to a nearest integer, a prefix sum is done on the yield vector.  The $j^{\text{th}}$ value of an exclusive prefix sum, or exclusive scan as CUDPP calls it, is sum of the array values before index $j$ as shown in \eqref{prefix_sum}.  Such a vector can be used in the pop kernel, which writes the secondary particle data into the next batch's initial data based on the yield vector.
 
