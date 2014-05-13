@@ -1,11 +1,11 @@
 \chapter{Supplementary Results}
 \label{app:A}
 
-This appendix includes results that were redundant or not directly relevent to the discussions in the chapters.  They are provided here as supplementary and complimentary information.
+This appendix includes results that were redundant or not directly relevant to the discussions in the chapters.  They are provided here as supplementary and complimentary information.
 
 \section{2D Scattering on an NVIDIA Tesla C2075}
 
-Figure \ref{prelim_speedup_old} shows the speedup factors, $F_s=t_\mathrm{CPU}/t_\mathrm{GPU}$, of the GPU implementations discussed in Section \ref{sec:prelim}.  This benchmark was run on the same server with a 8-core AMD Opteron 6128 CPU clocked at 2.0GHz, but on a Tesla C2075 card.   The task-parallel implementation performs best, with a maximum speedup of around 29x.  The remapping implementation has the next best performance, with about a 20x speedup over the CPU. The batched implementation's performance departs from the remapping implementation at $10^5$ particles and even starts to deteriorate between $10^6$ and $10^7$ particles.  This is due to the transport having to be done in batches at this point due to the maximum block number of 65,536.  
+As was mentioned in Section \ref{sec:prelim}, different results were obtained in the 2D scattering study when the GPU implementations were run on a NVIDIA Tesla C2075 card instead of a Tesla K20.  Figure \ref{prelim_speedup_old} shows the speedup factors, $F_s=t_\mathrm{CPU}/t_\mathrm{GPU}$, of the GPU implementations discussed in Section \ref{sec:prelim}.  This benchmark was run on the same server with a 8-core AMD Opteron 6128 CPU clocked at 2.0GHz, but on a Tesla C2075 card.   The task-parallel implementation performs best, with a maximum speedup of around 29x.  The remapping implementation has the next best performance, with about a 20x speedup over the CPU. The batched implementation's performance departs from the remapping implementation at $10^5$ particles and even starts to deteriorate between $10^6$ and $10^7$ particles.  This is due to the transport having to be done in batches at this point due to the maximum block number of 65,536.  
 
 \begin{figure}[h!] 
   \centering
@@ -20,6 +20,8 @@ In Kepler, the L1 is reserved for register spills and local data access.  ``L1 c
 The remapping version performs better than the non-remapping version for the very same reasons the remming version of WARP performs better than the non-remapping version.  Remapping creates more efficient, if non-coalesced, data access.  Since the amount of data required per neutron is greater in WARP than that of the particles in this preliminary study, the L1 cache would most likely be overflown anyway, and the remapping algorithm would be the best performing on Fermi as well as Kepler architectures.
 
 \section{Serpent Fission Source Distributions}
+
+Included here are the fission source distributions of the criticality benchmarks produced by Serpent.  
 
 \begin{figure}[h!] 
   \centering
