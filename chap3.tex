@@ -77,7 +77,7 @@ Figure \ref{prelim_speedup_01} shows the speedup factors, $F_s=t_\mathrm{CPU}/t_
 
 The batched approach sees a visible performance decrease at around $10^7$ particles, the point where transport has to be broken into two batches ($128\times65,536=8,388,608$ threads in a single kernel launch possible).  The finite address space affects the batched implementation with 512 threads per block at larger dataset sizes, specifically %? later when?  ok rephrased
  at $512\times65,536=33,554,432$ particles. 
- A similar test was done with a Tesla C2075 (Fermi) card where this performance hit is more accentuated.  The results of the test and speculation as to why it exhibits different behavior compared to the K20 is %how/why?  IT IS IN THE APPENDIX!
+ A similar test was done with a Tesla C2075 (Fermi) card where this performance hit is more accentuated.  The results of the test and speculation as to why it exhibits different behavior compared to the K20 is %how/why?  it is in the appendix!
  is shown in Appendix \ref{app:A} .  
  The performance degradation of the batched implementation of the K20 is only slight at $10^7$ particles.   The task-based implementation also needs to break transport into two batches at the same boundaries as the batched implementation, but is seemingly unaffected by it.  The effect is likely unnoticeable since it only implies a second kernel launch in the task-based implementation instead of the hundreds more in the batched.
 
@@ -138,6 +138,12 @@ From this preliminary, 2D, mono-energetic scattering study it can be concluded t
 
 Another preliminary study was preformed in order to determine the performance of OptiX when ray tracing from randomized points as well as to find the optimal OptiX configuration for WARP.  In rendering, rays are initialized in a uniform array, but the flexibility from writing a custom ray-generation program in OptiX allows for arbitrary starting points and directions to be used.  The ray tracing in WARP will be done in a batched way, i.e.\ the traces will be done for all neutrons at the same time.
 
+There are two types of scaling in OptiX that need to be characterized in order to ensure optimal performance -- scaling with regard to the number of concurrent rays traced and scaling with regard to the number of geometrical objects in the scene.  Determining how OptiX scales with the number of concurrent rays is important in knowing how large neutron batches need to be in WARP for the geometry routines to execute efficiently.  Nuclear reactor simulations can contain thousands of material zones, and knowing how OptiX scales with the number of geometrical objects is important for choosing a configuration that will allow WARP to perform well neutron transport in complex geometries.  In all of the tests, a cell query was done from a uniformly random and isotropic distribution of source points in addition to finding the closest intersection point.
+
+The first scaling study focuses on scaling with regard to the number of concurrent rays. Three different geometries were used in the test -- an assembly-like hexagonal array of cylinders, an assembly of the same size but with two interleaved arrays, and a much larger version of the assembly-like geometry.  The assembly-like configuration has 631 instances of a single primitive type, the interleaved array has 381 instances of three different primitives types, and the large array consists of 1801 instances of a single primitive type.  These cases were chosen to determine if there are any large differences in the scaling when the number of objects as well as the number of geometrical object types are increased.
+
+The second scaling study focuses on how OptiX scales with regard to the number of geometrical objects in the scene using two different primitive instancing methods.  The geometry used is a hexagonal lattice of cylinders, identical to the assembly-like geometry of the first scaling study.  The volume, pitch to diameter ratio, and aspect ratios of the lattice was kept constant, but the cylinder radii were halved while doubling the number of elements on an edge.  The smallest scene only has a single primitive in it, and the most complex has 42,843 primitives in it.  
+
 \subsubsection{Point-in-Polygon / Material Query}
 
 \begin{figure}[h!] 
@@ -152,7 +158,7 @@ The material query algorithm is shown in Figure \ref{whereami}.  An ordered list
 
 An issue with ray tracing is that mathematical cell descriptions are exact, but the numbers representing them are not. If these numbers are treated as exact, a situation can occur where a neutron is placed at a boundary but is actually slightly behind the boundary because of floating-point roundoff.  When the next trace is started, the ray intersects the boundary it has already intersected with instead of tracing into the next cell.  This situation can be prevented by using the scene epsilon, which determines the minimum intersection distance possible, i.e.\ the distance away from the source point at which intersections are allowed to occur.  Giving OptiX a scene epsilon helps to guarantee that a trace starts after the very near boundary, and accurate results are calculated.  It is important to make the scene epsilon an appropriate value for the geometry if this algorithm is to be used effectively. 
 
-Another problem that can occur that is due to the scene epsilon is an inaccurate material query.  This can occur when intersecting the very corner of a box, for example. If the thickness of the object is less than the scene epsilon, the material query algorithm may only count a single intersection of the distant object and think the material into which a particle may be traveling is the distant box's material instead of the correct material.  In many cases this can be avoided by performing the surface intersection in the neutron direction and then performing the material query in the $z$-direction only.  Currently, the objects in WARP are all $z$-aligned and corner cases like this will not happen if the material query is done in the $z$-direction only because the ray will only encounter planes perpendicular to it.  %why is that? is that a rule, or just reactor models?  Neither, its just how warp is right now.
+Another problem that can occur that is due to the scene epsilon is an inaccurate material query.  This can occur when intersecting the very corner of a box, for example. If the thickness of the object is less than the scene epsilon, the material query algorithm may only count a single intersection of the distant object and think the material into which a particle may be traveling is the distant box's material instead of the correct material.  In many cases this can be avoided by performing the surface intersection in the neutron direction and then performing the material query in the $z$-direction only.  Currently, the objects in WARP are all various kinds of $z$-aligned prisms (or spheres) and corner cases like this will not happen if the material query is done in the $z$-direction only because the ray will only encounter planes perpendicular to it.  %why is that? is that a rule, or just reactor models?  Neither, its just how warp is right now.
 
 The last problem that can result from this algorithm happens when cells have coincident surfaces.  In this case, which cell is actually intersected is undefined and the next trace iteration will skip the intersection of the coincident cell since it will be smaller than the scene epsilon value.  A way to avoid this would be to ensure the desired coincident surfaces are more than a scene epsilon away from each other.  In some cases, the neutron mean free path is larger than the introduced gap, and this approximation will not change the results, but it could introduce errors cases where the mean free path is smaller than the gap (e.g. in cells next to strong absorbers) % really?  I guess maybe not... will say so.
  Doing this by hand would be tedious, however, so an automatic way of doing this may be an area of future development in WARP.
@@ -188,12 +194,11 @@ An alternative instancing method is using mesh-based primitives.  In this scheme
 
 This method produces a shallower node graph with only two acceleration objects and a single GeometryGroup for \emph{all boxes}.  These numbers would not change if there more boxes in the scene, only the number of data elements on the bottom of the graph would change.  This is called mesh instancing since the data structure was envisioned for the many triangular surfaces in meshes of complex objects rather than for individual instancing of separate, simple objects.
 
-One goal of this study is to determine which of these instancing methods has better performance and will ultimately be used in WARP.
+%One goal of this study is to determine which of these instancing methods has better performance and will ultimately be used in WARP.
 
 \subsubsection{Test Geometries}
 
-Three different geometries were used in the test--an assembly-like hexagonal array of cylinders, an assembly of the same size but with two interleaved arrays, and a much larger version of the assembly-like geometry. These cases were chosen to highlight the scaling% of what?
- and to see the performance of the instancing schemes in common-nuclear-reactor-like scenarios.  Figure \ref{raster_images} shows the geometry for the interleaved assembly and the large assembly.  These figures were created by OptiX by performing a cell number query as prescribed in the previous section.  The interleaved assembly consists of three hexagonal arrays, two cylinders, and one hexagonal prism.  The arrays are seven elements on a side, which corresponds to 127 elements each for a total of 383 elements (including the large hex cell around the arrays and the outer box cell).  The large assembly has 25 cylinders on a side, for a total of 1803 elements.  The smaller assembly is 15 cylinders on a side, for a total of 633 elements.
+Figure \ref{raster_images} shows the geometry for the interleaved assembly and the large assembly.  These figures were created by OptiX by performing a cell number query as prescribed in the previous section.  The interleaved assembly consists of three hexagonal arrays, two cylinders, and one hexagonal prism.  The arrays are seven elements on a side, which corresponds to 127 elements each for a total of 383 elements (including the large hex cell around the arrays and the outer box cell).  The large assembly has 25 cylinders on a side, for a total of 1803 elements.  The smaller assembly is 15 cylinders on a side, for a total of 633 elements.
 
 \begin{figure}[h!]
 \centering
@@ -217,9 +222,13 @@ The cell numbers are mapped to colors in Figure \ref{raster_images}. The images 
 
 \subsubsection{Results}
 
+%%%%%%%%%%
+%    first study
+%%%%%%%%%%
+
 Figure \ref{prelim_optix_k20} shows the ray trace rates for running these geometries on an NVIDIA Tesla K20 card.  There are cases for each geometry (assembly, large, and interleaved), whether the trace uses primitive or transform instancing (prim or xfrm), and whether it uses a split bounding volume hierarchy or regular bounding volume hierarchy (SBVH or BVH).  These traces all employed the cell number query PIP algorithm in addition to finding the nearest intersection point. %, so these rates are representative of the actual rates in a Monte Carlo Simulation where not only the first intersection must be found.  % what does this mean?  not much, leaving out.
 The source point distribution in all cases is uniformly random over all space and isotropically random in angle.  % After noticing on this plot, it would be nice to have the actual data points on all of the plots instead of lines only. This helps show where there's real data and where it's just a line between data points. It's okay if it's too much of a pain to change this at this point.   Done.
-K-d trees are not used since they require a mesh vertex buffer be provided by the user, which implies that they only work for triangularly-meshed objects, not ones instanced by simple geometric primitives like spheres and cubes.  Handling geometries that are meshed in such a way may be a future area of development in WARP.% seems like this should go here, unless it doesn't apply to all tests?
+K-d trees are not used since they require a mesh vertex buffer be provided by the user, which implies that they only work for triangularly-meshed objects, not ones instanced by simple geometric primitives like spheres and cubes.  Handling geometries that are meshed in such a way may be a future area of development in WARP.% seems like this should go here, unless it doesn't apply to all tests?  yeah I agree, thanks!
 
 The trace rates are fairly constant after $10^6$ particles, but primitive instancing is always faster than transform instancing,% you don't show us that data?
  and using BVH acceleration is always faster than SBVH.  The only time this isn't the case is for the interleaved assembly, where transform instancing performs slightly better than primitive instancing.  The interleaved assembly is also the geometry with the fewest objects.  
@@ -228,9 +237,13 @@ The trace rates are fairly constant after $10^6$ particles, but primitive instan
   \centering
     \includegraphics[width=0.8\textwidth]{graphics/prelim_optix_k20.eps}
      \caption{Trace rates of an NVIDIA Tesla K20 performing cell queries with the PIP algorithm. `\label{prelim_optix_k20} }
-\end{figure}% all your labels say prim...?
+\end{figure}% all your labels say prim...?  ADDED XFRM.
 
-Another study was done to show the scaling of the two instancing types.  In these traces, a cell query was again done from a uniformly random and isotropic distribution of source points.  The number of source points was set to $8\times10^7$ for every trace in order to ensure being on the trace rate plateau shown in in Figure \ref{prelim_optix_k20}.  A BVH acceleration structure was used since it showed the best performance.  The geometry used was another hexagonal lattice of cylinders, identical to the assembly and large assemblies test geometries, except with more elements.  The volume, pitch to diameter ratio, and aspect ratios of the large cells were kept constant, but the cylinder radii were halved while doubling the number of elements on an edge.  The smallest scene only had a single primitive in it, and the most complex had 42,843 primitives in it.  
+%%%%%%%%%%
+%    second study
+%%%%%%%%%%
+
+The number of source points was set to $8\times10^7$ for every trace in order to ensure being on the trace rate plateau shown in in Figure \ref{prelim_optix_k20}.  A BVH acceleration structure was used since it showed the best performance.
 % I think you need to explain this better. It is totally unclear how you're doing the scaling study. Please explain the geometry and refer to the figure (which I moved)
 
 \begin{figure}[h!] 
@@ -242,7 +255,7 @@ Another study was done to show the scaling of the two instancing types.  In thes
 Figure \ref{prelim_optix_scaling} shows the results of the scaling test. It can be seen that the ray trace rates for both primitive and transform instancing plateau after about $10^3$ objects in the scene. % It sort of plateaus after 20 or 30 doesn't it? 
  Primitive instancing still outperforms transform instancing, especially at very large numbers of objects.% it looks like they stay about the same amount apart and get closer towards the end. 
    It should be noted that the trace rates for the two dataset sizes start quite far apart for one object then converge to equal performance at large object numbers where the trace becomes more dependent on acceleration traversal rather than output buffer access (where smaller size makes a difference when there are few objects). %They're not that different - and they come together pretty quickly.
-  Traces were also done in a cell containing no objects, and rates were on the order of ten times faster, which is apparent in the scaling figure.%?
+  %Traces were also done in a cell containing no objects, and rates were on the order of ten times faster, which is apparent in the scaling figure.%?
 
 \begin{figure}[h!] 
   \centering
