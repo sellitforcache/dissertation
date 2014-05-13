@@ -33,10 +33,11 @@ If an entire overhaul of the WARP transport algorithm is feasible, using a SM-ba
 
 Data access patterns are very important on the GPU and there are a few straight forward modifications that could be made to WARP in the future.  The first is using Legendre expansion data for the angular dependencies of anisotropic scattering instead of using tabular data.  This method uses more computation and less data than tabular distributions, and would probably perform well on the GPU.  Since global memory comes at a premium on GPUs, an on-the-fly temperature treatment for nuclides will most likely be required if more than a handful os isotopes are desired at more than on temperature.  Methods like those used in Serpent could be adapted for use on the GPU \cite{serpent}.  On-the-fly methods reduce the amount of storage needed, but they require more computation per data element loaded since the loaded value is adjusted according to the temperature of the material.  This kind of method may work well on the GPU since GPUs have a larger FLOP/byte ratio than CPUs and the additional work may cost little.  Other than the how to represent and adjust the data, an efficient way to handle situations where there are many different material and isotopes present needs to be explored.  The work done by Scudiero on porting OpenMC's macroscopic cross section processing benchmarking tool ``xsbench'' may be elucidating in this endeavor \cite{openmc,scudiero}.
 
+%ADD:  neutron importance (cutoffs in subcritical mult), variance reduction tech, multiple tallies and reaction rates, BU
+WARP would gain usability if more features were incorporated as well.  
+
+
 Releasing WARP as open source software is in progress and is pending University approval.  OpenMC has opened the door for open source neutron transport codes, and hopefully WARP will follow in its footsteps.  Releasing the source openly has obvious benefits of providing potential users with a convenient and transparent way of obtaining the software, as well as allowing for valuable contributions from the community.  
-
-
-%ADD:  neutron impoartance (cutoffs in subcritical mult), variance reduciton tech, multple tallies and reaction rates, BU
 
 
 
