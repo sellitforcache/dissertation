@@ -187,13 +187,13 @@ Three different geometries were used in the test--an assembly-like hexagonal arr
   \caption{The interleaved assembly}
   \label{fig:sub1}
 \end{subfigure}%
-\begin{subfigure}{.5\textwidth}x`
+\begin{subfigure}{.5\textwidth}x
   \centering
   \includegraphics[width=.9\linewidth]{graphics/prelim/large_assembly.png}
   \caption{The large assembly}
   \label{fig:sub2}
 \end{subfigure}
-\caption$x$-$y$ cross sections of the geometry created by using the PIP cell/material query algorithm \label{raster_images}}
+\caption{$x$-$y$ cross sections of the geometry created by using the PIP cell/material query algorithm \label{raster_images}}
 \label{fig:test}
 \end{figure}
 
@@ -425,7 +425,7 @@ Using a LCRNG keeps global access down and improves performance greatly, since a
 
 The macroscopic kernel in WARP computes all values related to macroscopic cross sections.  These include total macroscopic cross section for the material, interaction distance, which isotope the neutron interacts with, moving the neutron to the nearer of the interaction/intersection distance, and setting the neutron's reaction number to the resample flag if the intersection is closer.  
 
-Since the isotopes' total cross sections are stored together in the unionized cross section matrix, the total macroscopic cross section can scan the contiguous row of this part of the matrix, interpolating the value between $i$ and $i+1$, which was found by the grid search kernel.  The interpolated values are multiplied by the atom density vector (in atoms/barn-cm) and the sum is accumulated as shown in \eqref{macro_vector}, where $M_k$ is the number density and \Sigma_{t,k}(E) is the macroscopic cross section of isotope $k$.  When the material vector has been completely scanned and total cross section is computed, the array is scanned again, but this time a random number is used to determined which isotope the neutron interacts with via \eqref{isotope_selection}.
+Since the isotopes' total cross sections are stored together in the unionized cross section matrix, the total macroscopic cross section can scan the contiguous row of this part of the matrix, interpolating the value between $i$ and $i+1$, which was found by the grid search kernel.  The interpolated values are multiplied by the atom density vector (in atoms/barn-cm) and the sum is accumulated as shown in \eqref{macro_vector}, where $M_k$ is the number density and $\Sigma_{t,k}(E)$ is the macroscopic cross section of isotope $k$.  When the material vector has been completely scanned and total cross section is computed, the array is scanned again, but this time a random number is used to determined which isotope the neutron interacts with via \eqref{isotope_selection}.
 
 \begin{equation}
 \Sigma_t(E) = \sum_{k=0}^{N_\mathrm{isotopes}} M_k \: \Sigma_{t,k}(E)
