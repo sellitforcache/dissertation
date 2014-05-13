@@ -254,14 +254,12 @@ The trace rates are fairly constant after $10^6$ particles, but primitive instan
 %    second study
 %%%%%%%%%%
 
-Teh seconda 
-The number of source points was set to $8\times10^7$ for every trace in order to ensure being on the trace rate plateau shown in in Figure \ref{prelim_optix_k20}.  A BVH acceleration structure was used since it showed the best performance.
-
-Figure \ref{prelim_optix_scaling} shows the results of the scaling test. It can be seen that the ray trace rates for both primitive and transform instancing plateau after about $10^3$ objects in the scene. % It sort of plateaus after 20 or 30 doesn't it? 
- Primitive instancing still outperforms transform instancing, especially at very large numbers of objects.% it looks like they stay about the same amount apart and get closer towards the end. 
-   It should be noted that the trace rates for the two dataset sizes start quite far apart for one object then converge to equal performance at large object numbers where the trace becomes more dependent on acceleration traversal rather than output buffer access (where smaller size makes a difference when there are few objects). %They're not that different - and they come together pretty quickly.
-  %Traces were also done in a cell containing no objects, and rates were on the order of ten times faster, which is apparent in the scaling figure.%?
-
+The number of source points used in the second scaling study was set to $10^6$ and $10^8$ to see if the trace rate scales with object number differently if done on the extreme edges of the trace rate plateau shown in Figure \ref{prelim_optix_k20}.  A BVH acceleration structure was used since it showed the best performance.  Figure \ref{prelim_optix_scaling} shows the results of the scaling test on an NVIDIA K20 card.  It can be seen that the ray trace rates for both primitive and transform instancing plateau after about 20 objects in the scene.  Primitive instancing also always outperforms transform instancing.  It should be noted that the trace rates for the two dataset sizes start quite far apart for one object then converge to equal performance qucikly as more objects are included in the scene.  This may be because the trace becomes more dependent on acceleration traversal rather than output buffer access (where smaller size makes a difference when there are few objects). 
+%They're not that different - and they come together pretty quickly.
+%Traces were also done in a cell containing no objects, and rates were on the order of ten times faster, which is apparent in the scaling figure.%? extra information
+ % It sort of plateaus after 20 or 30 doesn't it?  yup... hahah
+ %especially at very large numbers of objects.% it looks like they stay about the same amount apart and get closer towards the end. 
+ 
 \begin{figure}[h!] 
   \centering
     \includegraphics[width=0.8\textwidth]{graphics/prelim_optix_scaling.eps}
@@ -269,10 +267,9 @@ Figure \ref{prelim_optix_scaling} shows the results of the scaling test. It can 
 \end{figure}
 %What do the 10^6 and 10^8 mean? You don't need to label them all as BVH since they all are.
 
-Using transform instancing did not work for cell numbers between 2613 and 10,623 cells for the $10^8$ dataset size because this requires too much memory so the tracking process cannot execute % you may want to explain this more clearly. 
-This is why the transform instancing trace stops at 2613 cells in Figure \ref{prelim_optix_scaling}.  This is also likely the reason why performance of the transform instancing method drops at the same point for the $10^6$ set of rays.  This is the point where OptiX started paging GPU memory to the host memory, and this cost degraded performance significantly.  Structure construction for transform instancing prior to the trace also became very slow compared to primitive instancing, presumably due to the independent acceleration objects attached to every instance and the overhead of computing all the affine transformations at acceleration structure build time.
+Using transform instancing fails for the $10^8$ dataset size when somewhere between 2613 and 10,623 objects were included in the scene.  This is why the transform instancing trace stops at 2613 cells in Figure \ref{prelim_optix_scaling}.  The most likely reason is because this instancing method requires a large amount of memory, and the card runs out of memory when a large particle dataset is also present on the card.  This is also most likely why performance of the transform instancing method drops at the same point for the $10^6$ dataset size.  At this point, OptiX started paging GPU memory to the host memory, and this cost degraded performance significantly.  Structure construction for transform instancing prior to the trace also became very slow compared to primitive instancing, presumably due to the independent acceleration objects attached to every instance and the overhead of computing all the affine transformations at acceleration structure build time.
 
-Traces were also done where the direction of every particle was in the negative $z$ direction, since this is the direction with the fewest number of surfaces between the source particles and the boundary cell.  Performance was increased marginally, but this can only be taken advantage of in geometries where there is a direction of least heterogeneity (like 2D lattices).% why would you do this exactly? I don't understand...
+%Traces were also done where the direction of every particle was in the negative $z$ direction, since this is the direction with the fewest number of surfaces between the source particles and the boundary cell.  Performance was increased marginally, but this can only be taken advantage of in geometries where there is a direction of least heterogeneity (like 2D lattices).% why would you do this exactly? I don't understand...
 
 Figure \ref{prelim_optix_G650M} shows the trace rate versus dataset size test, but run on an NVIDIA GeForce GT 650M instead of a Tesla K20, the discrete graphics card in a MacBook Pro, Mid-2012 Retina model.  The same trends can be observed except that overall trace rate is much slower, which is not surprising,% why not?
  and the impact of transform instancing is very pronounced in runs with fewer particles.  This study was done to compare the performance of a smaller non-compute card compared to a larger compute card.
@@ -283,7 +280,7 @@ Figure \ref{prelim_optix_G650M} shows the trace rate versus dataset size test, b
      \caption{Trace rates of an NVIDIA GeForce GT 650M performing cell queries with the PIP algorithm. \label{prelim_optix_G650M} }
 \end{figure}% is there a way to keep the legend from covering the data?   This is the best I can do...
 
-From the OptiX geometry study it can be concluded that this library can be used to handle the geometry representation in a Monte Carlo neutron transport code.  Using a primitive-based geometry instancing method, a BVH acceleration structure, and running as many parallel rays as possible provides the best performance.  OptiX also seems to be insensitive to the number of objects in a scene after about ten primitives.
+From the scaling studies it can be concluded that OptiX can be used to handle the geometry representation in a Monte Carlo neutron transport code.  Using a primitive-based geometry instancing method, a BVH acceleration structure, and running as many parallel rays as possible provides the best performance.  OptiX also seems to be insensitive to the number of objects in a scene after about ten primitives.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
