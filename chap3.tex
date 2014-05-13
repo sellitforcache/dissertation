@@ -217,8 +217,8 @@ The cell numbers are mapped to colors in Figure \ref{raster_images}. The images 
 
 \subsubsection{Results}
 
-Figure \ref{prelim_optix_k20} shows the ray trace rates for running these geometries on an NVIDIA Tesla K20 card.  There are cases for each geometry (assembly, large, and interleaved), whether the trace uses primitive or transform instancing (prim or xfrm), and whether it uses a split bounding volume hierarchy or regular bounding volume hierarchy (SBVH or BVH).  These traces all employed the cell number query PIP algorithm%, so these rates are representative of the actual rates in a Monte Carlo Simulation where not only the first intersection must be found.  % what does this mean?
-The source point distribution in all cases is uniformly random over all space and isotropically random in angle.  % After noticing on this plot, it would be nice to have the actual data points on all of the plots instead of lines only. This helps show where there's real data and where it's just a line between data points. It's okay if it's too much of a pain to change this at this point. 
+Figure \ref{prelim_optix_k20} shows the ray trace rates for running these geometries on an NVIDIA Tesla K20 card.  There are cases for each geometry (assembly, large, and interleaved), whether the trace uses primitive or transform instancing (prim or xfrm), and whether it uses a split bounding volume hierarchy or regular bounding volume hierarchy (SBVH or BVH).  These traces all employed the cell number query PIP algorithm in addition to finding the nearest intersection point. %, so these rates are representative of the actual rates in a Monte Carlo Simulation where not only the first intersection must be found.  % what does this mean?  not much, leaving out.
+The source point distribution in all cases is uniformly random over all space and isotropically random in angle.  % After noticing on this plot, it would be nice to have the actual data points on all of the plots instead of lines only. This helps show where there's real data and where it's just a line between data points. It's okay if it's too much of a pain to change this at this point.   Done.
 K-d trees are not used since they require a mesh vertex buffer be provided by the user, which implies that they only work for triangularly-meshed objects, not ones instanced by simple geometric primitives like spheres and cubes.  Handling geometries that are meshed in such a way may be a future area of development in WARP.% seems like this should go here, unless it doesn't apply to all tests?
 
 The trace rates are fairly constant after $10^6$ particles, but primitive instancing is always faster than transform instancing,% you don't show us that data?
@@ -227,7 +227,7 @@ The trace rates are fairly constant after $10^6$ particles, but primitive instan
 \begin{figure}[h!] 
   \centering
     \includegraphics[width=0.8\textwidth]{graphics/prelim_optix_k20.eps}
-     \caption{Trace rates of an NVIDIA Tesla K20 performing cell queries with the PIP algorithm. \label{prelim_optix_k20} }
+     \caption{Trace rates of an NVIDIA Tesla K20 performing cell queries with the PIP algorithm. `\label{prelim_optix_k20} }
 \end{figure}% all your labels say prim...?
 
 Another study was done to show the scaling of the two instancing types.  In these traces, a cell query was again done from a uniformly random and isotropic distribution of source points.  The number of source points was set to $8\times10^7$ for every trace in order to ensure being on the trace rate plateau shown in in Figure \ref{prelim_optix_k20}.  A BVH acceleration structure was used since it showed the best performance.  The geometry used was another hexagonal lattice of cylinders, identical to the assembly and large assemblies test geometries, except with more elements.  The volume, pitch to diameter ratio, and aspect ratios of the large cells were kept constant, but the cylinder radii were halved while doubling the number of elements on an edge.  The smallest scene only had a single primitive in it, and the most complex had 42,843 primitives in it.  
@@ -263,7 +263,7 @@ Figure \ref{prelim_optix_G650M} shows the trace rate versus dataset size test, b
   \centering
     \includegraphics[width=0.8\textwidth]{graphics/prelim_optix_G650M.eps}
      \caption{Trace rates of an NVIDIA GeForce GT 650M performing cell queries with the PIP algorithm. \label{prelim_optix_G650M} }
-\end{figure}% is there a way to keep the legend from covering the data?
+\end{figure}% is there a way to keep the legend from covering the data?   This is the best I can do...
 
 From the OptiX geometry study it can be concluded that this library can be used to handle the geometry representation in a Monte Carlo neutron transport code.  Using a primitive-based geometry instancing method, a BVH acceleration structure, and running as many parallel rays as possible provides the best performance.  OptiX also seems to be insensitive to the number of objects in a scene after about ten primitives.
 
