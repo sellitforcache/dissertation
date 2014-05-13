@@ -297,38 +297,41 @@ The host-side code in WARP is written in C/C++ with some Python (which will be e
 
 \section{Data Layout}
 
-As described in Chapter \ref{chap:background}, the nuclear data required in Monte Carlo simulations are very heterogeneous.  This section describes the methods used to deal with the data heterogeneity and how data access in WARP has been optimized for the GPU.
-
-%Since most data will be accessed randomly in all cases, the data layout will be regularized as much as possible and the particles will be sorted by reaction, sweeping out completed particles and grouping similarly-interacting particles together to maximize warp coherence and occupancy. 
-% It seems like laying out the data is trying to fight random access, not that you're making that choice because of random access?
- %Since histories complete randomly, history data access will become sparse even if sweeping out is not done. % so why do it?
- %In any case, the radix sort%what's that?
- %will preserve monotonically increasing thread IDs within a reaction group, so its impact on data access should be small, and the only cost be that of performing the operation.
- % Ok, I'm just confused but what you're trying to say in this paragraph. 
+As described in Chapter \ref{chap:background}, the nuclear data required in Monte Carlo simulations are very heterogeneous and the way the data is accessed in a Monte Carlo simulation is random.  This section describes the methods used to deal with the data heterogeneity and how data access in WARP has been optimized for the GPU.
 
 \subsection{Unionized Cross Sections}
 
+% Maybe we need to know how you're computing cross sections for this to be clear. Perhaps note that you'll discuss the impact of this tradeoff later and move this discussion to cross section calculation?  yeah I think so, I'll start with it...
+
 It is particularly troublesome that each cross section has its own independent energy grid.  Using point-wise data for continuous energy simulations requires an interpolation be performed between points, and to do this, the code must somehow scan the energy grid array to find the points between which the neutron's energy falls.  If every isotope has its own grid, this search must be done for every isotope, and can become very expensive.  This is why a unionized energy grid structure, like that implemented in Serpent, is used in WARP \cite{jaakko_xs}.
 
-Unionizing the cross sections simply means that the energy grids of the cross sections are all unionized into a single, larger structure that every isotope can use, i.e.\ many 1D vectors are transformed into a single 2D matrix indexed by incoming energy and MT reaction number. %I'm assuming this is material number, can't remember if you told us, sorry!
- Figure \ref{unionized_layout} shows the unionization process with two small, arbitrary energy grids and their corresponding cross section vectors.  
+Unionizing the cross sections means that the energy grids of the cross sections are all unionized into a single, larger structure that contains the energy points of every isotope.  Including every energy point ensures that no information is lost in the unionizing process.  Since the unionized grid is then used to index every isotope's cross section vectors, there are energy points which do not correspond to values in the original nuclear data.  These holes in the data are filled by linear interpolating between the closest two grid points that have values.  The unionization process transforms  many 1D reaction cross section vectors into a single 2D matrix indexed by incoming energy and MT reaction number.  Figure \ref{unionized_layout} shows the unionization process with two small, arbitrary energy grids and their corresponding cross section vectors.  The colors in the unionized energy grid represent which isotope the grid value came from, the green cross section data blocks are interpolated values, and the red blocks are placeholder zeros to preserve thresholds. It is clear that the resulting dataset is larger than the sum of the individual cross sections since it contains redundant data, but it will be much easier to search.  
 
-%It would be clearer if tied your explanation to the figure and added a little more detail. I think this is better?
-Unionizing the energy grid makes holes in the data, %tell us why
-which are filled by linear interpolation. The colors in the unionized energy grid represent which isotope the grid value came from, the green cross section data blocks are interpolated values, and the red blocks are placeholder zeros to preserve thresholds. It is clear that the resulting dataset is larger than the sum of the individual cross sections since it contains redundant data, but it will be much easier to search.%how is it redundant? I thought it was just filled in? maybe just unecessary?
-  This tradeoff between regularizing the data in this way as opposed to accessing the energy grids separately is worthwhile because...  
-  
+The interpolated data is redundant in the sense that it contains no new information.  If a cross section was required between two data points of the original grid, linear interpolation would be performed to calculate it.  The filled-in holes of the unionized dataset contains values on a straight line which could be calculated using the original data.
+ The tradeoff between regularizing the data in this way as opposed to accessing the energy grids separately is worthwhile because only a single grid search is needed to find the vector indices a neutron's energy falls in between.
+
+  %It would be clearer if tied your explanation to the figure and added a little more detail. I think this is better?    I added more descriptions, hopefully clearer now.
+ %tell us why holes are made
+ %%how is it redundant? I thought it was just filled in? maybe just unnecessary?   these words mean the same thing in this case.
+ %I'm assuming this is material number, can't remember if you told us, sorry!   Nope, reaction number.  macroscopic cross sections are calculated on the fly
+
 \begin{figure}[h!] 
 \centering
 \includegraphics[width=0.6\textwidth]{graphics/unionized.eps}
 \caption{Unionizing two cross section vectors. \label{unionized_layout} }
 \end{figure}
 
-Because the cross sections unionized in this way the cross section values for every isotope can be read along a single row once the bounding energy indices, $E_i<E<E_{i+1}$, are found for a given interaction.  This format reduces the number of energy searches needed and promotes data locality by keeping all the data points for all isotopes in a given energy range adjacent to one another in memory (if row-major matrix format is used).  On CPUs, the data for an energy value can be read as a cache line and accessed quickly by the cores.  On a GPU, since a thread needs to read the entire energy line (one energy over all isotopes) in sequence in order to compute the macroscopic cross section on-the-fly, the memory loads are not coalesced and memory bandwidth is wasted (adjacent threads do not access adjacent memory at the same time).  % Maybe we need to know how you're computing cross sections for this to be clear. Perhaps note that you'll discuss the impact of this tradeoff later and move this discussion to cross section calculation? 
+Because the cross sections unionized in this way the cross section values for every isotope can be read along a single row once the bounding energy indices, $E_i<E<E_{i+1}$, are found for a given interaction.  This format reduces the number of energy searches needed and promotes data locality by keeping all the data points for all isotopes in a given energy range adjacent to one another in memory (if row-major matrix format is used).  On CPUs, the data for an energy value can be read as a cache line and accessed quickly by the cores.  On a GPU, since a thread needs to read the entire energy line (one energy over all isotopes) in sequence in order to compute the macroscopic cross section on-the-fly, the memory loads are not coalesced and memory bandwidth is wasted (adjacent threads do not access adjacent memory at the same time).   
 
-To mitigate this inefficiency, the data can be recast to use the  \lstinline{float4} datatype, which is a vector type that is 16 bytes long.  When requested, the entire 16 bytes will be loaded in one transaction rather than 4 separate 4-byte transactions, maximizing bandwidth and minimizing the number of global requests (and reducing the impact of latency).  Also, since all of the total cross sections are all needed at one time, %? all for all materials? 
- they are stored together in the first columns of the unionized data array.  After this block of total cross section columns, the individual reaction cross section are stored as blocks in the same material order as the total cross section block (all the cross sections for an isotope are in a single block).% what? I thought you were storing total for all materials, then scattering for all materials, etc. that's opposite from all cross sections for one isotope are in a block. 
-   This is done so the macroscopic or microscopic kernel needs only scan a single, contiguous block of data in the array.
+To mitigate this inefficiency, the data can be recast to use the  \lstinline{float4} datatype, which is a vector type that is 16 bytes long.  When requested, the entire 16 bytes will be loaded in one transaction rather than 4 separate 4-byte transactions, maximizing bandwidth and minimizing the number of global requests (and reducing the impact of latency).  Also, since all of the total cross sections for a material are all needed at the same time, %? all for all materials?  no, but all the macroscopic cross sections for a single material
+ they are stored together in the first columns of the unionized data array.  After this block of total cross section columns, the individual reaction cross section are stored as blocks in the same material order as the total cross section block (all the cross sections for an isotope are in a single block).% what? I thought you were storing total for all materials, then scattering for all materials, etc. that's opposite from all cross sections for one isotope are in a block.   NO.  REACTIONS NOT MATERIALS
+  This is done so the macroscopic or microscopic kernel needs only scan a single, contiguous block of data in the array.  Figure \ref{unionized_layout_overall} shows an illustration of the unionized cross section dataset structure used in WARP.
+   
+\begin{figure}[h!] 
+\centering
+\includegraphics[width=0.9\textwidth]{graphics/unionized_overall.eps}
+\caption{The unionized cross section layout used in WARP. \label{unionized_layout_overall} }
+\end{figure}
 
 \subsection{Distribution Data as a Linked List}
 
@@ -510,6 +513,12 @@ Kernels launched without an explicit stream are launched on the default stream 0
 The array-wide parallel operations in WARP are done with the CUDPP library.  The functions used are reductions for calculating $k_\mathrm{eff}$ via \eqref{k_eff_batch}, prefix sums for calculating the indices for the source pop kernels, and sorts for keeping warps coherent and full after the microscopic kernel.
 
 \subsubsection{Remapping with Radix Sort}
+
+%Since most data will be accessed randomly in all cases, the data layout will be regularized as much as possible and the particles will be sorted by reaction, sweeping out completed particles and grouping similarly-interacting particles together to maximize warp coherence and occupancy. 
+% It seems like laying out the data is trying to fight random access, not that you're making that choice because of random access?
+ %Since histories complete randomly, history data access will become sparse even if sweeping out is not done. % so why do it?
+ %In any case, the radix sort%what's that?
+ %will preserve monotonically increasing thread IDs within a reaction group, so its impact on data access should be small, and the only cost be that of performing the operation.
 
 Since the reaction numbers are integers they can be sorted by very efficient algorithms like a radix sort, which performs in $O(kn)$, where $n$ is the number of values to be sorted and $k$ is the number of significant digits of the values.  The reaction numbers in WARP are four digits or less, so $k=4$.  The reaction number encodings in WARP are shown in Appendix B in Table \ref{WARP_rxn_numbers}.  Since reactions greater than 900 represent a terminated particle, the sort will push all the completed history references to the end of the remapping vector.  
 
