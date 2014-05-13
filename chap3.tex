@@ -508,9 +508,11 @@ The implementation of these methods is where the pointer array becomes useful.  
 
 \subsubsection{Concurrent Kernels}
 
-As mentioned previously, the reaction kernels should never access overlapping data so that they can all be launched concurrently.  NVIDIA cards with a compute capacity of 2.0 and higher support up to 16 concurrent kernel launches.  Kernel launches are submitted to nonzero execution streams by declaring additional streams to be present and passing the stream objects to the kernel launches as an extra launch parameter.  Kernels launched on different streams can be executed concurrently and their blocks can be interleaved, which is why it is very important for them to act on independent data. %tie this more directly to reaction kernels. the first sentence does, but the rest of the paragraph is sort of detached. 
+As mentioned previously, the reaction kernels should never access overlapping data so that they can all be launched concurrently.  NVIDIA cards with a compute capacity of 2.0 and higher support up to 16 concurrent kernel launches.  Kernel launches are submitted to nonzero execution streams by declaring additional streams to be present and passing the stream objects to the kernel launches as an extra launch parameter.  Kernels launched on different streams can be executed concurrently and their blocks can be interleaved, which is why it is very important for them to act on independent data.  Launching the reaction kernels concurrently means they are launched in parallel and they do not need to wait for each other to complete.  If not launched concurrently, kernels must be launched sequentially, and the inelastic scattering kernel would have to wait for the elastic scattering kernel to complete before it could be launched, for instance.
+%tie this more directly to reaction kernels. the first sentence does, but the rest of the paragraph is sort of detached.  Ok, tried.
 
-Kernels launched without an explicit stream are launched on the default stream 0, which are synchronous (program flow does not continue on the host until the launch is complete).  If kernel synchronization is important after execution completes (as it is here, reactions must be carried out before the OptiX trace), the streams must be synchronized with an explicit stream synchronization command or with a synchronous operation like a cudaMemcpy().% when does it need to be synchronous? how does this relate to interaction kernels? what does your 2nd parenthetical statement mean? 
+Kernels launched without an explicit stream are launched on the default stream 0, which are synchronous (program flow does not continue on the host until the launch is complete).  If kernel synchronization is important after execution completes (as it is here, reactions must be carried out before the OptiX trace), the streams must be synchronized with an explicit stream synchronization command or with a synchronous operation like a cudaMemcpy().  If the kernels are not synchronized, control can continue  to the OptiX trace, and launching OptiX before the reaction kernels are done processing could lead to errors, incorrect results, or program crashes.
+% when does it need to be synchronous? how does this relate to interaction kernels? what does your 2nd parenthetical statement mean? I hope this is more clear now too.
 
 \subsubsection{Parallel Operations}
 
@@ -534,11 +536,11 @@ Another benefit pushing all of the completed references to the end of the vector
 \caption{A radix key-value sort creating a remapping vector. \label{radix_sort} }
 \end{figure}
 
-There is one more piece of information that is needed to launch the reaction kernels concurrently--the number of particles undergoing each type of reaction.  This is determined by launching a comparison kernel on the sorted array, which detects the places where the reaction numbers change.  The algorithm to do this is a simple adjacent comparison.  If there are $N$ elements in the array, $N-1$ threads are launched that load values tid and tid+1.  If the values are different, tid is the last index of a reaction type. If a transition is determined to be valid, its thread can write to a small array and no data races should occur because there are coarse boundaries for the reaction kernels and each boundary is unique.  There are only two boundaries for each reaction group, this %what's this?
+There is one more piece of information that is needed to launch the reaction kernels concurrently--the number of particles undergoing each type of reaction.  This is determined by launching a comparison kernel on the sorted array, which detects the places where the reaction numbers change.  The algorithm to do this is a simple adjacent comparison.  If there are $N$ elements in the array, $N-1$ threads are launched that load values tid and tid+1.  If the values are different, tid is the last index of a reaction type. If a transition is determined to be valid, its thread can write to a small array and no data races should occur because there are coarse boundaries for the reaction kernels and each boundary is unique.  There are only two boundaries for each reaction group, and writing the indices of the reaction block edges %what's this?  done.
  can be done without atomic operations since only one thread should ever write to an element.  
  
-The array % of what?
-needs to be read by the host in order to determine the number of blocks that need to be launched for each reaction kernel and where they%who are they?
+The array of reaction block boundaries % of what? done.
+needs to be read by the host in order to determine the number of blocks that need to be launched for each reaction kernel and where the kernels %who are they? done.
  start accessing the remapping vector.  Therefore, it makes sense to have this edge array as mapped memory, where values are implicitly copied from the device.  Declaring the array as mapped allows CUDA to handle when it makes sense for the copy to happen and can potentially hide the communication overhead.  It also makes the code simpler, since explicit copy commands are not needed.  
  
 If a launched thread lies on a boundary, it writes its index into a vector containing 11 elements, the start and end indices for the four reaction kernels (three types of scattering kernels and the fission kernel), and the the resample block.  Terminated neutron data are pushed to the end of the remapping vector and will not be accessed by active blocks, eliminating the need for an explicit absorption kernel (which \emph{is} needed in the non-remapped implementation of WARP).
@@ -548,7 +550,7 @@ The standard MT numbers are not well suited for producing contiguous blocks of r
 Any reaction over 900 signifies a terminated history, so when the cross section data is loaded, any reaction larger than 102 has 1000 added to it to ensure it will be pushed out of the remapping vector upon sorting.  Since fission also terminates particles but needs a yield value sampled after the microscopic kernel samples it to occur, any reactions in the MT=11-45 block have 800 added to their MT numbers.  Therefore, after the sort is performed, the fission-like reactions are already near then end of the remapping vector.  After the fission kernel processes these histories, their reaction number have 100 added to them, making them part of the completed history block.  The reaction numbers for scattering (MT=2, 51-91) are not changed. MT=11-45 not including the fission numbers can usually be treated as continuum scattering (ENDF law 44), but may not be true for all isotopes. With the reactions laid out as such, a contiguous remapping vector can be formed and the total number of active neutrons can be calculated from a single, efficient radix sort operation.  
 
 %Finer-grained reaction kernels may be a future development point of WARP.  
-% okay, but that doesn't fit as the last sentence of the previous paragraph...I'd leave it out unless you want to talk more about what this might mean.
+% okay, but that doesn't fit as the last sentence of the previous paragraph...I'd leave it out unless you want to talk more about what this might mean.  ok, leaving it out.
 
 \subsubsection{Criticality Source}
 
@@ -576,9 +578,13 @@ Needing to store generational information to determine $k_\mathrm{eff}$ and the 
 
 \subsubsection{Fixed Source \& Subcritical Multiplication}
 
-In fixed source mode, the secondary particles can be popped back into the active particle dataset at the end of the inner loop since generational information is not needed and only the system response to the pulse is desired. %what pulse?
+In fixed source mode, the secondary particles can be popped back into the active particle dataset at the end of the inner loop since generational information is not needed and only the total system response to the primary neutrons is desired. %what pulse? rephrased.
  In this mode, the number of source neutrons is given as an input and, memory allowing, a dataset of source neutrons this size is made.  These neutrons and transported, and any secondary-producing reactions are popped back in to the actively transporting dataset.  This is done by performing a compaction operation on the \emph{completed} dataset indices and a prefix sum is done on the yield vector.  
  
 A pop routine is used in a manner similar to a criticality source run, but the threads with a nonzero yield write into the indices where a neutron has been terminated. This is specified by writing into indices $p_j$ to $p_j+y_j$ of the compaction vector instead of $p_j$ to $p_j+y_j$ of the dataset itself.  This reactivates terminated particle data for transporting secondary neutrons.  The terminated neutron data is all replaced by data appropriately sampled for the secondary neutron reaction.  As mentioned previously, it is necessary to be subcritical in fixed source mode, or subsequent generations will grow instead of shrink and the total number of neutrons needing to be transported to calculate the response will diverge.
+
+
+
+
 
 % Some sort of wrap up of this chapter would be nice. A quick summary saying that you selected all these methods so now you can efficiently do all the transport stuff on the GPU. 
