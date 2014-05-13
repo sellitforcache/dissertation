@@ -583,8 +583,16 @@ In fixed source mode, the secondary particles can be popped back into the active
  
 A pop routine is used in a manner similar to a criticality source run, but the threads with a nonzero yield write into the indices where a neutron has been terminated. This is specified by writing into indices $p_j$ to $p_j+y_j$ of the compaction vector instead of $p_j$ to $p_j+y_j$ of the dataset itself.  This reactivates terminated particle data for transporting secondary neutrons.  The terminated neutron data is all replaced by data appropriately sampled for the secondary neutron reaction.  As mentioned previously, it is necessary to be subcritical in fixed source mode, or subsequent generations will grow instead of shrink and the total number of neutrons needing to be transported to calculate the response will diverge.
 
+\subsection*{}
+
+% Some sort of wrap up of this chapter would be nice. A quick summary saying that you selected all these methods so now you can efficiently do all the transport stuff on the GPU.   done-ish?
+
+All the necessary pieces to perform Monte Carlo neutron transport in general 3D geometries using continuous energy cross sections have been outlined.  Algorithms and libraries have been chosen so each step of neutron transport can be preformed efficiently on a GPU.  The next chapter will discuss the consequences of these choices and compare WARP's results and runtimes to those of Serpent and MCNP.
 
 
 
 
-% Some sort of wrap up of this chapter would be nice. A quick summary saying that you selected all these methods so now you can efficiently do all the transport stuff on the GPU. 
+
+
+
+
