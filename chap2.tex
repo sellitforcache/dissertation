@@ -802,7 +802,7 @@ The \emph{direct inversion} method relies on being able to analytically integrat
 \label{CDF}
 CDF(x) = \int_{x_1}^{x_2} PDF(x^\prime) dx^\prime
 \end{equation}
-%define x_1 and x_2
+%define x_1 and x_2, done.
 
 The bounds of integration are $x_1$ and $x_2$, which should span the entire domain of the PDF, i.e. that CDF$(x_2) - $CDF$(x_1) = 1$. Since a PDF must be positive and normalized by definition, the CDF must range from 0 to 1 and increase monotonically.  Setting the CDF equal to a uniformly distributed random number, $\xi$, and solving for the value to be sampled yields the sampling scheme.  
 
@@ -831,7 +831,7 @@ CDF(x_2) - CDF(x_1) = \Delta \xi =  \int_{x_1}^{x_2} PDF(x) dx
 
 When the CDF is not invertible, the \emph{rejection sampling} method can be used.  It uses a secondary PDF, $f(x)$, that is greater at all points in the primary PDF, $g(x)$ to be sampled from and whose CDF is easily inverted.  Since the primary PDF is normalized, $f(x)$ now corresponds to probabilities greater than one.  This is simply a scaling problem, and the random numbers used to directly sample from it must be uniform on $[0,\int_\mathrm{domain}f(x))$ instead of $[0,1)$.   Then, two random numbers are generated.  The first, $\xi_1$ is sampled from a $f(x)$ using a scaled random number as mentioned, and the second, $\xi_2$ is uniformly distributed on $[0,f(\xi_1))$.  If $\xi_2 < g(\xi_1)$, the sampled value $(\xi_1)$, is added to the population, else it is \emph{rejected}, or discarded from the population.  The set of accepted values of ${\xi_2}$ will then follow $g(x)$.  Figure \ref{rejection_samp} shows an illustration of rejection sampling. The red shaded area is the space between the primary and auxiliary PDFs where samples are rejected (red dots), and the blue shaded area is where they are accepted (blue dots).  In this illustration, the main benefit of choosing a line as the auxiliary function instead of a constant is that a line produces less red shaded area and more samples will be accepted.
 %  I think I modified this to be clearer?
-% explain the colors and what this means.
+% explain the colors and what this means.   done.
 
 \begin{figure}[h!] 
   \centering
@@ -840,18 +840,6 @@ When the CDF is not invertible, the \emph{rejection sampling} method can be used
 \end{figure}
 
 Using these two methods of sampling from probability distributions, expressions can be found for every reaction type and transport phenomenon that a neutron undergoes in its random walk through matter.  The specific schemes are described in the following subsections.
-
-\subsubsection{Cross Section Interpolation}
-
-When a Monte Carlo simulation is referred to as ``Continuous Energy,'' it means that the cross sections are evaluated on the fly at the exact energy the neutron is currently at instead of using a fixed value for a range of energies.  The cross section data is finite, however, and only includes data at discrete points in energy.  Therefore, interpolation must be performed between the data points to get values for any specific energy.  This is done by linear interpolation.  This assumes that the cross section is a straight line between the surrounding energy points, $E_i$ and $E_{i+1}$, and the interpolated value is calculated using the slope of the line via \eqref{xs_interp}.
-
- \begin{equation}
-\label{xs_interp}
-\begin{gathered}
-E_i < E < E_{i+1} \\
-\sigma(E) = \frac{E-E_i}{E_{i+1}-E_i}(\sigma(E_{i+1})-\sigma(E_i)) + \sigma(E_i)
-\end{gathered}
-\end{equation}
 
 \subsubsection{Cross Section Interpolation}
 
