@@ -136,13 +136,13 @@ From this preliminary, 2D, mono-energetic scattering study it can be concluded t
 
 \subsection{Ray Tracing with OptiX}
 
-Another preliminary study was preformed in order to determine the performance of OptiX when ray tracing from randomized points as well as to find the optimal OptiX configuration for WARP.  In rendering, rays are initialized in a uniform array, but the flexibility from writing a custom ray-generation program in OptiX allows for arbitrary starting points and directions to be used.  The ray tracing in WARP will be done in a batched way, i.e.\ the traces will be done for all neutrons at the same time.
+Another preliminary study was preformed to investigate how OptiX performs when ray tracing is done from randomized points and to find the optimal OptiX configuration for WARP.  In rendering, rays are initialized in a uniform array, but OptiX also allows for arbitrary starting points and directions to be used.  This flexibility comes from being able to write custom ray-generation programs in OptiX.  OptiX processes rays concurrently, so the ray tracing in WARP will be done in a batched way, i.e.\ the traces will be done for all neutrons in a single step.
 
-There are two types of scaling in OptiX that need to be characterized in order to ensure optimal performance -- scaling with regard to the number of concurrent rays traced and scaling with regard to the number of geometrical objects in the scene.  Determining how OptiX scales with the number of concurrent rays is important in knowing how large neutron batches need to be in WARP for the geometry routines to execute efficiently.  Nuclear reactor simulations can contain thousands of material zones, and knowing how OptiX scales with the number of geometrical objects is important for choosing a configuration that will allow WARP to perform well neutron transport in complex geometries.  In all of the tests, a cell query was done from a uniformly random and isotropic distribution of source points in addition to finding the closest intersection point.
+There are two types of scaling in OptiX that need to be characterized in order to ensure optimal performance -- scaling with regard to the number of concurrent rays traced and scaling with regard to the number of geometrical objects in the scene.  Determining how OptiX scales with the number of concurrent rays is important in knowing how large neutron batches need to be in WARP for the geometry routines to execute efficiently.  Nuclear reactor simulations can contain thousands of material zones, and knowing how OptiX scales with the number of geometrical objects is important for choosing a configuration that will allow WARP to perform well neutron transport in complex geometries.  
 
-The first scaling study focuses on scaling with regard to the number of concurrent rays. Three different geometries were used in the test -- an assembly-like hexagonal array of cylinders, an assembly of the same size but with two interleaved arrays, and a much larger version of the assembly-like geometry.  The assembly-like configuration has 631 instances of a single primitive type, the interleaved array has 381 instances of three different primitives types, and the large array consists of 1801 instances of a single primitive type.  These cases were chosen to determine if there are any large differences in the scaling when the number of objects as well as the number of geometrical object types are increased.
+The first scaling study focuses on scaling with regard to the number of concurrent rays. Three different geometries were used in the test -- an assembly-like hexagonal array of cylinders, an assembly of the same size but with two interleaved arrays, and a much larger version of the assembly-like geometry.  The assembly-like configuration has 631 instances of a single primitive type, the interleaved array has 381 instances of three different primitives types, and the large array consists of 1801 instances of a single primitive type.  These cases were chosen to determine if there are any large differences in the scaling when the number and types of objects are changed.  Each array resides in a large hexagonal prism, which is in turn nested in a large cube that defines the outer limit of the scene.
 
-The second scaling study focuses on how OptiX scales with regard to the number of geometrical objects in the scene using two different primitive instancing methods.  The geometry used is a hexagonal lattice of cylinders, identical to the assembly-like geometry of the first scaling study.  The volume, pitch to diameter ratio, and aspect ratios of the lattice was kept constant, but the cylinder radii were halved while doubling the number of elements on an edge.  The smallest scene only has a single primitive in it, and the most complex has 42,843 primitives in it.  
+The second scaling study focuses on how OptiX scales with regard to the number of geometrical objects in the scene using two different primitive instancing methods.  Instancing refers to how individual geometric objects are created in the OptiX scene.  The geometry used in this study is a hexagonal lattice of cylinders identical to the assembly-like geometry of the first scaling study.  The volume, pitch to diameter ratio, and aspect ratios of the lattice is kept constant, but the cylinder radii are halved while doubling the number of elements on an edge.  The smallest scene only has a single primitive in it, and the most complex has 42,843 primitives in it.  
 
 \subsubsection{Point-in-Polygon / Material Query}
 
@@ -174,13 +174,13 @@ An important consideration in the type of geometrical representation used in WAR
 
 \subsubsection{Instancing}
 
+Nuclear reactors can have very complicated geometries, but many rely on simple shapes that are repeated in arrays.  There are a few ways in which identical cells can be instanced in OptiX.  The first and most convenient is to define a single primitive in its own coordinate system, then use a transform node (shown in Figure \ref{node_graph}) in the OptiX node graph to transform the primitive to its actual position via an affine transformation matrix.  The resulting node graph is shown in Figure \ref{transform_instancing} for a scene that has three boxes in it.  Note, a GeometryInstance object ties a hit program to the spatial geometry data in the geometry primitive object, acceleration objects are attached to all group objects, and transform objects can only have a \emph{single child} that is a Group or GeometryGroup object.  This is why each GeometryInstance must have its own GeometryGroup.
+
 \begin{figure}[h!] 
   \centering
     \includegraphics[width=0.8\textwidth]{graphics/transform_instancing.eps}
      \caption{The OptiX node graph using transform instancing \label{transform_instancing} }
 \end{figure}
-
-Nuclear reactors can have very complicated geometries, but many rely on simple shapes that are repeated in arrays.  There are a few ways in which identical cells can be instanced in OptiX.  The first and most convenient is to define a single primitive in its own coordinate system, then use a transform node (shown in Figure \ref{node_graph}) in the OptiX node graph to transform the primitive to its actual position via an affine transformation matrix.  The resulting node graph is shown in Figure \ref{transform_instancing} for a scene that has three boxes in it.  Note, a GeometryInstance object ties a hit program to the spatial geometry data in the geometry primitive object, acceleration objects are attached to all group objects, and transform objects can only have a \emph{single child} that is a Group or GeometryGroup object.  This is why each GeometryInstance must have its own GeometryGroup.
 
 Transform instancing is convenient since only a single primitive needs to be defined.  If another instance is needed, one can simply apply a transform matrix to it and all the work is done by OptiX.  This scheme has a lot of overhead, however, since each instance has its own group and its own acceleration object, producing a deeper node graph than necessary.
 
@@ -190,7 +190,7 @@ Transform instancing is convenient since only a single primitive needs to be def
      \caption{The OptiX node graph using mesh primitive instancing. \label{primitive_instancing} }
 \end{figure}
 
-An alternative instancing method is using mesh-based primitives.  In this scheme there is still a single geometry primitive, but now the primitive is attached to an array of spatial data (and OptiX buffer) that contains the dimensions of each individual primitive.  The transform node is no longer used since it would transform the whole group instead of a single primitive.   The transforms must be applied to the data beforehand and the results are written into the OptiX buffer as separate primitives.  
+An alternative instancing method uses mesh-based primitives.  In this scheme, there is still a single geometry primitive, but now the primitive is attached to an array of spatial data (and OptiX buffer) that contains the dimensions of each individual primitive.  The transform node is no longer used since it would transform the whole group instead of a single primitive.   The transforms must be applied to the data beforehand and the results are written into the OptiX buffer as separate primitives.  
 
 This method produces a shallower node graph with only two acceleration objects and a single GeometryGroup for \emph{all boxes}.  These numbers would not change if there more boxes in the scene, only the number of data elements on the bottom of the graph would change.  This is called mesh instancing since the data structure was envisioned for the many triangular surfaces in meshes of complex objects rather than for individual instancing of separate, simple objects.
 
@@ -198,7 +198,7 @@ This method produces a shallower node graph with only two acceleration objects a
 
 \subsubsection{Test Geometries}
 
-Figure \ref{raster_images} shows the geometry for the interleaved assembly and the large assembly.  These figures were created by OptiX by performing a cell number query as prescribed in the previous section.  The interleaved assembly consists of three hexagonal arrays, two cylinders, and one hexagonal prism.  The arrays are seven elements on a side, which corresponds to 127 elements each for a total of 383 elements (including the large hex cell around the arrays and the outer box cell).  The large assembly has 25 cylinders on a side, for a total of 1803 elements.  The smaller assembly is 15 cylinders on a side, for a total of 633 elements.
+Figure \ref{raster_images} shows the geometry for the interleaved assembly and the large assembly cases used in the first scaling study.  These figures were created by OptiX by performing a cell number query as prescribed in the previous section.  The interleaved assembly consists of three hexagonal arrays, two cylinders, and one hexagonal prism.  The arrays are seven elements on a side, which corresponds to 127 elements each for a total of 383 elements (including the large hex cell around the arrays and the outer box cell).  The large assembly has 25 cylinders on a side, for a total of 1803 elements.  The smaller assembly is 15 cylinders on a side, for a total of 633 elements.
 
 \begin{figure}[h!]
 \centering
@@ -218,7 +218,15 @@ Figure \ref{raster_images} shows the geometry for the interleaved assembly and t
 \label{fig:test}
 \end{figure}
 
-The cell numbers are mapped to colors in Figure \ref{raster_images}. The images appear correct upon visual inspection and no tracking errors were generated when creating these images, it therefore appears the routine is working and the algorithm can calculate the cell numbers.  A nice feature of OptiX is that variables can be attached to each geometry primitive.  In addition to the cell ID number, the materiel ID is also attached, so the material query can be done directly by OptiX rather than by determining the cell number and then having to do an additional lookup or hash.
+The cell numbers are mapped to colors in Figure \ref{raster_images}. The images appear correct upon visual inspection and no tracking errors were generated when creating these images, it therefore appears the routine is working and the algorithm can calculate the cell numbers.  A helpful feature of OptiX is that variables can be attached to each geometry primitive.  In addition to the cell ID number, the materiel ID is also attached, so the material query can be done directly by OptiX rather than by determining the cell number and then having to do an additional lookup or hash.
+
+\begin{figure}[h!] 
+  \centering
+    \includegraphics[width=1.0\textwidth]{graphics/prelim/prelim_scaling_geom.png}
+     \caption{The geometries used in the scaling study from least number of objects on the left to most on the right. \label{prelim_scaling_geom} }
+\end{figure}
+
+Figure \ref{prelim_scaling_geom} shows the geometries used in the second scaling study.  The hexagonal cell has the same dimensions as the assembly-like geometry case in the first scaling study, but each successive case has smaller and more numerous cylinders in a hexagonal array inside the hexagonal cell.  The most sparse scene only has a single primitive in it, shown on the left side of Figure \ref{prelim_scaling_geom}, and the most complex scene, shown on the right side of the figure, has 42,843 primitives in it.
 
 \subsubsection{Results}
 
@@ -226,31 +234,28 @@ The cell numbers are mapped to colors in Figure \ref{raster_images}. The images 
 %    first study
 %%%%%%%%%%
 
-Figure \ref{prelim_optix_k20} shows the ray trace rates for running these geometries on an NVIDIA Tesla K20 card.  There are cases for each geometry (assembly, large, and interleaved), whether the trace uses primitive or transform instancing (prim or xfrm), and whether it uses a split bounding volume hierarchy or regular bounding volume hierarchy (SBVH or BVH).  These traces all employed the cell number query PIP algorithm in addition to finding the nearest intersection point. %, so these rates are representative of the actual rates in a Monte Carlo Simulation where not only the first intersection must be found.  % what does this mean?  not much, leaving out.
-The source point distribution in all cases is uniformly random over all space and isotropically random in angle.  % After noticing on this plot, it would be nice to have the actual data points on all of the plots instead of lines only. This helps show where there's real data and where it's just a line between data points. It's okay if it's too much of a pain to change this at this point.   Done.
-K-d trees are not used since they require a mesh vertex buffer be provided by the user, which implies that they only work for triangularly-meshed objects, not ones instanced by simple geometric primitives like spheres and cubes.  Handling geometries that are meshed in such a way may be a future area of development in WARP.% seems like this should go here, unless it doesn't apply to all tests?  yeah I agree, thanks!
-
-The trace rates are fairly constant after $10^6$ particles, but primitive instancing is always faster than transform instancing,% you don't show us that data?
- and using BVH acceleration is always faster than SBVH.  The only time this isn't the case is for the interleaved assembly, where transform instancing performs slightly better than primitive instancing.  The interleaved assembly is also the geometry with the fewest objects.  
+Both of the scaling studies were run on an NVIDIA Tesla K20 card.  Cell queries were done with the PIP algorithm from a uniformly random and isotropic distribution of source points in addition to finding the closest intersection point.  Figure \ref{prelim_optix_k20} shows the ray trace rates versus number particle starting points for the three test geometries. There are cases for each geometry (assembly, large, and interleaved), whether the trace uses primitive or transform instancing (prim or xfrm), and whether it uses a split bounding volume hierarchy or regular bounding volume hierarchy (SBVH or BVH).  K-d trees are not used since they require a mesh vertex buffer be provided by the user, which implies that they only work for triangularly-meshed objects, not ones instanced by simple geometric primitives like spheres and cubes.  Handling geometries that are meshed in such a way may be a future area of development in WARP.
 
 \begin{figure}[h!] 
   \centering
     \includegraphics[width=0.8\textwidth]{graphics/prelim_optix_k20.eps}
      \caption{Trace rates of an NVIDIA Tesla K20 performing cell queries with the PIP algorithm. `\label{prelim_optix_k20} }
-\end{figure}% all your labels say prim...?  ADDED XFRM.
+\end{figure}
+
+The trace rates are fairly constant after $10^6$ particles, but primitive instancing is always faster than transform instancing, and using BVH acceleration is always faster than SBVH.  The only time this isn't the case is for the interleaved assembly, where transform instancing performs slightly better than primitive instancing.  The interleaved assembly is also the geometry with the fewest objects.  The final data point at $10^8$ starting points is missing for the transform instancing because the card ran out of memory and these cases would not run.
+
+
+%, so these rates are representative of the actual rates in a Monte Carlo Simulation where not only the first intersection must be found.  % what does this mean?  not a lot, leaving out.
+% After noticing on this plot, it would be nice to have the actual data points on all of the plots instead of lines only. This helps show where there's real data and where it's just a line between data points. It's okay if it's too much of a pain to change this at this point.   Done.
+% seems like this should go here, unless it doesn't apply to all tests?  yeah I agree, thanks!
+% all your labels say prim...?  ADDED XFRM.
 
 %%%%%%%%%%
 %    second study
 %%%%%%%%%%
 
+Teh seconda 
 The number of source points was set to $8\times10^7$ for every trace in order to ensure being on the trace rate plateau shown in in Figure \ref{prelim_optix_k20}.  A BVH acceleration structure was used since it showed the best performance.
-% I think you need to explain this better. It is totally unclear how you're doing the scaling study. Please explain the geometry and refer to the figure (which I moved)
-
-\begin{figure}[h!] 
-  \centering
-    \includegraphics[width=1.0\textwidth]{graphics/prelim/prelim_scaling_geom.png}
-     \caption{The geometries used in the scaling study from least number of objects on the left to most on the right. \label{prelim_scaling_geom} }
-\end{figure}
 
 Figure \ref{prelim_optix_scaling} shows the results of the scaling test. It can be seen that the ray trace rates for both primitive and transform instancing plateau after about $10^3$ objects in the scene. % It sort of plateaus after 20 or 30 doesn't it? 
  Primitive instancing still outperforms transform instancing, especially at very large numbers of objects.% it looks like they stay about the same amount apart and get closer towards the end. 
