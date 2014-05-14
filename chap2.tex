@@ -1558,18 +1558,16 @@ A study lead by Qi Xu from Tsinghua University has investigated adding GPU accel
   
 OpenMC is a ``Monte Carlo particle transport simulation code focused on neutron criticality calculations ... [that] was originally developed by members of the Computational Reactor Physics Group at the Massachusetts Institute of Technology starting in 2011'' \cite{openmc}.  It aims to be an open testing platform for novel Monte Carlo algorithms, has gained U.S. governmental approval to be released as open source software.  It is cited often in the work due it its freely available source code and thorough documentation, and the process of release WARP as open source software will be streamlined by the efforts done in releasing OpenMC.  OpenMC is also being developed by NVIDIA to run on GPUs.  Progress was presented at the 2014 GPU Technology Conference (GTC), but mainly consisted of accelerating xsbench, OpenMC's synthetic cross section processing benchmark tool, and did not mention any developments on OpenMC itself \cite{scudiero,openmc}.  % I think this is the first time you mention this code, so if you're going to talk about it you should tell us something about it.   Yup I should.
 
-WARP aims to be much more general and accurate than all previous codes while employing efficient parallel algorithms in order to have a completely GPU-accelerated code.  WARP reads ACE-formatted data, performs all reaction types as prescribed by them, uses a Serpent-like unionized energy grid to regularize data access, uses an event-based transport algorithm with parallelized operations for sorts and sums, use OptiX for general 3D geometry representation (without explicit nesting), use a SOA for neutron history data, and perform \emph{all} operations on the GPU unless strictly forbidden for some reason (the benefit of which will be discussed later).% you might want to change that to a bulleted list to highlight what is new and useful about your code. A big part of your job is explaining why your work is a new contribution.
-
-To recap its novel features, WARP...
+WARP aims to be much more general and accurate than all previous codes while employing efficient parallel algorithms in order to have a completely GPU-accelerated code.  WARP reads ACE-formatted data, performs all reaction types as prescribed by them, uses a Serpent-like unionized energy grid to regularize data access, uses an event-based transport algorithm with parallelized operations for sorts and sums, use OptiX for general 3D geometry representation (without explicit nesting), use a SOA for neutron history data, and perform \emph{all} operations on the GPU unless strictly forbidden (the benefit of which will be discussed later).  WARP takes these previous works into consideration and advances the state of the art by:
 \begin{itemize}
-  \item Uses an event-based transport algorithm to conduct continuous energy Monte Carlo neutron transport on a GPU
-  \item Uses a vector of neutron references to remap data access on-the-fly, therefore minimizing thread divergence and simultaneously eliminate completed histories
-  \item Uses nuclear data loaded from ACE formatted files
-  \item Uses a modified unionized energy grid data structure to minimize data traffic when performing cross section lookups
-  \item Treats interactions exactly as specified by the nuclear data files
-  \item Uses the NVIDIA OptiX ray tracing framework for general 3D geometry representation 
-  \item Uses the CUDPP libraries to perform parallel sorts, scans, and sums on the GPU 
-  \item Can produced results (multiplication factors, fission distributions, flux spectra) comparable to production Monte Carlo neutron transport codes
+  \item Using an event-based transport algorithm to conduct continuous energy Monte Carlo neutron transport on a GPU
+  \item Using a vector of neutron references to remap data access on-the-fly, therefore minimizing thread divergence and simultaneously eliminate completed histories
+  \item Using nuclear data loaded from ACE formatted files
+  \item Using a modified unionized energy grid data structure to minimize data traffic when performing cross section lookups
+  \item Treating interactions exactly as specified by the nuclear data files
+  \item Using the NVIDIA OptiX ray tracing framework for general 3D geometry representation 
+  \item Using the CUDPP libraries to perform parallel sorts, scans, and sums on the GPU 
+  \item Producing results (multiplication factors, fission distributions, flux spectra) comparable to production Monte Carlo neutron transport codes
 \end{itemize}
-
+% you might want to change that to a bulleted list to highlight what is new and useful about your code. A big part of your job is explaining why your work is a new contribution.
 
