@@ -52,8 +52,8 @@ Table \ref{test_setup} summarizes the geometry and materials used in the test ca
   \hline
  Jezebel                           & 1 sphere, r=5.1cm & Fuel & (1.00) $^{239}$Pu & 19.816 g/cm$^3$\\
   \hline
- \multirow{4}{*}{Homogenized Block}  & \multirow{4}{*}{1 cube, r=10cm } & \multirow{4}{*}{Hom. Fuel.} & (0.90) $^{238}$U  & \multirow{4}{*}{10  g/cm$^3$} \\
- & & & (0.10) $^{235}$U & \\
+ \multirow{3}{*}{Homogenized}  & \multirow{4}{*}{1 cube, r=10cm } & \multirow{4}{*}{Hom. Fuel.} & (0.90) $^{238}$U  & \multirow{4}{*}{10  g/cm$^3$} \\
+  \multirow{3}{*}{Block} & & & (0.10) $^{235}$U & \\
  & & & (3.00) $^{16}$O   & \\
  & & & (2.00) $^{1}$H     & \\
   \hline
@@ -65,14 +65,14 @@ Table \ref{test_setup} summarizes the geometry and materials used in the test ca
  & & & (2.00) $^{1}$H & \\
   \hline
   \multirow{5}{*}{Hex Assembly}  & \multirow{4}{*}{1 cube, 84cm$^3$} & \multirow{3}{*}{Fuel} & (0.90) $^{238}$U & \multirow{3}{*}{15  g/cm$^3$} \\
-   & \multirow{4}{*}{631 cylinders, r=1cm z=40cm} & & (0.10) $^{235}$U & \\
+   & \multirow{4}{*}{{\small 631 cylinders, r=1cm z=40cm}} & & (0.10) $^{235}$U & \\
      & & & (2.00) $^{16}$O & \\
  \cline{3-5}
  & & \multirow{2}{*}{Water} & (1.00) $^{16}$O &  \multirow{2}{*}{3  g/cm$^3$} \\
  & & & (2.00) $^{1}$H & \\
   \hline
- \multirow{7}{*}{Fixed-source Block}  & \multirow{2}{*}{1 cube, 2x2x2m}  & \multirow{2}{*}{Water} & (1.00) $^{16}$O  & \multirow{2}{*}{1  g/cm$^3$} \\
- & &  & (2.00) $^{1}$H & \\
+ \multirow{6}{*}{Fixed-source}  & \multirow{2}{*}{1 cube, 2x2x2m}  & \multirow{2}{*}{Water} & (1.00) $^{16}$O  & \multirow{2}{*}{1  g/cm$^3$} \\
+ \multirow{6}{*}{Block}& &  & (2.00) $^{1}$H & \\
  \cline{2-5}
  & \multirow{5}{*}{1 cube, 2x2x2m}  & \multirow{4}{*}{Hom. Fuel}  & (0.90) $^{238}$U & \multirow{5}{*}{10  g/cm$^3$} \\
  & &  \multirow{4}{*}{w/ $^{10}$B}  & (0.10) $^{235}$U & \\
@@ -93,9 +93,10 @@ The goal of WARP is to be the first step in creating a full-featured continuous 
 \centering
 \caption{Summary of $k_\mathrm{eff}$ single-run results of the WARP criticality tests with 20/40 discarded/active criticality cycles and $10^5$ histories per cycle.}
 \label{test_summary_5}
+\small
 \begin{tabular}{| l | r | r | r | r | r |}
  \hline
- test & MCNP 6.1 & Serpent 2.1.18 & WARP & $\Delta$ M & $\Delta$ S  \\
+ Test & MCNP 6.1 & Serpent 2.1.18 & WARP & $\Delta$ M & $\Delta$ S  \\
 \hline
 \hline
 \multicolumn{6}{|l|}{Jezebel}  \\
@@ -132,10 +133,11 @@ The goal of WARP is to be the first step in creating a full-featured continuous 
 \begin{table}[h]
 \centering
 \caption{Summary of $k_\mathrm{eff}$ single-run results of the WARP criticality tests with 20/40 discarded/active criticality cycles and $10^6$ histories per cycle.}
-\label{test_summary_6}
+\label{test_summary_6} 
+\small
 \begin{tabular}{| l | r | r | r | r | r |}
  \hline
- test & MCNP 6.1 & Serpent 2.1.18 & WARP & $\Delta$ M & $\Delta$ S  \\
+ Test & MCNP 6.1 & Serpent 2.1.18 & WARP & $\Delta$ M & $\Delta$ S  \\
 \hline
 \hline
 \multicolumn{6}{|l|}{Jezebel}  \\
