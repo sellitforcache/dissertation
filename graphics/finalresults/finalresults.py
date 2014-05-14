@@ -1081,4 +1081,25 @@ else:
 	fig.savefig('process_rate.eps')
 
 
+fig = pl.figure(figsize=(10,6))
+ax=fig.add_subplot(1,1,1)
+w_len=12
+ax.semilogy( ar_x, 'r',   label='Assembly,    Remapping')
+ax.semilogy( an_x, 'b',   label='Assembly,    Non-Remapping')
+ax.semilogy( hr_x, 'r--', label='Homogenized, Remapping')
+ax.semilogy( hn_x, 'b--', label='Homogenized, Non-Remapping')
+handles, labels = ax.get_legend_handles_labels()
+ax.legend(handles,labels,loc=1)
+ax.set_xlabel('Iteration')
+ax.set_ylabel('Active Neutrons')
+#ax.set_xlim([0,5])
+#ax.set_ylim([-5e-1,5e-1])
+ax.grid(True)
+
+if plot:
+	pl.show()
+else:
+	print 'process_rate_iteration.eps'
+	fig.savefig('process_rate_iteration.eps')
+
 
