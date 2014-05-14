@@ -1,23 +1,22 @@
 \chapter{Results}
 \label{chap:results}
 
-% I changed benchmark to test because benchmark tends to imply comparison to some published result somewhere, where you're just running the code yourself and comparing to your own results. This is especially because you're not comparing to the published Jezebel benchmark results. I think this avoids confusion.
-
-The results of four simple tests of WARP compared to Serpent 2.1.18 and MCNP 6.1 are presented in this section.  WARP used the same nuclear data ACE libraries that Serpent uses.  MCNP 6.1 used the nuclear data distributed with it. Both data sets are derived from ENDF/BVII data. Since the library files used in Serpent and WARP are identical but the one used in MCNP is different, the error comparisons in this section are made against Serpent, not MCNP.  
-
-WARP only uses collision estimators for flux tallies and $k_\mathrm{eff}$ estimations, so the collision estimates from Serpent and MCNP are also used.  %Serpent and MCNP have more sophisticated estimators as well, but a comparing WARP against their collision estimators specifically will provide the fairest comparison.  
+The results of six simple tests of WARP compared to Serpent 2.1.18 and MCNP 6.1 are presented in this section.  WARP used the same nuclear data ACE libraries that Serpent uses.  MCNP 6.1 used the nuclear data distributed with it. Both data sets are derived from ENDF/BVII data. Since the library files used in Serpent and WARP are identical but the one used in MCNP is different, the error comparisons in this section are made against Serpent, not MCNP.  WARP only uses collision estimators for flux tallies and $k_\mathrm{eff}$ estimations, so the collision estimates from Serpent and MCNP are also used.  %Serpent and MCNP have more sophisticated estimators as well, but a comparing WARP against their collision estimators specifically will provide the fairest comparison.  
 Serpent and MCNP are run serially, which gives them the best theoretical performance since no time is lost to parallelization inefficiencies; both codes are then assumed to scale linearly.  The GPU card that WARP runs on can be approximated as a certain number of CPU cores, and a conservative performance per cost comparison can be made.
 
-Since WARP does not include S($\alpha$,$\beta$) or unresolved resonance tables (yet), these features were not activated in MCNP or Serpent in the test runs.  WARP is currently only able to handle black, or vacuum, boundary conditions, so all the test runs use black boundary condition as well.
+All of the test cases were run on a server containing two AMD Opteron 6128 Magny-Cours processors.  These processors each contain eight cores which are clocked at 2.0 GHz and have a 512 kB L2 cache.  The server has 32 GB of DDR3 clocked at 1.333 GHz between the two processors.  The GPU used in the tests is a NVIDIA Tesla k20.  It has 2496 ``CUDA cores,'' a multiprocessor clock of 706 MHz, and 5 GB of 2.6 GHz GDDR5 global memory.  The Opteron 6128 was released in Q2 of 2010, whereas the k20 was released in Q4 2012 \cite{opterondate,k20date}.  This is a comparison of one of the newest Tesla cards with a older CPU, but it is a standard CPU for many supercomputer systems currently running and is sufficient if given every advantage in the comparison (i.e. perfect scaling linearity).  WARP was built using CUDA 5.0, OptiX 3.0.1, CUDPP 2.1, and PyNE 0.4-dev.
 
-All of the test cases were run on a server containing two AMD Opteron 6128 Magny-Cours processors.  These processors each contain eight cores that are clocked at 2.0 GHz and have a 512 kB L2 cache.  The server has 32 GB of DDR3 clocked at 1.333 GHz between the two processors.  The GPU used in the tests is a NVIDIA Tesla k20.  It has 2496 ``CUDA cores,'' a multiprocessor clock of 706 MHz, and 5 GB of 2.6 GHz GDDR5 global memory.  The Opteron 6128 was released in Q2 of 2010, whereas the k20 was released in Q4 2012 \cite{opterondate,k20date}.  This is a comparison of one of the newest Tesla cards with a older CPU, but it is a standard CPU for many supercomputer systems currently running and is sufficient if given the advantage of perfect scaling linearity in the comparison.  WARP was built using CUDA 5.0, OptiX 3.0.1, CUDPP 2.1, and PyNE 0.4-dev.
+The multiplication factor differences are reported in ``per cent mille,'' which is a thousandth of a percent, or $10^{-5}$.  This is a standard way of reporting differences in the multiplication factor, as any small deviation from unity can cause a reactor to change its power level.  The flux spectra are normalized per source neutron and per unit lethargy.  Normalizing per source neutron serves to reproduce the same results for different numbers of histories run.  The uncertainty will be lower in results with more histories, of course, but the magnitudes should have the same mean values.   ``Lethargy'' means the logarithm of the neutron energy, $\ln(E_0/E)$ \cite{duderstadt}.  Normalizing the flux per unit lethargy accentuates the the high energy region, but used in conjunction with plotting on a logarithmic scale, it also yields a plot where the area under the line gives fraction of neutrons (flux) in a specific energy bin.  Plotting per unit lethargy is a change of base where plotting the flux $\phi(E)$ to transformed to $\phi(u)$, where $u=\ln(E_0/E)$ \cite{lethargyplot}.  Changing the base is shown in \eqref{lethargy}.  In the discrete energy group case, normalizing the flux to per unit lethargy means that the bin value is multiplied by the average (mid-point) energy of the bin.
 
-The multiplication factor differences are reported in ``per cent mille''  (pcm), which is a thousandth of a percent, or $10^{-5}$.  This is a standard way of reporting differences in the multiplication factor, as any small deviation from unity can cause a reactor to change its power level.  The flux spectra are normalized per source neutron and per unit lethargy.  Normalizing per source neutron serves to reproduce the same results for different numbers of histories run.  The uncertainty will be lower in results with more histories, but the magnitudes should have the same mean values within statistics.
+\begin{equation}
+\label{lethargy}
+\begin{gathered}
+\phi(E) dE = \phi(u) du = \phi(u) \frac{dE}{E}\\
+\phi(u) = E \phi(E) \qquad \Rightarrow \qquad  |\bar{\phi}_{g,j}| = \bar{E} \bar{\phi}_{g,j}
+\end{gathered}
+\end{equation}
 
-``Lethargy'' means the logarithm of the neutron energy, $\ln(E_0/E)$, and is convenient a convenient way of framing things since neutrons lose a fraction of energy per collision \cite{duderstadt}. %you should probably define this in chp 2 since I think you talk about lethargy there...
-Normalizing the flux per unit lethargy accentuates the high energy region of the flux, which makes plotting spectra more convenient since the otherwise overshadowed structure in the high-energy regions can be seen. 
-
-The tally actually taken, which is unnormalized, is shown in \eqref{flux_tally} and is designated as $\bar{\phi}_{g,j}$ is the raw tally value in cell volume $j$ and energy group $g$. The flux that includes the normalizations is shown in \eqref{fluxtallynorm}. The tallied flux values must be divided by the total number of source neutrons run, $N_{total}$, divided by the energy bin width, $E_{g+1}-E_g}$, and multiplied by the average energy bin size, $\frac{E_g+E_{g+1}}{2}$  \cite{lethargyplot}.%how is that the average energy bin size?
+To normalize the raw tally values (\eqref{flux_tally}) to per unit lethargy, the values must be divided by the total number of source neutrons run, divided by the energy bin width, and multiplied by the average bin energy \cite{lethargyplot}.  The expression for normalizing the raw tally scores is shown in \eqref{fluxtallynorm}, where $\bar{\phi}_{g,j}$ is the raw tally value in cell volume $j$ and energy group $g$.  Since WARP does not include S($\alpha$,$\beta$) or unresolved resonance tables (yet), these features were not activated in MCNP or Serpent in the test runs.  WARP is currently only able to handle black, or vacuum, boundary conditions, so all the test runs use black boundary condition as well.
 
 \begin{equation}
 \label{fluxtallynorm}
@@ -27,21 +26,20 @@ E_g < E_i < E_{g+1} \\
 \end{gathered}
 \end{equation}
 
-Five test cases were considered, four that are criticality-source type, and one that is a fixed-source	 type.  WARP can represent spheres, cuboids, cylinders, and hexagonal prisms, and all but the hexagonal prism are represented in the tests.  Most of the cases have very simple geometries with few cells, but the assembly case has 632 total cells to accentuate the geometry processing routines and the impact of the material resampling as the neutrons move into different regions without interacting.  Every material in every test case uses some combination of the reactor-pertinent isotopes $^{239}$Pu, $^{238}$U, $^{235}$U, $^{16}$O, $^{10}$B, and $^{1}$H.  This is a relatively small set of isotopes to have in a reactor simulation, but loading and processing of isotopes was only tested with $^{27}$Al, $^{208}$Pb, $^{12}$C, $^{6}$Li in addition to these isotopes. % what is this sentence saying? was that a separate test? why those materials? do you use them in some cases here?
+Six test cases were considered, four that are criticality-source type, and two that are fixed-source type.  WARP can represent spheres, cuboids, cylinders, and hexagonal prisms, and all but the hexagonal prism are represented in the tests.  Most of the cases have very simple geometries with few cells, but the assembly case has 632 total cells to accentuate the geometry processing routines and the impact of the material resampling as the neutrons move into different regions without interacting.  Every material in every test case uses some combination of the reactor-pertinent isotopes $^{239}$Pu, $^{238}$U, $^{235}$U, $^{16}$O, $^{10}$B, and $^{1}$H.  This is a relatively small set of isotopes to have in a reactor simulation.  In the debugging process of WARP's development, fixed-source simulations were done using $^{27}$Al, $^{208}$Pb, $^{12}$C, $^{6}$Li in addition to the previous isotopes, but the results short debugging simulations are not reported here.  These isotopes are only mentioned in order to fully express the amount of testing that went into the data loading routines. % what is this sentence saying? was that a separate test? why those materials?  do you use them in some cases here?  hopefully clearer...
  Currently a temperature of 300K is hardcoded into WARP, so cross sections used in these tests are all processed at this temperature.   The summary of the test geometries and materials is shown in Table \ref{test_setup}.  
 
 The ``Jezebel'' test is a bare plutonium sphere, and is a standard criticality test.   The fission neutron rate from $^{239}$Pu is balanced by the leakage rate from the 5.1cm radius to give a $k_\mathrm{eff}$ of approximately 1.  Since this system is so leaky, producing results consistent with MCNP and Serpent ensures that the boundary conditions are correctly being enforced.  The Jezebel test is a standard test used to validate neutron transport codes.  It is described in the International Handbook of Evaluated Criticality Safety Test Experiments under the name ``Pu-MET-FAST-001'' \cite{bench_handbook}.  The test here uses a slightly higher density, and therefore a slightly smaller critical radius than the handbook's version.
 
-The ``homogenized block'' test consists of a single cell and a single material as well, but that material has multiple isotopes in it.  This particular material is a one-to-one mixture of 1\% $^{235}$U enriched UO$_2$ and water.  Since this single cell is entirely made up of material containing fissile isotopes, fissions can happen anywhere and the fission source is spread over a large volume compared to the other tests.  The cell dimensions are small, so the amount of time required to converge the fission source is not extremely long.
+The ``Homogenized Block'' test consists of a single cell and a single material as well, but that material has multiple isotopes in it.  This particular material mixture of 1\% $^{235}$U enriched UO$_2$ and water at a 1:1 ratio.  Since this single cell is entirely made up of material containing fissile isotopes, fissions can happen anywhere and the fission source is spread over a large volume compared to the other tests.  The cell dimensions are small so the amount of time requires to converge the fission source is not extremely long.
 
-The ``pin cell'' test consists of a bare UO$_2$ cylinder surrounded by a block of water.  This test now has two materials, each with multiple isotopes, and two cells.  The water block dimensions are not very large, so leakage should play a part.  This test serves to highlight that all the processing routines work simultaneously and the effect of introducing more than one cell, which should have a significant effect on the ray tracing rate as pointed out in the preliminary OptiX study.
+The ``Pin Cell'' test consists of bare UO$_2$ cylinder surrounded by a block of water.  This test now has two materials, each with multiple isotopes, and two cells.  The water block dimensions are not very large, so leakage should play a part.  This test serves to highlight all the processing routines work simultaneously, and the effect of introducing more than one cell, which should have a significant effect on the ray tracing rate as pointed out in the preliminary OptiX study.
 
-The ``15-sided Hex Assembly'' test consists of 631 bare UO$_2$ cylinders laid out in a hexagonal lattice surrounded by water.  The material compositions, densities, and the cylinder dimensions are identical to the pin cell test case. However, since this test has two orders of magnitude more objects, it serves to highlight the effect of introducing many geometric objects into the problem and will further validate that the geometry processing routines work correctly if consistent results are obtained.
+The ``Hex assembly'' test consists of 631 bare UO$_2$ cylinders laid out in a hexagonal lattice surrounded by water.  The material compositions, densities, and the cylinder dimensions are identical to the pin cell test case, but since this test has two orders of magnitude more objects, it serves to highlight the effect of introducing many geometric objects into the problem and will further validate that the geometry processing routines work correctly if consistent results are obtained.
 
-The ``Fixed-source Block'' refers to two separate tests where WARP is run in fixed-source mode instead of criticality source mode. The first test illustrates WARP's ability to perform subcritical multiplication from secondary neutrons in fixed-source mode.  The geometry is a cube that is 2 meters on a side, so leakage is minimized and a thermal peak should be produced.  The materials are identical to the homogenized block test, except for the addition of a small amount $^{10}$B to suppress the multiplication factor to keep the runtimes relatively short (the multiplication for $k_\mathrm{eff}$=0.94 is about 17, i.e.\ each initial source neutron will produce 17 more neutrons on average).   A 1eV isotropic point source at the origin was chosen to highlight the effectiveness of popping any secondary neutrons back into the active transport cycle.  Since the source is at 1eV, it will induce fissions in $^{235}$U, which will produce neutrons in a fission spectrum that does not overlap with the source.  
+The ``Fixed-source Block'' refers to two separate tests where WARP is run in fixed-source mode in stead of criticality mode. The first test illustrates WARP's capability to perform subcritical multiplication from secondary neutrons in fixed-source mode.  The geometry is a cube that is 2 meters on a side so leakage is minimized and a thermal peak should be produced.  The materials are identical to the homogenized block test, except for the addition of a small amount $^{10}$B to make the system more subcritical.   A 1 eV isotropic point source at the origin was chosen as to highlight the effectiveness of popping any secondary neutrons back into the active transport cycle.  Since the source is at 1 eV, it will induce fissions in $^{235}$U which will produce neutrons in a fission spectrum that does not overlap with the source.  The second fixed-source test is a 2 meter cube of water that contains a 2 MeV point source at the center.  This test does not contain any fissile materials, so there are no secondary particles transported. There are also no highly absorbing materials, so neutrons will scatter many times before they are absorbed or leak out of the cube.  This test serves as a counterpoint to the first since it will be seen what effect eliminating the secondary pop routine from the inner transport loop will have on performance.
 
-The second fixed-source test is a 2 meter cube of water that contains a 2 MeV point source at the center.  This test does not contain any fissile materials, so there are no secondary particles transported. There are also no highly-absorbing materials, so neutrons will scatter many times before they are absorbed or leak out of the cube.  This test serves as a counterpoint to the first since it will be seen what effect eliminating the secondary pop routine from the inner transport loop will have on performance.
-
+Table \ref{test_setup} summarizes the geometry and materials used in the test cases.  The numbers in parentheses preceding the isotopes are the ratios of the  isotopes' to each other (i.e. they are unnormalized atomic fractions).  The pin cell and assembly cases have water a 3 g/cm$^3$, but water cannot ever have a density this high.  This was an oversight when deciding on the material parameters.  Changing it to 1.0 or lower will not affect the conclusions of the simulation, however, since the Serpent and MCNP simulations were run with these unrealistic densities as well.  The comparison should be consistent, even if the results are unphysical.
 
 \begin{table}[h]
 \centering
@@ -66,8 +64,8 @@ The second fixed-source test is a 2 meter cube of water that contains a 2 MeV po
  & & \multirow{2}{*}{Water} & (1.00) $^{16}$O &  \multirow{2}{*}{3  g/cm$^3$} \\
  & & & (2.00) $^{1}$H & \\
   \hline
-  \multirow{4}{*}{15-sided}  & \multirow{4}{*}{1 cube, 84cm$^3$} & \multirow{3}{*}{Fuel} & (0.90) $^{238}$U & \multirow{3}{*}{15  g/cm$^3$} \\
- \multirow{4}{*}{Hex Assembly}   & \multirow{4}{*}{631 cylinders, r=1cm z=40cm} & & (0.10) $^{235}$U & \\
+  \multirow{5}{*}{Hex Assembly}  & \multirow{4}{*}{1 cube, 84cm$^3$} & \multirow{3}{*}{Fuel} & (0.90) $^{238}$U & \multirow{3}{*}{15  g/cm$^3$} \\
+   & \multirow{4}{*}{631 cylinders, r=1cm z=40cm} & & (0.10) $^{235}$U & \\
      & & & (2.00) $^{16}$O & \\
  \cline{3-5}
  & & \multirow{2}{*}{Water} & (1.00) $^{16}$O &  \multirow{2}{*}{3  g/cm$^3$} \\
@@ -84,13 +82,12 @@ The second fixed-source test is a 2 meter cube of water that contains a 2 MeV po
 \hline
  \end{tabular}
 \end{table}
-% is the university going to care about the margins? we had rules about that at wisc.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Multiplication Factors and Runtimes}
 
-The goal of WARP is to be the first step in creating a full-featured continuous energy Monte Carlo neutron transport code that is \emph{accelerated} by running on GPUs.  The crux of the effort is to make Monte Carlo calculations faster but still produce accurate results.  Table \ref{test_summary_5} shows the multiplication factor deviations and the speedup factors for the four criticality tests compared to MCNP 6.1 and Serpent 2.1.18 when $10^5$ neutrons per batch are used.  Table  \ref{test_summary_6} shows the same information, but for cases where $10^6$ neutrons per batch are used. The (y) in the $\Delta$ columns signify if the WARP value is inside (y) or outside (n) two standard deviations of the production code's value.% define delta M and delta S; it's pretty clear, but just in case. Also mention that warp doesn't have statistics for criticality yet. 
+The goal of WARP is to be the first step in creating a full-featured continuous energy Monte Carlo neutron transport code that is \emph{accelerated} by running on GPUs.  The crux of the effort is to make Monte Carlo calculations faster but still produce accurate results.  Table \ref{test_summary_5} shows the multiplication factor deviations and the speedup factors for the four criticality tests compared to MCNP 6.1 and Serpent 2.1.18 when $10^5$ neutrons per batch are used.  Table  \ref{test_summary_6} shows the same information, but for cases where $10^6$ neutrons per batch are used.  The $\Delta$M column is for WARP's difference from MCNP, and the $\Delta$S column is for WARP's difference from Serpent.  The differences are reported in pcm for multiplication factors, and speedup factors ($t/t_\mathrm{WARP}$) for runtimes.  The (y) in the $\Delta$ columns signify if the WARP value is inside (y) or outside (n) two standard deviations of the production code's value. Error estimators have not yet been implemented in WARP, so a confidence interval is not reported for WARP's values.
 
 \begin{table}[h]
 \centering
@@ -98,7 +95,7 @@ The goal of WARP is to be the first step in creating a full-featured continuous 
 \label{test_summary_5}
 \begin{tabular}{| l | r | r | r | r | r |}
  \hline
- Test & MCNP 6.1 & Serpent 2.1.18 & WARP & $\Delta$ M & $\Delta$ S  \\
+ test & MCNP 6.1 & Serpent 2.1.18 & WARP & $\Delta$ M & $\Delta$ S  \\
 \hline
 \hline
 \multicolumn{6}{|l|}{Jezebel}  \\
@@ -122,7 +119,7 @@ The goal of WARP is to be the first step in creating a full-featured continuous 
  Runtime               & 55.85 m & 40.0035 m &  2.81583 m &  19.8x & 14.2x  \\
  \hline
   \hline
-\multicolumn{6}{|l|}{15-sided Hex Assembly}\\
+\multicolumn{6}{|l|}{Hex Assembly}\\
 \hline
  $k_\mathrm{eff}$ & 1.437465$\pm$0.0004 & 1.44704$\pm$0.00046 & 1.4442 & -673 pcm (n) & 284 pcm (n) \\
  \hline
@@ -138,7 +135,7 @@ The goal of WARP is to be the first step in creating a full-featured continuous 
 \label{test_summary_6}
 \begin{tabular}{| l | r | r | r | r | r |}
  \hline
- Test & MCNP 6.1 & Serpent 2.1.18 & WARP & $\Delta$ M & $\Delta$ S  \\
+ test & MCNP 6.1 & Serpent 2.1.18 & WARP & $\Delta$ M & $\Delta$ S  \\
 \hline
 \hline
 \multicolumn{6}{|l|}{Jezebel}  \\
@@ -162,7 +159,7 @@ The goal of WARP is to be the first step in creating a full-featured continuous 
  Runtime               & 578.62 m & 404.2 m & 7.1 m & 81.9x & 57.2x \\
  \hline
   \hline
-\multicolumn{6}{|l|}{15-sided Hex Assembly}\\
+\multicolumn{6}{|l|}{Hex Assembly}\\
 \hline
  $k_\mathrm{eff}$ & 1.437326$\pm$0.0002 & 1.44722$\pm$0.00014 & 1.4454 & -807.4 pcm (n) &  182 pcm (n) \\
  \hline
@@ -171,13 +168,15 @@ The goal of WARP is to be the first step in creating a full-featured continuous 
 \end{tabular}
 \end{table}
 
-It can be seen that in the $10^5$ neutrons per batch case, WARP performs 8 to 36 times faster than the production codes. The multiplication factor discrepancies are different between Serpent and MCNP, which also means that Serpent and MCNP do not match exactly.  The multiplication factors are most different in the assembly test, where WARP's answer falls between MCNP and Serpent, but is still very far from either.  
+It can be seen that in the $10^5$ neutrons per batch case, WARP performs 8 to 36 times faster than the production codes, and the multiplication factor differences are slightly different.  Most multiplication factors are most notably different in the assembly test, where WARP's answer falls between MCNP and Serpent, but is still very far from either.  Similar trends are shown in the multiplication factor for the $10^6$ runs in Table \ref{test_summary_6}, but the speedup factors are much higher, with WARP being 11 to 82 times faster than the production codes.   The greatest speedup is seen in the pin cell test, followed by the homogenized block, assembly, then finally the bare sphere.  The speedup factors compared to Serpent in the $10^6$ neutrons per batch runs are relatively constant, ranging from 33 to 56, whereas the speedup factors compared to MCNP range from 11 to 82.
 
-Similar trends are shown in the multiplication factor for the $10^6$ runs in Table \ref{test_summary_6}, but the speedup factors are much higher, with WARP being 11 to 82 times faster than the production codes.   The greatest speedup is seen in the pin cell test, followed by the homogenized block, the assembly, and then finally the bare sphere.  The speedup factors compared to Serpent in the $10^6$ neutrons per batch runs are relatively constant, ranging from 33 to 56, whereas the speedup factors compared to MCNP range from 11 to 82.
+In the Jezebel test, all codes agree, but as things get more complicated, deviations start to occur.  WARP is often outside of a single standard deviation for either code.  It is important to point out that Serpent and MCNP are also often more than a standard deviation away from each other, with WARP falling somewhere in between, or if not in between, near one of the two codes.
 
-In the Jezebel test, all codes agree, but as things get more complicated, deviations start to occur.  WARP is often outside of a single standard deviation for either code.  It is important to point out that Serpent and MCNP are also often more than a standard deviation away from each other, with WARP falling somewhere in between. In cases where WARP not between the two, it is near one of the two codes. That is, WARP is never completely different from both. 
+It is also interesting that in the Jezebel test, MCNP is actually much faster than Serpent.  Presumably, this is due to the different methods they use for neutron tracking.  Serpent uses Woodcock tracking, and moves the neutron in small steps across the geometry, but does not have to calculate any surface intersection points.  MCNP uses ray tracing and does calculate intersection points (as does WARP).  Since the Jezebel sphere is a very leaky system, many neutrons stream out of the sphere without interacting many times or at all.  Since  MCNP and WARP both use ray tracing, they can terminate this particles in a small number of geometry queries.  Serpent, however, needs to query the geometry many times in order to propagate the neutrons to the edge of the sphere where they are then leaked.  This difference is not seen in the homogenized block test, where leakage plays very little role in neutron loss.
 
-It is also interesting that in the Jezebel test, MCNP is actually much faster than Serpent.  Presumably, this is due to the different methods they use for neutron tracking.  Serpent uses Woodcock tracking, and moves the neutron in small steps across the geometry, but does not have to calculate any surface intersection points.  MCNP uses ray tracing and does calculate intersection points (as does WARP).  Since the Jezebel sphere is a very leaky system, many neutrons stream out of the sphere without interacting many times or at all.  Since  MCNP and WARP both use ray tracing, they can terminate leaking particles in a small number of geometry queries.  Serpent, however, needs to query the geometry many times in order to propagate the neutrons to the edge of the sphere where they are then leaked.  This difference is not seen in the homogenized block test, where leakage plays very little role in neutron loss.
+Tables \ref{test_summary_5} and \ref{test_summary_6} show that the multiplication factors calculated by WARP sometimes fall outside the uncertainty of the production codes.  The exact reason for this has not been determined, but can be speculated.  The deviations are the worst in the assembly test, implying that there may be a bug error in the geometry processing routines.  The fact that WARP treats (n,2/3/4n) multiplicity reactions as neutron sources instead of negative absorptions could also be effecting the results, as per \eqref{k_eff_mcnp} and \eqref{k_eff_warp}.  WARP also produces spectra that have slight differences from Serpent and MCNP (shown in the next section), indicating that the reaction rates are different at certain energies.  And even though they are small, spectral differences may point to a bug in the reaction sampling routines.  WARP also uses single precision float point numbers, and the way that $k_\mathrm{eff}$ is accumulated between batches may also be leading to roundoff errors in the final result.  The reproducibility of results has also no been tested in WARP.  CURAND can be seeded with the same number across runs, which should lead to the same sequence of random numbers in the kernel LCRNGs, but exact reproducibility has not been attempted.  Reproducibility is an important feature in validating results, and will be an area of future development for WARP.
+
+% Tell us about why there are differences in k!!! You show it and don't mention it. I think this is really important and has wide implications for the use of WARP in terms of reproducibility and algorithm selection. Speaking of - are the results reproducible from time to time with fixed algorithms? I wasn't sure because of kernel launch ordering...?  I hope this is sufficient!
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -192,13 +191,13 @@ It is also interesting that in the Jezebel test, MCNP is actually much faster th
 \begin{figure}[h!]
 \centering
 \includegraphics[width=\textwidth,trim= 5cm 0cm 7cm 0cm]{graphics/finalresults/godiva_fiss-6.eps}
-\caption{Fission source distribution of a ``Jezebel'' bare $^{239}$Pu sphere. \label{godiva_fiss} }
+\caption{Fission source distribution of a ``Jezebel'' bare $^{239}$Pu sphere calculated by WARP. \label{godiva_fiss} }
 \end{figure}
 
 \begin{figure}[h!]
 \centering
 \includegraphics[width=\textwidth,trim= 5cm 0cm 7cm 0cm]{graphics/finalresults/godiva_fiss_diff-6.eps}
-\caption{Relative error of WARP's fission source distribution compared to Serpent's for the Jezebel bare $^{239}$Pu sphere. \label{godiva_fiss_diff} }
+\caption{Relative difference of WARP's fission source distribution compared to Serpent's for the Jezebel bare $^{239}$Pu sphere. \label{godiva_fiss_diff} }
 \end{figure}
 
 \begin{figure}[h!] 
@@ -210,13 +209,13 @@ It is also interesting that in the Jezebel test, MCNP is actually much faster th
 \begin{figure}[h!]
 \centering
 \includegraphics[width=\textwidth,trim= 5cm 0cm 7cm 0cm]{graphics/finalresults/homfuel_fiss-6.eps}
-\caption{Fission source distribution of a homogenized block of UO$_2$ and water. \label{homfuel_fiss} }
+\caption{Fission source distribution of a homogenized block of UO$_2$ and water calculated by WARP. \label{homfuel_fiss} }
 \end{figure}
 
 \begin{figure}[h!]
 \centering
 \includegraphics[width=\textwidth,trim= 5cm 0cm 7cm 0cm]{graphics/finalresults/homfuel_fiss_diff-6.eps}
-\caption{Relative error of WARP's fission source distribution compared to Serpent's for the homogenized block of UO$_2$ and water. \label{homfuel_fiss_diff} }
+\caption{Relative difference of WARP's fission source distribution compared to Serpent's for the homogenized block of UO$_2$ and water. \label{homfuel_fiss_diff} }
 \end{figure}
 
 \begin{figure}[h!] 
@@ -228,13 +227,13 @@ It is also interesting that in the Jezebel test, MCNP is actually much faster th
 \begin{figure}[h!]
 \centering
 \includegraphics[width=\textwidth,trim= 11cm 0cm 6cm 0cm]{graphics/finalresults/pincell_fiss-6.eps}
-\caption{Fission source distribution of a single UO$_2$ pin surrounded by a block of water. \label{pincell_fiss} }
+\caption{Fission source distribution of a single UO$_2$ pin surrounded by a block of water calculated by WARP. \label{pincell_fiss} }
 \end{figure}
 
 \begin{figure}[h!]
 \centering
 \includegraphics[width=\textwidth,trim= 11cm 0cm 6cm 0cm]{graphics/finalresults/pincell_fiss_diff-6.eps}
-\caption{Relative error of WARP's fission source distribution compared to Serpent's for the single UO$_2$ pin surrounded by water. \label{pincell_fiss_diff} }
+\caption{Relative difference of WARP's fission source distribution compared to Serpent's for the single UO$_2$ pin surrounded by water. \label{pincell_fiss_diff} }
 \end{figure}
 
 \begin{figure}[h!] 
@@ -246,57 +245,57 @@ It is also interesting that in the Jezebel test, MCNP is actually much faster th
 \begin{figure}[h!]
 \centering
 \includegraphics[width=\textwidth,trim= 4cm 0cm 6cm 0cm]{graphics/finalresults/assembly_fiss-6.eps}
-\caption{Fission source distribution of a 15-sided hexagonal array of UO$_2$ pins in water. \label{assembly_fiss} }
+\caption{Fission source distribution of a 15-sided hexagonal array of UO$_2$ pins in water calculated by WARP. \label{assembly_fiss} }
 \end{figure}
 
 \begin{figure}[h!]
 \centering
 \includegraphics[width=\textwidth,trim= 4cm 0cm 6cm 0cm]{graphics/finalresults/assembly_fiss_diff-6.eps}
-\caption{Relative error of WARP's fission source distribution compared to Serpent's for the 15-sided hexagonal array of UO$_2$ pins in water. \label{assembly_fiss_diff} }
+\caption{Relative difference of WARP's fission source distribution compared to Serpent's for the 15-sided hexagonal array of UO$_2$ pins in water. \label{assembly_fiss_diff} }
 \end{figure}
 
-% I'd be careful about the relative error syntax since that's one (very common) way that MC statistical error is often expressed. I would use relative difference and make it clear that you're plotting/talking about the relative between WARP and Serpent - not the relative error (you don't necessarily know that Serpent is right anyway, and saying error implies that it is). Also, right out the equation so we know what exactly you're doing. 
+% I'd be careful about the relative error syntax since that's one (very common) way that MC statistical error is often expressed. I would use relative difference and make it clear that you're plotting/talking about the relative between WARP and Serpent - not the relative error (you don't necessarily know that Serpent is right anyway, and saying error implies that it is). Also, right out the equation so we know what exactly you're doing.   CHANGED.
 
-The flux and fission source distributions for the criticality tests are shown in the following figures.  The relative error subplots for the spectra also have the 2$\sigma$ statistical error shown in transparent green.  Since the relative error is calculated against Serpent, the statistical error levels are from Serpent as well.% what's the grey in those?
-  The colors in the fission source distribution plots represent the relative probability of a fission neutron being born at that point.  The distributions are normalized so the maximum value is one.  Plots showing the relative error compared to the fission source distributions produced by Serpent are also shown to attest to the accuracy of the fission source.  These plots were made by dumping mesh plots produced by Serpent and re-normalizing them to a maximum of one.  The mesh plots have a resolution of 500x500 pixels for every plot.  The fission points produced by WARP were binned at an identical resolution, and the relative error distributions are calculated by simply subtracting bin-by-bin (there is no smoothing).  The Serpent fission source mesh plots are included in Figures \ref{serp_godiva_mesh}-\ref{serp_assembly_mesh} in Appendix \ref{app:A} as they are redundant to the information shown by WARP's fission distributions and the relative error distributions.  To show the most accurate and highest resolution results, the data in all these figures are from runs using $10^6$ neutrons per batch.
-
-
-Figure \ref{godiva_spec} shows the volume-averaged flux spectrum in the Jezebel sphere.  The relative error compared to the Serpent spectrum is show in the subplot below the main spectrum plot.  The relative error is very low compared to Serpent, with the normalized tally bins being less than 2\% from each other in regions where the flux is large.  When the flux is small, the statistical uncertainty becomes much higher, and the relative error becomes noisy.   For the most part, the relative difference of WARP's spectrum is is within $2\sigma$ of Serpent's, and the relative difference appears to have an average of zero.% what is the actual average?
-  The spectra produced by the three codes lie very close together and are almost indistinguishable from each other in the plot.  
-
-The fission distribution, shown in Figure \ref{godiva_fiss}, appears very uniform, with neutrons being preferentially born near the center.  The distribution is visually identical in a $z$-integrated slice compared to a $y$-integrated slice, as it should be.  The distribution is not as smooth as that produced by Serpent, however, and the noisiness of the WARP distribution can be seen in the relative error plot in Figure \ref{godiva_fiss_diff}.  On the whole, the relative difference is near zero and appears to be mostly green, implying an average of zero.  There seems to be a slight non-zero offset in the $x$-$z$ plot, but this is likely from the statistical uncertainty in the maximum value used to normalized the distribution.  The noisiness increases at the edge of the sphere, where the flux, and therefore fission probability, is low.  The white areas are where a NaN value is produced from dividing zero by zero, indicating that WARP and Serpent are in agreement that no fissions occur there.
+The flux and fission source distributions for the criticality tests are shown in the following figures.  The relative difference subplots for the spectra also have the 2$\sigma$ error from Serpent shown in transparent green.  Since the relative difference is calculated from the Serpent results, the error levels shown in green are from Serpent.  The green area has a black border line to highlight where it terminates.  The colors in the fission source distribution plots represent the relative probability of a fission neutron being born at that point.  The distributions are normalized so the maximum value is one.  Plots showing the relative difference compared to the fission source distributions produced by Serpent are also shown to attest to the accuracy of the fission source.  These plots were made by dumping mesh plots produced by Serpent and re-normalizing them to a maximum of one.  The mesh plots have a resolution of 250x250 pixels for every plot.  The fission points produced by WARP were binned at an identical resolution, and the relative difference distributions calculated by simply subtracting bin-by-bin (there is no smoothing done).  The average relative difference of each distributions is shown in the plots as $\bar{\Delta}_{xy}$ and $\bar{\Delta}_{xz}$.  The Serpent fission source mesh plots are included in Figures \ref{serp_godiva_mesh}-\ref{serp_assembly_mesh} in Appendix \ref{app:A} as they are somewhat redundant to the information shown by the WARP's fission distributions and the relative difference distributions.  To show the most accurate and highest resolution results, the data in all these figures are from runs using $10^6$ neutrons per batch.
 
 
 
 
-Figures \ref{homfuel_spec} shows the volume-averaged flux spectrum in the block of homogenized fuel.   Since this material is leaky and contains a strong thermal neutron absorber ($^{235}$U), no substantial thermal peak is seen since neutrons do not have time to accumulate around 0.026 eV before they absorbed or leak out of the system.   Again, the relative error compared the the Serpent spectrum is very low, at 5\% or lower for energies $10^{-9}$-$10^{-2}$ MeV where the flux has good statistics, but has much larger variations at energies above $10^{-2}$.  In this region, the errors become much larger, which could indicate that a minor sampling problem is occurring or physics isn't being handled exactly right.  The cause should be investigated as WARP continues to develop.  
+Figure \ref{godiva_spec} shows the volume-averaged flux spectrum in the Jezebel sphere.  The relative difference compared to the Serpent spectrum is shown in the subplot below the main spectrum plot.  The relative difference is very low compared to Serpent, with the normalized tally bins being less than 2\% from each other in regions where the flux is large.  Of course, when the flux is small, the statistical uncertainty becomes much higher, and the relative difference becomes noisy.   For the most part, the relative difference of WARP's spectrum is is within $2\sigma$ of Serpent's, and appears to have an average of zero.  The spectra produced by the three codes lie very close together and are almost indistinguishable from each other in the plot. 
 
-The fission source distribution of the homogenized block, shown in Figure \ref{homfuel_fiss}, has a structure similar to the Jezebel sphere, with an area of high probability in the center that drops to zero at the edges.  The noise seems to be more pronounced in this test, since the fissile volume is much larger than in the Jezebel sphere.  The relative error of the distribution, shown in Figure \ref{homfuel_fiss_diff}, shows that edges are also more noisy, especially in the corners, since the flux is low there.  Despite the noise, the fission distribution appears to have a fairly uniform error distribution with an approximate mean of zero as indicated by the predominately green color.  It may have a slight positive offset, but this again can be explained by the statistical uncertainty of the normalizing value.
-
-
-
-Figures \ref{pincell_spec} and \ref{pincell_fiss}, show the volume-averaged flux spectrum and fission source distribution, respectively, in the UO$_2$ pin of the pin cell test.  This system is slightly leaky, and again contains light nuclides (water), but now they are spatially separated from the fissile material.  The relative error compared to Serpent is again low, around 3\% or lower for energies $5\times10^{-9}$ to $10$ MeV where the flux has good statistics.  The relative error is also within $2\sigma$ of Serpent's values on the entire energy range, except for the slight deviation around 0.2 MeV where the error exceeds this bound.  This slightly increased error might be related to the resonance at 0.6 MeV.  
-
-We expect a small peak at thermal energies because in this geometry the fissile material is separated from the moderator, and neutrons have a chance to accumulate at thermal energies before they are absorbed or leak. In the results there is a small thermal peak in the spectrum around 0.026 eV, as expected, indicating that the target velocity sampling scheme and the vector transformation and rotation schemes are working correctly.  
-
-The fission source distribution of the pin cell, shown in Figure \ref{pincell_fiss}, appears to be very smooth and well-converged radially and only slightly noisy axially.  The effect of the fuel having a high fission cross section at low energies can also be seen in the fission source distribution.  The high cross section manifests itself as a ring of high fission probability around the edge of the pin.  This is caused by thermalized neutrons re-entering the fuel pin and immediately fissioning a $^{235}$U nucleus.  This phenomenon is also called ``self-shielding'' since the uranium at the surface shields the interior uranium from thermal neutrons and has implications in depletion and power distributions.  Since the flux spectrum is volume averaged over the pin, the small thermal peak is likely from the inclusion of this thin edge region where thermal neutrons still exist.  The axial fission source distribution is consistent with the expectation for a finite cylinder as well, roughly following a cosine with the peak at $z=0$ \cite{duderstadt}.  Figure \ref{pincell_fiss_diff} shows the relative error distribution of the pin cell compared to Serpent, and is almost entirely green in both the radial and axial directions, indicating very close agreement with Serpent.
+The fission distribution, shown in Figure \ref{godiva_fiss}, appears very uniform with neutrons being preferentially born near the center.  The distribution is visually identical in an $z$-integrated slice compared to the $y$-integrated slice, as it should be.  The distribution is not as smooth as that produced by Serpent, however, and the noisiness of the WARP distribution can be seen in the relative difference plot in Figure \ref{godiva_fiss_diff}.  On a whole, the relative difference is near zero and appears to be mostly green.  The white areas are where a NaN value is produced by dividing zero by zero, indicating that WARP and Serpent are in agreement that no fissions occur there.
 
 
 
-Figures \ref{assembly_spec} shows the volume-averaged flux spectrum in the center pin of the 15-sided hexagonal assembly test.  This problem is much more heterogeneous than any of the previous, with 300 times more objects in the domain compared to the pin cell test.  WARP's spectrum matches very well with Serpent's, and the relative error is with 15\% of Serpent for energies $10^{-8}$ to $9$ MeV, where the flux has good statistics.  The spectrum is much noisier than any of the other tests since the volume of the center pin is relatively small compared to the volume of the fission source, even though this pin has the highest flux of any of the pins in the assembly.  The mean of the error appears to be close to zero, however, and the high error is likely due to statistics.  Despite the large relative error, WARP's spectrum is within $2\sigma$ of Serpent's results for the entire energy range.  The MCNP spectrum is slightly higher than both the WARP and Serpent spectra, which might be a small normalization error or a real difference. % how much different is it? It looks like a pretty significant difference... 
 
-The fission source distribution, shown in Figure \ref{assembly_fiss}, appears as expected, with the highest average probability in the center of the array both axially and radially.  Self-shielding is shown again, as every pin has a ring of higher probability on near its surface.  The assembly also shows some reflection effects from the thick layers of water surrounding it.  The pins at the edges have a higher fission source probability at the surfaces facing the water than those facing the interior of the assembly.  This is due to neutrons being able to scatter many times in the large volume of water and eventually scattering into an edge pin where they are immediately absorbed.  This phenomenon is apparent in both the axial and radial directions.  
+Figures \ref{homfuel_spec} shows the volume-averaged flux spectrum in the block of homogenized fuel.   Since this material is leaky and contains a strong thermal neutron absorber ($^{235}$U), no substantial thermal peak is seen since neutrons do not have time to accumulate around 0.026 eV before they are absorbed or leak out of the system.   Again, the relative difference compared the the Serpent spectrum is very low, at 5\% or lower for energies $10^{-9}$-$10^{-2}$ MeV where the flux has good statistics, but has much larger variations at energies above $10^{-2}$.  In this region, the errors become much larger, which could indicate that a minor sampling problem is occurring or physics isn't being handled exactly right.  The cause should be investigated as WARP continues to develop.  
 
-The relative difference of the assembly's fission source distribution, shown in Figure \ref{assembly_fiss_diff}, shows good agreement with Serpent.  The radial agreement is very good, but the axial has some noise in it due to the flux being small and the fissile volume being thin at the vertical edges of the assembly.% when the the source points are summed in the $y$-direction.  
-The axial difference also seems to be slightly offset in the negative direction, %I think you mean slightly more negative, not a negative verticle direction? you might want to reword...
- but again this is likely from the statistical uncertainty in the maximum value used to normalize the distribution.
+The fission source distribution of the homogenized block, shown in Figure \ref{homfuel_fiss}, has a structure similar to the Jezebel sphere, with an area of high probability in the center that drops to zero at the edges.  The noise seems to be more pronounced in this test, since the fissile volume is much larger than in the Jezebel sphere.  The relative difference of the distribution, shown in Figure \ref{homfuel_fiss_diff}, shows that edges are also more noisy, especially in the corners, since the flux is low there.  Despite the noise, the fission distribution appears to have a fairly uniform error distribution with an approximate mean of zero as indicated by the predominately green color.  
+
+
+
+
+Figures \ref{pincell_spec} and \ref{pincell_fiss}, show the volume-averaged flux spectrum and fission source distribution, respectively, in the UO$_2$ pin of the pin cell test.  This system is slightly leaky, and again contains light nuclides (water), but now they are spatially separated from the fissile material.  The relative difference compared to Serpent is again low, around 3\% or lower for energies $5\times10^{-9}$-$10$ MeV where the flux has good statistics.  The relative difference is also within $2\sigma$ of Serpent's values on the entire energy range, except for the slight deviation around 0.2 MeV where the error exceeds this bound.  This slightly increased error might be related to the resonance at 0.6 MeV.  There is a small thermal peak in the spectrum around 0.026 eV, indicating that the target velocity sampling scheme is working correctly, as well as the vector transformation and rotation schemes.  This is expected behavior since in this geometry the fissile material is separated from the moderator, and neutrons have a chance to accumulate at thermal energies before they are absorbed or leak.  
+
+The fission source distribution of the pin cell, shown in Figure \ref{pincell_fiss}, appears to be very smooth and well-converged radially and only slightly noisy axially.  The effect of the fuel having a high fission cross section at low energies can also be seen in the fission source distribution.  The high cross section manifests itself as a ring of high fission probability around the edge of the pin.  This is cause by thermalized neutrons re-entering the fuel pin and immediately fissioning a $^{235}$U nucleus.  This phenomenon is also called ``spatial self-shielding'' since the uranium at the surface shields the interior uranium from resonance neutrons and has implications in depletion and power distributions.  
+%Since the flux spectrum is volume averaged over the pin, the small thermal peak is most likely from the inclusion of this thin edge region where thermal neutrons still exist.  
+The axial fission source distribution follows an expected behavior of a finite cylinder as well, roughly following a cosine with the peak at $z=0$ \cite{duderstadt}.  Figure \ref{pincell_fiss_diff} shows the relative difference distribution of the pin cell compared to Serpent, and is almost entirely green in both the radial and axial directions, indicating very close agreement with Serpent.
+
+
+
+
+
+Figures \ref{assembly_spec} shows the volume-averaged flux spectrum in the center pin of the 15-sided hexagonal assembly test.  This problem is much more heterogeneous than any of the previous, with 300 times more objects in the domain compared to the pin cell test.  The WARP's spectrum matches very well with Serpent's, and the relative difference is with 15\% of Serpent  for energies $10^{-8}$-$9$ MeV where the flux has good statistics.  The spectrum is much noisier than any of the other tests since the volume of the center pin is relatively small compared to the volume of the fission source, even though this pin has the highest flux of any of the pins in the assembly.  The mean of the error appears to be close to zero, however, and the high error is most likely due to statistics.  Despite the large relative difference, WARP's spectrum is within $2\sigma$ of Serpent's results for the entire energy range.  The MCNP spectrum is slightly higher than both the WARP and Serpent spectra, which might be a small normalization error or a real difference.  
+
+The fission source distribution, shown in Figure \ref{assembly_fiss}, appears as expected, with the highest average probability in the center of the array both axially and radially.  Self-shielding is shown again, as every pin has a ring of higher probability on near its surface.  The assembly also shows some reflection effects from the thick layers of water surrounding it.  The pins at the edges have a higher fission source probability at the surfaces facing the water rather than the interior of the assembly.  This is due to neutrons that slowed-down in the water moderator surrounding the fuel assembly eventually scattering back into an edge pin where they are absorbed.  This phenomenon is apparent in both the axial and radial directions.  The relative difference of the assembly's fission source distribution, shown in Figure \ref{assembly_fiss_diff}, shows good agreement with Serpent.  The radial agreement is very good, but the axial has some noise in it due to the flux being small and the fissile volume being thin at the vertical edges of the assembly when the the source points are summed in the $y$-direction.  
+%The axial error also seems to be slightly offset in the negative direction on but again this is most likely from the statistical uncertainty in the maximum value used to normalize the distribution.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Fixed Source}
 
-WARP is also able to run simulations in fixed-source mode, where the initial neutron energies, directions, and locations are predefined and do not incorporate any feedback from the flux like the criticality source.  This mode adds any induced secondary neutrons back into the active particle dataset to be transported in conjunction with the source neutrons, which is also why these problems must be subcritical.   The first test is a large block of homogenized fuel material with a low-energy point source, so fissions will occur in uranium and secondary neutrons are produced and transported.   The second test is a block of water with a high-energy point source where no secondary neutrons are produced.
+WARP is also able to run simulations in fixed-source mode, where the initial neutron energies, directions, and locations are predefined and do not incorporate any feedback from the flux like the criticality source.  This mode adds any induced secondary neutrons back into the active particle dataset to be transported in conjunction with the source neutrons, which is also why these problems must be subcritical.   The first test is a 2x2x2m cube of homogenized fuel material with a 1 eV point source at its center.  In this case, fissions occur in uranium and secondary neutrons are produced and transported.  A small amount of $^{10}$B was included to ensure the system is subcritical so multiplication, and therefore runtimes, are modest.   The second test is a 2x2x2m cube of light water with a 2 MeV point source at its center.   No secondary neutrons are produced in this case.
 
 \begin{table}[h]
 \centering
@@ -304,7 +303,7 @@ WARP is also able to run simulations in fixed-source mode, where the initial neu
 \label{fixed_summary}
 \begin{tabular}{| l | r | r | r | r | r |}
  \hline
- Test & MCNP 6.1 & Serpent 2.1.18 & WARP & $\Delta$ M & $\Delta$ S  \\
+ test & MCNP 6.1 & Serpent 2.1.18 & WARP & $\Delta$ M & $\Delta$ S  \\
 \hline
 \hline
 \multicolumn{6}{|l|}{Water with 2 MeV point source }  \\
@@ -319,30 +318,24 @@ WARP is also able to run simulations in fixed-source mode, where the initial neu
 \end{tabular}
 \end{table}
 
-Table \ref{fixed_summary} shows the runtimes of WARP, Serpent, and MCNP for the two fixed-source tests.  WARP is able to perform the transport faster than either code on a single CPU, but the the water test performs about twice as fast as the homogenized fuel test.  The runtime of the water test is about five times longer than the homogenized fuel test, indicating that neutrons survive much longer and undergo many more scattering reactions in water than the homogenized fuel before they are absorbed or leak out.  The homogenized block contains two very strong thermal neutron absorbers, and low-energy neutrons are quickly absorbed.  Even though there are more neutrons transported in total in the homogenized block because of the secondary neutrons produced, the number of scatters in water still makes the runtime much longer.
+Table \ref{fixed_summary} shows the runtimes of WARP, Serpent, and MCNP for the two fixed source tests.  WARP is able to perform the transport faster than either code on a single CPU, but the the water test performs about twice as fast as the homogenized fuel test.  The runtimes of the water test is about five times longer than the homogenized fuel test, indicating that neutrons survive much longer and undergo many more scattering reactions in water than the homogenized fuel before they are absorbed or leak out.  The homogenized block contains two very strong thermal neutron absorbers, and low energy neutrons are quickly absorbed.  Even though there are more neutrons transported in total in the homogenized block due to the secondary neutrons produced, the number of scatters in water still makes the runtime much longer.
 
 \begin{figure}[h!]
 \centering
 \includegraphics[width=\textwidth,trim= 1cm 0cm 1cm 0cm]{graphics/finalresults/fixed_spec_homfuel.pdf}
-\caption{Flux spectra of a fixed-source simulation with a 1 eV point source in a block of fuel with boron. \label{fixed_spec_homfuel} }
+\caption{Volume-average flux spectra of a fixed source simulation with a 1 eV point source in a homogenous block of fuel, water, and boron. \label{fixed_spec_homfuel} }
 \end{figure}
 
-Figure \ref{fixed_spec_homfuel} shows the spectra produced by WARP, Serpent, and MCNP for the homogenized fuel fixed-source test.  The source spike extends beyond the plot scale, but the plot is on this scale to show more structure at other energies.  Even though the height of the source flux is not shown, the error at source is still calculated with the actual value and can still be seen in the error plots.  The source spike at 1 eV is clearly visible, and despite the presence of very strong thermal absorbers, there is a slight thermal population. While the absorbers are strong, some neutrons will interact with the $^{1}$H, $^{16}$O, or $^{238}$U and will not immediately be absorbed. Because the source is so large there is a non-trivial number of these neutrons. The difference in magnitude of the source spike and the knee immediately below it is about a factor of 30, attesting to the strength of the absorbers since leakage is low.  Subcritical multiplication is also evident, since there is significant flux at energies higher than the source.  The structure looks very similar to that of the criticality test in Figure \ref{homfuel_spec}, as it should.  
-
-The relative difference is less than 1\% for most energies and within the statistical error of the Serpent results below the source spike, but has a constant negative offset above the source. % what might be the cause of this offset? It seems like a pretty big deal. Is it an accounting problem with subcritical multiplication?
- If this offset were not there, it appears that the error would also be within the Serpent bounds.  The error also exhibits a deviation 0.6 MeV, similar to that in the pin cell spectrum.  
+Figure \ref{fixed_spec_homfuel} shows the volume-averaged flux spectra produced by WARP, Serpent, and MCNP for the homogenized fuel fixed-source test.  The source spike extends beyond the plot scale, but the plot is on this scale to show more structure at other energies.  Even though the height of the source flux is not shown, the error at source is still calculated with the actual value and can still be seen in the error plots.  The source spike at 1 eV is clearly visible, and despite the presence of very strong thermal absorbers, there is a slight population below 1 eV due to the strength of the source.  Even though the absorbers are strong, some neutrons will interact with the $^{1}$H, $^{16}$O, or $^{238}$U and will not immediately be absorbed.  The difference in magnitude of the source spike and the knee immediately below it is about a factor of 30, attesting the the strength of the absorbers since leakage is low.  Subcritical multiplication is also evident, since there is significant flux at energies higher than the source.  The structure looks very similar to that of the criticality test in Figure \ref{homfuel_spec}, as it should.  The relative difference is below 1\% for most energies and within the statistical error of the Serpent results below the source spike, but has a constant negative offset above the source.  If this offset were not there, it appears that the error would also be within the Serpent bounds.  The error also exhibits a deviation at 0.6 MeV, similar to that in the pin cell spectrum.   % It looks like more than just the thermal peak - it looks like 10^{-10} to 5 x 10^{-6}.  ?  I call it a population, not a peak.  rephrased
 
 \begin{figure}[h!]
 \centering
 \includegraphics[width=\textwidth,trim= 1cm 0cm 1cm 0cm]{graphics/finalresults/fixed_spec_water.pdf}
-\caption{Flux spectra of a fixed-source simulation with a 2 MeV point source in a block of water. \label{fixed_spec_water} }
+\caption{Volume-average flux spectra of a fixed source simulation with a 2 MeV point source in a block of water. \label{fixed_spec_water} }
 \end{figure}
 
-Figure \ref{fixed_spec_water} shows the spectra produced by WARP, Serpent, and MCNP for the water fixed-source test.  Again, the source spike extends beyond the plot scale to show more details at other energies.  This spectrum is much simpler than those with heavy nuclides.  There are no resonances below about 0.6 MeV, and the reactions are almost entirely elastic scattering.  There is very little structure until the very large thermal peak where neutrons accumulate until they are (predominantly) absorbed in $^1$H.  The relative difference is less than 0.5\% and within the uncertainty of Serpent's results for most of the energy domain except in the thermal peak and again at 0.6 MeV.% It looks like more than just the thermal peak - it looks like 10^{-10} to 5 x 10^{-6}.
-  
-  
-The relative differences at the thermal peak exhibits the same large swings as the higher-energy region of the homogenized fuel criticality test.% Is there a connection between the two regions that could lead to some insight?
-  The large swings may indicate that there is a small error in how the tallies are accumulated or that there is some roundoff error in regions where the tallies are scored frequently.   Since the 0.6 MeV deviation is present in almost all spectra and so is $^{16}$O, this may indicate that there is a small error in handling the 0.6 MeV scattering resonance in $^{16}$O.  
+Figure \ref{fixed_spec_water} shows the volume-averaged flux spectra produced by WARP, Serpent, and MCNP for the water fixed-source test.% Is there a connection between the two regions that could lead to some insight?  ? I'm not sure what you mean... what two regions?
+Again, the source spike extends beyond the plot scale to show more details at other energies.  This spectrum is much simpler than those with heavy nuclides.  There are no resonances below about 0.6 MeV, and the reactions are almost entirely elastic scattering.  There is very little structure until the very large thermal peak where neutrons accumulate until they are most likely absorbed in $^1$H.  The relative difference is below 0.5\% and within the uncertainty of Serpent's results for most of the energy domain except in the thermal peak and again at 0.6 MeV.  The thermal peak exhibits the same large swings as the higher energy region of the homogenized fuel criticality test.  The large swings may indicate that there is a small error in how the tallies are accumulated and there is some roundoff error in regions where they tallies are scored frequently.   Since the 0.6 MeV deviation is present in almost all spectra and so is $^{16}$O, this may indicate that there is a small error in handling the 0.6 MeV scattering resonance in $^{16}$O.  
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -352,15 +345,13 @@ The relative differences at the thermal peak exhibits the same large swings as t
 To measure the benefit of sorting and remapping references in WARP, a comparison to a non-remapping version of WARP must be made.  Table \ref{test_nonremapping_summary} shows the runtimes and multiplication factors of the criticality tests for remapping and non-remapping versions of WARP.  The remapping version performs much better than the non-remapping version when more complexity is added to the problem.  For very simple problems, like the Jezebel test, remapping is slightly slower or only slightly faster than non-remapping. This is because remapping adds overhead but is not really needed because the of the geometry and material simplicity. In these cases neutrons will only experience a few reactions.  % Remind us why few interactions is good: when you're only looking through a small amount of possibilities, remapping costs more than it helps.
 The leaky nature of the problem also means neutrons only undergo a few interactions on average before being terminated, which keeps the number of active neutrons small. In the non-remapping case, this is advantageous since the version is comparatively more efficient at processing neutrons when the active number is small. % I think I interpreted that correctly...flip it back if not - but make the clear connection (also tell us what's more efficient). 
 
-% Tell us about why there are differences in k!!! You show it and don't mention it. I think this is really important and has wide implications for the use of WARP in terms of reproducibility and algorithm selection. Speaking of - are the results preproducible from time to time with fixed algorithms? I wasn't sure because of kernel launch ordering...?
-
 \begin{table}[h]
 \centering
 \caption{Comparison of the non-remapping and remapping versions of WARP for the four criticality test cases.  20/40 discarded/active criticality cycles and $10^6$ histories per cycle.}
 \label{test_nonremapping_summary}
 \begin{tabular}{| l | r | r | r |}
  \hline
- Test & Remapping  & Non-Remapping   & $\Delta k$ or Ratio  \\
+ test & Remapping  & Non-Remapping   & $\Delta k$ or Ratio  \\
 \hline
 \hline
 \multicolumn{4}{|l|}{Jezebel}  \\
@@ -384,7 +375,7 @@ The leaky nature of the problem also means neutrons only undergo a few interacti
  Runtime               & 7.0682 m & 10.52 m & 1.49x \\
  \hline
   \hline
-\multicolumn{4}{|l|}{15-sided Hex Assembly}\\
+\multicolumn{4}{|l|}{Hex assembly}\\
 \hline
  $k_\mathrm{eff}$  & 1.4454  & 1.4457 & -30 pcm \\
  \hline
@@ -406,7 +397,7 @@ The leaky nature of the problem also means neutrons only undergo a few interacti
 \begin{tabular}{| l | r  | r | r | r |}
 \multicolumn{5}{l}{Remapping} \\
  \hline
- Subroutine        & Jezebel & Homogenized Block & Pincell & 15-sided Hex Assembly  \\
+ Subroutine        & Jezebel & Homogenized Block & Pincell & Hex assembly  \\
  \hline \hline
  OptiX Trace       & 3.8       &    18.5                        &   26.5    &      41.1    \\ \hline
  Grid Search       & 0.5       &    6.5                         &   5.1       &      4.7       \\ \hline
@@ -426,7 +417,7 @@ The leaky nature of the problem also means neutrons only undergo a few interacti
 \multicolumn{5}{l}{} \\
 \multicolumn{5}{l}{Non-Remapping} \\
  \hline
-Subroutine         & Jezebel & Homogenized Block & Pincell & 15-sided Hex Assembly  \\
+Subroutine         & Jezebel & Homogenized Block & Pincell & Hex assembly  \\
 \hline \hline
  OptiX Trace       & 14.2       &      38.0            &   46.7    &    45.2     \\ \hline
  Grid Search       &  1.3      &        6.3                 &  4.7     &     2.1      \\ \hline
@@ -470,5 +461,4 @@ In the non-remapping version, WARP spends most of its time in global routines li
 %In its current state, the source pop operation is rather expensive, usually in the top five most costly routines.  This may explain why the fixed source mode is much slower that the criticality mode.  In fixed source mode, the source pop needs to be done at every inner loop iteration to add active particles to the list of  active neutrons, whereas in criticality mode it is only done once at the end of the inner loop.
 
 % concluding paragraph to wrap up this chapter?
-
 

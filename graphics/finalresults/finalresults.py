@@ -92,7 +92,7 @@ if case=='':
 else:
 	reso=512
 
-reso=500
+reso=250
 
 #
 #  set latex and font
@@ -254,6 +254,9 @@ else:
 	fig.savefig('homfuel_fiss_serp'+case+'.eps')
 
 
+avg_xy = np.sum(serp_xy - warp_xy) / (250.0*250.0)
+avg_xz = np.sum(serp_xz - warp_xz) / (250.0*250.0)
+
 fig = pl.figure(figsize=(18,6))
 gs = gridspec.GridSpec(1, 2, width_ratios=[1, 1]) 
 ax0 = plt.subplot(gs[0])
@@ -261,11 +264,13 @@ ax1 = plt.subplot(gs[1])
 ax0.imshow( np.divide(serp_xy - warp_xy , serp_xy), vmin=-0.5 , vmax=0.5 ,extent=[xmin, xmax, ymin, ymax])#, normed=True)#norm=LogNorm())
 ax0.set_xlabel('x (cm)')
 ax0.set_ylabel('y (cm)')
+ax0.set_title(r'$\bar{\Delta}_{xy}=$'+' '+("%4.2f" % avg_xy))
 ax0.grid('on',color='k')
 
 ax1.imshow( np.divide( serp_xz - warp_xz , serp_xz ), vmin=-0.5 , vmax=0.5 ,extent=[xmin, xmax, ymin, ymax])
 ax1.set_xlabel('x (cm)')
 ax1.set_ylabel('z (cm)')
+ax1.set_title(r'$\bar{\Delta}_{xz}=$'+' '+("%4.2f" % avg_xz))
 ax1.grid('on',color='k')
 ax1.yaxis.tick_right()
 cbar_ax = cbar.make_axes(fig.get_axes())
@@ -444,6 +449,9 @@ else:
 	fig.savefig('pincell_fiss_serp'+case+'.eps')
 
 
+avg_xy = np.sum(serp_xy - warp_xy) / (250.0*250.0)
+avg_xz = np.sum(serp_xz - warp_xz) / (250.0*250.0)
+
 xmin = -5
 xmax =  5
 ymin = -5
@@ -455,6 +463,7 @@ ax1 = plt.subplot(gs[1])
 ax0.imshow( np.divide(serp_xy - warp_xy , serp_xy), vmin=-0.5 , vmax=0.5 ,extent=[xmin, xmax, ymin, ymax])#, normed=True)#norm=LogNorm())
 ax0.set_xlabel('x (cm)')
 ax0.set_ylabel('y (cm)')
+ax0.set_title(r'$\bar{\Delta}_{xy}=$'+' '+("%4.2f" % avg_xy))
 ax0.grid('on',color='k')
 
 xmin = -5
@@ -464,6 +473,7 @@ ymax =  25
 ax1.imshow( np.divide( serp_xz - warp_xz , serp_xz ), vmin=-0.5 , vmax=0.5 ,extent=[xmin, xmax, ymin, ymax])
 ax1.set_xlabel('x (cm)')
 ax1.set_ylabel('z (cm)')
+ax1.set_title(r'$\bar{\Delta}_{xz}=$'+' '+("%4.2f" % avg_xz))
 ax1.grid('on',color='k')
 ax1.yaxis.tick_right()
 cbar_ax = cbar.make_axes(fig.get_axes())
@@ -638,6 +648,9 @@ else:
 	fig.savefig('godiva_fiss_serp'+case+'.eps')
 
 
+avg_xy = np.sum(serp_xy - warp_xy) / (250.0*250.0)
+avg_xz = np.sum(serp_xz - warp_xz) / (250.0*250.0)
+
 fig = pl.figure(figsize=(18,6))
 gs = gridspec.GridSpec(1, 2, width_ratios=[1, 1]) 
 ax0 = plt.subplot(gs[0])
@@ -645,11 +658,13 @@ ax1 = plt.subplot(gs[1])
 ax0.imshow( np.divide(serp_xy - warp_xy , serp_xy), vmin=-0.5 , vmax=0.5 ,extent=[xmin, xmax, ymin, ymax])#, normed=True)#norm=LogNorm())
 ax0.set_xlabel('x (cm)')
 ax0.set_ylabel('y (cm)')
+ax0.set_title(r'$\bar{\Delta}_{xy}=$'+' '+("%4.2f" % avg_xy))
 ax0.grid('on',color='k')
 
 ax1.imshow( np.divide( serp_xz - warp_xz , serp_xz ), vmin=-0.5 , vmax=0.5 ,extent=[xmin, xmax, ymin, ymax])
 ax1.set_xlabel('x (cm)')
 ax1.set_ylabel('z (cm)')
+ax1.set_title(r'$\bar{\Delta}_{xz}=$'+' '+("%4.2f" % avg_xz))
 ax1.grid('on',color='k')
 ax1.yaxis.tick_right()
 cbar_ax = cbar.make_axes(fig.get_axes())
@@ -827,6 +842,9 @@ else:
 	fig.savefig('assembly_fiss_serp'+case+'.eps')
 
 
+avg_xy = np.sum(serp_xy - warp_xy) / (250.0*250.0)
+avg_xz = np.sum(serp_xz - warp_xz) / (250.0*250.0)
+
 xmin = -48
 xmax =  48
 ymin = -48
@@ -838,6 +856,7 @@ ax1 = plt.subplot(gs[1])
 ax0.imshow( np.divide(serp_xy - warp_xy , serp_xy), vmin=-0.5 , vmax=0.5 ,extent=[xmin, xmax, ymin, ymax])#, normed=True)#norm=LogNorm())
 ax0.set_xlabel('x (cm)')
 ax0.set_ylabel('y (cm)')
+ax0.set_title(r'$\bar{\Delta}_{xy}=$'+' '+("%4.2f" % avg_xy))
 ax0.grid('on',color='k')
 
 xmin = -48
@@ -847,6 +866,7 @@ ymax =  48
 ax1.imshow( np.divide( serp_xz - warp_xz , serp_xz ), vmin=-0.5 , vmax=0.5 ,extent=[xmin, xmax, ymin, ymax])
 ax1.set_xlabel('x (cm)')
 ax1.set_ylabel('z (cm)')
+ax1.set_title(r'$\bar{\Delta}_{xz}=$'+' '+("%4.2f" % avg_xz))
 ax1.grid('on',color='k')
 ax1.yaxis.tick_right()
 cbar_ax = cbar.make_axes(fig.get_axes())
