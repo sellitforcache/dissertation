@@ -474,7 +474,7 @@ In the non-remapping version, WARP spends most of its time in global routines li
 
 %In its current state, the source pop operation is rather expensive, usually in the top five most costly routines.  This may explain why the fixed source mode is much slower that the criticality mode.  In fixed source mode, the source pop needs to be done at every inner loop iteration to add active particles to the list of  active neutrons, whereas in criticality mode it is only done once at the end of the inner loop.
 
-% concluding paragraph to wrap up this chapter?
+% concluding paragraph to wrap up this chapter? short. done.
 In conclusion, WARP can produce results that are near those of Serpent and MCNP, but there are slight deviations in both the multiplication factor and the flux spectra that are outside of statistical error.  Remapping data references is an effective way to keep GPU execution efficient when using an event-based transport algorithm, and WARP can produce results an order of magnitude faster than Serpent and MCNP.
 
 
