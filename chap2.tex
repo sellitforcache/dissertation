@@ -355,7 +355,8 @@ There is also a special treatment for sampling reaction types in the unresolved 
 \section{Temperature Effects}
 \label{sec:temp}
 
-Thus far there has only been mention of the target nuclide's velocity by how it manifests itself in the 1/$v$ behavior of cross sections at low energy.  It is a good assumption that the thermal motion of the target nuclide is negligible when neutrons are at MeV-range energies.  However, when neutrons scatter and lose energy they can come near the thermal energy of the material, which is on the order of .01 eV.  When this happens, the target nuclide no longer appears stationary, and assuming that it has zero velocity in scattering calculations is inaccurate as discussed above. 
+%Thus far there has only been mention of the target nuclide's velocity by how it manifests itself in the 1/$v$ behavior of cross sections at low energy.  
+It is a good assumption that the thermal motion of the target nuclide is negligible when neutrons are at MeV-range energies.  However, when neutrons scatter and lose energy they can come near the thermal energy of the material, which is on the order of .01 eV.  When this happens, the target nuclide no longer appears stationary, and assuming that it has zero velocity in scattering calculations is inaccurate as discussed above. 
 
 MCNP sets the threshold above which the target nuclide can be assumed stationary at 400 kT, which corresponds to about 10 eV for materials at room temperature \cite{mcnp}.  Below this threshold, it is important to model thermal effects.  If this wasn't done, a neutron could keep scattering off of zero-energy targets and its energy could approach zero, which is not physical.  Neutrons can only scatter down to a state where they are in thermal equilibrium with the material they are traveling through.  This creates a ``thermal peak'' at low energies where neutrons collect, especially in materials where the absorption-to-scattering cross section ratio is small and neutrons scatter many times before they are absorbed.
 
@@ -528,7 +529,7 @@ Since the reactions rate density is dependent on the cross section and the veloc
 \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) = v(E) n(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t)
 \end{equation}
 
-Scattering cross sections are differential in angle, but absorption cross sections are not, so absorption reactions can be written in terms of the \emph{scalar flux density} (or simply the \emph{flux}), which is angular flux that has been integrated over all angles.  The relation between the angular and scalar fluxes is show in \eqref{scalar_flux}.  The scalar flux is usually the most interesting quantity in reactor physics since the reactor power profile is directly proportional to it (power comes from fission, which is an absorption reaction).  The reaction rate for a reaction $i$ that has no angular dependence is shown in \eqref{scalar_flux_RR}.
+Scattering cross sections have angular dependence, but absorption cross sections typically do not (their angular PDF is a constant), so absorption reactions can be written in terms of the \emph{scalar flux density} (or simply the \emph{flux}), which is angular flux that has been integrated over all angles.  The relation between the angular and scalar fluxes is show in \eqref{scalar_flux}.  The scalar flux is usually the most interesting quantity in reactor physics since the reactor power profile is directly proportional to it (power comes from fission, which is an absorption reaction).  The reaction rate for a reaction $i$ that has no angular dependence is shown in \eqref{scalar_flux_RR}.
 
 \begin{equation}
 \label{scalar_flux}
@@ -594,16 +595,29 @@ The fission source term describes the number of neutrons that are born in $dE$ a
 
 \begin{equation}
 \label{fiss_source1}
-R_f(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) =  \int_0^\infty dE^\prime \int_{\boldsymbol{\hat{\Omega}}} d\boldsymbol{\hat{\Omega}}^\prime \: \nu(E^\prime) \Sigma_f(E^\prime \rightarrow E,\boldsymbol{\hat{\Omega}}^\prime \rightarrow \boldsymbol{\hat{\Omega}}) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}}^\prime,E^\prime,t)  
+R_f(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) =  \int_0^\infty dE^\prime \int_{\boldsymbol{\hat{\Omega}}} d\boldsymbol{\hat{\Omega}}^\prime \: \nu_T(E^\prime) \Sigma_f(\boldsymbol{\vec{r}},E^\prime \rightarrow E,\boldsymbol{\hat{\Omega}}^\prime \rightarrow \boldsymbol{\hat{\Omega}}) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}}^\prime,E^\prime,t)  
  \end{equation}
  
- Fission neutrons are born isotropically, the cross section has no incoming angular dependence, and the emission energy is very weakly dependent on incoming energy.  The angular dependence is constant and can be extracted from the differential cross section and moved outside the integral.  To keep quantities unbiased, the extracted angular distribution must integrate to one, and is therefore $1/4\pi$.  Since the emission energy does not depend on incoming energy, the fission spectrum can be extracted from the differential cross section and removed from the integral as well.  The other two fission quantities do not depend on angle, so the angular integral over angular flux density can be be replaced with the scalar flux.  The final fission source expression is shown in \eqref{fiss_source2}.
+The doubly-differential cross section can be split into a total cross section and a pair of PDFs that describe the transfer probability, as shown in \eqref{pdf_split} \cite{jasmina_book}.  Fission neutrons are born isotropically, so $P_2$ must be a constant.  Since PDFs must integrate to 1, and angles are integrated over $4\pi$ seradians, $P_2=1/4\pi$.  The fission cross section has no incoming angular dependence, so it removed.  The fission emission energy is very weakly dependent on incoming energy, so $P_1$ is the total fission spectrum, $\chi_T(E)$, which includes both prompt and delayed neutrons.  These PDFs are not dependent on incoming angle or energy, and can be moved outside the integral.  The other two fission quantities, $\nu_T(E^\prime)$ and $\Sigma_f(\boldsymbol{\vec{r}},E^\prime)$ , do not depend on angle, so the angular integral over angular flux density can be be replaced with the scalar flux.  The final fission source expression is shown in \eqref{fiss_source2}.
 
+\begin{equation}
+\label{pdf_split}
+\begin{split}
+\Sigma_f(\boldsymbol{\vec{r}},E^\prime \rightarrow E,\boldsymbol{\hat{\Omega}}^\prime \rightarrow \boldsymbol{\hat{\Omega}}) &= \Sigma_f(\boldsymbol{\vec{r}},E^\prime,\boldsymbol{\hat{\Omega}}^\prime)  P_1(E \rightarrow E^\prime) P_2( \boldsymbol{\hat{\Omega}}^\prime \rightarrow \boldsymbol{\hat{\Omega}}) \\
+&= \Sigma_f(\boldsymbol{\vec{r}},E^\prime)  P_1(E \rightarrow E^\prime) P_2( \boldsymbol{\hat{\Omega}}^\prime \rightarrow \boldsymbol{\hat{\Omega}})
+\end{split}
+ \end{equation}
+ 
+ \begin{equation}
+\label{pdf_fissions}
+P_1(E \rightarrow E^\prime) = \chi_T(E) \qquad \qquad P_2( \boldsymbol{\hat{\Omega}}^\prime \rightarrow \boldsymbol{\hat{\Omega}}) = \frac{1}{4\pi}
+ \end{equation}
+ 
 \begin{equation}
 \label{fiss_source2}
 \begin{split}
-R_f(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) & = \frac{\chi(E)}{4\pi} \int_0^\infty  \int_{\boldsymbol{\hat{\Omega}}}   \nu(E^\prime) \Sigma_f(\boldsymbol{\vec{r}},E^\prime) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}}^\prime,E^\prime,t) d\boldsymbol{\Omega}^\prime  dE^\prime \\
-&= \frac{\chi(E)}{4\pi} \int_0^\infty   \nu(E^\prime) \Sigma_f(\boldsymbol{\vec{r}},E^\prime) \phi(\boldsymbol{\vec{r}},E^\prime,t)  dE^\prime
+R_f(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) & = \frac{\chi_T(E)}{4\pi} \int_0^\infty  \int_{\boldsymbol{\hat{\Omega}}}   \nu_T(E^\prime) \Sigma_f(\boldsymbol{\vec{r}},E^\prime) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}}^\prime,E^\prime,t) d\boldsymbol{\Omega}^\prime  dE^\prime \\
+&= \frac{\chi_T(E)}{4\pi} \int_0^\infty   \nu_T(E^\prime) \Sigma_f(\boldsymbol{\vec{r}},E^\prime) \phi(\boldsymbol{\vec{r}},E^\prime,t)  dE^\prime
 \end{split}
  \end{equation}
 % you switched from angle integration limits of omega to 4pi. just an fyi.  oops, FIXED!
@@ -640,7 +654,7 @@ We can then write an expression for the leakage by performing a surface integral
 
 \subsection{Neutron Transport Equation}
 
-Now all the terms of \eqref{NBE} have been explicitly defined.  Substituting them all in yields \eqref{NTE}, the \emph{neutron transport equation}, written here with the neutron sinks on the left side and the neutron sources on the right side.  An additional external source term, $S_{\mathrm{external}}$, has been added to account for any neutron sources not induced by the neutron flux itself, i.e.\ external sources.  This form of the equation also includes delayed neutrons.  For delayed neutron precursor group $j$, $C_j$ is the concentration, $\chi_{d,j}$ is the energy spectrum ($d$ only signifies ``delayed''), and $\lambda_j$ is the decay constant \cite{jasmina_book}.  As was stated previously, delayed neutrons are important for reactor control.  WARP is concerned with time-independent solutions, and the spectral and fission yield effects of delayed neutrons are incorporated into the data WARP uses.
+Now all the terms of \eqref{NBE} have been explicitly defined.  Substituting them all in yields \eqref{NTE}, the \emph{neutron transport equation}, written here with the neutron sinks on the left side and the neutron sources on the right side.  An additional external source term, $S_{\mathrm{external}}$, has been added to account for any neutron sources not induced by the neutron flux itself, i.e.\ external sources.  This form of the equation also includes delayed neutrons.  For delayed neutron precursor group $j$, $C_j$ is the concentration, $\chi_{d,j}$ is the energy spectrum ($d$ only signifies ``delayed''), and $\lambda_j$ is the decay constant \cite{jasmina_book}.  As was stated previously, delayed neutrons are important for reactor control.  Since delayed neutrons are included explicitly in these equations, the fission spectrum, $\chi_p(E)$, and average fission neutron yield, $\nu_p(E)$, are for prompt neutrons only.  The inclusion of delayed neutrons also means an additional six equations defining the precursor concentrations must be included (since the concentration depends on the flux), and are shown in \eqref{precursor_conc}.  WARP is concerned with time-independent solutions, and the spectral and fission yield effects of delayed neutrons are incorporated into the data WARP uses.
 
 \begin{equation}
 \label{NTE}
@@ -650,10 +664,15 @@ Now all the terms of \eqref{NBE} have been explicitly defined.  Substituting the
 \Sigma_t(\boldsymbol{\vec{r}},E) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) & \\
 & =  \\
 & \quad \int_0^\infty dE^\prime \int_{\boldsymbol{\hat{\Omega}}} d\boldsymbol{\Omega}^\prime \:\: \Sigma_s(E^\prime \rightarrow E,\boldsymbol{\hat{\Omega}}^\prime \rightarrow \boldsymbol{\hat{\Omega}}) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}}^\prime,E^\prime,t)    \\
-&+ \frac{\chi(E)}{4\pi} \int_0^\infty dE^\prime  \int_{\boldsymbol{\hat{\Omega}}} d\boldsymbol{\Omega}^\prime \:\:  \nu(E^\prime) \Sigma_f(\boldsymbol{\vec{r}},E^\prime) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}}^\prime,E^\prime,t)  \\
+&+ \frac{\chi_p(E)}{4\pi} \int_0^\infty dE^\prime  \int_{\boldsymbol{\hat{\Omega}}} d\boldsymbol{\Omega}^\prime \:\:  \nu_p(E^\prime) \Sigma_f(\boldsymbol{\vec{r}},E^\prime) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}}^\prime,E^\prime,t)  \\
 & + \sum_{j=1}^{6}\frac{\chi_{d,j}(E)}{4\pi} \lambda_j C_j(r,t)     \\
 & + S_{\mathrm{external}}
 \end{split}
+ \end{equation}
+ 
+ \begin{equation}
+\label{precursor_conc}
+\frac{\partial}{\partial t}C_j(r,t)  = -\lambda_j C_j(r,t) + \int_0^\infty dE^\prime  \int_{\boldsymbol{\hat{\Omega}}} d\boldsymbol{\Omega}^\prime \:\: \nu_j(E^\prime) \Sigma_{f}(\boldsymbol{\vec{r}},E^\prime) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}}^\prime,E^\prime,t)
  \end{equation}
 % add delayed neutrons here
 % add expression for keff here.
@@ -677,7 +696,7 @@ In \eqref{time_ind_NTE} another parameter has been introduced, the effective mul
 \Sigma_t(\boldsymbol{\vec{r}},E) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E) & \\
 & =  \\
 & \quad \int_0^\infty dE^\prime   \int_{\boldsymbol{\hat{\Omega}}} d\boldsymbol{\Omega}^\prime \:\: \Sigma_s(E^\prime \rightarrow E,\boldsymbol{\hat{\Omega}}^\prime \rightarrow \boldsymbol{\hat{\Omega}}) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}}^\prime,E^\prime)  \\
-&+ \frac{1}{k_{\mathrm{eff}}}\frac{\chi(E)}{4\pi} \int_0^\infty dE^\prime  \int_{\boldsymbol{\hat{\Omega}}}  d\boldsymbol{\Omega}^\prime \:\:  \nu(E^\prime) \Sigma_f(\boldsymbol{\vec{r}},E^\prime) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}}^\prime,E^\prime)  \\
+&+ \frac{1}{k_{\mathrm{eff}}}\frac{\chi_T(E)}{4\pi} \int_0^\infty dE^\prime  \int_{\boldsymbol{\hat{\Omega}}}  d\boldsymbol{\Omega}^\prime \:\:  \nu_T(E^\prime) \Sigma_f(\boldsymbol{\vec{r}},E^\prime) \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}}^\prime,E^\prime)  \\
 \end{split}
  \end{equation}
  
