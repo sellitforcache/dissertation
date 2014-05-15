@@ -15,17 +15,17 @@ Number &  Description \\
 800 &  Resample flag \\
 &  History is skipped until OptiX determines the material \\
 \hline
-811-845 & Secondary-producing disappearance reactions \\
+811-845 & Secondary-producing absorption reactions \\
  & that have NOT yet been processed by the fission kernel \\
 \hline
-911-945 & Secondary-producing disappearance reactions \\
+911-945 & Secondary-producing absorption reactions \\
 & that have been processed, history terminated \\
 \hline
 997	&  OptiX miss (error) \\
 \hline
 999	&   Leakage	\\
 \hline
-$>$1102 & Absorption reactions \\
+$>$1102 & Capture reactions \\
 & 1000 added to standard MT number\\
 \hline
 \end{tabular}
@@ -39,11 +39,11 @@ $>$1102 & Absorption reactions \\
 \hline
 Number &  Description \\
 \hline
-1	  &   Cuboid  \\
+1	  &   Axis-aligned Cuboid  \\
 \hline
 2 	&  Z-parallel finite cylinder \\
 \hline
-3	&   Hexagonal prism	\\
+3	&   Z-parallel finite hexagonal prism	\\
 \hline
 4     & Sphere \\
 \hline
