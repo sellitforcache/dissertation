@@ -1,6 +1,8 @@
 \chapter{Conclusions and Future Work}
 \label{chap:conclusions}
 
+\section{General Conclusions}
+
 %Start with a brief summary of what you have accomplished (emphasis on new elements) and in what ways you have advanced the state of the art.  enough I hope?
 The WARP code developed in this work is currently the most detailed and feature-rich program in existence for performing continuous energy Monte Carlo neutron transport in general 3D geometries on GPUs.  It implements a novel adaptation of an event-based transport algorithm; loads standard data files; unionizes the nuclear data in a new, high performance way; accurately simulates each reaction type specified in the data; and uses a flexible, scalable, and optimized geometry representation.
 
@@ -12,9 +14,9 @@ This initial development phase of WARP is the first step in creating a full-feat
 
 In its current state it may be a good tool for multiplication factor searches, like determining reactivity coefficients by perturbing material densities and temperatures, since these types of calculations typically do not require many flux tallies.  WARP is also useful in a workstation environment since it currently can only be run on a single GPU card and can significantly accelerate calculations where only a few CPU cores would be available otherwise.  Conversely, it is currently not good for depletion calculations since they can require many, many tallies.  This is not to say that GPUs couldn't perform depletion well, but rather that WARP is currently not suited to the task.
 
-\section{Conclusions}
+\section{Specific Conclusions}
 
-The development of WARP has led to important conclusions.  The first is that running with large datasets, and therefore a large number of threads, is important for good performance.  It was found that in some cases, moving from $10^5$ to $10^6$ neutrons per batch in criticality mode increase performance by a factor of four or more.  It is important to keep the GPU saturated with threads so it can effectively pipeline data loads.  
+The development of WARP has led to important conclusions regarding how to conduct neutron transport on GPUs.  The first is that running with large datasets, and therefore a large number of threads, is important for good performance.  It was found that in some cases, moving from $10^5$ to $10^6$ neutrons per batch in criticality mode increase performance by a factor of four or more.  It is important to keep the GPU saturated with threads so it can effectively pipeline data loads.  
 %WARP uses global operations to act on a large dataset of neutron histories, and there is no state continuity between kernel launches.  Therefore data must be stored in and loaded from global memory.  This makes it  important to launch as many threads as possible so the GPU can hide the large data access latencies though pipelining, especially since data access is random and non-coalesced, exacerbating the need for pipelining.  In addition to being able to hide latencies better with more active threads, using large datasets also pays for kernel launch overhead by making the computational payload large and therefore the factional cost of launching a kernel small.  This also why it is important to have most of the data loads requested immediately at the beginning of the kernel; the compute rate mainly depends on the rate at which data is fetched, so fetching it as soon as possible will provide the best performance.
 
 The second conclusion is that remapping threads to active data is an effective way of raising the processing rate when the number of active neutrons becomes small; this also reduces thread divergence in reaction kernels.  Using a radix sort to do the remapping is effective since it segregates reactions into contiguous blocks, efficient since it can be done in place and in $O(kN)$ time, and can eliminate completed data from being accessed if slight modifications to the standard reaction number encodings are made.  
