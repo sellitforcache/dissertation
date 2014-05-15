@@ -160,15 +160,15 @@ The above expressions do not take any energy dependence into account. The quantu
     \caption{The energy dependence of some reactions in $^{235}$U.   \label{xs_e_dependence_u}}
 \end{figure}
 
-It is important to note the complexity shown in $^{235}$U in the 0.1 eV to 40 keV range.  This is referred to as the ``resonance region'' and adds much of the complexity in accurately modeling neutron transport.  There are no simple functional representations available for such cross sections, so they must be represented in a point-wise tabular format.  
+It is important to note the complexity shown in in the cross sections for $^{235}$U in the 0.1 eV to 40 keV range.  This is referred to as the ``resonance region'' and adds much of the complexity in accurately modeling neutron transport.  There are no simple functional representations available for such cross sections, so they must be represented in a point-wise tabular format.  
 
 %It is also important to note that at low energies, cross sections typically exhibit ``1/$v$'' scaling with regard to the incoming neutron energy.  This is due to the particle and the target having more time to interact with each other.  This phenomenon exists at energy levels similar the thermal energy of the target.  Since the neutron has an energy similar to the target, the target no longer appears stationary from the neutron's perspective.  If the neutron is slow enough, the target appears to be moving instead of the neutron, and more targets come into the neutron's sphere of interaction.  This is the qualitative reason for 1/$v$ scaling at low energies.  Because of their identical scaling, the ratios between the reaction types stays constant as velocity is decreased but the overall interaction probability with respect to distance increases \cite{duderstadt}.
 
 \subsection{Elastic Scattering}
 
-Elastic scattering conserves both the momentum and the kinetic energy of the reacting particles and occurs when the neutron does not enter the nucleus, but bounces off of its potential field.  Since there is only a single exiting particle, elastic scattering is a two-body interaction and the kinematics are constrained by conservation of momentum and energy.  The angle between the neutron's incoming and outgoing directions, or scattering angle, $\theta$, is often represented as its cosine, $\mu = \cos \theta$.  The scattering angle is the only unconstrained variable in the elastic scattering interaction, and the exiting neutron energy can be determined if the angle between the incoming and exiting particle is known.  
+Elastic scattering conserves both the momentum and the kinetic energy of the reacting particles and occurs when the neutron does not enter the nucleus, but bounces off of its potential field.  Since there is only a single exiting particle, elastic scattering is a two-body interaction and the kinematics are constrained by conservation of momentum and total energy.  The angle between the neutron's incoming and outgoing directions, or scattering angle, $\theta$, is often represented as its cosine, $\mu = \cos \theta$.  The scattering angle is the only unconstrained variable in the elastic scattering interaction, and the exiting neutron kinetic energy can be determined if the angle between the incoming and exiting particle is known.  
 
-This problem is greatly simplified if the velocities of the interacting neutron and nucleus are transformed into the center-of-mass (CM) frame, where net momentum is zero. The velocity of the CM is defined in \eqref{vCM} where $m$ and $M$ are the neutron's and the target's respective masses, $v$ and $V$ are their respective velocity vectors, and $A$ is the ratio of the target's mass to the neutron's mass (also know as the ``atomic mass ratio'' or AMR).  The derivation from here follows closely with that in \cite{jaakko}.
+This problem is greatly simplified if the velocities of the interacting neutron and nucleus are transformed into the center-of-mass (CM) frame, where net momentum before and after the collision is zero. The velocity of the CM is defined in \eqref{vCM} where $m$ and $M$ are the neutron's and the target's respective masses, $v$ and $V$ are their respective velocity vectors, and $A$ is the ratio of the target's mass to the neutron's mass (also know as the ``atomic mass ratio'' or AMR).  The derivation from here follows closely with that in \cite{jaakko}.
 
 \begin{equation}
 A = \frac{M}{m}
@@ -218,7 +218,7 @@ m v_{_\mathrm{c}}^2 + M V_{_\mathrm{c}}^2 &= m v_{_\mathrm{c}}^{\prime2} + M V_{
 \label{consECM}
 \end{equation}
 
-There are now two unknowns (the primed values) and two equations, and the final velocities of the neutron and the target can be determined.  Substituting \eqref{rotationCM} into \eqref{consECM} and solving yields either equation in \eqref{finalvCM}, depending on how the substitution is done.  If $Q$ is zero, as it is in elastic scattering, the initial and final velocities are the same for both the neutron and the target, and the interaction only causes a rotation in the CM frame.
+There are now two unknowns (the primed values) and two equations, and the final velocities of the neutron and the target can be determined.  Substituting \eqref{rotationCM} into \eqref{consECM} and solving for either $v_{_\mathrm{c}}^{\prime}$ or $V_{_\mathrm{c}}^{\prime}$  yields either equation in \eqref{finalvCM}.  If $Q$ is zero, as it is in elastic scattering, the initial and final velocities are the same for both the neutron and the target, and the interaction only causes a rotation in the CM frame.
 
 \begin{equation}
 \begin{split}
@@ -283,22 +283,23 @@ The released energy isn't deposited as heat directly, however.  It is released i
 
 \begin{table}[h]
 \centering
-\caption[Average distribution of fission energy.]{Average distribution of fission energy \cite{duderstadt}.\label{fission_dist}}
+\caption[Average distribution of of $^{235}$U fission energy.]{Average distribution of of $^{235}$U fission energy \cite{duderstadt}.\label{fission_dist}}
 \begin{tabular}{| l | c | r | r |}
 \hline
-Particle & Energy (\%) & Range & Time \\
+\multirow{2}{*}{Particle} & Energy  & \multirow{2}{*}{Range} & \multirow{2}{*}{Time} \\
+  & (\% of 192.9$\pm$0.5 MeV) & & \\
 \hline
 Fission fragment kinetic energy & 80 & $<$0.1cm & prompt \\
 \hline
-Prompt neutrons & 3 & 10-100cm & prompt \\
+Prompt neutrons & 3 & 10-100 cm & prompt \\
 \hline
-Photons & 4 & 100cm & prompt \\
+Photons & 4 & 100 cm & prompt \\
 \hline
 Fission product $\beta$ decay & 4 & short & delayed \\
 \hline
 Neutrinos &  5 & extremely long & delayed \\
 \hline
-Nonfission reactions from n capture & 4 & 100cm & delayed \\
+Nonfission reactions from n capture & 4 & 100 cm & delayed \\
 \hline
 \end{tabular}
 \end{table}
@@ -323,13 +324,13 @@ The kinetics of a nuclear chain reaction depends heavily on the mean neutron lif
      \caption{Fission cross sections for $^{235}$U, $^{238}$U, and  $^{239}$Pu. \label{xs_fission_only}}
 \end{figure}
 
-Figure \ref{nu_compare} shows the energy dependence of the average total number of neutrons per fission, $\nu_\mathrm{T}$, for several fissionable isotopes.  $\nu_\mathrm{T}$ is shown at a single target material temperature since it has very weak temperature dependence for most incoming neutron energies.   For all three isotopes shown, $\nu_\mathrm{T}$ is nearly constant from low energies up to energies in the MeV range, where it increases sharply due to the energy the incident neutron provides being sufficient to eject additional bound neutrons.  
+Figure \ref{nu_compare} shows the energy dependence of the average total number of neutrons per fission, $\nu_\mathrm{T}$, for several fissionable isotopes.  The average total number of neutrons per fission is shown at a single target material temperature since it has very weak temperature dependence for most incoming neutron energies.   For all three isotopes shown, $\nu_\mathrm{T}$ is nearly constant from low energies up to energies in the MeV range, where it increases sharply due to the energy the incident neutron provides being sufficient to eject additional bound neutrons.  
 
 % Okay, I got to here and had thought \nu up above was total. what does \nu include then? I'm confused by your previous discussion now. I have relabeled it so I am always talking about nu_T
 % In this discussion you should indicate which \nu_T you're talking about or talk about them collectively (the figure has 3 values)
 %  I am speaking about nu_T in general.  I never once mention a specific value for it, I only am discussing what it means and the figure is for illustration
 
-Figure \ref{xs_fission_only} shows the total fission cross sections for two fissile isotopes, $^{235}$U and $^{239}$Pu, and one fertile isotope, $^{238}$U.  The figure shows that  $^{238}$U has a fission cross section, but it isn't significant until above 1 MeV.  For $^{238}$U, fission is practically a threshold reaction.  Simply absorbing a neutron does not provide enough energy to split the nucleus.  Additional energy is required, which can be provided in the form of an incident neutron's kinetic energy.  $^{238}$U isn't fissile, but it can be a significant contributor of fission reactions in reactors where the neutron population is \emph{fast}, i.e.\ mainly high-energy.  As mentioned before, $^{238}$U is considered fertile because it is converted to the fissile isotope $^{239}$Pu after absorbing a neutron and radioactively decaying\cite{duderstadt}.  
+Figure \ref{xs_fission_only} shows the total fission cross sections for two fissile isotopes, $^{235}$U and $^{239}$Pu, and one fertile isotope, $^{238}$U.  The figure shows that  $^{238}$U has a fission cross section, but it isn't significant until above 1 MeV.  For $^{238}$U, fission is practically a threshold reaction.  Simply absorbing a neutron does not provide enough energy to split the nucleus.  Additional energy is required, which can be provided in the form of an incident neutron's kinetic energy.  $^{238}$U isn't fissile, but it can be a significant contributor of fission reactions in reactors where the neutron population is \emph{fast}, i.e.\ mainly high-energy.  As mentioned before, $^{238}$U is considered fertile because it is converted to the fissile isotope $^{239}$Pu after absorbing a neutron and radioactively decaying \cite{duderstadt}.  
   
 WARP uses $\nu_\mathrm{T}$ and fission neutron energy spectra that incorporate delayed neutron energies since is more physically accurate and produces the overall effective multiplication factor.  
 
@@ -415,7 +416,7 @@ Many Monte Carlo codes read ACE-formatted data rather than the original ENDF fil
 
 It can clearly be seen that there are many reactions a neutron can undergo, most of which have very strong energy dependence.  Most of the complexity in modeling nuclear reactors comes from the fact that the data needed to model neutrons is very complicated.  Data may be the most important part of the simulation; it is what ties the calculations to reality.  
 
-ACE data files typically come pre-processed at different temperatures.  This processing can done by a code called NJOY \cite{jaakko}, which Doppler broadens all the resonances in the cross sections and adjusts and unresolved resonance tables accordingly.  It can also thin the energy grid if requested by the user, though this reduces the accuracy of the cross sections \cite{jaakko}.  Thinning the energy grid is a computationally intensive task, and NJOY is not parallelized.  Most production codes come with their own pre-processed datasets at several temperature intervals in order to save the user the time and effort needed to process data from ENDF files.
+ACE data files typically come pre-processed at different temperatures.  This processing can done by a code called NJOY \cite{jaakko}, which Doppler broadens all the resonances in the cross sections and adjusts the unresolved resonance tables accordingly.  It can also thin the energy grid if requested by the user, though this reduces the accuracy of the cross sections \cite{jaakko}.  Thinning the energy grid is a computationally intensive task, and NJOY is not parallelized.  Most production codes come with their own pre-processed datasets at several temperature intervals in order to save the user the time and effort needed to process data from ENDF files.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
