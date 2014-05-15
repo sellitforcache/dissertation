@@ -332,7 +332,7 @@ Figure \ref{nu_compare} shows the energy dependence of the average total number 
 
 Figure \ref{xs_fission_only} shows the total fission cross sections for two fissile isotopes, $^{235}$U and $^{239}$Pu, and one fertile isotope, $^{238}$U.  The figure shows that  $^{238}$U has a fission cross section, but it isn't significant until above 1 MeV.  For $^{238}$U, fission is practically a threshold reaction.  Simply absorbing a neutron does not provide enough energy to split the nucleus.  Additional energy is required, which can be provided in the form of an incident neutron's kinetic energy.  $^{238}$U isn't fissile, but it can be a significant contributor of fission reactions in reactors where the neutron population is \emph{fast}, i.e.\ mainly high-energy.  As mentioned before, $^{238}$U is considered fertile because it is converted to the fissile isotope $^{239}$Pu after absorbing a neutron and radioactively decaying \cite{duderstadt}.  
   
-WARP uses $\nu_\mathrm{T}$ and fission neutron energy spectra that incorporate delayed neutron energies since is more physically accurate and produces the overall effective multiplication factor.  
+WARP uses $\nu_\mathrm{T}$ and fission neutron energy spectra that incorporate delayed neutron energies since it is more physically accurate and produces the overall effective multiplication factor.  
 
 \subsection{Capture Reactions}
 
@@ -496,14 +496,14 @@ N_V = \int_0^\infty dE \int_{\boldsymbol{\hat{\Omega}}} d\boldsymbol{\hat{\Omega
 
 \subsection{Reaction Rates}
 
-A \emph{reaction rate} is the rate at which a certain reaction is happening in a volume \cite{duderstadt}.  If we consider $N$ particles that travel at speed $v$ in one direction.  If $\Sigma$ is the interaction probability per unit length, multiplying it by the speed gives the probability of interaction per second, or the \emph{collision rate}.  Since there are $N$ particles, multiplying the collision rate by $N$ gives the overall reaction rate, $N v \Sigma$, of the particles in an infinite medium.  If $N$ is substituted for the neutron distribution function instead of a pulse, the expression becomes the reaction rate per distribution differential, or the \emph{reaction rate density}, $R(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t)$.  This expression is shown in \eqref{RR} and is the first building block of the explicit neutron balance equation.
+A \emph{reaction rate} is the rate at which a certain reaction is happening in a volume \cite{duderstadt}.  Consider $N$ particles that travel at speed $v$ in one direction.  If $\Sigma$ is the interaction probability per unit length, multiplying it by the speed gives the probability of interaction per second, or the \emph{collision rate}.  Since there are $N$ particles, multiplying the collision rate by $N$ gives the overall reaction rate, $N v \Sigma$, of the particles in an infinite medium.  If $N$ is substituted for the neutron distribution function instead of a pulse, the expression becomes the reaction rate per distribution differential, or the \emph{reaction rate density}, $R(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t)$.  This expression is shown in \eqref{RR} and is the first building block of the explicit neutron balance equation.
 
 \begin{equation}
 \label{RR}
 R(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t)  = v(E) n(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) \Sigma(\boldsymbol{\vec{r}},E)
 \end{equation}
 
-If we assume there is only one energy, $E_0$ and one direction that the neutron distribution varies along, $\hat{x}$, and integrate over the other dimensions of this equation, as shown in \eqref{1d_diff}, we get an expression for the reaction rate in an infinitesimal slice, $dx$.  $A$ is the area perpendicular to the direction of motion where the neutron population is nonzero.
+If we assume there is only one energy, $E_0$, and one direction that the neutron distribution varies along, $\hat{x}$, and integrate over the other dimensions of this equation, as shown in \eqref{1d_diff}, we get an expression for the reaction rate in an infinitesimal slice, $dx$.  $A$ is the area perpendicular to the direction of motion where the neutron population is nonzero.
 
 
 \begin{equation}
@@ -550,19 +550,19 @@ From \eqref{NBE} we can see that the time derivative is in terms of the neutron 
 
 \subsection{Scattering}
 
-Scattering is highly dependent on angle in addition to energy and requires a more detailed cross section expression than absorption reactions.  Elastic scattering has a fixed relation between incoming and outgoing energy and angle, but inelastic scattering does not. To be completely general in order to describe either type of scattering, all scattering cross sections are assumed to depend not only on incoming energy (like all cross sections), but also on outgoing energy, incoming angle, and outgoing angle.  Since two quantities are being related before and after the scattering event, the scattering cross section is considered \emph{doubly differential} and is sometimes called the \emph{scattering kernel}, whereas the integrated value, which only depends on incoming energy, is called the scattering cross section.   An expression for the scattering kernel is shown in \eqref{scattering_DD_xs} with the incoming values primed \cite{jaakko}.
+Scattering is highly dependent on angle in addition to energy and requires a more detailed cross section expression than absorption reactions.  Elastic scattering has a fixed relation between incoming and outgoing energy and angle, but inelastic scattering does not. To be completely general in order to describe either type of scattering, all scattering cross sections are assumed to depend not only on incoming energy (like all cross sections), but also on outgoing energy, incoming angle, and outgoing angle.  Since two quantities are being related before and after the scattering event, the scattering cross section is considered \emph{doubly differential} and is sometimes called the \emph{scattering kernel}, whereas the integrated value, which only depends on incoming energy, is called the scattering cross section.   An expression for the scattering kernel is shown in \eqref{scattering_DD_xs} with the outgoing values primed \cite{jaakko}.
 % this equality doesn't make sense to me - i think i understand what you're trying to say, but I don't understand this equation. done
 
 \begin{equation}
 \label{scattering_DD_xs}
-\Sigma_s(\boldsymbol{\vec{r}},E) = \int_{\boldsymbol{\hat{\Omega}}} d\boldsymbol{\hat{\Omega}}^\prime \int_0^\infty dE^\prime \: \: \Sigma_s(\boldsymbol{\vec{r}},E^\prime \rightarrow E,\boldsymbol{\hat{\Omega}}^\prime \rightarrow \boldsymbol{\hat{\Omega}})
+\Sigma_s(\boldsymbol{\vec{r}},E) = \int_{\boldsymbol{\hat{\Omega}}} d\boldsymbol{\hat{\Omega}}^\prime \int_0^\infty dE^\prime \: \: \Sigma_s(\boldsymbol{\vec{r}},E \rightarrow E^\prime,\boldsymbol{\hat{\Omega}} \rightarrow \boldsymbol{\hat{\Omega}}^\prime)
  \end{equation}
 
 There is a practical reason for separating scattering into a cross
 %use of total here is confusing
  section that describes the likelihood of a neutron entering the reaction, and a kernel that describes how it exits.  In a Monte Carlo simulation, the cross section is used to determine \emph{whether} scattering happens rather than \emph{how} it happens.  The scattering kernel is used to determine exit energy and angle only if a neutron has already been determined to scatter.  
  
-This separation is also useful in expressions for scattering in a differential volume.  The cross section is used as the removal of a neutron from a particular energy and/or angle, whereas the kernel is used to determine which other energies and angles contribute to neutrons scattering \emph{into} a particular energy and/or angle.  This can be seen in \eqref{scattering_DD_xs}.  If the outgoing energy and angle are held constant, the quantity is the probability for which other angles and energies scatter into it.
+This separation is also useful in expressions for scattering in a differential volume.  The cross section is used as the removal of a neutron from a particular energy and/or angle (it is the doubly differential scattering cross section integrated over all outgoing directions and energies), whereas the kernel is used to determine which other energies and angles contribute to neutrons scattering \emph{into} a particular energy and/or angle.  This can be seen in \eqref{scattering_DD_xs}.  If the outgoing energy and angle are held constant, the quantity is the probability for which other angles and energies scatter into it.
 
 Using these two quantities, in-scattering and out-scattering terms can be written for the differential volume.  The expression for loss uses the integrated cross section, shown in \eqref{scattering_loss}, and the kernel is used in what is often called the \emph{scattering source} term, shown in \eqref{scattering_source}.  The source term needs to be integrated over all other energies, $E^\prime$, and angles, $\boldsymbol{\hat{\Omega}}^\prime$, from which neutrons can scatter into energy $E$ and angle $\boldsymbol{\hat{\Omega}}$.
 
@@ -622,14 +622,14 @@ We can then write an expression for the leakage by performing a surface integral
 
 \begin{equation}
 \label{leakage_surface}
-\mathrm{Leakage} = \int_S ds \cdot  \vec{\boldsymbol{J}}(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) = \int_S ds \cdot  \boldsymbol{\hat{\Omega}} \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t)
+\mathrm{Leakage} = \int_S \boldsymbol{\vec{ds}} \cdot  \vec{\boldsymbol{J}}(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) = \int_S \boldsymbol{\vec{ds}}  \cdot  \boldsymbol{\hat{\Omega}} \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t)
 \end{equation}
  
  We can turn this into a volume integral by applying the divergence theorem, shown in \eqref{div_theorem}.  If the volume of interest is shrunk to an infinitesimal volume and we switch the order of the dot product, we come to an expression that can be used in the balance equation.  This expression, shown in \eqref{streaming}, is often called the \emph{streaming} term, since it describes the net movement of neutrons into the differential volume due to their physical movement.
  
 \begin{equation}
 \label{div_theorem}
-\int_S ds \cdot \boldsymbol{\hat{\Omega}} \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) = \int_V dV \nabla \cdot \boldsymbol{\hat{\Omega}}  \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t)
+\int_S \boldsymbol{\vec{ds}}  \cdot \boldsymbol{\hat{\Omega}} \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t) = \int_V dV \nabla \cdot \boldsymbol{\hat{\Omega}}  \psi(\boldsymbol{\vec{r}},\boldsymbol{\hat{\Omega}},E,t)
 \end{equation}
 
 \begin{equation}
@@ -658,7 +658,7 @@ Now all the terms of \eqref{NBE} have been explicitly defined.  Substituting the
 % add delayed neutrons here
 % add expression for keff here.
  
- The neutron transport equation in this form is an integro-differential equation since it has both derivates and integrals in it.  Its spatial and temporal parts are differential, whereas its angular and energy parts are integral.  It is linear and relatively easy to solve for simple geometries and reaction parameters, but in order to capture all the relevant physics for real-world problems, complex geometries and energy-dependent reaction parameters must be used.  Despite it's linearity, the neutron transport can be difficult to solve because of the large, heterogeneous domains over which it must be solved and the complex energy dependence of the cross sections.  
+ The neutron transport equation in this form is an integro-differential equation since it has both derivates and integrals in it.  Its spatial and temporal parts are differential, whereas its angular and energy parts are integral.  It is linear and relatively easy to solve for simple geometries and reaction parameters, but in order to capture all the relevant physics for real-world problems, complex geometries and energy-dependent reaction parameters must be used.  Despite it's linearity, the neutron transport equation can be difficult to solve because of the large, heterogeneous domains over which it must be solved and the complex energy dependence of the cross sections.  
 % the juxtaposition of the two previous sentences doesn't match. they should have the same form.  fixed??
  The energy range of interest can span more then 12 orders of magnitude, from $1\times 10 ^{-11}$ to $1\times 10 ^{1}$ MeV and above, and the geometries involved can include millions of individual material regions containing many different mixtures of materials. 
  
@@ -666,7 +666,7 @@ Now all the terms of \eqref{NBE} have been explicitly defined.  Substituting the
 
 % no longer  driven, becomes an eigenvalue problem, inf solutions, 
 %From the Mats point of view, our criticality equations have infinite number of solutions, i.e. the pair of solutions: the eigenfunctions (fluxes) and corresponding eigenvalues. We are searching for the fundamental mode which corresponds to the smallest system eigenvalue (which is the largest k-eigenvalues, or our multiplication coefficient). See my slides for NE-150 on that topic (slide 32, for example).
-In most situations, the equilibrium state of the neutron population is of interest.  By setting all time derivates and external sources to zero, \eqref{NTE} becomes the time-independent neutron transport equation shown in \eqref{time_ind_NTE}.  The equation is no longer driven by an independent source term, and the transport equation becomes homogenous, turning its solution into a eigenvalue problem.  There are infinitely many eigenfunction solutions to \eqref{time_ind_NTE}, and each has an associated eigenvalue.  The fundamental mode of the eigenfunction set corresponds to the longest-lived state, which is typically of greatest interested \cite{duderstadt}.  This eigenvalue is equal to the multiplication factor, which is why criticality calculations are often called ``eigenvalue'' calculations. 
+In most situations, the equilibrium state of the neutron population is of interest.  By setting all time derivates and external sources to zero, \eqref{NTE} becomes the time-independent neutron transport equation shown in \eqref{time_ind_NTE}.  The equation is no longer driven by an independent source term, and the transport equation becomes homogenous, turning its solution into an eigenvalue problem.  There are infinitely many eigenfunction solutions to \eqref{time_ind_NTE}, and each has an associated eigenvalue.  The fundamental mode of the eigenfunction set corresponds to the longest-lived state, which is typically of greatest interested \cite{duderstadt}.  This eigenvalue is equal to the multiplication factor, which is why criticality calculations are often called ``eigenvalue'' calculations. 
 
 In \eqref{time_ind_NTE} another parameter has been introduced, the effective multiplication factor, $k_\mathrm{eff}$, which was described earlier.  It is introduced here since, by forcing the time derivates to be zero, it is implied that the multiplication factor must be equal to one.  The physical properties of a problem may say otherwise, however, and failing to divide the fission source by the effective multiplication factor could make the time-independent equation inconsistent.  Of course there will be no inequality if the source and sink terms are actually balanced and $k_\mathrm{eff}$ calculated from \eqref{NTE} is one.  
 
@@ -1102,7 +1102,7 @@ It is essential to model this phenomena accurately since the scattering angle fa
 
 The anisotropy shown in \ref{scattering_anisotropy} at the 1 MeV resonance indicates that a neutron should either lose a little (forward-peaked elastic scattering) or a large (backward-peaked elastic scattering) amount of energy in the elastic scattering event.  It should not lose an intermediate amount.  The minimum fraction of energy than can be lost to $^{16}$O is zero and the maximum is $1-((16+1)/(16-1))^2=0.22$ \cite{duderstadt}.  The errors shown in Figure \ref{scattering_error} typically span 2 octaves in the logarithmic flux plots, which is consistent with the maximum factional energy loss.  In the completely isotropic flux, the higher flux at intermediate energies indicates that neutrons are being scattered to these energies at a higher rate than Serpent.  It is low immediately on the resonance because neutrons are leaving the energy bin faster than they should be and are not scattering multiple times within the bin (as they would if they lost no energy in the elastic scattering event).  
 
-The point of highlighting this phenomenon is that sampling angular dependence of the scattering kernels is very important for obtaining correct results, especially for elastic scattering where the energy exchange are completely defined by the scattering angle and the target momentum.  The energy dependencies cannot be ignored and the distributions in the nuclear data must be sampled.  Elastic scattering is very common (and often dominant) reaction and modeling it accurately is essential to obtaining correct results.
+The point of highlighting this phenomenon is that sampling angular dependence of the scattering kernels is very important for obtaining correct results, especially for elastic scattering where the energy exchanges are completely defined by the scattering angle and the target momentum.  The energy dependencies cannot be ignored and the distributions in the nuclear data must be sampled.  Elastic scattering is very common (and often dominant) reaction and modeling it accurately is essential to obtaining correct results.
 % how do you know that? do you have a reference? how are you deciding what is wrong? we also don't know where the resonances are...
 % okay, how does this relate to the previous sentence? and the point you're making here?
 % does it make more sense now?   I need to make a point here unless i just want to say refer to section 2.2
@@ -1166,14 +1166,14 @@ The sampling scheme for this probability distribution shown in \eqref{law44samp}
 % this seems random and not applicable to all tallies.
 MCNP uses the word ``tally'' and Serpent uses the word ``detector'' for the same measurement \cite{serpent,mcnp}.  Evidently, ``tally'' does not translate into Finnish, which is why ``detector'' is used.  ``Tally'' will be used here for terminological consistency with the majority of neutron transport codes.  
 
-Other than determining the multiplication factor, one of the main purposes of simulation reactors is determining the reactions rates in the core.  The reaction rates and, therefore, power of the reactor are proportional to the flux, making the flux another very important quantity in determining how a rector will behave.  Since reactions are explicitly simulated with the  Monte Carlo method, a collision estimator can be used to estimate the neutron flux.  A collision estimator does not directly calculate the flux, but relies on the fact that the total collision rate is the flux multiplied by the total macroscopic cross section, as was shown in \eqref{RR}.  If every collision within a volume is counted in a Monte Carlo simulation, this corresponds directly to the total reaction rate density integrated over the volume and can be used to estimate the volume-averaged flux in that volume per \eqref{scalar_flux_RR}.  Once the reaction rate is know, the flux can be written in terms of it and the material's total macroscopic cross section as shown in \eqref{flux_from_RR}.
+Other than determining the multiplication factor, one of the main purposes of simulation reactors is determining the reactions rates in the core.  The reaction rates and, therefore, power of the reactor are proportional to the flux, making the flux another very important quantity in determining how a rector will behave.  Since reactions are explicitly simulated with the  Monte Carlo method, a collision estimator can be used to estimate the neutron flux.  A collision estimator does not directly calculate the flux, but relies on the fact that the total collision rate is the flux multiplied by the total macroscopic cross section, as was shown in \eqref{RR}.  If every collision within a volume is counted in a Monte Carlo simulation, this corresponds directly to the total reaction rate density integrated over the volume and can be used to estimate the volume-averaged flux in that volume per \eqref{scalar_flux_RR}.  Once the reaction rate is known, the flux can be written in terms of it and the material's total macroscopic cross section as shown in \eqref{flux_from_RR}.
 %
 \begin{equation}
 \label{flux_from_RR}
 \phi(\boldsymbol{\vec{r}},E) = \frac{ R_t(\boldsymbol{\vec{r}},E) }{  \Sigma_t(\boldsymbol{\vec{r}},E) }
 \end{equation}
 %
-The reaction rates is simply the number of collisions at energy $E$, and \eqref{flux_from_RR} can be rewritten as a sum over all the collisions that happen at energy $E$, as shown in \eqref{flux_recast_to_sum}.
+The reaction rate is simply the number of collisions at energy $E$, and \eqref{flux_from_RR} can be rewritten as a sum over all the collisions that happen at energy $E$, as shown in \eqref{flux_recast_to_sum}.
 %
 \begin{equation}
 \label{flux_recast_to_sum}
@@ -1300,7 +1300,7 @@ To start a criticality simulation, a guess for the initial neutron source points
 
 One way to specify the initial source distribution is by choosing a single initial point where all of the first generation neutrons are born; this is called the \emph{point source} method. To accelerate the source convergence process, WARP uses a method similar to that used by Serpent to guess the initial source distribution.  The materials in the geometry are all flagged as fissile or non-fissile.  Then a uniform, random distribution of source neutrons are distributed across the geometry.  If a particle lies in a fissile material, it is recorded in a buffer.  This process is repeated until the required amount of source points are accumulated in the starting point buffer.  This method is called the \emph{flat source approximation}. Since the initial distribution has spatial extent, fewer discarded cycles will be needed to push neutrons into all geometrical regions than in the point source method \cite{jaakko}.
 
-When all the cycles are complete, the individual estimates of $k_\mathrm{eff}$ are averaged to make a final estimate for the system.  This is typically called the \emph{generation estimate} of $k_\mathrm{eff}$ \cite{jaakko}.  As the simulation runs, a recursion relation can be made so the values for every cycle do not need to be stored individually.  Expressions for the generation estimate are shown in \eqref{k_eff_final}.  It may be of interest to keep values for every cycle in order to perform statistical checks to assure convergence and prevent roundoff error, however.
+When all the cycles are completed, the individual estimates of $k_\mathrm{eff}$ are averaged to make a final estimate for the system.  This is typically called the \emph{generation estimate} of $k_\mathrm{eff}$ \cite{jaakko}.  As the simulation runs, a recursion relation can be made so the values for every cycle do not need to be stored individually.  Expressions for the generation estimate are shown in \eqref{k_eff_final}.  It may be of interest to keep values for every cycle in order to perform statistical checks to assure convergence and prevent roundoff error, however.
 
 \begin{equation}
 \label{k_eff_final}
