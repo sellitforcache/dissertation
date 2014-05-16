@@ -43,7 +43,7 @@ Table \ref{test_setup} summarizes the geometry and materials used in the test ca
 
 \begin{table}[h]
 \centering
-\caption{The five test cases.}
+\caption{Geometry and materials used in the six test cases.}
 \label{test_setup}
 \begin{tabular}{| l | c | c | c | c |}
  \hline
@@ -85,7 +85,7 @@ Table \ref{test_setup} summarizes the geometry and materials used in the test ca
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Multiplication Factors and Runtimes}
+\section{Criticality Tests - Multiplication Factors and Runtimes}
 
 The goal of WARP is to be the first step in creating a full-featured continuous energy Monte Carlo neutron transport code that is \emph{accelerated} by running on GPUs.  The crux of the effort is to make Monte Carlo calculations faster but still produce accurate results.  Table \ref{test_summary_5} shows the multiplication factor deviations and the speedup factors for the four criticality tests compared to MCNP 6.1 and Serpent 2.1.18 when $10^5$ neutrons per batch are used.  Table  \ref{test_summary_6} shows the same information, but for cases where $10^6$ neutrons per batch are used.  $10^6$ was the maximum number of neutrons that could be run before the GPU ran out of memory, so larger batches could not be considered.  The $\Delta$M column is for WARP's difference from MCNP, and the $\Delta$S column is for WARP's difference from Serpent.  The differences are reported in pcm for multiplication factors, and speedup factors ($t/t_\mathrm{WARP}$) for runtimes.  The (y) in the $\Delta$ columns signify if the WARP value is inside (y) or outside (n) two standard deviations of the production code's value. Error estimators have not yet been implemented in WARP, so a confidence interval is not reported for WARP's values.
 
@@ -182,7 +182,7 @@ Tables \ref{test_summary_5} and \ref{test_summary_6} show that the multiplicatio
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Flux Spectra and Fission Distributions}
+\section{Criticality Tests - Flux Spectra and Fission Distributions}
 
 \begin{figure}[h!] 
 \centering
@@ -287,7 +287,7 @@ The axial fission source distribution follows an expected behavior of a finite c
 
 
 
-Figures \ref{assembly_spec} shows the volume-averaged flux spectrum in the center pin of the hexagonal assembly test.  This problem is much more heterogeneous than any of the previous, with 300 times more objects in the domain compared to the pin cell test.  The WARP spectrum matches very well with Serpent's, and the relative difference is with 15\% of Serpent  for energies $10^{-8}$-$9$ MeV where the flux has good statistics.  The spectrum is much noisier than any of the other tests since the volume of the center pin is relatively small compared to the volume of the fission source, even though this pin has the highest flux of any of the pins in the assembly.  The mean of the error appears to be close to zero, however, and the high error is most likely due to statistics.  Despite the large relative difference, the WARP spectrum is within $2\sigma$ of Serpent's results for the entire energy range.  The MCNP spectrum is slightly higher than both the WARP and Serpent spectra, which might be a small normalization error or a real difference.  
+Figures \ref{assembly_spec} shows the volume-averaged flux spectrum in the center pin of the hexagonal assembly test.  This problem is much more heterogeneous than any of the previous, with 300 times more objects in the domain compared to the pin cell test.  The WARP spectrum matches very well with Serpent's, and the relative difference is with 15\% of Serpent for energies $10^{-8}$-$9$ MeV where the flux has good statistics.  The spectrum is much noisier than any of the other tests since the volume of the center pin is relatively small compared to the volume of the fission source, even though this pin has the highest flux of any of the pins in the assembly.  The mean of the error appears to be close to zero, however, and the high error is most likely due to statistics.  Despite the large relative difference, the WARP spectrum is within $2\sigma$ of Serpent's results for the entire energy range.  The MCNP spectrum is slightly higher than both the WARP and Serpent spectra, which might be a small normalization error or a real difference.  
 
 The fission source distribution, shown in Figure \ref{assembly_fiss}, appears as expected, with the highest average probability in the center of the array both axially and radially.  Self-shielding is shown again, as every pin has a ring of higher probability on near its surface.  The assembly also shows some reflection effects from the thick layers of water surrounding it.  The pins at the edges have a higher fission source probability at the surfaces facing the water rather than the interior of the assembly.  This is due to neutrons that slowed-down in the water moderator surrounding the fuel assembly eventually scattering back into an edge pin where they are absorbed.  This phenomenon is apparent in both the axial and radial directions.  The relative difference of the assembly's fission source distribution, shown in Figure \ref{assembly_fiss_diff}, shows good agreement with Serpent.  The radial agreement is very good, but the axial has some noise in it due to the flux being small and the fissile volume being thin at the vertical edges of the assembly when the source points are summed in the $y$-direction.  
 %The axial error also seems to be slightly offset in the negative direction on but again this is most likely from the statistical uncertainty in the maximum value used to normalize the distribution.
@@ -295,7 +295,7 @@ The fission source distribution, shown in Figure \ref{assembly_fiss}, appears as
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{fixed-source}
+\section{Fixed-Source Tests}
 
 WARP is also able to run simulations in fixed-source mode, where the initial neutron energies, directions, and locations are predefined and do not incorporate any feedback from the flux like the criticality source.  This mode adds any induced secondary neutrons back into the active particle dataset to be transported in conjunction with the source neutrons, which is also why these problems must be subcritical.   The first test is a 2x2x2 m cube of homogenized fuel material with a 1 eV point source at its center.  In this case, fissions occur in uranium and secondary neutrons are produced and transported.  A small amount of $^{10}$B was included to ensure the system is subcritical so multiplication, and therefore runtimes, are modest.   The second test is a 2x2x2 m cube of light water with a 2 MeV point source at its center.   No secondary neutrons are produced in this case.
 
