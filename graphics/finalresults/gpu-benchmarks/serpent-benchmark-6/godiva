@@ -1,0 +1,44 @@
+% --- godiva -------------------
+
+set title "godiva"
+
+% --- box
+
+surf 1 sph 0 0 0 5.1
+%surf 1 cube 0 0 0 5.1
+
+% --- Cell definitions:
+
+cell  1  0  fuel1   -1  % material
+cell 99  0  outside  1  % Outside world
+
+% --- Fuel materials:
+	
+mat fuel1   -19.816
+ 94239.03c   1
+
+% --- Cross section data library file path:
+
+set acelib "/xs/sss_endfb7u.xsdata"
+
+% --- black boundary condition:
+
+set bc 1 1 1
+
+% detectors
+
+ene leth 3 1024 1e-11 20
+ene lin  2 1024 1e-11 20
+det fluxlog dm fuel1 de leth dt -3
+det fluxlin dm fuel1 de lin  dt -3
+
+% --- Geometry and mesh plots:
+
+plot 3 500 500
+mesh 3 500 500
+mesh 2 500 500
+
+% --- criticality parameters
+
+set pop 1000000 40 20 % 1.00
+

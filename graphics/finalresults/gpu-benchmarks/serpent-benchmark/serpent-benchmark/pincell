@@ -1,0 +1,53 @@
+% --- Simple Input - Single Pin -------------------
+
+set title "black BC, pin, u235-fuel, water"
+
+% --- pincell
+
+surf 1 cyl      0 0 1 -20   20
+surf 2 cuboid  -5 5 -5 5 -25 25
+
+% --- Cell definitions:
+
+cell 1   0      fuel1     -1  				% fill large hex
+cell 2   0      water1     1 -2              % box around hex 
+cell 99  0      outside    2  				% Outside world
+
+% --- Fuel materials:
+
+mat fuel1   -15.00
+ 92235.03c   0.10 
+ 92238.03c   0.90
+ 8016.03c    2
+
+mat water1  -3.00
+ 8016.03c   1
+ 1001.03c   2
+
+% --- Cross section data library file path:
+
+set acelib "/xs/sss_endfb7u.xsdata"
+
+% --- black boundary condition:
+
+set bc 1 1 1
+
+% detectors
+
+ene leth 3 1024 1e-11 20
+ene lin  2 1024 1e-11 20
+det fluxlog dc 1  de leth dt -3
+det fluxlin dc 1  de lin  dt -3
+
+% --- Geometry and mesh plots:
+
+plot 3 1500 1500
+plot 2 1500 1500
+mesh 3 1500 1500
+
+% --- criticality parameters
+
+set pop 100000 40 20 % 1.00
+% 2MeV point source at origin
+%set nps 4000000 40
+%src mono2 sp 0.0 0.0 0.0 se 0.001
